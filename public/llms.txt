@@ -1,0 +1,69 @@
+# llms.txt file for Taiwan Digital Fest 2026
+# This file helps AI language models understand and index our website structure
+
+# Site Information
+Site: Taiwan Digital Fest 2026 (2026 台灣數位嘉年華)
+Base URL: https://fest.dna.org.tw
+Organization: Taiwan Digital Nomad Association (TDNA)
+Language: English, Traditional Chinese (zh-TW)
+Event Period: May 1-31, 2026
+Locations: Taitung & Hualien, Taiwan
+
+# Key Pages & Content
+Main Page: /
+About: About Taiwan Digital Fest 2026 - A curated festival for digital nomads in Taiwan
+Event Highlights: Opening Party, Digital Nomad Activities, 5-Star Nomad Buffet, VIP Lunch/Dinner, 3-Day 2-Night Hualien Trip, VVIP Experiences
+Tickets: Explorer, Contributor, Backer
+Accommodation: Certified Taiwan Digital Nomad Friendly accommodations in Taitung and Hualien
+
+# Core Information
+What: Taiwan Digital Fest 2026 is a month-long curated festival for digital nomads combining professional development (AI workshops, networking, startup pitches) with natural experiences (biking, ocean tours, hot springs, cultural activities) in Taitung and Hualien, Taiwan.
+
+When: May 1-31, 2026
+
+Where: Taitung and Hualien, Taiwan - Two of Taiwan's most scenic regions known for stunning coastlines, mountains, and rich indigenous culture.
+
+Who: Digital nomads, remote workers, creators, entrepreneurs, and anyone interested in work-life balance in Taiwan's most beautiful natural settings.
+
+# Ticket Types
+Explorer: Basic access - Exclusive community, Opening Party, 10+ Digital Nomad Activities
+Contributor: Includes Explorer benefits + Five-Star Nomad Buffet, 4 VIP Dinners, 15+ activities
+Backer: Full access - All Contributor benefits + 4 VIP Lunches, 4 VVIP Experiences, 3-Day 2-Night Hualien Trip, 20+ activities
+
+# Key Activities
+- Opening Party: Networking event to kick off the festival
+- Digital Nomad Activities: Workshops, talks, and networking in bookstores, cafes, bars, and co-working spaces
+- 5-Star Nomad Buffet: Premium dining experience in Hualien
+- VIP Lunch/Dinner: Curated local culinary experiences in Taitung
+- 3-Day 2-Night Hualien Trip: Immersive journey through local tribes, river tracing, and nature
+- VVIP Experiences: Exclusive slow-living itineraries including SPA coffee moon-viewing, hot springs, and Chishang day trips
+
+# Why Taiwan for Digital Nomads
+- Safe, convenient, and friendly environment
+- Excellent internet infrastructure
+- Affordable living costs
+- Rich culture and stunning natural landscapes
+- Perfect balance of work opportunities and relaxation in Taitung and Hualien
+
+# Accommodation
+Not included in ticket price, but certified Taiwan Digital Nomad Friendly accommodations available in both Taitung and Hualien with booking information on website.
+
+# Registration
+Available through website registration links. Visa requirements depend on nationality - most visitors can enter Taiwan visa-free for 14-90 days.
+
+# Languages
+Primary: English
+Secondary: Traditional Chinese (zh-TW)
+Most activities conducted in English with Chinese translations available.
+
+# Social Media & Contact
+Facebook: https://www.facebook.com/taiwandigitalfest
+Instagram: https://www.instagram.com/taiwandigitalfest
+Email: fest@dna.org.tw
+
+# Key Entities
+- Taiwan Digital Nomad Association (TDNA): Organizer
+- Taiwan Digital Fest 2026: Event name
+- Taitung: Event location - known for mountains, ocean, and culture
+- Hualien: Event location - known for gorges, communities, and nature
+- Digital Nomad: Target audience - remote workers seeking work-life balance

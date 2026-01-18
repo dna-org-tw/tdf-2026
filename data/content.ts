@@ -1,0 +1,887 @@
+export const content = {
+  en: {
+    hero: {
+      title: "Taiwan Digital Fest 2026",
+      subtitle: "Where Digital Nomads Meet Nature & Innovation",
+      dateLocation: "May 1 – May 31, 2026 | Taitung & Hualien, Taiwan",
+      cta: "Register Now"
+    },
+    nav: {
+      about: "About",
+      why: "Why Taiwan",
+      highlights: "Highlights",
+      schedule: "Schedule",
+      gallery: "Gallery",
+      accommodation: "Accommodation",
+      register: "Register"
+    },
+    about: {
+      title: "About The Event",
+      description: "Escape to where the mountains meet the sea. Join us for Taiwan Digital Fest 2026, a curated festival designed for the modern digital nomad. Immerse yourself in a landscape of rolling hills and endless coastlines, perfectly balancing professional growth with deep relaxation.\n\nEngage in cutting-edge AI workshops, productivity sessions, and startup pitches by day. As the sun sets, unwind with scenic biking trips through golden rice fields, refreshing ocean tours, and soothing hot springs. Connect with a global community at our exclusive VVIP lunches and networking parties. Whether you're brainstorming the next big idea or simply watching the sunset paint the sky, this is your destination to pause, breathe, and reconnect.",
+      tags: ["Digital Nomad", "Placemaking", "International", "Nature", "Culture"],
+      info: {
+        title: "Event Information",
+        time: "Date:",
+        timeValue: "May 1, 2026 – May 31, 2026",
+        location: "Location:",
+        locationValue: "Taitung & Hualien, Taiwan",
+        theme: "Theme:",
+        themeValue: "Digital Nomad, AI Workshops, Placemaking, Nature Experience"
+      },
+      ctas: [
+        { type: "Register", text: "Register Now", href: "#tickets-timeline" },
+        { type: "Gallery", text: "View 2025 Gallery", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
+      ]
+    },
+    why: {
+      taiwan: {
+        title: "Taiwan as Digital Nomad Destination",
+        desc: "Safe, convenient, and friendly. Taiwan is becoming Asia's top hub for remote workers."
+      },
+      taitung: {
+        title: "Taitung – Mountains, Ocean & Culture",
+        desc: "Experience the slow life, indigenous culture, and breathtaking coastline."
+      },
+      hualien: {
+        title: "Hualien – Travel, Community & Nature",
+        desc: "Majestic gorges, vibrant communities, and the perfect balance of work and adventure."
+      },
+      ctas: [
+        { type: "Register", text: "Start Your Journey", href: "#tickets-timeline" },
+        { type: "Gallery", text: "View Past Memories", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
+      ]
+    },
+    highlights: {
+      title: "Event Highlights",
+      viewMore: "See More",
+      ctas: [
+        { type: "Register", text: "Register Now", href: "#tickets-timeline" },
+        { type: "Call for Side Events", text: "Call for Side Events", href: "https://forms.gle/EofTp9Qso27jEeeY7" }
+      ],
+      items: [
+        { 
+          title: "🎉 Opening Party", 
+          summary: "Kick off your journey with a relaxed evening of networking. Connect with digital nomads, creators, and local partners over exquisite appetizers and drinks in a pressure-free atmosphere. An unforgettable start where making friends feels natural.",
+          desc: "The first night of the event, let's meet in the most relaxed way. Opening Party is not just an opening, but a starting point for everyone to quickly break the ice and build connections. With exquisite appetizers and refreshing drinks, you'll naturally connect with digital nomads, startup workers, creators, and local partners from around the world in a pressure-free atmosphere. You can talk about work, life, journeys, or nothing at all—just enjoy the music, the buzz, and the flowing energy. This is an evening where you can \"make friends without introducing yourself,\" and the moment you step in, you'll know: this journey will be worth it.", 
+          icon: "Calendar" 
+        },
+        { 
+          title: "🌍 Digital Nomad Activity", 
+          summary: "Immerse yourself in diverse activities across the city—from inspiring bookstore talks to cafe creator meetups and evening bar discussions. Experience the true rhythm of \"Work, Live, Connect\" through art, culture, AI, and placemaking events in unique venues.",
+          desc: "This is not a single-format lecture, but a series of nomadic experiences that take you into the city and deep into life. We organize diverse activities around themes of art, culture, startups, AI, placemaking, and nature, hosted in bookstores, cafes, bars, accommodations, and co-working spaces. You might attend an inspiring talk at a bookstore in the morning, exchange ideas with creators at a cafe in the afternoon, and continue discussions at a bar in the evening. Each venue tells a story, and each activity creates a connection. This is the rhythm of living, learning, and expanding your world—a true experience of \"Work, Live, Connect.\"", 
+          icon: "CalendarCheck" 
+        },
+        { 
+          title: "⭐ 5-Star Nomad Buffet", 
+          summary: "Indulge in an exclusive five-star dining experience in Hualien. Enjoy carefully curated local and international flavors, captivating performances, and meaningful connections. This premium gathering is your chance to slow down and create unforgettable memories.",
+          desc: "In Hualien, we've prepared a five-star dinner exclusively for digital nomads. The 5-Star Nomad Buffet is not just an all-you-can-eat experience, but a premium gathering that combines fine food, performances, and community connection. Featuring carefully curated high-quality buffet cuisine with both local and international flavors, alongside captivating performances and a relaxed networking atmosphere. This is an evening to slow down, treat yourself, and deepen relationships with partners while creating unforgettable memories. Enjoy great food and great conversations—this is the highlight moment for nomads.", 
+          icon: "Users" 
+        },
+        { 
+          title: "🍽 VIP Lunch / Dinner", 
+          summary: "Discover Taitung's authentic flavors at carefully selected local restaurants. Experience curated culinary journeys featuring local ingredients, artisan craftsmanship, and cultural stories. Share meaningful conversations with fellow nomads while savoring dishes that capture Taitung's essence.",
+          desc: "When in Taitung, you can't miss the authentic flavors that truly represent this land. We've carefully selected local acclaimed restaurants, taking you to Taitung's proudest dining tables. VIP Lunch / Dinner is not just a meal, but a curated culinary experience that lets you savor local ingredients, artisan craftsmanship, and cultural stories. No tourist traps, only genuine recommendations. Share deep conversations with international nomads at the table, or feel Taitung's rhythm and warmth through its cuisine. This is a meal you'll remember for a long time—and one you'll want to come back for.", 
+          icon: "Heart" 
+        },
+        { 
+          title: "🌿 3-Day 2-Night Hualien Digital Nomad Trip", 
+          summary: "Embark on a transformative journey through Hualien's most authentic nature and culture. Visit local tribes, experience river tracing, and reconnect with nature. This immersive trip recharges both body and mind, creating memories that truly settle into your heart.",
+          desc: "Three days and two nights, taking you into Hualien's most authentic and awe-inspiring nature and culture. We'll visit local tribes, listen to their stories, and feel the depth of their culture. You'll also experience river tracing, personally stepping into mountains and streams to reconnect with nature. Of course, the journey includes delightful local cuisine, tasting Hualien's generosity and warmth at the table. This journey is not just sightseeing—it's a nomadic experience that recharges your body and mind while opening your horizons. You'll take home not just photos, but Hualien moments that truly \"settle into your memory.\"", 
+          icon: "Heart" 
+        },
+        { 
+          title: "👑 VVIP Experience", 
+          summary: "Exclusive slow-living itineraries designed for the select few. From SPA coffee moon-viewing sessions to mountain-surrounded hot springs and Chishang day trips, each experience is thoughtfully curated. Feel the flow of light, air, and time as you truly settle into this land.",
+          desc: "This is an in-depth experience prepared for only a select few, allowing you to step into the everyday scenery of Hualien and Taitung in the most comfortable and elegant way. VVIP Experience activities carefully curate unique slow-living itineraries, from evening SPA coffee moon-viewing sessions to hot spring therapy surrounded by mountains and sea, and day trips to Chishang filled with human warmth and natural rhythms. Each itinerary is thoughtfully arranged to let you truly \"settle into\" this land. No rush, no superficial tours—just the right pace to feel the flow of light, air, scents, and time. This is more than an experience; it's a VVIP journey that completely relaxes your body and mind, rekindling your sense of living, helping you understand why this place is worth returning to again and again.", 
+          icon: "Heart" 
+        }
+      ]
+    },
+    register: {
+      title: "Join Taiwan Digital Fest 2026",
+      subtitle: "Be part of the journey. Be part of the community."
+    },
+    tickets: {
+      title: "Ticket Information",
+      subtitle: "Choose the ticket type that suits you and participate in different levels of activities",
+      saleBanner: "🎉 Limited Time Sale",
+      saleEnd: "Sale ends on",
+      save: "Save",
+      explore: {
+        name: "Explorer",
+        label: "Explorer",
+        features: [
+          "Exclusive Digital Nomad Community",
+          "Opening Party x 1",
+          "Digital Nomad Activities x 10+"
+        ]
+      },
+      contribute: {
+        name: "Contributor",
+        label: "Contributor",
+        features: [
+          "Exclusive Digital Nomad Community",
+          "Opening Party x 1",
+          "Five-Star Nomad Buffet x 1",
+          "VIP Dinner x 4",
+          "Digital Nomad Activities x 15+"
+        ]
+      },
+      backer: {
+        name: "Backer",
+        label: "Backer",
+        features: [
+          "Exclusive Digital Nomad Community",
+          "Opening Party x 1",
+          "Five-Star Nomad Buffet x 1",
+          "VIP Dinner x 4",
+          "VIP Lunch x 4",
+          "VVIP Experience x 4",
+          "3-Day 2-Night Hualien Digital Nomad Trip x 1",
+          "Digital Nomad Activities x 20+"
+        ]
+      },
+      cta: "Register Now",
+      becomePartner: "Join as Partner",
+      reviewLink: "2025 Gallery",
+      note: "💡 Tip: Different ticket types have access to different activities. Please use the filter below in the schedule to see activities available for each ticket type."
+    },
+    gallery: {
+      title: "Highlights",
+      subtitle: "Capture every precious moment from the 2025 event, witness how digital nomads from around the world create connections and memories between mountains and sea",
+      viewFull: "Click to view full image"
+    },
+    partners: {
+      title: "Partners & Supporters",
+      ctas: [
+        { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
+        { type: "Call for Community Partners", text: "Join as Community Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
+      ]
+    },
+    accommodation: {
+      title: "Recommended Accommodations",
+      subtitle: "These establishments are certified Taiwan Digital Nomad Friendly businesses, providing excellent accommodation options for digital nomads.",
+      badge: "Certified Taiwan Digital Nomad Friendly",
+      viewWebsite: "Visit Website",
+      mapLoadError: "Unable to load map data",
+      ctas: [
+        { type: "Register", text: "Register Now", href: "#tickets-timeline" }
+      ],
+      items: [
+        {
+          name: "東糖官邸民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Zhongxing Road Section 2",
+            "addr:housenumber": "No. 13, Lane 200",
+            "addr:postcode": "950"
+          },
+          latitude: 22.76680,
+          longitude: 121.13720,
+          website: "https://www.facebook.com/share/16CYARGnHe/?mibextid=wwXIfr",
+          description: "Dongtang Official Residence B&B is located on Zhongxing Road Section 2 in Taitung City, combining retro and modern design to provide a peaceful and comfortable accommodation environment. The surrounding area offers convenient transportation, perfect for travelers who love exploring Taitung City.",
+          phone: "886932615060"
+        },
+        {
+          name: "樂知旅店（知森開發有限公司）",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Fuxing Road",
+            "addr:housenumber": "No. 145",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75336,
+          longitude: 121.15049,
+          website: "https://www.yeshotel.com.tw",
+          description: "Yes Hotel is operated by Zhisen Development Co., Ltd., offering a comfortable accommodation environment that combines modern design with local culture, creating a warm living experience for travelers.",
+          phone: "886912103615"
+        },
+        {
+          name: "古栗house民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Ningbo Street",
+            "addr:housenumber": "No. 120",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75620,
+          longitude: 121.13850,
+          website: "https://booking.owlting.com/4bf1a19a-dafc-43c6-8b02-94f8fc25d2ac",
+          description: "Guli House B&B is located on Ningbo Street in Taitung City, featuring a warm family atmosphere and unique interior design. It offers diverse room types, suitable for families or groups of friends.",
+          phone: "886918950391"
+        },
+        {
+          name: "仲夏綠茵民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Zhihang Road Section 1",
+            "addr:housenumber": "No. 25, Lane 146",
+            "addr:postcode": "950"
+          },
+          latitude: 22.78033,
+          longitude: 121.12841,
+          website: "https://www.facebook.com/share/15RkLfSDkX/",
+          description: "Midsummer Green B&B is located in Taitung City, providing a peaceful and comfortable accommodation environment, perfect for travelers who love nature and relaxation. Each room is equipped with free Wi-Fi, air conditioning, and private bathroom, allowing you to enjoy a relaxing time in Taitung.",
+          phone: "886987661688"
+        },
+        {
+          name: "路得行旅 台東1館",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Guangdong Road",
+            "addr:housenumber": "No. 162",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75430,
+          longitude: 121.15280,
+          website: "https://taitung.nordenruder.com/",
+          description: "Norden Ruder Taitung 1 is located in Taitung City, combining literary design with comfortable accommodation space, providing facilities such as free Wi-Fi, air conditioning, and private bathrooms. The hotel features a shared kitchen, reading space, and bicycle repair area, perfect for travelers who love socializing and exploring.",
+          phone: "886978549244"
+        },
+        {
+          name: "途中台東青年旅舍",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Anhe Road",
+            "addr:housenumber": "No. 30, Lane 102",
+            "addr:postcode": "950"
+          },
+          latitude: 22.79751,
+          longitude: 121.12402,
+          website: "https://www.onmywayhostel.com/hostels/taitung",
+          description: "On My Way Hostel Taitung is located at No. 30, Lane 102, Anhe Road, Taitung City, just a 7-minute walk from Taitung Railway Station, with convenient transportation. The hostel provides facilities such as free Wi-Fi, bedside lights, curtains, bedside baskets, universal sockets, and personal lockers, and features a shared kitchen, reading space, and board game area, allowing travelers to socialize and relax in a comfortable environment.",
+          phone: "886965577167"
+        },
+        {
+          name: "ㄧ品苑民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Xinxing Road",
+            "addr:housenumber": "No. 20, Alley 61, Lane 1",
+            "addr:postcode": "950"
+          },
+          latitude: 22.79320,
+          longitude: 121.12380,
+          website: "https://www.facebook.com/share/1L8HSjurGu/?mibextid=wwXIfr",
+          description: "Yipin Yuan B&B is located in Taitung City, just a 10-15 minute walk from Taitung Railway Station, with convenient transportation. The B&B has a peaceful environment with a lush garden and sunny terrace, providing facilities such as free Wi-Fi, air conditioning, and free parking. The rooms are spacious and bright, equipped with comfortable beds and complete bathroom facilities, with some room types featuring balconies or terraces. The B&B owner is friendly and enthusiastic, committed to creating a home-like accommodation experience for travelers, making you feel warm and relaxed during your journey.",
+          phone: "886932923009"
+        },
+        {
+          name: "花東民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Lianhang Road",
+            "addr:housenumber": "No. 77",
+            "addr:postcode": "950"
+          },
+          latitude: 22.77063,
+          longitude: 121.12158,
+          website: "https://loveandpeacebnb.com/%e8%8a%b1%e6%9d%b1%e6%b0%91%e5%ae%bf%e4%bb%8b%e7%b4%b9",
+          description: "Huadong B&B is located in Taitung City, just about 5 minutes by car from the station, airport, and downtown, with convenient surrounding amenities, near famous snacks like Beinan Steamed Buns and Beinan Pork Blood Soup. The B&B owner loves music and art, with the living room featuring electric guitars, keyboards, and drums, and regularly hosting impromptu music performances, allowing travelers to feel the artistic atmosphere while relaxing. Some room types are equipped with multi-functional entertainment projection lights, providing a 100-inch screen and premium surround sound, creating a home theater-like accommodation experience.",
+          phone: "886908950102"
+        },
+        {
+          name: "T-HOUSE民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Baosang Road",
+            "addr:housenumber": "No. 18, Alley 55, Lane 50",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75298,
+          longitude: 121.15729,
+          website: "https://www.booking-owlnest.com/t-house?lang=zh_TW&adult=1&child=0&infant=0",
+          description: "T-HOUSE offers air-conditioned accommodation with balconies and Wi-Fi. Each room type provides private shower bathrooms, toiletries, electric kettle, hair dryer, and slippers. Our mattresses are pocket spring with latex padding, very comfortable to sleep on, and you won't disturb the person next to you when turning over. 1F is the public area with living room and dining area, 2F is the exclusive space for the owner's family of five, 3F is the guest rooms.",
+          phone: "886976525929"
+        },
+        {
+          name: "tt-house民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Siwei Road",
+            "addr:housenumber": "No. 3, Alley 27, Lane 488",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75799,
+          longitude: 121.15769,
+          website: "https://booking.owlting.com/tt-house?lang=zh_TW&adult=1&child=0&infant=0",
+          description: "Taitung is like Taiwan's paradise, where you can smell the freshest air, and when riding a bicycle on the road, you'll see beautiful scenery like landscape paintings. Come play in Taitung! Get away from the bustling city and enjoy the slow pace here. tt-house offers air-conditioned accommodation with balconies and Wi-Fi. Each room type provides private shower bathrooms, toiletries, electric kettle, hair dryer, and slippers. 1F mattress is latex padding, 2F mattress is pocket spring with latex padding, very comfortable to sleep on, and you won't disturb the person next to you when turning over.",
+          phone: "886976525929"
+        },
+        {
+          name: "宅民宿",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Zhongxing Road Section 3",
+            "addr:housenumber": "No. 10, Lane 275",
+            "addr:postcode": "950"
+          },
+          latitude: 22.77600,
+          longitude: 121.11700,
+          website: "https://loveandpeacebnb.com/%e5%ae%85%e6%b0%91%e5%ae%bf%e4%bb%8b%e7%b4%b9",
+          description: "Zhai B&B is located in Taitung City, providing a warm and comfortable accommodation environment. The B&B owner is hospitable and enthusiastic, happy to share local food and travel information with travelers, and assist in planning itineraries. The room design is simple, with complete facilities, making travelers feel the warmth of home. Whether for solo travel or family trips, Zhai B&B is an ideal choice.",
+          phone: "886973721826"
+        },
+        {
+          name: "窩Wo style inn",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Xinghang 2nd Street",
+            "addr:housenumber": "No. 1, Alley 5, Lane 37",
+            "addr:postcode": "950"
+          },
+          latitude: 22.79850,
+          longitude: 121.12580,
+          website: "https://www.instagram.com/wo.inn?igsh=MW00d3pkMzFib2RxYg%3D%3D&utm_source=qr",
+          description: "Wo Style Inn is located in Taitung City, combining modern design with comfortable accommodation, providing a unique lodging experience. Each room is equipped with free Wi-Fi, air conditioning, and private bathroom, allowing you to enjoy a relaxing time in Taitung.",
+          phone: "886920451022"
+        },
+        {
+          name: "路得行旅 台東2館",
+          address: {
+            "addr:city": "Taitung County",
+            "addr:district": "Taitung City",
+            "addr:street": "Zhongshan Road",
+            "addr:housenumber": "No. 374",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75120,
+          longitude: 121.14850,
+          website: "https://www.taitung2.nordenruder.com/",
+          description: "Norden Ruder Taitung 2 is located at No. 374, Zhongshan Road, Taitung City, combining literary design with comfortable accommodation space, providing facilities such as free Wi-Fi, air conditioning, and private bathrooms. The hotel features a shared kitchen, reading space, and 24-hour bookstore, and provides local guide vouchers, allowing travelers to deeply experience Taitung's local culture and food. It's just a few minutes' walk from Tiehua Village Music Village and the night market, with convenient transportation, perfect for travelers who love socializing and exploring.",
+          phone: "886978549244"
+        }
+      ]
+    },
+    timeline: {
+      title: "Event Timeline",
+      filterLabel: "Filter by ticket type:",
+      explorer: "Explorer",
+      contributor: "Contributor",
+      backer: "Backer",
+      explorerLabel: "Explorer",
+      contributorLabel: "Contributor",
+      backerLabel: "Backer",
+      clearFilter: "Clear Filter",
+      clickDate: "Click on a date to view event details"
+    },
+    eventModal: {
+      day: "May",
+      daySuffix: "",
+      events: "events",
+      event: "event",
+      close: "Close"
+    },
+    footer: {
+      copyright: "© 2026 Taiwan Digital Fest. All rights reserved.",
+      getInvolved: "Get Involved",
+      callForSpeakers: "Call for Speakers",
+      callForSponsors: "Call for Sponsors",
+      callForPartners: "Call for Community Partners",
+      callForVolunteers: "Call for Volunteers",
+      callForSideEvents: "Call for Side Events"
+    },
+    faq: {
+      title: "Frequently Asked Questions",
+      subtitle: "Common questions about Taiwan Digital Fest 2026",
+      items: [
+        {
+          question: "What is Taiwan Digital Fest 2026?",
+          answer: "Taiwan Digital Fest 2026 is a curated festival for digital nomads taking place from May 1-31, 2026 in Taitung and Hualien, Taiwan. It combines professional development through AI workshops and networking events with breathtaking natural experiences in Taiwan's most beautiful regions."
+        },
+        {
+          question: "When and where does Taiwan Digital Fest 2026 take place?",
+          answer: "Taiwan Digital Fest 2026 runs from May 1 to May 31, 2026, in Taitung and Hualien, Taiwan. These are two of Taiwan's most scenic regions, known for their stunning coastlines, mountains, and rich indigenous culture."
+        },
+        {
+          question: "What activities are included in Taiwan Digital Fest 2026?",
+          answer: "The festival includes Opening Party, Digital Nomad Activities (workshops, talks, and networking), 5-Star Nomad Buffet, VIP Lunches and Dinners, 3-Day 2-Night Hualien Digital Nomad Trip, and exclusive VVIP Experiences. Activities range from AI workshops and startup pitches to cultural tours, river tracing, and hot spring visits."
+        },
+        {
+          question: "What are the ticket types available?",
+          answer: "There are three ticket types: Explorer (basic access with community, opening party, and 10+ activities), Contributor (includes five-star buffet, VIP dinners, and 15+ activities), and Backer (full access including VIP lunches, VVIP experiences, Hualien trip, and 20+ activities)."
+        },
+        {
+          question: "How do I register for Taiwan Digital Fest 2026?",
+          answer: "You can register by clicking the 'Register Now' button on our website and selecting your preferred ticket type. Registration links are available throughout the site, including in the ticket timeline section."
+        },
+        {
+          question: "Is accommodation included in the ticket price?",
+          answer: "Accommodation is not included in the ticket price, but we have partnered with certified Taiwan Digital Nomad Friendly accommodations in Taitung and Hualien. These are listed on our accommodation page with booking information."
+        },
+        {
+          question: "What makes Taiwan a good destination for digital nomads?",
+          answer: "Taiwan is safe, convenient, and friendly, making it an ideal destination for remote workers. It offers excellent internet infrastructure, affordable living costs, rich culture, and stunning natural landscapes. Taitung and Hualien specifically provide a perfect balance of work opportunities and relaxation."
+        },
+        {
+          question: "Do I need a visa to attend Taiwan Digital Fest 2026?",
+          answer: "Visa requirements depend on your nationality. Most visitors can enter Taiwan visa-free for 14-90 days. We recommend checking with the Taiwan Representative Office in your country for specific visa requirements."
+        },
+        {
+          question: "What language are the events conducted in?",
+          answer: "The festival is primarily conducted in English with Chinese translations provided. Most activities will be in English, and Chinese translations will be available for Chinese-led activities. Our community is international, so English is the primary language for networking."
+        },
+        {
+          question: "Can I attend specific events without buying a full ticket?",
+          answer: "Taiwan Digital Fest 2026 is designed as an integrated festival experience. While some side events may be open to the public, most activities require a ticket. We recommend purchasing a ticket that matches your interests and desired level of participation."
+        }
+      ]
+    }
+  },
+  zh: {
+    hero: {
+      title: "2026 台灣數位嘉年華",
+      subtitle: "在山海之間，遇見世界的數位遊牧者",
+      dateLocation: "2026/05/01 – 2026/05/31 | 台灣 台東 & 花蓮",
+      cta: "立即報名"
+    },
+    nav: {
+      about: "活動介紹",
+      why: "為什麼是這裡",
+      highlights: "活動亮點",
+      schedule: "重要時程",
+      gallery: "精彩瞬間",
+      accommodation: "住宿推薦",
+      register: "立即報名"
+    },
+    about: {
+      title: "關於本活動",
+      description: "2026 年 5 月，我們邀您前往壯麗的山海交界處，開啟一場工作與生活完美共融的旅程 。在這片遠離塵囂的土地上，Taiwan Digital Fest 將前瞻科技與自然療癒深度結合 。\n\n行程涵蓋全方位的身心體驗：您將在 AI 工作坊與創業路演中掌握最新趨勢，與全球遊牧者激盪火花 。午後，轉身投入大自然的懷抱，享受稻浪間的單車漫遊、海洋導覽與療癒溫泉 。夜晚，則在星空下的 VIP 晚宴與社交派對中，與志同道合的夥伴建立真實連結 。這不僅是工作，更是在絕美日落與微風中找回生活節奏的契機 。",
+      tags: ["數位遊牧", "地方創生", "國際交流", "自然體驗", "文化探索"],
+      info: {
+        title: "活動資訊",
+        time: "時間：",
+        timeValue: "2026年5月1日 – 2026年5月31日",
+        location: "地點：",
+        locationValue: "台灣 台東 & 花蓮",
+        theme: "主題：",
+        themeValue: "數位遊牧、AI 工作坊、地方創生、自然體驗"
+      },
+      ctas: [
+        { type: "Register", text: "立即報名", href: "#tickets-timeline" },
+        { type: "Gallery", text: "查看 2025 精彩瞬間", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
+      ]
+    },
+    why: {
+      taiwan: {
+        title: "台灣：數位遊牧新聖地",
+        desc: "安全、便利、友善。台灣正成為亞洲首選的遠距工作樞紐。"
+      },
+      taitung: {
+        title: "台東：山海與文化的交響",
+        desc: "體驗慢生活、深厚的原民文化與令人屏息的海岸線。"
+      },
+      hualien: {
+        title: "花蓮：旅行、社群與自然",
+        desc: "壯麗的峽谷、充滿活力的社群，以及工作與冒險的完美平衡。"
+      },
+      ctas: [
+        { type: "Register", text: "開始旅程", href: "#tickets-timeline" },
+        { type: "Gallery", text: "查看活動回顧", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
+      ]
+    },
+    highlights: {
+      title: "活動亮點",
+      viewMore: "查看更多",
+      ctas: [
+        { type: "Register", text: "立即報名", href: "#tickets-timeline" },
+        { type: "Call for Side Events", text: "徵求 Side Event", href: "https://forms.gle/EofTp9Qso27jEeeY7" }
+      ],
+      items: [
+        { 
+          title: "🎉 Opening Party｜開幕交流派對", 
+          summary: "活動第一晚，以最輕鬆的方式展開旅程。在精緻小點與豐富飲品的氛圍中，自然地與來自世界各地的數位遊牧者、創作者與在地夥伴交流。這是一個不用自我介紹也能交到朋友的夜晚，讓你一踏進就知道：這趟旅程，會很值得。",
+          desc: "活動的第一晚，讓我們用最輕鬆的方式相遇。Opening Party 不只是開場，而是一個讓所有人迅速破冰、建立連結的起點。現場準備了精緻小點與豐富飲品，讓你在沒有壓力的氛圍中，自然地與來自世界各地的數位遊牧者、新創工作者、創作者與在地夥伴交流。你可以聊工作、聊生活、聊旅程，也可以什麼都不聊，只是享受音樂、微醺與現場流動的能量。這是一個「不用自我介紹也能交到朋友」的夜晚，讓你一踏進活動，就知道：這趟旅程，會很值得。", 
+          icon: "Calendar" 
+        },
+        { 
+          title: "🌍 Digital Nomad Activity｜多元主題遊牧活動", 
+          summary: "這不是單一講座，而是一系列走進城市、深入生活的遊牧體驗。圍繞藝術、文化、新創、AI、地方創生與自然等主題，在書店、咖啡廳、酒吧、旅宿與共創空間舉辦活動。邊生活、邊學習、邊拓展世界，真正體驗「Work, Live, Connect」。",
+          desc: "這不是單一形式的講座，而是一系列走進城市、深入生活的遊牧體驗。我們圍繞藝術、文化、新創、AI、地方創生與自然等主題，在書店、咖啡廳、酒吧、旅宿與共創空間舉辦不同型態的活動。你可能上午在書店聽一場靈感滿滿的分享，下午在咖啡廳與創作者交流，晚上在酒吧延續討論。每個場域都是一個故事，每場活動都是一次連結。這是一種邊生活、邊學習、邊拓展世界的節奏，讓你真正體驗什麼叫做「Work, Live, Connect」。", 
+          icon: "CalendarCheck" 
+        },
+        { 
+          title: "⭐ 5-Star Nomad Buffet｜花蓮尊榮遊牧饗宴", 
+          summary: "專屬於數位遊牧者的五星級晚宴。精心規劃高品質自助料理，結合在地與國際風味，搭配精彩演出與輕鬆交流氛圍。這是一個放慢腳步、好好犒賞自己的夜晚，也是與夥伴深化關係、留下難忘回憶的重要時刻。",
+          desc: "在花蓮，我們為你準備了一場專屬於數位遊牧者的五星級晚宴。5-Star Nomad Buffet 不只是吃到飽，而是一場結合美食、表演與社群交流的尊榮體驗。現場精心規劃高品質自助料理，讓你盡情享用在地與國際風味，同時搭配精彩演出與輕鬆交流的氛圍。這是一個放慢腳步、好好犒賞自己的夜晚，也是與夥伴深化關係、留下難忘回憶的重要時刻。吃得開心、聊得盡興，這就是屬於遊牧者的高光時刻。", 
+          icon: "Users" 
+        },
+        { 
+          title: "🍽 VIP Lunch / Dinner｜台東在地美食款待", 
+          summary: "精選在地口碑餐廳，帶你走進台東最驕傲的餐桌。不只是用餐，而是一場由我們親自策劃的美食體驗，讓你品嚐在地食材、職人精神與文化故事。沒有觀光客路線，只有真心推薦。在餐桌上與國際遊牧者深度交流，透過料理感受台東的節奏與溫度。",
+          desc: "來到台東，不能錯過真正代表這片土地的味道。我們精選在地口碑餐廳，帶你走進台東最驕傲的餐桌。VIP Lunch / Dinner 不只是用餐，而是一場由我們親自策劃的美食體驗，讓你品嚐到在地食材、職人精神與文化故事。沒有觀光客路線，只有真心推薦。你可以在餐桌上與國際遊牧者深度交流，也能透過料理感受台東的節奏與溫度。這是一頓會讓你記得很久、也會想再回來的餐。", 
+          icon: "Heart" 
+        },
+        { 
+          title: "🌿 3-Day 2-Night Hualien Digital Nomad Trip｜花蓮深度遊牧之旅", 
+          summary: "三天兩夜，走進花蓮最真實、最震撼的自然與文化。造訪部落聆聽在地故事，進行溯溪體驗重新連結自然，品嚐令人驚喜的在地美食。這趟旅程不只是觀光，而是一段讓身心充電、視野打開的遊牧體驗，帶走真正「住進記憶裡」的花蓮時光。",
+          desc: "三天兩夜，帶你走進花蓮最真實、最震撼的自然與文化。我們將造訪部落，聆聽在地故事，感受文化的深度；也會進行溯溪體驗，親身走入山林與溪流，重新連結自然。當然，旅程中少不了令人驚喜的在地美食，從餐桌感受花蓮的豪爽與溫暖。這趟旅程不只是觀光，而是一段讓身心充電、視野打開的遊牧體驗。你會帶走的不只是照片，而是一段真正「住進記憶裡」的花蓮時光。", 
+          icon: "Heart" 
+        },
+        { 
+          title: "👑 VVIP 體驗活動｜最貼近土地的極致享受", 
+          summary: "只為少數人準備的深度體驗。精選在地獨有的慢活行程：夜晚 SPA 咖啡賞月時光、山海環繞的溫泉療癒、充滿人情味的池上一日遊。用剛剛好的節奏感受光、空氣、氣味與時間的流動，真正「住進」這片土地。",
+          desc: "這是一場只為少數人準備的深度體驗，讓你用最舒服、最優雅的方式，走進花東的日常風景。VVIP 體驗活動精選在地獨有的慢活行程，從夜晚的 SPA 咖啡賞月時光、山海環繞的溫泉療癒，到充滿人情味與自然節奏的池上一日遊，每一段行程都經過細心安排，只為讓你真正「住進」這片土地。沒有趕行程的壓力，也不是走馬看花，而是用剛剛好的節奏，感受光、空氣、氣味與時間的流動。這不只是體驗活動，更是一段讓身心徹底放鬆、重新找回生活感受力的 VVIP 旅程，讓你理解為什麼這裡，值得一來再來。", 
+          icon: "Heart" 
+        }
+      ]
+    },
+    register: {
+      title: "報名 2026 台灣數位嘉年華",
+      subtitle: "成為旅程的一部分。成為社群的一份子。"
+    },
+    tickets: {
+      title: "票券資訊",
+      subtitle: "選擇適合您的票種，參與不同層級的活動體驗",
+      saleBanner: "🎉 限時特價中",
+      saleEnd: "特價優惠至",
+      save: "省",
+      explore: {
+        name: "Explorer",
+        label: "Explorer",
+        features: [
+          "專屬數位遊牧社群",
+          "開幕派對 x 1",
+          "數位遊牧活動 x 10+"
+        ]
+      },
+      contribute: {
+        name: "Contributor",
+        label: "Contributor",
+        features: [
+          "專屬數位遊牧社群",
+          "開幕派對 x 1",
+          "五星級 Nomad Buffet x 1",
+          "VIP 晚餐 x 4",
+          "數位遊牧活動 x 15+"
+        ]
+      },
+      backer: {
+        name: "Backer",
+        label: "Backer",
+        features: [
+          "專屬數位遊牧社群",
+          "開幕派對 x 1",
+          "五星級 Nomad Buffet x 1",
+          "VIP 晚餐 x 4",
+          "VIP 午餐 x 4",
+          "VVIP 體驗活動 x 4",
+          "三天兩夜花蓮數位遊牧旅行 x 1",
+          "數位遊牧活動 x 20+"
+        ]
+      },
+      cta: "立即報名",
+      becomePartner: "成為合作夥伴",
+      reviewLink: "2025 活動回顧",
+      note: "💡 提示：不同票種可參加的活動不同，請在下方時程表中使用篩選器查看各票種可參加的活動"
+    },
+    gallery: {
+      title: "精彩瞬間",
+      subtitle: "捕捉 2025 年活動中的每一個珍貴時刻，見證來自世界各地的數位遊牧者如何在山海之間創造連結與回憶",
+      viewFull: "點擊查看大圖"
+    },
+    partners: {
+      title: "合作夥伴與支持者",
+      ctas: [
+        { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
+        { type: "Call for Community Partners", text: "成為社群夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
+      ]
+    },
+    accommodation: {
+      title: "住宿推薦",
+      subtitle: "這些商家均為取得台灣數位遊牧友善標章的優良商家，為數位遊牧者提供優質的住宿選擇。",
+      badge: "台灣數位遊牧友善標章認證商家",
+      viewWebsite: "查看網站",
+      mapLoadError: "無法載入地圖資料",
+      ctas: [
+        { type: "Register", text: "立即報名", href: "#tickets-timeline" }
+      ],
+      items: [
+        {
+          name: "東糖官邸民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "中興路二段",
+            "addr:housenumber": "200巷13號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.76680,
+          longitude: 121.13720,
+          website: "https://www.facebook.com/share/16CYARGnHe/?mibextid=wwXIfr",
+          description: "東糖官邸民宿位於台東市中興路二段，結合復古與現代設計，提供寧靜舒適的住宿環境。周邊交通便利，適合喜愛探索台東市區的旅客。",
+          phone: "932615060"
+        },
+        {
+          name: "樂知旅店（知森開發有限公司）",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "復興路",
+            "addr:housenumber": "145號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75336,
+          longitude: 121.15049,
+          website: "https://www.yeshotel.com.tw",
+          description: "樂知旅店由知森開發有限公司經營，提供舒適的住宿環境，結合現代設計與在地文化，為旅客打造溫馨的居住體驗。",
+          phone: "886912103615"
+        },
+        {
+          name: "古栗house民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "寧波街",
+            "addr:housenumber": "120號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75620,
+          longitude: 121.13850,
+          website: "https://booking.owlting.com/4bf1a19a-dafc-43c6-8b02-94f8fc25d2ac",
+          description: "古栗house民宿位於台東市寧波街，擁有溫馨的家庭氛圍與獨特的室內裝潢。提供多樣化的房型選擇，適合家庭或朋友群體入住。",
+          phone: "886918950391"
+        },
+        {
+          name: "仲夏綠茵民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "志航路一段",
+            "addr:housenumber": "146巷25號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.78033,
+          longitude: 121.12841,
+          website: "https://www.facebook.com/share/15RkLfSDkX/",
+          description: "仲夏綠茵民宿位於台東市，提供寧靜舒適的住宿環境，適合喜愛大自然與放鬆的旅客。每間客房皆設有免費Wi-Fi、空調與私人衛浴，讓您在台東享受放鬆的時光。",
+          phone: "987661688"
+        },
+        {
+          name: "路得行旅 台東1館",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "廣東路",
+            "addr:housenumber": "162號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75430,
+          longitude: 121.15280,
+          website: "https://taitung.nordenruder.com/",
+          description: "路得行旅台東1館位於台東市，結合文青風設計與舒適住宿空間，提供免費Wi-Fi、空調、私人衛浴等設施。館內設有共享廚房、閱讀空間與自行車維修區，適合喜愛交流與探索的旅客。",
+          phone: "886978549244"
+        },
+        {
+          name: "途中台東青年旅舍",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "安和路",
+            "addr:housenumber": "102巷30號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.79751,
+          longitude: 121.12402,
+          website: "https://www.onmywayhostel.com/hostels/taitung",
+          description: "途中台東青年旅舍位於台東市安和路102巷30號，距離台東火車站僅需步行7分鐘，交通便利。旅舍提供免費 Wi-Fi、床頭燈、床簾、床頭籃、多國萬用插座、個人置物櫃等設施，並設有共享廚房、閱讀空間與桌遊區，讓旅客在舒適的環境中交流與放鬆。",
+          phone: "965577167"
+        },
+        {
+          name: "ㄧ品苑民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "新興路一巷",
+            "addr:housenumber": "61弄20號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.79320,
+          longitude: 121.12380,
+          website: "https://www.facebook.com/share/1L8HSjurGu/?mibextid=wwXIfr",
+          description: "一品苑民宿位於台東市，距離台東火車站僅約10至15分鐘步行路程，交通便利。民宿環境寧靜，設有綠意盎然的庭院和陽光露台，提供免費Wi-Fi、空調、免費停車場等設施。客房寬敞明亮，配備舒適床鋪和完善的衛浴設備，部分房型設有陽台或露台。民宿主人親切熱情，致力於為旅客營造如家的住宿體驗，讓您在旅途中感受到溫馨與放鬆。",
+          phone: "932923009"
+        },
+        {
+          name: "花東民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "連航路",
+            "addr:housenumber": "77號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.77063,
+          longitude: 121.12158,
+          website: "https://loveandpeacebnb.com/%e8%8a%b1%e6%9d%b1%e6%b0%91%e5%ae%bf%e4%bb%8b%e7%b4%b9",
+          description: "花東民宿位於台東市，距離車站、機場、市區僅約5分鐘車程，周邊生活機能便利，鄰近卑南肉包、卑南豬血湯等知名小吃。民宿主人熱愛音樂與藝術，客廳設有電吉他、電子琴和爵士鼓，並不定期舉辦即興音樂演出，讓旅客在放鬆之餘感受藝術氛圍。部分房型配備多功能娛樂投影燈，提供百吋螢幕與頂級環繞音響，打造家庭電影院般的住宿體驗。",
+          phone: "886908950102"
+        },
+        {
+          name: "T-HOUSE民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "寶桑路50巷",
+            "addr:housenumber": "55弄18號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75298,
+          longitude: 121.15729,
+          website: "https://www.booking-owlnest.com/t-house?lang=zh_TW&adult=1&child=0&infant=0",
+          description: "T-HOUSE 提供附陽台和Wi-Fi的空調住宿，每個房型都提供私人淋浴衛浴、盥洗用品、快煮壺、吹風機和拖鞋。我們的床墊是獨立筒加上乳膠墊，非常好睡，翻身也不怕影響旁邊的人唷～ 1F為公共區域有客廳及用餐區，2F為屋主一家五口的專屬空間，3F為客房～",
+          phone: "886976525929"
+        },
+        {
+          name: "tt-house民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "四維路488巷27弄",
+            "addr:housenumber": "3號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75799,
+          longitude: 121.15769,
+          website: "https://booking.owlting.com/tt-house?lang=zh_TW&adult=1&child=0&infant=0",
+          description: "台東就像是台灣的世外桃源般，在這裡你可以聞到最新鮮的空氣，騎著單車在路上你會看到一幅幅像山水畫的美景。來台東玩吧！遠離熱鬧的都市享受這裡的慢步調吧～tt-house 提供附陽台和Wi-Fi的空調住宿，每個房型都提供私人淋浴衛浴、盥洗用品、快煮壺、吹風機和拖鞋。1F床墊為乳膠墊，2F床墊是獨立筒加上乳膠墊，非常好睡，翻身也不怕影響旁邊的人唷～",
+          phone: "886976525929"
+        },
+        {
+          name: "宅民宿",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "中興路三段",
+            "addr:housenumber": "275巷10號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.77600,
+          longitude: 121.11700,
+          website: "https://loveandpeacebnb.com/%e5%ae%85%e6%b0%91%e5%ae%bf%e4%bb%8b%e7%b4%b9",
+          description: "宅民宿位於台東市，提供溫馨舒適的住宿環境。民宿主人熱情好客，樂於與旅客分享在地美食與旅遊資訊，並協助規劃行程。房間設計簡約，設備齊全，讓旅客感受到家的溫暖。無論是單人旅行或家庭出遊，宅民宿都是理想的選擇。",
+          phone: "886973721826"
+        },
+        {
+          name: "窩Wo style inn",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "興航二街37巷5弄",
+            "addr:housenumber": "1號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.79850,
+          longitude: 121.12580,
+          website: "https://www.instagram.com/wo.inn?igsh=MW00d3pkMzFib2RxYg%3D%3D&utm_source=qr",
+          description: "窩Wo Style Inn位於台東市，融合現代設計與舒適住宿，提供獨特的旅宿體驗。每間客房皆設有免費Wi-Fi、空調與私人衛浴，讓您在台東享受放鬆的時光。",
+          phone: "920451022"
+        },
+        {
+          name: "路得行旅 台東2館",
+          address: {
+            "addr:city": "台東縣",
+            "addr:district": "台東市",
+            "addr:street": "中山路",
+            "addr:housenumber": "374號",
+            "addr:postcode": "950"
+          },
+          latitude: 22.75120,
+          longitude: 121.14850,
+          website: "https://www.taitung2.nordenruder.com/",
+          description: "路得行旅 台東2館位於台東市中山路374號，結合文青風設計與舒適住宿空間，提供免費Wi-Fi、空調、私人衛浴等設施。館內設有共享廚房、閱讀空間與不打烊書店，並提供在地領路券，讓旅客深入體驗台東在地文化與美食。距離鐵花村音樂聚落與夜市僅數分鐘路程，交通便利，適合喜愛交流與探索的旅客。",
+          phone: "886978549244"
+        }
+      ]
+    },
+    timeline: {
+      title: "活動時程",
+      filterLabel: "依票種篩選活動：",
+      explorer: "Explorer",
+      contributor: "Contributor",
+      backer: "Backer",
+      explorerLabel: "Explorer",
+      contributorLabel: "Contributor",
+      backerLabel: "Backer",
+      clearFilter: "清除篩選",
+      clickDate: "點擊日期查看活動詳情"
+    },
+    eventModal: {
+      day: "年 5 月",
+      daySuffix: "日",
+      events: "個活動",
+      event: "個活動",
+      close: "關閉"
+    },
+    footer: {
+      copyright: "© 2026 Taiwan Digital Fest. All rights reserved.",
+      getInvolved: "參與我們",
+      callForSpeakers: "徵求講者",
+      callForSponsors: "徵求贊助商",
+      callForPartners: "徵求社群夥伴",
+      callForVolunteers: "徵求志工",
+      callForSideEvents: "徵求 Side Event"
+    },
+    faq: {
+      title: "常見問題",
+      subtitle: "關於 2026 台灣數位嘉年華的常見問題",
+      items: [
+        {
+          question: "什麼是 2026 台灣數位嘉年華？",
+          answer: "2026 台灣數位嘉年華是一個專為數位遊牧者策劃的節慶活動，將於 2026 年 5 月 1 日至 31 日在台灣的台東與花蓮舉辦。活動結合了 AI 工作坊、社交活動等專業發展機會，以及台灣最美麗地區的絕美自然體驗。"
+        },
+        {
+          question: "2026 台灣數位嘉年華何時何地舉行？",
+          answer: "2026 台灣數位嘉年華將於 2026 年 5 月 1 日至 5 月 31 日在台灣的台東與花蓮舉行。這兩個地區以令人屏息的海岸線、山脈和豐富的原住民文化而聞名。"
+        },
+        {
+          question: "2026 台灣數位嘉年華包含哪些活動？",
+          answer: "活動包含開幕交流派對、多元主題遊牧活動（工作坊、講座與社交）、花蓮尊榮遊牧饗宴、台東在地美食款待、三天兩夜花蓮深度遊牧之旅，以及專屬 VVIP 體驗活動。活動範圍從 AI 工作坊、新創路演到文化導覽、溯溪體驗和溫泉之旅。"
+        },
+        {
+          question: "有哪些票種可以選擇？",
+          answer: "共有三種票種：Explorer（基本參與，包含社群、開幕派對和 10+ 活動）、Contributor（包含五星級饗宴、VIP 晚餐和 15+ 活動），以及 Backer（完整參與，包含 VIP 午餐、VVIP 體驗、花蓮之旅和 20+ 活動）。"
+        },
+        {
+          question: "如何報名 2026 台灣數位嘉年華？",
+          answer: "您可以點擊網站上的「立即報名」按鈕，選擇您偏好的票種進行報名。報名連結在網站各處均可找到，包括票券時程區塊。"
+        },
+        {
+          question: "住宿費用是否包含在票價中？",
+          answer: "住宿費用不包含在票價中，但我們已與台東與花蓮的台灣數位遊牧友善標章認證住宿夥伴合作。這些住宿資訊列在我們的住宿推薦頁面上，並提供預訂資訊。"
+        },
+        {
+          question: "為什麼台灣是數位遊牧者的好去處？",
+          answer: "台灣安全、便利且友善，是遠距工作者的理想目的地。它擁有優秀的網路基礎設施、合理的生活成本、豐富的文化和令人驚嘆的自然景觀。台東與花蓮特別提供了工作機會與放鬆之間的完美平衡。"
+        },
+        {
+          question: "參加 2026 台灣數位嘉年華需要簽證嗎？",
+          answer: "簽證要求取決於您的國籍。大多數訪客可以免簽證進入台灣 14-90 天。我們建議您向您所在國家的台灣代表處查詢具體簽證要求。"
+        },
+        {
+          question: "活動使用什麼語言進行？",
+          answer: "活動以英文為主，中文為輔。大多數活動將以英文進行，中文為主的活動將提供英文翻譯。我們的社群是國際化的，因此英文是主要的交流語言。"
+        },
+        {
+          question: "我可以不購買完整票券，只參加特定活動嗎？",
+          answer: "2026 台灣數位嘉年華設計為整合式節慶體驗。雖然部分 Side Event 可能對公眾開放，但大多數活動需要購買票券。我們建議購買符合您興趣和期望參與程度的票種。"
+        }
+      ]
+    }
+  }
+};
+
+export type Language = 'en' | 'zh';
+export type Content = typeof content.en;
