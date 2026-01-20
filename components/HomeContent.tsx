@@ -1,6 +1,5 @@
 'use client';
 
-import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/sections/HeroSection';
@@ -13,33 +12,35 @@ const Footer = dynamic(() => import('@/components/Footer'), {
   loading: () => null, // Footer 不需要 loading 狀態
 });
 
+// AEO优化：启用SSR以确保AI爬虫可以访问内容
+// 关键内容区域使用SSR，提升AI可访问性和SEO表现
 const AboutSection = dynamic(() => import('@/components/sections/AboutSection'), {
-  ssr: false,
+  ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
 const WhySection = dynamic(() => import('@/components/sections/WhySection'), {
-  ssr: false,
+  ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
 const HighlightsSection = dynamic(() => import('@/components/sections/HighlightsSection'), {
-  ssr: false,
+  ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-stone-100 animate-pulse" />,
 });
 
 const TicketTimelineSection = dynamic(() => import('@/components/sections/TicketTimelineSection'), {
-  ssr: false,
+  ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
 });
 
 const AccommodationSection = dynamic(() => import('@/components/sections/AccommodationSection'), {
-  ssr: false,
+  ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
 const PartnersSection = dynamic(() => import('@/components/sections/PartnersSection'), {
-  ssr: false,
+  ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 

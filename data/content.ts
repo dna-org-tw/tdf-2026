@@ -20,6 +20,15 @@ export const content = {
       accommodation: "Accommodation",
       register: "Register"
     },
+    navShort: {
+      about: "About",
+      why: "Why",
+      highlights: "Highlights",
+      schedule: "Schedule",
+      gallery: "Gallery",
+      accommodation: "Stay",
+      register: "Register"
+    },
     about: {
       title: "About The Event",
       description: "Escape to where the mountains meet the sea. Join us for Taiwan Digital Fest 2026, a curated festival designed for the modern digital nomad. Immerse yourself in a landscape of rolling hills and endless coastlines, perfectly balancing professional growth with deep relaxation.\n\nEngage in cutting-edge AI workshops, productivity sessions, and startup pitches by day. As the sun sets, unwind with scenic biking trips through golden rice fields, refreshing ocean tours, and soothing hot springs. Connect with a global community at our exclusive VVIP lunches and networking parties. Whether you're brainstorming the next big idea or simply watching the sunset paint the sky, this is your destination to pause, breathe, and reconnect.",
@@ -165,11 +174,17 @@ export const content = {
       viewFull: "Click to view full image"
     },
     partners: {
-      title: "Partners & Supporters",
-      ctas: [
-        { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
-        { type: "Call for Partners", text: "Join as Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
-      ]
+      organizers: {
+        title: "Organizers"
+      },
+      sponsors: {
+        title: "Sponsors",
+        cta: { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
+      },
+      partners: {
+        title: "Partners",
+        cta: { type: "Call for Partners", text: "Join as Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
+      }
     },
     accommodation: {
       title: "Recommended Accommodations",
@@ -474,6 +489,15 @@ export const content = {
       accommodation: "住宿推薦",
       register: "立即報名"
     },
+    navShort: {
+      about: "介紹",
+      why: "為什麼",
+      highlights: "亮點",
+      schedule: "時程",
+      gallery: "精彩瞬間",
+      accommodation: "住宿",
+      register: "報名"
+    },
     about: {
       title: "關於本活動",
       description: "2026 年 5 月，我們邀您前往壯麗的山海交界處，開啟一場工作與生活完美共融的旅程 。在這片遠離塵囂的土地上，Taiwan Digital Fest 將前瞻科技與自然療癒深度結合 。\n\n行程涵蓋全方位的身心體驗：您將在 AI 工作坊與創業路演中掌握最新趨勢，與全球遊牧者激盪火花 。午後，轉身投入大自然的懷抱，享受稻浪間的單車漫遊、海洋導覽與療癒溫泉 。夜晚，則在星空下的 VIP 晚宴與社交派對中，與志同道合的夥伴建立真實連結 。這不僅是工作，更是在絕美日落與微風中找回生活節奏的契機 。",
@@ -619,11 +643,17 @@ export const content = {
       viewFull: "點擊查看大圖"
     },
     partners: {
-      title: "合作夥伴與支持者",
-      ctas: [
-        { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
-        { type: "Call for Partners", text: "成為合作夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
-      ]
+      organizers: {
+        title: "主辦單位"
+      },
+      sponsors: {
+        title: "贊助單位",
+        cta: { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
+      },
+      partners: {
+        title: "合作夥伴",
+        cta: { type: "Call for Partners", text: "成為合作夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
+      }
     },
     accommodation: {
       title: "住宿推薦",

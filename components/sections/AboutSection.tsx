@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function AboutSection() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const instagramRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,30 +135,41 @@ export default function AboutSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="w-full md:w-1/2"
           >
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1E1F1C] mb-8 leading-tight">
+            {/* AEO优化：BLUF原则 - 结论先行，问题导向标题 */}
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1E1F1C] mb-6 leading-tight">
               {t.about.title}
             </h2>
             
-            {/* 關鍵活動資訊摘要 - AEO 優化 */}
+            {/* AEO优化：答案块格式 - 整合关键信息，浓缩至40-60字 */}
+            <div className="mb-6 p-6 bg-teal-50 rounded-xl border-l-4 border-teal-500">
+              <p className="text-lg md:text-xl font-semibold text-[#1E1F1C] leading-relaxed">
+                {lang === 'en' 
+                  ? 'Escape to where mountains meet the sea. A curated festival for digital nomads combining AI workshops, networking, and startup pitches with scenic biking, ocean tours, and hot springs in Taiwan\'s most beautiful regions.'
+                  : '前往山海交界的壯麗之地。專為數位遊牧者策劃的節慶，結合 AI 工作坊、社交活動與創業路演，以及稻浪單車、海洋導覽與溫泉體驗，在台灣最美麗的地區。'
+                }
+              </p>
+            </div>
+            
+            {/* 關鍵活動資訊摘要 - AEO 優化：結構化數據 */}
             <div className="mb-6 p-6 bg-[#F6F6F6] rounded-xl border border-[#1E1F1C]/10">
               <h3 className="text-xl font-semibold text-[#1E1F1C] mb-4">{t.about.info.title}</h3>
-              <ul className="space-y-2 text-[#1E1F1C]/80">
-                <li>
-                  <strong>{t.about.info.time}</strong>
-                  <time dateTime="2026-05-01/2026-05-31">{t.about.info.timeValue}</time>
-                </li>
-                <li>
-                  <strong>{t.about.info.location}</strong>{t.about.info.locationValue}
-                </li>
-                <li>
-                  <strong>{t.about.info.theme}</strong>{t.about.info.themeValue}
-                </li>
-              </ul>
+              <dl className="space-y-2 text-[#1E1F1C]/80">
+                <div>
+                  <dt className="font-semibold inline">{t.about.info.time}</dt>
+                  <dd className="inline">
+                    <time dateTime="2026-05-01/2026-05-31">{t.about.info.timeValue}</time>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold inline">{t.about.info.location}</dt>
+                  <dd className="inline">{t.about.info.locationValue}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold inline">{t.about.info.theme}</dt>
+                  <dd className="inline">{t.about.info.themeValue}</dd>
+                </div>
+              </dl>
             </div>
-
-            <p className="text-lg md:text-xl text-[#1E1F1C]/80 leading-relaxed mb-8 whitespace-pre-line">
-              {t.about.description}
-            </p>
 
             <div className="flex flex-wrap gap-3 mb-12">
               {t.about.tags.map((tag, i) => (

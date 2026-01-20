@@ -112,11 +112,11 @@ export default function Navbar() {
   }, [isHomePage, pathname]);
 
   const navLinks = [
-    { name: t.nav.about, href: '#about' },
-    { name: t.nav.why, href: '#why' },
-    { name: t.nav.highlights, href: '#highlights' },
-    { name: t.nav.schedule, href: '#tickets-timeline' },
-    { name: t.nav.accommodation, href: '#accommodation' },
+    { name: t.nav.about, nameShort: t.navShort?.about || t.nav.about, href: '#about' },
+    { name: t.nav.why, nameShort: t.navShort?.why || t.nav.why, href: '#why' },
+    { name: t.nav.highlights, nameShort: t.navShort?.highlights || t.nav.highlights, href: '#highlights' },
+    { name: t.nav.schedule, nameShort: t.navShort?.schedule || t.nav.schedule, href: '#tickets-timeline' },
+    { name: t.nav.accommodation, nameShort: t.navShort?.accommodation || t.nav.accommodation, href: '#accommodation' },
   ];
 
   return (
@@ -138,13 +138,13 @@ export default function Navbar() {
             className="object-contain"
           />
           <span className="whitespace-nowrap">
-            <span className="md:hidden">TDF 2026</span>
-            <span className="hidden md:inline">Taiwan Digital Fest 2026</span>
+            <span className="lg:hidden">TDF 2026</span>
+            <span className="hidden lg:inline">Taiwan Digital Fest 2026</span>
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-4 lg:gap-8">
           {navLinks.map((link) => (
             <a
               key={link.name}
@@ -154,7 +154,8 @@ export default function Navbar() {
                 scrolled ? 'text-[#1E1F1C]' : 'text-white'
               }`}
             >
-              {link.name}
+              <span className="md:inline lg:hidden">{link.nameShort}</span>
+              <span className="hidden lg:inline">{link.name}</span>
             </a>
           ))}
           
