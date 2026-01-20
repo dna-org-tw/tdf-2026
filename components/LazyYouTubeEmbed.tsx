@@ -12,7 +12,7 @@ interface LazyYouTubeEmbedProps {
 export default function LazyYouTubeEmbed({ 
   videoId, 
   title,
-  thumbnailQuality = 'maxresdefault'
+  thumbnailQuality = 'hqdefault' // Use hqdefault (480x360) instead of maxresdefault (1280x720) for better performance
 }: LazyYouTubeEmbedProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
@@ -63,7 +63,7 @@ export default function LazyYouTubeEmbed({
             alt={title}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 412px, (max-width: 1200px) 50vw, 600px"
             loading={isInView ? 'eager' : 'lazy'}
             unoptimized
           />
