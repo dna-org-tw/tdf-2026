@@ -43,13 +43,21 @@ export const content = {
         title: "Taiwan as Digital Nomad Destination",
         desc: "Safe, convenient, and friendly. Taiwan is becoming Asia's top hub for remote workers."
       },
+      reasons: [
+        { icon: "🌐", text: "World-class 5G internet" },
+        { icon: "💼", text: "Affordable living costs" },
+        { icon: "🍜", text: "Incredible food culture" },
+        { icon: "🏥", text: "Excellent healthcare" },
+        { icon: "⚡", text: "Visa-free entry" },
+        { icon: "🤝", text: "Thriving community" }
+      ],
       taitung: {
         title: "Taitung – Mountains, Ocean & Culture",
-        desc: "Experience the slow life, indigenous culture, and breathtaking coastline."
+        desc: "Experience the slow life, indigenous culture, and breathtaking coastline. Taitung is where time slows down and nature takes center stage. Wake up to golden rice fields stretching to the horizon, cycle through charming villages where locals greet you with warm smiles, and immerse yourself in the rich traditions of Taiwan's indigenous peoples. From pristine beaches perfect for sunrise meditation to hot springs nestled in mountain valleys, Taitung offers a sanctuary for digital nomads seeking balance between productivity and peace. Here, every sunset paints the sky in hues you've never seen, and every meal tells a story of the land and sea."
       },
       hualien: {
         title: "Hualien – Travel, Community & Nature",
-        desc: "Majestic gorges, vibrant communities, and the perfect balance of work and adventure."
+        desc: "Majestic gorges, vibrant communities, and the perfect balance of work and adventure. Hualien is where dramatic landscapes meet a thriving digital nomad scene. Picture yourself working from a cafe overlooking the Pacific Ocean, then hiking through Taroko Gorge's marble canyons in the afternoon. The city pulses with creative energy—from artisanal coffee shops to night markets buzzing with local flavors. Connect with fellow nomads at co-working spaces, join community events, or simply wander through the streets where every corner reveals a new discovery. In Hualien, adventure is never far away, and the community is always welcoming. This is where your best work meets your best life."
       },
       ctas: [
         { type: "Register", text: "Start Your Journey", href: "#tickets-timeline" },
@@ -160,7 +168,7 @@ export const content = {
       title: "Partners & Supporters",
       ctas: [
         { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
-        { type: "Call for Community Partners", text: "Join as Community Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
+        { type: "Call for Partners", text: "Join as Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ]
     },
     accommodation: {
@@ -394,7 +402,7 @@ export const content = {
       getInvolved: "Get Involved",
       callForSpeakers: "Call for Speakers",
       callForSponsors: "Call for Sponsors",
-      callForPartners: "Call for Community Partners",
+      callForPartners: "Call for Partners",
       callForVolunteers: "Call for Volunteers",
       callForSideEvents: "Call for Side Events"
     },
@@ -489,13 +497,21 @@ export const content = {
         title: "台灣：數位遊牧新聖地",
         desc: "安全、便利、友善。台灣正成為亞洲首選的遠距工作樞紐。"
       },
+      reasons: [
+        { icon: "🌐", text: "世界級 5G 網路" },
+        { icon: "💼", text: "合理生活成本" },
+        { icon: "🍜", text: "美食文化豐富" },
+        { icon: "🏥", text: "優質醫療體系" },
+        { icon: "⚡", text: "免簽入境便利" },
+        { icon: "🤝", text: "活躍社群網絡" }
+      ],
       taitung: {
         title: "台東：山海與文化的交響",
-        desc: "體驗慢生活、深厚的原民文化與令人屏息的海岸線。"
+        desc: "體驗慢生活、深厚的原民文化與令人屏息的海岸線。台東，是時間慢下來、自然成為主角的地方。清晨醒來，眼前是延伸到天際的金黃稻浪；騎著單車穿梭在充滿人情味的村落，當地人用溫暖的笑容迎接你；深入體驗台灣原住民的豐富傳統文化。從適合日出冥想的純淨海灘，到隱藏在山谷中的溫泉秘境，台東為追求工作與生活平衡的數位遊牧者提供了一個心靈避風港。在這裡，每個日落都為天空染上你從未見過的色彩，每頓餐點都訴說著這片土地與海洋的故事。"
       },
       hualien: {
         title: "花蓮：旅行、社群與自然",
-        desc: "壯麗的峽谷、充滿活力的社群，以及工作與冒險的完美平衡。"
+        desc: "壯麗的峽谷、充滿活力的社群，以及工作與冒險的完美平衡。花蓮，是壯麗景觀與蓬勃數位遊牧社群的交匯點。想像自己在俯瞰太平洋的咖啡廳工作，下午則漫步在太魯閣的大理石峽谷中。這座城市充滿創意能量——從手工咖啡店到充滿在地風味的夜市。在共創空間與同行的遊牧者交流，參與社群活動，或只是漫步街頭，每個轉角都有新發現。在花蓮，冒險從不遙遠，社群總是熱情歡迎。這裡是你最佳工作與最佳生活的完美結合。"
       },
       ctas: [
         { type: "Register", text: "開始旅程", href: "#tickets-timeline" },
@@ -606,7 +622,7 @@ export const content = {
       title: "合作夥伴與支持者",
       ctas: [
         { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
-        { type: "Call for Community Partners", text: "成為社群夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
+        { type: "Call for Partners", text: "成為合作夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ]
     },
     accommodation: {
@@ -840,7 +856,7 @@ export const content = {
       getInvolved: "參與我們",
       callForSpeakers: "徵求講者",
       callForSponsors: "徵求贊助商",
-      callForPartners: "徵求社群夥伴",
+      callForPartners: "徵求合作夥伴",
       callForVolunteers: "徵求志工",
       callForSideEvents: "徵求 Side Event"
     },

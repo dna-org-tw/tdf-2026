@@ -135,7 +135,7 @@ export default function AccommodationSection() {
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1E1F1C] mb-6">
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1E1F1C] mb-4">
             {t.accommodation.title}
           </h2>
           <p className="text-lg md:text-xl text-[#1E1F1C]/80 max-w-3xl mx-auto leading-relaxed">

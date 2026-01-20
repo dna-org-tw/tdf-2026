@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { Menu, X, Globe, Instagram, Calendar } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import MobileMenu from './MobileMenu';
 
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
@@ -137,7 +137,10 @@ export default function Navbar() {
             height={40}
             className="object-contain"
           />
-          <span className="whitespace-nowrap">Taiwan Digital Fest 2026</span>
+          <span className="whitespace-nowrap">
+            <span className="md:hidden">TDF 2026</span>
+            <span className="hidden md:inline">Taiwan Digital Fest 2026</span>
+          </span>
         </Link>
 
         {/* Desktop Nav */}
@@ -212,10 +215,20 @@ export default function Navbar() {
             <Instagram className="w-5 h-5" />
           </a>
           <button 
+            onClick={toggleLanguage}
+            className={`hover:text-[#10B8D9] transition-colors ${
+              scrolled ? 'text-[#1E1F1C]' : 'text-white'
+            }`}
+            aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+          >
+            <Globe className="w-5 h-5" />
+          </button>
+          <button 
             className={`transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
           >
             {isOpen ? <X /> : <Menu />}
           </button>
@@ -223,43 +236,11 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Nav */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 bg-white border-b border-[#F6F6F6] p-6 md:hidden shadow-lg"
-          >
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="text-lg font-medium text-[#1E1F1C] cursor-pointer"
-                >
-                  {link.name}
-                </a>
-              ))}
-               <button 
-                onClick={() => { toggleLanguage(); setIsOpen(false); }}
-                className="flex items-center gap-2 text-sm font-medium"
-              >
-                <Globe className="w-4 h-4" />
-                Switch to {lang === 'en' ? '中文' : 'English'}
-              </button>
-              <a
-                href="#tickets-timeline"
-                onClick={(e) => handleNavClick(e, '#tickets-timeline')}
-                className="bg-[#10B8D9] text-white px-6 py-3 rounded-lg text-center font-semibold cursor-pointer"
-              >
-                {t.nav.register}
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileMenu 
+        isOpen={isOpen} 
+        navLinks={navLinks} 
+        handleNavClick={handleNavClick} 
+      />
     </nav>
   );
 }

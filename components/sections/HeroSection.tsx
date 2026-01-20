@@ -25,13 +25,14 @@ export default function HeroSection() {
         className="absolute inset-0 z-0"
       >
         {/* Image Background */}
+        <div className="absolute inset-0 bg-[#1E1F1C] z-0" /> {/* Fallback background */}
         <div className="absolute inset-0 bg-[#1E1F1C]/70 z-10" /> {/* Overlay */}
         <Image
           src="/images/tdf2025.webp"
           alt="Taiwan Digital Fest 2026 - Where Digital Nomads Meet Nature & Innovation in Taitung and Hualien, Taiwan"
           fill
           priority
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
           quality={85}
           className="object-cover"
           placeholder="blur"

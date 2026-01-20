@@ -1,18 +1,105 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import LazyVideo from '@/components/LazyVideo';
 
 export default function AboutSection() {
   const { t } = useTranslation();
+  const instagramRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Function to try autoplay
+    const tryAutoPlay = () => {
+      if (!instagramRef.current) return;
+
+      // Find the Instagram iframe
+      const iframe = instagramRef.current.querySelector('iframe');
+      if (!iframe) return;
+
+      // Try to access iframe content (may fail due to CORS)
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          const video = iframeDoc.querySelector('video');
+          if (video) {
+            video.muted = true;
+            video.play().catch(() => {
+              // Autoplay failed, try clicking play button
+              const playButton = iframeDoc.querySelector('button[aria-label*="Play"], button[aria-label*="播放"]');
+              if (playButton) {
+                (playButton as HTMLButtonElement).click();
+              }
+            });
+          }
+        }
+      } catch {
+        // CORS restriction - try alternative method
+        // Send postMessage to iframe (if Instagram supports it)
+        iframe.contentWindow?.postMessage({ type: 'play' }, '*');
+      }
+    };
+
+    // Check if script is already loaded
+    const existingScript = document.querySelector('script[src="https://www.instagram.com/embed.js"]');
+    
+    const processEmbeds = () => {
+      if (window.instgrm) {
+        window.instgrm.Embeds.process();
+        
+        // Try to trigger autoplay after embed is processed
+        setTimeout(() => {
+          tryAutoPlay();
+        }, 1000);
+      }
+    };
+    
+    if (!existingScript) {
+      // Load Instagram embed script
+      const script = document.createElement('script');
+      script.src = 'https://www.instagram.com/embed.js';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+
+      // Process embeds after script loads
+      script.onload = processEmbeds;
+    } else {
+      // Script already exists, process embeds after a short delay to ensure it's ready
+      setTimeout(processEmbeds, 100);
+    }
+
+    // Intersection Observer for autoplay when in view
+    if (!instagramRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // When reel comes into view, try to autoplay
+            setTimeout(tryAutoPlay, 500);
+          }
+        });
+      },
+      {
+        threshold: 0.5, // Trigger when 50% visible
+        rootMargin: '0px',
+      }
+    );
+
+    observer.observe(instagramRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <section id="about" className="py-24 md:py-32 bg-white overflow-hidden relative">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center gap-16">
 
-          {/* Video Side */}
+          {/* Instagram Reel Side */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -20,16 +107,23 @@ export default function AboutSection() {
             transition={{ duration: 0.8 }}
             className="w-full md:w-1/2"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <LazyVideo
-                src="/videos/tdf2025_short.mov"
-                poster="/images/tdf2025.webp"
-                aria-label="Taiwan Digital Fest 2025 - Digital nomads networking and connecting at the festival in Taipei, Taiwan"
-                className="w-full h-auto object-contain"
+            <div ref={instagramRef} className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
+              <blockquote
+                className="instagram-media"
+                data-instgrm-permalink="https://www.instagram.com/reel/DLKU-cjpk7G/"
+                data-instgrm-version="14"
+                style={{
+                  background: '#FFF',
+                  border: 0,
+                  borderRadius: '12px',
+                  boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)',
+                  margin: '1px',
+                  maxWidth: '100%',
+                  minWidth: '326px',
+                  padding: 0,
+                  width: '99.375%',
+                }}
               />
-              <div className="absolute bottom-6 left-6 px-4 py-2 bg-[#000000]/60 backdrop-blur-sm rounded-lg text-white font-medium z-10 pointer-events-none">
-                2025 - Taipei, Taiwan
-              </div>
             </div>
           </motion.div>
 
@@ -66,7 +160,7 @@ export default function AboutSection() {
               {t.about.description}
             </p>
 
-            <div className="flex flex-wrap gap-3 mb-8">
+            <div className="flex flex-wrap gap-3 mb-12">
               {t.about.tags.map((tag, i) => (
                 <span
                   key={i}

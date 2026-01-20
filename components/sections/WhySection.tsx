@@ -2,33 +2,14 @@
 
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
-import LazyVideo from '@/components/LazyVideo';
 
 export default function WhySection() {
   const { t } = useTranslation();
 
-  const features: Array<{
-    key: string;
-    video?: string;
-    img?: string;
-    tag: string;
-  }> = [
-    {
-      key: 'taiwan',
-      video: '/videos/taiwan_view.mp4', // Taitung Nature
-      tag: 'Digital Nomad Hub'
-    },
-    {
-      key: 'taitung',
-      video: '/videos/taitung_view.mp4', // Taitung Nature
-      tag: 'Nature & Culture'
-    },
-    {
-      key: 'hualien',
-      video: '/videos/hualien_view.mp4', // Taitung Nature
-      tag: 'Community & Travel'
-    }
-  ];
+  const taitungContent = (t.why as any).taitung;
+  const hualienContent = (t.why as any).hualien;
+
+  const reasons = (t.why as any).reasons || [];
 
   return (
     <section id="why" className="bg-white py-24 md:py-32">
@@ -39,48 +20,40 @@ export default function WhySection() {
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-          <h2 className="text-4xl font-display font-bold text-[#1E1F1C]">{t.nav.why}</h2>
+          <h2 className="text-4xl font-display font-bold text-[#1E1F1C] mb-8">{t.nav.why}</h2>
+          {reasons.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="max-w-5xl mx-auto"
+            >
+              <div className="grid grid-cols-3 md:flex md:flex-row md:justify-center gap-4 md:gap-6">
+                {reasons.map((reason: { icon: string; text: string } | string, index: number) => {
+                  const reasonObj = typeof reason === 'string' 
+                    ? { icon: reason.split(' ')[0], text: reason.split(' ').slice(1).join(' ') }
+                    : reason;
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3 + index * 0.05 }}
+                      className="flex flex-col items-center text-center gap-2"
+                    >
+                      <span className="text-3xl mb-1">{reasonObj.icon}</span>
+                      <span className="text-sm font-medium text-[#1E1F1C]/90 leading-tight">
+                        {reasonObj.text}
+                      </span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {features.map((item, index) => {
-            // @ts-expect-error - item.key is a valid key of t.why but TypeScript can't infer it
-            const content = t.why[item.key];
-            return (
-              <motion.div
-                key={item.key}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                className="group cursor-pointer"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-xl mb-6">
-                  {item.video ? (
-                    <LazyVideo
-                      src={item.video}
-                      poster={`${item.video.replace('.mp4', '_poster.webp')}`}
-                      aria-label={`${content.title} - ${content.desc}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  ) : item.img ? (
-                    <img
-                      src={item.img}
-                      alt={content.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      loading="lazy" // 非首屏圖片延遲載入
-                    />
-                  ) : null}
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full text-[#004E9D]">
-                    {item.tag}
-                  </div>
-                </div>
-                <h3 className="text-2xl font-bold text-[#1E1F1C] mb-3">{content.title}</h3>
-                <p className="text-[#1E1F1C]/80 leading-relaxed">{content.desc}</p>
-              </motion.div>
-            );
-          })}
-        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -90,23 +63,31 @@ export default function WhySection() {
           className="mb-12 -mx-6 md:-mx-6"
         >
           <div className="grid md:grid-cols-2 gap-4 md:gap-8">
-            <div className="relative aspect-video overflow-hidden">
-              <iframe
-                src="https://www.youtube.com/embed/i7WnQn7c5bc"
-                title="YouTube video player"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="w-full h-full"
-              />
+            <div>
+              <div className="relative aspect-video overflow-hidden mb-6">
+                <iframe
+                  src="https://www.youtube.com/embed/i7WnQn7c5bc"
+                  title="YouTube video player"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+              <h3 className="text-2xl font-bold text-[#1E1F1C] mb-3">{taitungContent.title}</h3>
+              <p className="text-[#1E1F1C]/80 leading-relaxed">{taitungContent.desc}</p>
             </div>
-            <div className="relative aspect-video overflow-hidden">
-              <iframe
-                src="https://www.youtube.com/embed/U40EpRW5p-c"
-                title="YouTube video player"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="w-full h-full"
-              />
+            <div>
+              <div className="relative aspect-video overflow-hidden mb-6">
+                <iframe
+                  src="https://www.youtube.com/embed/U40EpRW5p-c"
+                  title="YouTube video player"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+              <h3 className="text-2xl font-bold text-[#1E1F1C] mb-3">{hualienContent.title}</h3>
+              <p className="text-[#1E1F1C]/80 leading-relaxed">{hualienContent.desc}</p>
             </div>
           </div>
         </motion.div>

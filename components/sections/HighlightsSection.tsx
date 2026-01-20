@@ -24,7 +24,7 @@ export default function HighlightsSection() {
   const items = t.highlights.items;
 
   return (
-    <section id="highlights" className="bg-stone-100 py-16 md:py-20">
+    <section id="highlights" className="bg-stone-100 py-24 md:py-32">
       <div className="container mx-auto px-6">
         {/* 标题区域 */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 md:mb-12">
