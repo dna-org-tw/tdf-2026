@@ -14,7 +14,7 @@ export default function WhySection() {
 
   return (
     <section id="why" className="bg-white py-24 md:py-32">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -30,7 +30,7 @@ export default function WhySection() {
               transition={{ delay: 0.2 }}
               className="max-w-5xl mx-auto"
             >
-              <div className="grid grid-cols-3 md:flex md:flex-row md:justify-center gap-4 md:gap-6">
+              <div className="grid grid-cols-3 md:flex md:flex-row md:justify-center gap-2 sm:gap-4 md:gap-6">
                 {reasons.map((reason: { icon: string; text: string } | string, index: number) => {
                   const reasonObj = typeof reason === 'string' 
                     ? { icon: reason.split(' ')[0], text: reason.split(' ').slice(1).join(' ') }
@@ -61,7 +61,7 @@ export default function WhySection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-12 -mx-6 md:-mx-6"
+          className="mb-12 -mx-4 sm:-mx-6 md:-mx-6"
         >
           <div className="grid md:grid-cols-2 gap-4 md:gap-8">
             <div>
@@ -104,7 +104,7 @@ export default function WhySection() {
                 rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`inline-block px-10 py-4 rounded-full text-lg font-bold tracking-wide transition-all shadow-lg ${
+                className={`inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg ${
                   isPrimary
                     ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/80 text-white shadow-[#004E9D]/20'
                     : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C]'

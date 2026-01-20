@@ -7,19 +7,19 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#1E1F1C] text-[#F6F6F6] z-10 max-h-[150px] overflow-hidden">
-      <div className="container mx-auto px-6 py-3">
+      <div className="container mx-auto px-4 sm:px-6 py-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-2">
           {/* Brand Section */}
           <div className="text-center md:text-left">
-             <h3 className="text-white font-display font-bold text-lg mb-1">TDF 2026</h3>
+             <h3 className="text-white font-display font-bold text-base sm:text-lg mb-1">TDF 2026</h3>
              <p className="text-xs">Taiwan Digital Fest</p>
              <p className="text-xs mt-1">{t.footer.copyright}</p>
           </div>
           
           {/* Get Involved Section */}
           <div className="flex flex-col gap-1 text-xs">
-            <h4 className="font-semibold text-white mb-1 text-sm">{t.footer.getInvolved}</h4>
-            <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+            <h4 className="font-semibold text-white mb-1 text-xs sm:text-sm">{t.footer.getInvolved}</h4>
+            <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-0.5">
               <a 
                 href="https://forms.gle/pVc6oTEi1XZ1pAR49"
                 target="_blank"

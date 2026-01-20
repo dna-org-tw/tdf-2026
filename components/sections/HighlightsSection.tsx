@@ -25,7 +25,7 @@ export default function HighlightsSection() {
 
   return (
     <section id="highlights" className="bg-stone-100 py-24 md:py-32">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         {/* 标题区域 */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 md:mb-12">
           <motion.h2 
@@ -118,7 +118,7 @@ export default function HighlightsSection() {
                   rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`inline-block px-8 py-3 rounded-full text-base md:text-lg font-bold tracking-wide transition-all shadow-lg ${
+                  className={`inline-block px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all shadow-lg ${
                     isPrimary
                       ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/80 text-white shadow-[#004E9D]/20'
                       : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C]'

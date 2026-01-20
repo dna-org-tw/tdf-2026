@@ -125,9 +125,9 @@ export default function Navbar() {
         scrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'
       }`}
     >
-      <div className="container mx-auto px-6 flex justify-between items-center">
+      <div className="container mx-auto px-4 sm:px-6 flex justify-between items-center">
         {/* Logo */}
-          <Link href="/" className={`font-display font-bold text-xl tracking-tight flex items-center gap-3 transition-colors ${
+          <Link href="/" className={`font-display font-bold text-base sm:text-xl tracking-tight flex items-center gap-2 sm:gap-3 transition-colors ${
             scrolled ? 'text-[#1E1F1C]' : 'text-white'
           }`}>
           <Image 
@@ -135,7 +135,7 @@ export default function Navbar() {
             alt="Taiwan Digital Fest 2026 Logo - Taiwan Digital Nomad Association" 
             width={40} 
             height={40}
-            className="object-contain"
+            className="object-contain w-8 h-8 sm:w-10 sm:h-10"
           />
           <span className="whitespace-nowrap">
             <span className="lg:hidden">TDF 2026</span>
@@ -193,7 +193,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Button and Icons */}
-        <div className="md:hidden flex items-center gap-4">
+        <div className="md:hidden flex items-center gap-2 sm:gap-4">
           <a
             href="#tickets-timeline"
             onClick={(e) => handleNavClick(e, '#tickets-timeline')}

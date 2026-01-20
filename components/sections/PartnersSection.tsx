@@ -11,7 +11,7 @@ export default function PartnersSection() {
     <section id="partners" className="text-center">
       {/* 主辦單位 Organizers */}
       <div className="py-24 md:py-32 bg-[#F6F6F6]">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function PartnersSection() {
 
       {/* 贊助單位 Sponsors */}
       <div className="py-24 md:py-32 bg-[#F9D2E5]">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -86,7 +86,7 @@ export default function PartnersSection() {
                 rel={t.partners.sponsors.cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-block px-10 py-4 rounded-full text-lg font-bold tracking-wide transition-all shadow-lg bg-[#C54090] hover:bg-[#C54090]/80 text-white shadow-[#C54090]/20"
+                className="inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg bg-[#C54090] hover:bg-[#C54090]/80 text-white shadow-[#C54090]/20"
               >
                 {t.partners.sponsors.cta.text}
               </motion.a>
@@ -97,7 +97,7 @@ export default function PartnersSection() {
 
       {/* 合作夥伴 Partners */}
       <div className="py-24 md:py-32 bg-[#10B8D9]">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -121,7 +121,7 @@ export default function PartnersSection() {
                 rel={t.partners.partners.cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-block px-10 py-4 rounded-full text-lg font-bold tracking-wide transition-all shadow-lg bg-white hover:bg-white/90 text-[#1E1F1C] shadow-[#004E9D]/20"
+                className="inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg bg-white hover:bg-white/90 text-[#1E1F1C] shadow-[#004E9D]/20"
               >
                 {t.partners.partners.cta.text}
               </motion.a>

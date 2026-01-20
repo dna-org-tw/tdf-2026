@@ -163,7 +163,7 @@ export default function TicketTimelineSection() {
 
   return (
     <section id="tickets-timeline" className="bg-[#1E1F1C] text-white py-24 md:py-32 overflow-hidden">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         {/* Tickets Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -310,12 +310,12 @@ export default function TicketTimelineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="mt-12 text-center flex flex-wrap justify-center gap-4"
+            className="mt-12 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
           >
             <button
               onClick={() => window.open('https://luma.com/bghtt5zv', '_blank')}
               className="
-                inline-block px-8 py-4 rounded-lg font-bold text-lg
+                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                 bg-[#10B8D9] text-[#FFFFFF]
                 hover:bg-[#10B8D9]/80
                 transition-all duration-200 shadow-lg hover:shadow-xl
@@ -329,7 +329,7 @@ export default function TicketTimelineSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="
-                inline-block px-8 py-4 rounded-lg font-bold text-lg
+                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                 bg-[#F6F6F6] text-[#1E1F1C] border-2 border-[#1E1F1C]
                 hover:bg-white
                 transition-all duration-200 shadow-lg hover:shadow-xl
@@ -366,7 +366,7 @@ export default function TicketTimelineSection() {
         <div className="max-w-8xl mx-auto">
           {/* Eligibility Filters */}
           <div className="mb-6">
-            <div className="flex flex-wrap items-center gap-3 justify-center">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center">
               <span className="text-sm text-[#F6F6F6]/70 font-medium">{t.timeline.filterLabel}</span>
               {[
                 { tag: '#explorer', label: t.timeline.explorer, bg: 'bg-[#10B8D9]/20', text: 'text-[#10B8D9]', border: 'border-[#10B8D9]/40', activeBg: 'bg-[#10B8D9]/40', activeBorder: 'border-[#10B8D9]' },
@@ -379,7 +379,7 @@ export default function TicketTimelineSection() {
                     key={tag}
                     onClick={() => toggleFilter(tag.toLowerCase())}
                     className={`
-                      px-4 py-2 rounded-lg border transition-all duration-200 font-medium text-sm
+                      px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border transition-all duration-200 font-medium text-xs sm:text-sm
                       ${isSelected 
                         ? `${activeBg} ${text} ${activeBorder} shadow-lg` 
                         : `${bg} ${text} ${border} hover:opacity-80`}
@@ -392,7 +392,7 @@ export default function TicketTimelineSection() {
               {selectedFilter && (
                 <button
                   onClick={clearFilter}
-                  className="px-4 py-2 rounded-lg border border-[#1E1F1C]/50 text-[#F6F6F6]/60 hover:text-white hover:border-[#1E1F1C]/70 transition-all duration-200 font-medium text-sm"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-[#1E1F1C]/50 text-[#F6F6F6]/60 hover:text-white hover:border-[#1E1F1C]/70 transition-all duration-200 font-medium text-xs sm:text-sm"
                 >
                   {t.timeline.clearFilter}
                 </button>
@@ -408,7 +408,7 @@ export default function TicketTimelineSection() {
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2 md:gap-4">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4">
             {calendarDays.map((day, index) => {
               // If it's an empty slot
               if (day === null) {
@@ -531,14 +531,14 @@ export default function TicketTimelineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-12 text-center flex flex-wrap justify-center gap-4"
+            className="mt-12 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
           >
             <a
               href="https://forms.gle/EofTp9Qso27jEeeY7"
               target="_blank"
               rel="noopener noreferrer"
               className="
-                inline-block px-8 py-4 rounded-lg font-bold text-lg
+                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                 bg-[#10B8D9] text-[#FFFFFF]
                 hover:bg-[#10B8D9]/80
                 transition-all duration-200 shadow-lg hover:shadow-xl
@@ -552,7 +552,7 @@ export default function TicketTimelineSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="
-                inline-block px-8 py-4 rounded-lg font-bold text-lg
+                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                 bg-[#F6F6F6] text-[#1E1F1C] border-2 border-[#1E1F1C]
                 hover:bg-white
                 transition-all duration-200 shadow-lg hover:shadow-xl

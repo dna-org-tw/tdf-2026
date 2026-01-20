@@ -99,7 +99,7 @@ export default function AboutSection() {
 
   return (
     <section id="about" className="py-24 md:py-32 bg-white overflow-hidden relative">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row items-center gap-16">
 
           {/* Instagram Reel Side */}
@@ -122,7 +122,7 @@ export default function AboutSection() {
                   boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)',
                   margin: '1px',
                   maxWidth: '100%',
-                  minWidth: '326px',
+                  minWidth: '280px',
                   padding: 0,
                   width: '99.375%',
                 }}
@@ -200,7 +200,7 @@ export default function AboutSection() {
                     transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`inline-block px-10 py-4 rounded-full text-lg font-bold tracking-wide transition-all shadow-lg ${
+                    className={`inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg ${
                       isPrimary
                         ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/80 text-white shadow-[#004E9D]/20'
                         : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C]'

@@ -43,13 +43,13 @@ export default function HeroSection() {
       {/* Content Layer */}
       <motion.div
         style={{ opacity }}
-        className="relative z-20 text-center px-6 max-w-5xl mx-auto text-white"
+        className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto text-white"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-lg md:text-2xl font-medium tracking-widest mb-4 uppercase text-[#10B8D9]"
+          className="text-sm sm:text-lg md:text-2xl font-medium tracking-widest mb-4 uppercase text-[#10B8D9]"
         >
           <time dateTime="2026-05-01/2026-05-31" className="font-semibold">
             {t.hero.dateLocation}
@@ -60,7 +60,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-5xl md:text-8xl font-bold font-display tracking-tight mb-6 leading-tight drop-shadow-2xl"
+          className="text-3xl sm:text-5xl md:text-8xl font-bold font-display tracking-tight mb-6 leading-tight drop-shadow-2xl"
         >
           {t.hero.title}
         </motion.h1>
@@ -69,7 +69,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-xl md:text-3xl font-light text-white/90 mb-12"
+          className="text-base sm:text-xl md:text-3xl font-light text-white/90 mb-8 sm:mb-12"
         >
           {t.hero.subtitle}
         </motion.p>
@@ -135,7 +135,7 @@ export default function HeroSection() {
                   damping: 20,
                 },
               }}
-              className="relative inline-block bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white px-12 md:px-16 py-5 md:py-6 rounded-full text-xl md:text-2xl font-bold tracking-wide transition-all shadow-lg shadow-[#10B8D9]/40"
+              className="relative inline-block bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white px-8 sm:px-12 md:px-16 py-4 sm:py-5 md:py-6 rounded-full text-lg sm:text-xl md:text-2xl font-bold tracking-wide transition-all shadow-lg shadow-[#10B8D9]/40"
             >
               <motion.span
                 className="relative z-10"
@@ -158,7 +158,7 @@ export default function HeroSection() {
           </motion.div>
           
           {/* 第二行：次要 CTA */}
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
             <motion.a
               href="https://forms.gle/pVc6oTEi1XZ1pAR49"
               target="_blank"
@@ -168,7 +168,7 @@ export default function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.5, delay: 0.9 }}
-              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
             >
               {t.hero.ctaSpeakers}
             </motion.a>
@@ -181,14 +181,14 @@ export default function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.5, delay: 1.0 }}
-              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
             >
               {t.hero.ctaVolunteers}
             </motion.a>
           </div>
           
           {/* 第三行：合作夥伴 CTA */}
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
             <motion.a
               href="https://forms.gle/KqJGkQhdWmSZVTdv6"
               target="_blank"
@@ -198,7 +198,7 @@ export default function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.5, delay: 1.1 }}
-              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
             >
               {t.hero.ctaPartners}
             </motion.a>
@@ -211,7 +211,7 @@ export default function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.5, delay: 1.2 }}
-              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
             >
               {t.hero.ctaSideEvents}
             </motion.a>
@@ -224,7 +224,7 @@ export default function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.5, delay: 1.3 }}
-              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
             >
               {t.hero.ctaSponsors}
             </motion.a>
