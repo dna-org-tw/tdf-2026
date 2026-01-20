@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import type { Coordinates } from '@/utils/geocoding';
+import LazyLeafletCSS from '@/components/LazyLeafletCSS';
 
 // 修复 Leaflet 默认 icon 在 Next.js 中的问题
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,15 +101,17 @@ export default function AccommodationMap({
   const customIcon = createCustomIcon();
 
   return (
-    <MapContainer
-      center={getMapCenter()}
-      zoom={11}
-      style={{ height: '100%', width: '100%' }}
-      scrollWheelZoom={false}
-      className="z-0"
-      // 優化：點擊後啟用地圖互動，避免意外攔截觸控事件
-      // 這能提升 INP 指標並改善行動裝置體驗
-    >
+    <>
+      <LazyLeafletCSS />
+      <MapContainer
+        center={getMapCenter()}
+        zoom={11}
+        style={{ height: '100%', width: '100%' }}
+        scrollWheelZoom={false}
+        className="z-0"
+        // 優化：點擊後啟用地圖互動，避免意外攔截觸控事件
+        // 這能提升 INP 指標並改善行動裝置體驗
+      >
       <MapBoundsController coordinatesMap={coordinatesMap} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -248,6 +251,7 @@ export default function AccommodationMap({
           </Marker>
         );
       })}
-    </MapContainer>
+      </MapContainer>
+    </>
   );
 }

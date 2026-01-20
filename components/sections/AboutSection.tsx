@@ -9,6 +9,8 @@ export default function AboutSection() {
   const instagramRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!instagramRef.current) return;
+
     // Function to try autoplay
     const tryAutoPlay = () => {
       if (!instagramRef.current) return;
@@ -40,9 +42,6 @@ export default function AboutSection() {
       }
     };
 
-    // Check if script is already loaded
-    const existingScript = document.querySelector('script[src="https://www.instagram.com/embed.js"]');
-    
     const processEmbeds = () => {
       if (window.instgrm) {
         window.instgrm.Embeds.process();
@@ -53,37 +52,41 @@ export default function AboutSection() {
         }, 1000);
       }
     };
-    
-    if (!existingScript) {
-      // Load Instagram embed script
-      const script = document.createElement('script');
-      script.src = 'https://www.instagram.com/embed.js';
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
 
-      // Process embeds after script loads
-      script.onload = processEmbeds;
-    } else {
-      // Script already exists, process embeds after a short delay to ensure it's ready
-      setTimeout(processEmbeds, 100);
-    }
-
-    // Intersection Observer for autoplay when in view
-    if (!instagramRef.current) return;
-
+    // Intersection Observer to lazy load Instagram script only when section is visible
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            // Only load Instagram script when section comes into view
+            const existingScript = document.querySelector('script[src="https://www.instagram.com/embed.js"]');
+            
+            if (!existingScript) {
+              // Load Instagram embed script lazily
+              const script = document.createElement('script');
+              script.src = 'https://www.instagram.com/embed.js';
+              script.async = true;
+              script.defer = true;
+              document.body.appendChild(script);
+
+              // Process embeds after script loads
+              script.onload = processEmbeds;
+            } else {
+              // Script already exists, process embeds after a short delay to ensure it's ready
+              setTimeout(processEmbeds, 100);
+            }
+
             // When reel comes into view, try to autoplay
             setTimeout(tryAutoPlay, 500);
+            
+            // Disconnect observer after loading to avoid repeated loads
+            observer.disconnect();
           }
         });
       },
       {
-        threshold: 0.5, // Trigger when 50% visible
-        rootMargin: '0px',
+        threshold: 0.1, // Trigger when 10% visible (earlier trigger for better UX)
+        rootMargin: '100px', // Start loading 100px before entering viewport
       }
     );
 

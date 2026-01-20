@@ -10,8 +10,16 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000, // 1年快取，靜態資源
-    // 允許從外部域名載入圖片（如果未來需要）
-    remotePatterns: [],
+    // 允許從外部域名載入圖片
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        pathname: '/vi/**',
+      },
+    ],
+    // 對於外部圖片，使用 unoptimized 以減少處理時間
+    unoptimized: false,
   },
   
   // 壓縮配置（Next.js 16 預設啟用）
@@ -21,6 +29,56 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react', 'react-leaflet'],
     // 注意：PPR 已合併到 cacheComponents，但我們通過動態導入已實現代碼分割優化
+  },
+  
+  // Turbopack 配置（用於開發模式）
+  // 注意：webpack 配置仍會在生產建置中使用
+  turbopack: {},
+  
+  // Webpack 優化配置（用於生產建置）
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // 優化客戶端 bundle 分割
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // 將 framer-motion 單獨打包
+            framerMotion: {
+              name: 'framer-motion',
+              test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+              priority: 40,
+              reuseExistingChunk: true,
+            },
+            // 將 react-leaflet 和 leaflet 單獨打包
+            leaflet: {
+              name: 'leaflet',
+              test: /[\\/]node_modules[\\/](react-leaflet|leaflet)[\\/]/,
+              priority: 30,
+              reuseExistingChunk: true,
+            },
+            // 將其他大型庫打包
+            vendor: {
+              name: 'vendor',
+              test: /[\\/]node_modules[\\/]/,
+              priority: 20,
+              reuseExistingChunk: true,
+            },
+            // 共享代碼
+            common: {
+              name: 'common',
+              minChunks: 2,
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      };
+    }
+    return config;
   },
   
   // 生產環境優化

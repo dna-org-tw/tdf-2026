@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, Outfit, Noto_Sans_TC } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
-import 'leaflet/dist/leaflet.css';
 import StructuredData from '@/components/StructuredData';
+import ResourceHints from '@/components/ResourceHints';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -124,6 +124,8 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} ${notoSansTC.variable} font-sans antialiased bg-stone-50 text-slate-900 selection:bg-teal-500 selection:text-white`}
       >
+        {/* Performance optimization: Add resource hints for external domains */}
+        <ResourceHints />
         {/* AEO优化：添加结构化数据 - Next.js会自动将其移到head */}
         <StructuredData lang={lang === 'zh-TW' ? 'zh' : 'en'} />
         {children}

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
+import LazyYouTubeEmbed from '@/components/LazyYouTubeEmbed';
 
 export default function WhySection() {
   const { t } = useTranslation();
@@ -64,26 +65,20 @@ export default function WhySection() {
         >
           <div className="grid md:grid-cols-2 gap-4 md:gap-8">
             <div>
-              <div className="relative aspect-video overflow-hidden mb-6">
-                <iframe
-                  src="https://www.youtube.com/embed/i7WnQn7c5bc"
-                  title="YouTube video player"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="w-full h-full"
+              <div className="mb-6">
+                <LazyYouTubeEmbed
+                  videoId="i7WnQn7c5bc"
+                  title={taitungContent.title}
                 />
               </div>
               <h3 className="text-2xl font-bold text-[#1E1F1C] mb-3">{taitungContent.title}</h3>
               <p className="text-[#1E1F1C]/80 leading-relaxed">{taitungContent.desc}</p>
             </div>
             <div>
-              <div className="relative aspect-video overflow-hidden mb-6">
-                <iframe
-                  src="https://www.youtube.com/embed/U40EpRW5p-c"
-                  title="YouTube video player"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="w-full h-full"
+              <div className="mb-6">
+                <LazyYouTubeEmbed
+                  videoId="U40EpRW5p-c"
+                  title={hualienContent.title}
                 />
               </div>
               <h3 className="text-2xl font-bold text-[#1E1F1C] mb-3">{hualienContent.title}</h3>
