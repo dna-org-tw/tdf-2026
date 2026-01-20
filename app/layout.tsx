@@ -7,13 +7,16 @@ import 'leaflet/dist/leaflet.css';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap',
+  display: 'swap', // 使用 swap 避免 FOIT
+  preload: true, // 預載入主要字體
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-outfit',
-  display: 'swap',
+  display: 'swap', // 使用 swap 避免 FOIT
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 const notoSansTC = Noto_Sans_TC({
@@ -22,8 +25,10 @@ const notoSansTC = Noto_Sans_TC({
   // 如需完整字元集，可移除 subset 限制或使用 preload
   variable: '--font-noto-sans-tc',
   weight: ['400', '500', '700'],
-  display: 'swap',
+  display: 'swap', // 使用 swap 避免 FOIT，提升 LCP
   preload: true, // 預載入字體以減少 CLS
+  // 優化字體載入：使用 font-display: swap 確保文字立即顯示
+  fallback: ['system-ui', 'sans-serif'], // 提供 fallback 字體
 });
 
 export const metadata: Metadata = {

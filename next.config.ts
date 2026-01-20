@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 31536000, // 1年快取，靜態資源
     // 允許從外部域名載入圖片（如果未來需要）
     remotePatterns: [],
   },
@@ -19,8 +19,12 @@ const nextConfig: NextConfig = {
   
   // 實驗性功能：啟用 React Server Components 優化
   experimental: {
-    optimizePackageImports: ['framer-motion', 'lucide-react'],
+    optimizePackageImports: ['framer-motion', 'lucide-react', 'react-leaflet'],
+    // 注意：PPR 已合併到 cacheComponents，但我們通過動態導入已實現代碼分割優化
   },
+  
+  // 生產環境優化
+  productionBrowserSourceMaps: false, // 關閉 source maps 以減少 bundle 大小
   
   async headers() {
     return [
@@ -69,6 +73,26 @@ const nextConfig: NextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+        ],
+      },
+      {
+        // 為 JavaScript 和 CSS 設置長期快取
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // 為字體設置長期快取
+        source: '/_next/static/media/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

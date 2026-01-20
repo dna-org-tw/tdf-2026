@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
+import LazyVideo from '@/components/LazyVideo';
 
 export default function AboutSection() {
   const { t } = useTranslation();
@@ -20,19 +21,12 @@ export default function AboutSection() {
             className="w-full md:w-1/2"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
+              <LazyVideo
+                src="/videos/tdf2025_short.mov"
                 poster="/images/tdf2025.webp"
                 aria-label="Taiwan Digital Fest 2025 - Digital nomads networking and connecting at the festival in Taipei, Taiwan"
                 className="w-full h-auto object-contain"
-              >
-                <source src="/videos/tdf2025_short.mov" type="video/quicktime" />
-                <source src="/videos/tdf2025_short.mov" type="video/mp4" />
-              </video>
+              />
               <div className="absolute bottom-6 left-6 px-4 py-2 bg-[#000000]/60 backdrop-blur-sm rounded-lg text-white font-medium z-10 pointer-events-none">
                 2025 - Taipei, Taiwan
               </div>

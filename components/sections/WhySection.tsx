@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
+import LazyVideo from '@/components/LazyVideo';
 
 export default function WhySection() {
   const { t } = useTranslation();
@@ -56,13 +57,9 @@ export default function WhySection() {
               >
                 <div className="relative aspect-[3/4] overflow-hidden rounded-xl mb-6">
                   {item.video ? (
-                    <video
+                    <LazyVideo
                       src={item.video}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      preload="metadata" // 優化：僅預載入元數據，減少初始載入時間
+                      poster={`${item.video.replace('.mp4', '_poster.webp')}`}
                       aria-label={`${content.title} - ${content.desc}`}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
