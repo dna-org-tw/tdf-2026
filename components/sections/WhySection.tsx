@@ -62,17 +62,18 @@ export default function WhySection() {
                       loop
                       muted
                       playsInline
-                      preload="metadata"
+                      preload="metadata" // 優化：僅預載入元數據，減少初始載入時間
                       aria-label={`${content.title} - ${content.desc}`}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                  ) : (
+                  ) : item.img ? (
                     <img
                       src={item.img}
                       alt={content.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy" // 非首屏圖片延遲載入
                     />
-                  )}
+                  ) : null}
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full text-[#004E9D]">
                     {item.tag}
                   </div>
@@ -83,6 +84,35 @@ export default function WhySection() {
             );
           })}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-12 -mx-6 md:-mx-6"
+        >
+          <div className="grid md:grid-cols-2 gap-4 md:gap-8">
+            <div className="relative aspect-video overflow-hidden">
+              <iframe
+                src="https://www.youtube.com/embed/i7WnQn7c5bc"
+                title="YouTube video player"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+            <div className="relative aspect-video overflow-hidden">
+              <iframe
+                src="https://www.youtube.com/embed/U40EpRW5p-c"
+                title="YouTube video player"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

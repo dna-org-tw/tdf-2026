@@ -4,7 +4,12 @@ export const content = {
       title: "Taiwan Digital Fest 2026",
       subtitle: "Where Digital Nomads Meet Nature & Innovation",
       dateLocation: "May 1 – May 31, 2026 | Taitung & Hualien, Taiwan",
-      cta: "Register Now"
+      cta: "Register Now",
+      ctaSpeakers: "Call for Speakers",
+      ctaVolunteers: "Call for Volunteers",
+      ctaPartners: "Call for Partners",
+      ctaSideEvents: "Call for Side Events",
+      ctaSponsors: "Call for Sponsors"
     },
     nav: {
       about: "About",
@@ -445,7 +450,12 @@ export const content = {
       title: "2026 台灣數位嘉年華",
       subtitle: "在山海之間，遇見世界的數位遊牧者",
       dateLocation: "2026/05/01 – 2026/05/31 | 台灣 台東 & 花蓮",
-      cta: "立即報名"
+      cta: "立即報名",
+      ctaSpeakers: "徵求講者",
+      ctaVolunteers: "徵求志工",
+      ctaPartners: "徵求合作夥伴",
+      ctaSideEvents: "徵求 Side Event",
+      ctaSponsors: "徵求贊助商"
     },
     nav: {
       about: "活動介紹",

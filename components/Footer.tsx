@@ -6,7 +6,7 @@ export default function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-[#1E1F1C] text-[#F6F6F6] z-10 max-h-[150px] overflow-hidden">
+    <footer className="bg-[#1E1F1C] text-[#F6F6F6] z-10 max-h-[150px] overflow-hidden">
       <div className="container mx-auto px-6 py-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-2">
           {/* Brand Section */}

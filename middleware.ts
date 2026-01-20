@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // 處理 /zh 和 /en 路徑，重定向到根路徑並添加查詢參數
+  if (pathname === '/zh' || pathname.startsWith('/zh/')) {
+    const redirectUrl = new URL(request.url);
+    // 移除 /zh 前綴，如果結果為空，則設為根路徑
+    const remainingPath = pathname.replace(/^\/zh\/?/, '');
+    redirectUrl.pathname = remainingPath ? `/${remainingPath}` : '/';
+    redirectUrl.searchParams.set('lang', 'zh');
+    return NextResponse.redirect(redirectUrl);
+  }
+  
+  if (pathname === '/en' || pathname.startsWith('/en/')) {
+    const redirectUrl = new URL(request.url);
+    // 移除 /en 前綴，如果結果為空，則設為根路徑
+    const remainingPath = pathname.replace(/^\/en\/?/, '');
+    redirectUrl.pathname = remainingPath ? `/${remainingPath}` : '/';
+    redirectUrl.searchParams.set('lang', 'en');
+    return NextResponse.redirect(redirectUrl);
+  }
+  
   // 從 URL 查詢參數獲取語言
   const langParam = request.nextUrl.searchParams.get('lang');
   const lang = langParam === 'en' ? 'en' : 'zh-TW';

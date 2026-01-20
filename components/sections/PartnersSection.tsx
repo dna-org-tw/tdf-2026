@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function PartnersSection() {
@@ -15,16 +16,26 @@ export default function PartnersSection() {
         
         <div className="flex flex-wrap justify-center items-center gap-16 md:gap-24 opacity-70 hover:opacity-100 transition-all duration-500 mb-12">
            {/* Government partner logos */}
-           <img
-             src="/images/logo/taitung_gov_logo.png"
-             alt="Taitung Government"
-             className="h-32 md:h-40 lg:h-48 object-contain"
-           />
-           <img
-             src="/images/logo/hualien_gov_logo.png"
-             alt="Hualien Government"
-             className="h-32 md:h-40 lg:h-48 object-contain"
-           />
+           <div className="relative h-32 md:h-40 lg:h-48 w-auto">
+             <Image
+               src="/images/logo/taitung_gov_logo.png"
+               alt="Taitung Government"
+               width={200}
+               height={192}
+               className="h-full w-auto object-contain"
+               loading="lazy"
+             />
+           </div>
+           <div className="relative h-32 md:h-40 lg:h-48 w-auto">
+             <Image
+               src="/images/logo/hualien_gov_logo.png"
+               alt="Hualien Government"
+               width={200}
+               height={192}
+               className="h-full w-auto object-contain"
+               loading="lazy"
+             />
+           </div>
         </div>
 
         {/* CTA Buttons */}

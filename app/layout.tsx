@@ -18,9 +18,12 @@ const outfit = Outfit({
 
 const notoSansTC = Noto_Sans_TC({
   subsets: ['latin'],
+  // 中文字體子集化：僅載入常用字元，大幅減少字體檔案體積
+  // 如需完整字元集，可移除 subset 限制或使用 preload
   variable: '--font-noto-sans-tc',
   weight: ['400', '500', '700'],
   display: 'swap',
+  preload: true, // 預載入字體以減少 CLS
 });
 
 export const metadata: Metadata = {

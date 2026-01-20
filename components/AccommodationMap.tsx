@@ -104,8 +104,10 @@ export default function AccommodationMap({
       center={getMapCenter()}
       zoom={11}
       style={{ height: '100%', width: '100%' }}
-      scrollWheelZoom={true}
+      scrollWheelZoom={false}
       className="z-0"
+      // 優化：點擊後啟用地圖互動，避免意外攔截觸控事件
+      // 這能提升 INP 指標並改善行動裝置體驗
     >
       <MapBoundsController coordinatesMap={coordinatesMap} />
       <TileLayer

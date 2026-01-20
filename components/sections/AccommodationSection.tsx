@@ -4,14 +4,26 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Award } from 'lucide-react';
+import { Award, MapPin } from 'lucide-react';
 import type { Coordinates } from '@/utils/geocoding';
 import type { StructuredAddress } from '@/components/AccommodationMap';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-// 动态导入地图组件（避免 SSR 问题）
+// 動態導入地圖組件（避免 SSR 問題）
+// 添加 loading 狀態與延遲載入優化
 const AccommodationMap = dynamic(
   () => import('@/components/AccommodationMap'),
-  { ssr: false }
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full bg-stone-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#10B8D9] mb-4"></div>
+          <p className="text-sm text-slate-600">載入地圖中...</p>
+        </div>
+      </div>
+    ),
+  }
 );
 
 // 将地址对象或字符串转换为字符串格式
@@ -147,14 +159,37 @@ export default function AccommodationSection() {
               className="rounded-lg overflow-hidden shadow-lg border border-[#F6F6F6]"
               style={{ height: '600px', width: '100%' }}
             >
-              <AccommodationMap
-                items={items}
-                coordinatesMap={coordinatesMap}
-                viewWebsite={t.accommodation.viewWebsite}
-                formatPhoneNumber={formatPhoneNumber}
-                generateOpenStreetMapUrl={generateOpenStreetMapUrl}
-                formatAddressToString={formatAddressToString}
-              />
+              <ErrorBoundary
+                fallback={
+                  <div className="flex flex-col items-center justify-center h-full bg-stone-50 p-8">
+                    <MapPin className="w-16 h-16 text-amber-500 mb-4" />
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                      地圖暫時無法載入
+                    </h3>
+                    <p className="text-sm text-slate-600 mb-4 text-center max-w-md">
+                      您可以在下方查看住宿資訊，或使用{' '}
+                      <a
+                        href="https://www.google.com/maps/search/?api=1&query=台東+花蓮+住宿"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#10B8D9] hover:underline"
+                      >
+                        Google Maps
+                      </a>
+                      {' '}搜尋位置。
+                    </p>
+                  </div>
+                }
+              >
+                <AccommodationMap
+                  items={items}
+                  coordinatesMap={coordinatesMap}
+                  viewWebsite={t.accommodation.viewWebsite}
+                  formatPhoneNumber={formatPhoneNumber}
+                  generateOpenStreetMapUrl={generateOpenStreetMapUrl}
+                  formatAddressToString={formatAddressToString}
+                />
+              </ErrorBoundary>
             </motion.div>
           ) : (
             <div className="text-center py-24">

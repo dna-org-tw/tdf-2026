@@ -16,12 +16,20 @@ export default function Navbar() {
   const router = useRouter();
   const isHomePage = pathname === '/';
 
-  // Handle scroll effect
+  // Handle scroll effect with throttle optimization
   useEffect(() => {
+    // 使用 requestAnimationFrame 優化 scroll 事件處理
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

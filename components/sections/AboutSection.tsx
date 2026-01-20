@@ -11,7 +11,7 @@ export default function AboutSection() {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center gap-16">
 
-          {/* Image Side */}
+          {/* Video Side */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -19,14 +19,21 @@ export default function AboutSection() {
             transition={{ duration: 0.8 }}
             className="w-full md:w-1/2"
           >
-            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src="/images/tdf2025.webp"
-                alt="Taiwan Digital Fest 2025 - Digital nomads networking and connecting at the festival in Taipei, Taiwan"
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-[#000000]/50" />
-              <div className="absolute bottom-6 left-6 text-white font-medium">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster="/images/tdf2025.webp"
+                aria-label="Taiwan Digital Fest 2025 - Digital nomads networking and connecting at the festival in Taipei, Taiwan"
+                className="w-full h-auto object-contain"
+              >
+                <source src="/videos/tdf2025_short.mov" type="video/quicktime" />
+                <source src="/videos/tdf2025_short.mov" type="video/mp4" />
+              </video>
+              <div className="absolute bottom-6 left-6 px-4 py-2 bg-[#000000]/60 backdrop-blur-sm rounded-lg text-white font-medium z-10 pointer-events-none">
                 2025 - Taipei, Taiwan
               </div>
             </div>

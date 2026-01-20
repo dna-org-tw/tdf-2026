@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ChevronDown } from 'lucide-react';
 
@@ -18,32 +19,22 @@ export default function HeroSection() {
 
   return (
     <section ref={ref} className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-      {/* Background Video/Image Layer - Parallax */}
+      {/* Background Image Layer - Parallax */}
       <motion.div
         style={{ y }}
         className="absolute inset-0 z-0"
       >
-        {/* Video Background */}
+        {/* Image Background */}
         <div className="absolute inset-0 bg-[#1E1F1C]/70 z-10" /> {/* Overlay */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          poster="/images/tdf2025.webp"
-          aria-label="Taiwan Digital Fest 2026 promotional video showcasing digital nomads meeting nature and innovation"
-          className="w-full h-full object-cover"
-        >
-          <source src="/videos/tdf2025_short.mov" type="video/quicktime" />
-          <source src="/videos/tdf2025_short.mov" type="video/mp4" />
-          {/* Fallback image if video fails to load or is not supported */}
-          <img
-            src="/images/tdf2025.jpg"
-            alt="Taiwan Digital Fest 2026 - Where Digital Nomads Meet Nature & Innovation in Taitung and Hualien, Taiwan"
-            className="w-full h-full object-cover"
-          />
-        </video>
+        <Image
+          src="/images/tdf2025.webp"
+          alt="Taiwan Digital Fest 2026 - Where Digital Nomads Meet Nature & Innovation in Taitung and Hualien, Taiwan"
+          fill
+          priority
+          sizes="100vw"
+          quality={90}
+          className="object-cover"
+        />
       </motion.div>
 
       {/* Content Layer */}
@@ -176,7 +167,7 @@ export default function HeroSection() {
               transition={{ duration: 0.5, delay: 0.9 }}
               className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
             >
-              {t.footer.callForSpeakers}
+              {t.hero.ctaSpeakers}
             </motion.a>
             <motion.a
               href="https://forms.gle/SPCggMHifbE3oqkk7"
@@ -189,7 +180,50 @@ export default function HeroSection() {
               transition={{ duration: 0.5, delay: 1.0 }}
               className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
             >
-              {t.footer.callForVolunteers}
+              {t.hero.ctaVolunteers}
+            </motion.a>
+          </div>
+          
+          {/* 第三行：合作夥伴 CTA */}
+          <div className="flex flex-wrap justify-center gap-4">
+            <motion.a
+              href="https://forms.gle/KqJGkQhdWmSZVTdv6"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.5, delay: 1.1 }}
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+            >
+              {t.hero.ctaPartners}
+            </motion.a>
+            <motion.a
+              href="https://forms.gle/EofTp9Qso27jEeeY7"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.5, delay: 1.2 }}
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+            >
+              {t.hero.ctaSideEvents}
+            </motion.a>
+            <motion.a
+              href="https://forms.gle/aN3LbaHy8iV5xqyi8"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.5, delay: 1.3 }}
+              className="inline-block bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 px-6 md:px-8 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold tracking-wide transition-all shadow-lg"
+            >
+              {t.hero.ctaSponsors}
             </motion.a>
           </div>
         </div>
