@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
   
   // 實驗性功能：啟用 React Server Components 優化
   experimental: {
-    optimizePackageImports: ['framer-motion', 'lucide-react', 'react-leaflet'],
+    optimizePackageImports: ['framer-motion', 'lucide-react'],
     // 注意：PPR 已合併到 cacheComponents，但我們通過動態導入已實現代碼分割優化
   },
   
@@ -51,13 +51,6 @@ const nextConfig: NextConfig = {
               name: 'framer-motion',
               test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
               priority: 40,
-              reuseExistingChunk: true,
-            },
-            // 將 react-leaflet 和 leaflet 單獨打包
-            leaflet: {
-              name: 'leaflet',
-              test: /[\\/]node_modules[\\/](react-leaflet|leaflet)[\\/]/,
-              priority: 30,
               reuseExistingChunk: true,
             },
             // 將其他大型庫打包
@@ -89,26 +82,6 @@ const nextConfig: NextConfig = {
       {
         // 為圖片資源設置快取
         source: '/images/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        // 為視頻資源設置快取
-        source: '/videos/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        // 為 2025 目錄下的圖片設置快取
-        source: '/2025/:path*',
         headers: [
           {
             key: 'Cache-Control',

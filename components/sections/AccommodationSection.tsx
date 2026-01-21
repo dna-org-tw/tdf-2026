@@ -5,9 +5,13 @@ import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MapPin } from 'lucide-react';
-import type { Coordinates } from '@/utils/geocoding';
 import type { StructuredAddress } from '@/components/NomadMap';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+
+interface Coordinates {
+  lat: number;
+  lon: number;
+}
 
 // 動態導入地圖組件（避免 SSR 問題）
 // 添加 loading 狀態與延遲載入優化

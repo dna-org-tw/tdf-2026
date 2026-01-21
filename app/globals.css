@@ -43,18 +43,3 @@ html {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
-
-/* Leaflet Popup 自定义样式 */
-.leaflet-popup-content-wrapper {
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-.leaflet-popup-content {
-  margin: 0;
-}
-
-.custom-popup .leaflet-popup-content {
-  margin: 0;
-  width: auto !important;
-}
