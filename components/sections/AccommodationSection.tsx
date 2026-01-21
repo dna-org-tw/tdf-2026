@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Award, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import type { Coordinates } from '@/utils/geocoding';
-import type { StructuredAddress } from '@/components/AccommodationMap';
+import type { StructuredAddress } from '@/components/NomadMap';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // 動態導入地圖組件（避免 SSR 問題）
 // 添加 loading 狀態與延遲載入優化
-const AccommodationMap = dynamic(
-  () => import('@/components/AccommodationMap'),
+const NomadMap = dynamic(
+  () => import('@/components/NomadMap'),
   { 
     ssr: false,
     loading: () => (
@@ -133,7 +133,7 @@ export default function AccommodationSection() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 text-center"
+          className="mb-8 text-center"
         >
           <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1E1F1C] mb-4">
             {t.accommodation.title}
@@ -142,8 +142,24 @@ export default function AccommodationSection() {
             {t.accommodation.subtitle}
           </p>
           <div className="flex items-center justify-center gap-2 mt-4">
-            <Award className="w-5 h-5 text-[#00993E]" />
-            <span className="text-sm font-medium text-[#00993E]">
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="12"
+                fill="rgb(249,168,37)"
+              />
+              <path
+                d="M12 2L15.09 8.26L22 9.5L16.55 14.47L17.64 21.51L12 18.27L6.36 21.51L7.45 14.47L2 9.5L8.91 8.26L12 2Z"
+                fill="white"
+              />
+            </svg>
+            <span className="text-sm font-medium" style={{ color: 'rgb(249,168,37)' }}>
               {t.accommodation.badge}
             </span>
           </div>
@@ -181,7 +197,7 @@ export default function AccommodationSection() {
                   </div>
                 }
               >
-                <AccommodationMap
+                <NomadMap
                   items={items}
                   coordinatesMap={coordinatesMap}
                   viewWebsite={t.accommodation.viewWebsite}

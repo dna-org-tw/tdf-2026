@@ -43,12 +43,20 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
     },
   };
 
-  // Event Schema (AEO核心：事件结构化数据)
+  // Event Schema (SEO核心：事件结构化数据 - 優化關鍵字)
   const eventSchema = {
     '@context': 'https://schema.org',
     '@type': 'Festival',
     name: lang === 'en' ? 'Taiwan Digital Fest 2026' : '2026 台灣數位嘉年華',
-    alternateName: 'TDF 2026',
+    alternateName: [
+      'TDF 2026',
+      'Digital Nomad Event 2026 Taiwan',
+      'Remote Work Summit 2026',
+      'Global Nomad Meetup Taiwan',
+      'Location Independent Event Taiwan',
+      'Taitung Digital Nomad Event',
+      'Hualien Digital Nomad Event',
+    ],
     description: t.about.description,
     startDate: eventStartDate,
     endDate: eventEndDate,
@@ -84,28 +92,58 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
     offers: [
       {
         '@type': 'Offer',
-        name: 'Explorer',
+        name: 'Explorer Event Pass',
         description: t.tickets.explore.features.join(', '),
         category: 'Explorer',
+        availability: 'https://schema.org/InStock',
       },
       {
         '@type': 'Offer',
-        name: 'Contributor',
+        name: 'Contributor Event Pass',
         description: t.tickets.contribute.features.join(', '),
         category: 'Contributor',
+        availability: 'https://schema.org/InStock',
       },
       {
         '@type': 'Offer',
-        name: 'Backer',
+        name: 'Backer VIP Event Pass',
         description: t.tickets.backer.features.join(', '),
         category: 'Backer',
+        availability: 'https://schema.org/InStock',
       },
     ],
-    keywords: t.about.tags.join(', '),
+    keywords: [
+      ...t.about.tags,
+      'Digital Nomad Event',
+      'Remote Work Summit',
+      'Location Independent Event',
+      'Global Nomad Meetup',
+      'Entrepreneurship Event',
+      'Freelancer Summit',
+      'Online Business Expo',
+      'Geo-arbitrage',
+      'Async Work',
+      'Bootstrapping',
+      'Solopreneur',
+      'Indie Hacker',
+      'Work-Life Balance',
+      'Slow Travel',
+      'Nomad Tribe',
+      'Cost of living Taiwan',
+      'Coworking spaces Taiwan',
+      'Visa for digital nomads Taiwan',
+      'Early bird tickets',
+      'Event Pass',
+      'VIP Access',
+    ].join(', '),
     inLanguage: lang === 'en' ? 'en' : 'zh-TW',
     audience: {
       '@type': 'Audience',
-      audienceType: 'Digital Nomads, Remote Workers, Entrepreneurs, Creators',
+      audienceType: 'Digital Nomads, Remote Workers, Location Independent Entrepreneurs, Solopreneurs, Indie Hackers, Freelancers, Bootstrapped Founders, Online Business Owners',
+    },
+    about: {
+      '@type': 'Thing',
+      name: 'Digital Nomad Lifestyle, Remote Work, Location Independence, Geo-arbitrage, Async Work, Bootstrapping, Solopreneurship',
     },
   };
 
@@ -165,6 +203,39 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
     },
   };
 
+  // LocalBusiness Schema for locations (Local SEO optimization)
+  const locationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristDestination',
+    name: lang === 'en' ? 'Taitung & Hualien - Digital Nomad Destinations' : '台東與花蓮 - 數位遊牧目的地',
+    description: lang === 'en' 
+      ? 'Taitung and Hualien, Taiwan: Premier digital nomad destinations offering cost-effective living, fast internet, coworking spaces, and visa-free entry for remote workers.'
+      : '台東與花蓮，台灣：頂級數位遊牧目的地，提供高性價比生活、快速網路、共創空間和免簽入境。',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Taitung & Hualien',
+      addressRegion: 'Taiwan',
+      addressCountry: 'TW',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: '23.0',
+      longitude: '121.2',
+    },
+    containsPlace: [
+      {
+        '@type': 'City',
+        name: 'Taitung',
+        description: 'Taitung, Taiwan: Best digital nomad destination with slow travel, indigenous culture, and cost-effective coliving options.',
+      },
+      {
+        '@type': 'City',
+        name: 'Hualien',
+        description: 'Hualien, Taiwan: Digital nomad hub with coworking spaces, specialty coffee shops, and proximity to Taroko Gorge.',
+      },
+    ],
+  };
+
   // AEO优化：结构化数据脚本，Next.js会自动将其放在head中
   return (
     <>
@@ -187,6 +258,10 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(locationSchema) }}
       />
     </>
   );

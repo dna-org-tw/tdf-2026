@@ -21,16 +21,16 @@ export default function WhySection() {
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-          <h2 className="text-4xl font-display font-bold text-[#1E1F1C] mb-8">{t.nav.why}</h2>
+          <h2 className="text-4xl font-display font-bold text-[#1E1F1C] mb-12 md:mb-16">{t.nav.why}</h2>
           {reasons.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="max-w-5xl mx-auto"
+              className="w-full"
             >
-              <div className="grid grid-cols-3 md:flex md:flex-row md:justify-center gap-2 sm:gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 lg:gap-10">
                 {reasons.map((reason: { icon: string; text: string } | string, index: number) => {
                   const reasonObj = typeof reason === 'string' 
                     ? { icon: reason.split(' ')[0], text: reason.split(' ').slice(1).join(' ') }
@@ -42,10 +42,10 @@ export default function WhySection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.3 + index * 0.05 }}
-                      className="flex flex-col items-center text-center gap-2"
+                      className="flex flex-col items-center text-center gap-4 md:gap-5 p-6 md:p-8"
                     >
-                      <span className="text-3xl mb-1">{reasonObj.icon}</span>
-                      <span className="text-sm font-medium text-[#1E1F1C]/90 leading-tight">
+                      <span className="text-6xl md:text-7xl lg:text-8xl mb-2">{reasonObj.icon}</span>
+                      <span className="text-base md:text-lg lg:text-xl font-semibold text-[#1E1F1C] leading-tight">
                         {reasonObj.text}
                       </span>
                     </motion.div>

@@ -66,14 +66,65 @@ const ticketTiers: TicketTier[] = [
   },
 ];
 
+interface CountdownTime {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  total: number;
+}
+
 export default function TicketTimelineSection() {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [icsEvents, setIcsEvents] = useState<CalendarEvent[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<CountdownTime | null>(null);
   
   const saleEndDate = '2/28';
-  const isOnSale = true; // 可以根据日期判断是否还在特价期间
+  
+  // Calculate countdown to February 28, 2026 (end of day UTC)
+  useEffect(() => {
+    const calculateCountdown = () => {
+      const now = new Date();
+      // February 28, 2026 23:59:59 UTC
+      const endDate = new Date('2026-02-28T23:59:59Z');
+      const difference = endDate.getTime() - now.getTime();
+      
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        
+        setCountdown({
+          days,
+          hours,
+          minutes,
+          seconds,
+          total: difference
+        });
+      } else {
+        setCountdown({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          total: 0
+        });
+      }
+    };
+    
+    // Calculate immediately
+    calculateCountdown();
+    
+    // Update every second
+    const interval = setInterval(calculateCountdown, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  const isOnSale = countdown !== null && countdown.total > 0;
 
   // Fetch ICS calendar data
   useEffect(() => {
@@ -106,6 +157,12 @@ export default function TicketTimelineSection() {
   }
   for (let i = 1; i <= daysInMonth; i++) {
     calendarDays.push(i);
+  }
+
+  // Group calendar days into weeks (7 days per week)
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < calendarDays.length; i += 7) {
+    weeks.push(calendarDays.slice(i, i + 7));
   }
 
   // Pre-process events for easier lookup by day
@@ -162,41 +219,92 @@ export default function TicketTimelineSection() {
   };
 
   return (
-    <section id="tickets-timeline" className="bg-[#1E1F1C] text-white py-24 md:py-32 overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6">
-        {/* Tickets Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl font-display font-bold mb-4">{t.tickets.title}</h2>
-          <p className="text-[#F6F6F6]/70 text-lg">{t.tickets.subtitle}</p>
-        </motion.div>
-
-        <div className="max-w-6xl mx-auto mb-24">
-          {/* Sale Banner */}
-          {isOnSale && (
+    <>
+      {/* Tickets Section */}
+      <section id="tickets-timeline" className="bg-gradient-to-r from-[#1E1F1C] via-[#1E1F1C] to-[#1E1F1C] text-white py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Sale Banner Info - Only show if on sale */}
+          {isOnSale && countdown && countdown.total > 0 && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mb-12 text-center"
+              transition={{ delay: 0.2 }}
+              className="text-center mb-12 md:mb-16 space-y-4"
             >
-              <div className="inline-block bg-[#10B8D9]/20 border border-[#10B8D9]/40 rounded-xl px-6 py-4">
-                <p className="text-[#10B8D9] font-bold text-xl mb-1">
-                  {t.tickets.saleBanner}
-                </p>
-                <p className="text-[#F6F6F6]/80 text-sm">
-                  {t.tickets.saleEnd} <span className="font-bold text-[#FFD028]">{saleEndDate}</span>
-                </p>
+              <motion.p
+                className="text-[#10B8D9] font-bold text-xl sm:text-2xl md:text-3xl"
+                animate={{
+                  textShadow: [
+                    "0 0 10px rgba(16, 184, 217, 0.3)",
+                    "0 0 25px rgba(16, 184, 217, 0.6)",
+                    "0 0 10px rgba(16, 184, 217, 0.3)"
+                  ]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                {t.tickets.saleBanner}
+              </motion.p>
+              
+              {/* Countdown Info */}
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-white/80 text-sm sm:text-base">
+                    {t.tickets.saleEnd}
+                  </span>
+                  <span className="font-bold text-[#FFD028] text-xl sm:text-2xl md:text-3xl tracking-wide">
+                    {saleEndDate}
+                  </span>
+                </div>
+                
+                <motion.div
+                  className="flex items-baseline gap-2"
+                  key={`days-${countdown.days}`}
+                  initial={{ scale: 1.1 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <motion.span
+                    className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#10B8D9] tabular-nums"
+                    key={countdown.days}
+                    animate={{ 
+                      textShadow: countdown.total < 86400000
+                        ? [
+                            "0 0 20px rgba(16, 184, 217, 0.5)",
+                            "0 0 40px rgba(16, 184, 217, 0.8)",
+                            "0 0 20px rgba(16, 184, 217, 0.5)"
+                          ]
+                        : [
+                            "0 0 10px rgba(16, 184, 217, 0.3)",
+                            "0 0 25px rgba(16, 184, 217, 0.6)",
+                            "0 0 10px rgba(16, 184, 217, 0.3)"
+                          ]
+                    }}
+                    transition={{ 
+                      duration: 0.2,
+                      textShadow: {
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }
+                    }}
+                  >
+                    {countdown.days}
+                  </motion.span>
+                  <span className="text-base sm:text-lg md:text-xl text-[#10B8D9] font-semibold uppercase tracking-wide">
+                    {countdown.days === 1 ? 'Day' : 'Days'} Left
+                  </span>
+                </motion.div>
               </div>
             </motion.div>
           )}
 
           {/* Ticket Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-16">
             {ticketTiers.map((tier, index) => (
               <motion.div
                 key={tier.name}
@@ -206,8 +314,8 @@ export default function TicketTimelineSection() {
                 transition={{ delay: index * 0.1 }}
                 className={`
                   relative rounded-2xl p-8 border-2 transition-all duration-300
-                  ${tier.color.bg} ${tier.color.border}
-                  hover:shadow-2xl hover:scale-105
+                  bg-gradient-to-br from-[#1E1F1C] to-[#1E1F1C]/90 backdrop-blur-sm ${tier.color.border}
+                  hover:shadow-2xl hover:shadow-[#10B8D9]/20 hover:scale-105 hover:from-[#1E1F1C]/95 hover:to-[#1E1F1C]/85
                 `}
               >
                 {/* Badge */}
@@ -217,7 +325,7 @@ export default function TicketTimelineSection() {
 
                 {/* Content */}
                 <div className="mt-4">
-                  <h3 className="text-2xl font-display font-bold mb-2">
+                  <h3 className="text-2xl font-display font-bold mb-2 text-white">
                     {t.tickets[tier.key].label}
                   </h3>
                   
@@ -229,10 +337,10 @@ export default function TicketTimelineSection() {
                           <span className="text-3xl font-bold text-white">
                             ${tier.salePrice}
                           </span>
-                          <span className="text-[#F6F6F6]/60 text-sm">USD</span>
+                          <span className="text-white/70 text-sm">USD</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[#F6F6F6]/40 line-through text-sm">
+                          <span className="text-white/50 line-through text-sm">
                             ${tier.originalPrice} USD
                           </span>
                           <span className="text-[#FFD028] text-xs font-medium">
@@ -292,7 +400,7 @@ export default function TicketTimelineSection() {
                           <svg className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isPreviousTierFeature ? 'text-[#10B8D9]/50' : 'text-[#10B8D9]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span className={`text-sm ${isPreviousTierFeature ? 'text-[#F6F6F6]/60' : 'text-[#F6F6F6]/80'}`}>
+                          <span className={`text-sm ${isPreviousTierFeature ? 'text-white/50' : 'text-white/90'}`}>
                             {feature}
                           </span>
                         </div>
@@ -304,266 +412,278 @@ export default function TicketTimelineSection() {
             ))}
           </div>
 
-          {/* Register Button */}
+          {/* Register and Partner Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="mt-12 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
+            className="text-center space-y-4"
           >
-            <button
-              onClick={() => window.open('https://luma.com/bghtt5zv', '_blank')}
-              className="
-                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-                bg-[#10B8D9] text-[#FFFFFF]
-                hover:bg-[#10B8D9]/80
-                transition-all duration-200 shadow-lg hover:shadow-xl
-                transform hover:scale-105
-              "
-            >
-              {t.tickets.cta}
-            </button>
-            <a
-              href="https://forms.gle/KqJGkQhdWmSZVTdv6"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-                bg-[#F6F6F6] text-[#1E1F1C] border-2 border-[#1E1F1C]
-                hover:bg-white
-                transition-all duration-200 shadow-lg hover:shadow-xl
-                transform hover:scale-105
-              "
-            >
-              {t.tickets.becomePartner}
-            </a>
-          </motion.div>
+            {/* Register Button - Full Width */}
+            <div className="w-full max-w-2xl mx-auto">
+              <button
+                onClick={() => window.open('https://luma.com/bghtt5zv', '_blank')}
+                className="
+                  w-full px-6 sm:px-8 py-4 sm:py-5 rounded-lg font-bold text-base sm:text-lg md:text-xl
+                  bg-[#10B8D9] text-[#FFFFFF]
+                  hover:bg-[#10B8D9]/80
+                  transition-all duration-200 shadow-lg hover:shadow-xl
+                  transform hover:scale-[1.02]
+                "
+              >
+                {t.tickets.cta}
+              </button>
+            </div>
 
-          {/* Note */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
-            className="mt-8 text-center text-[#F6F6F6]/60 text-sm"
-          >
-            <p>{t.tickets.note}</p>
+            {/* Partner Button - Next Line */}
+            <div className="w-full max-w-2xl mx-auto">
+              <a
+                href="https://forms.gle/KqJGkQhdWmSZVTdv6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-block w-full px-6 sm:px-8 py-4 sm:py-5 rounded-lg font-bold text-base sm:text-lg md:text-xl text-center
+                  bg-white/10 text-white border-2 border-white/30
+                  hover:bg-white/20 hover:border-white/50
+                  transition-all duration-200 shadow-lg hover:shadow-xl
+                  transform hover:scale-[1.02]
+                "
+              >
+                {t.tickets.becomePartner}
+              </a>
+            </div>
           </motion.div>
         </div>
+      </section>
 
-        {/* Timeline Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl font-display font-bold mb-4">{t.timeline.title}</h2>
-          <div className="text-teal-400 font-bold tracking-widest text-xl uppercase">May 2026</div>
-        </motion.div>
+      {/* Schedule Section */}
+      <section className="bg-gray-50 text-[#1E1F1C] py-24 md:py-32">
+        <div className="container mx-auto px-4 sm:px-6">
+          {/* Timeline Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-display font-bold mb-4 text-[#1E1F1C]">{t.timeline.title}</h2>
+            <div className="text-[#10B8D9] font-bold tracking-widest text-xl uppercase">May 2026</div>
+          </motion.div>
 
-        <div className="max-w-8xl mx-auto">
-          {/* Eligibility Filters */}
-          <div className="mb-6">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center">
-              <span className="text-sm text-[#F6F6F6]/70 font-medium">{t.timeline.filterLabel}</span>
-              {[
-                { tag: '#explorer', label: t.timeline.explorer, bg: 'bg-[#10B8D9]/20', text: 'text-[#10B8D9]', border: 'border-[#10B8D9]/40', activeBg: 'bg-[#10B8D9]/40', activeBorder: 'border-[#10B8D9]' },
-                { tag: '#contributor', label: t.timeline.contributor, bg: 'bg-[#00993E]/20', text: 'text-[#00993E]', border: 'border-[#00993E]/40', activeBg: 'bg-[#00993E]/40', activeBorder: 'border-[#00993E]' },
-                { tag: '#backer', label: t.timeline.backer, bg: 'bg-[#FFD028]/20', text: 'text-[#FFD028]', border: 'border-[#FFD028]/40', activeBg: 'bg-[#FFD028]/40', activeBorder: 'border-[#FFD028]' },
-              ].map(({ tag, label, bg, text, border, activeBg, activeBorder }) => {
-                const isSelected = selectedFilter === tag.toLowerCase();
-                return (
+          <div className="max-w-8xl mx-auto">
+            {/* Eligibility Filters */}
+            <div className="mb-6">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center">
+                <span className="text-sm text-[#1E1F1C]/70 font-medium">{t.timeline.filterLabel}</span>
+                {[
+                  { tag: '#explorer', label: t.timeline.explorer, bg: 'bg-[#10B8D9]/20', text: 'text-[#10B8D9]', border: 'border-[#10B8D9]/40', activeBg: 'bg-[#10B8D9]/40', activeBorder: 'border-[#10B8D9]' },
+                  { tag: '#contributor', label: t.timeline.contributor, bg: 'bg-[#00993E]/20', text: 'text-[#00993E]', border: 'border-[#00993E]/40', activeBg: 'bg-[#00993E]/40', activeBorder: 'border-[#00993E]' },
+                  { tag: '#backer', label: t.timeline.backer, bg: 'bg-[#FFD028]/20', text: 'text-[#FFD028]', border: 'border-[#FFD028]/40', activeBg: 'bg-[#FFD028]/40', activeBorder: 'border-[#FFD028]' },
+                ].map(({ tag, label, bg, text, border, activeBg, activeBorder }) => {
+                  const isSelected = selectedFilter === tag.toLowerCase();
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => toggleFilter(tag.toLowerCase())}
+                      className={`
+                        px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border transition-all duration-200 font-medium text-xs sm:text-sm
+                        ${isSelected 
+                          ? `${activeBg} ${text} ${activeBorder} shadow-lg` 
+                          : `${bg} ${text} ${border} hover:opacity-80`}
+                      `}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+                {selectedFilter && (
                   <button
-                    key={tag}
-                    onClick={() => toggleFilter(tag.toLowerCase())}
-                    className={`
-                      px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border transition-all duration-200 font-medium text-xs sm:text-sm
-                      ${isSelected 
-                        ? `${activeBg} ${text} ${activeBorder} shadow-lg` 
-                        : `${bg} ${text} ${border} hover:opacity-80`}
-                    `}
+                    onClick={clearFilter}
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-[#1E1F1C]/30 text-[#1E1F1C]/60 hover:text-[#1E1F1C] hover:border-[#1E1F1C]/50 transition-all duration-200 font-medium text-xs sm:text-sm"
                   >
-                    {label}
+                    {t.timeline.clearFilter}
                   </button>
-                );
-              })}
-              {selectedFilter && (
-                <button
-                  onClick={clearFilter}
-                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-[#1E1F1C]/50 text-[#F6F6F6]/60 hover:text-white hover:border-[#1E1F1C]/70 transition-all duration-200 font-medium text-xs sm:text-sm"
-                >
-                  {t.timeline.clearFilter}
-                </button>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Calendar Header */}
-          <div className="grid grid-cols-7 mb-4 text-center text-[#F6F6F6]/60 font-medium text-sm border-b border-[#1E1F1C]/50 pb-4">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-              <div key={day}>{day}</div>
-            ))}
-          </div>
+            {/* Calendar Header */}
+            <div className="grid grid-cols-7 mb-4 text-center text-[#1E1F1C]/60 font-medium text-sm border-b border-[#1E1F1C]/20 pb-4">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                <div key={day}>{day}</div>
+              ))}
+            </div>
 
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4">
-            {calendarDays.map((day, index) => {
-              // If it's an empty slot
-              if (day === null) {
-                return <div key={`empty-${index}`} className="aspect-square" />;
-              }
-
-              const events = getEventsForDay(day);
-              const hasEvents = events.length > 0;
-              const isSelected = selectedDate === day;
-
-              // Determine styling based on event types
-              // We'll simplisticly check if there is an "event" which is usually a range or single day.
-              // We can color code or just use a generic 'active' state.
-
-              return (
-                <motion.div
-                  key={day}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.01 }}
-                  viewport={{ once: true }}
-                  className={`relative group aspect-square md:aspect-auto md:min-h-[120px] ${
-                    hasEvents ? 'cursor-pointer' : ''
-                  }`}
-                  onClick={() => hasEvents && handleDateClick(day)}
-                >
-                  <div className={`
-                            h-full w-full rounded-lg p-2 transition-all duration-300 border
-                            ${hasEvents
-                        ? isSelected
-                        ? 'bg-[#1E1F1C] border-[#10B8D9] shadow-[0_0_20px_-3px_rgba(16,184,217,0.5)]'
-                        : 'bg-[#1E1F1C] border-[#10B8D9]/50 shadow-[0_0_15px_-3px_rgba(16,184,217,0.3)] hover:border-[#10B8D9] hover:shadow-[0_0_20px_-3px_rgba(16,184,217,0.5)]'
-                      : 'bg-[#1E1F1C]/30 border-[#1E1F1C]/50 hover:bg-[#1E1F1C] hover:border-[#1E1F1C]/70'}
-                        `}>
-                    <div className={`text-sm font-bold mb-2 ${hasEvents ? 'text-[#10B8D9]' : 'text-[#F6F6F6]/60'}`}>
-                      {day}
-                    </div>
-
-                    {/* Desktop Event Indicators */}
-                    <div className="hidden md:flex flex-col gap-1">
-                      {events.map((event, i) => {
-                        // Get unique eligibility colors for this event
-                        const eligibilityColors = event.eligibility?.map(tag => {
-                          const colorMap: { [key: string]: string } = {
-                            '#explorer': 'bg-[#10B8D9]',
-                            '#contributor': 'bg-[#00993E]',
-                            '#backer': 'bg-[#FFD028]',
-                          };
-                          return colorMap[tag.toLowerCase()] || 'bg-[#10B8D9]';
-                        }) || ['bg-[#10B8D9]'];
+            {/* Calendar Grid */}
+            <div className="space-y-2 sm:space-y-3 md:space-y-4">
+              {weeks.map((week, weekIndex) => {
+                const globalIndexOffset = weekIndex * 7;
+                return (
+                  <div key={weekIndex}>
+                    {/* Week Separator (except for first week) */}
+                    {weekIndex > 0 && (
+                      <div className="border-t border-[#1E1F1C]/10 mb-2 sm:mb-3 md:mb-4" />
+                    )}
+                    
+                    {/* Week Grid */}
+                    <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4">
+                      {week.map((day, dayIndex) => {
+                        const globalIndex = globalIndexOffset + dayIndex;
                         
+                        // If it's an empty slot
+                        if (day === null) {
+                          return <div key={`empty-${globalIndex}`} className="min-h-[60px] md:min-h-[80px]" />;
+                        }
+
+                        const events = getEventsForDay(day);
+                        const hasEvents = events.length > 0;
+                        const isSelected = selectedDate === day;
+
                         return (
-                          <div key={i} className="px-1.5 py-1 rounded bg-[#10B8D9]/10 text-[#10B8D9] border border-[#10B8D9]/20">
-                            <div className="flex items-center gap-1.5 mb-0.5">
-                              {/* Eligibility Dots */}
-                              <div className="flex gap-1 items-center flex-shrink-0">
-                                {eligibilityColors.map((color, colorIdx) => (
-                                  <div key={colorIdx} className={`w-2 h-2 rounded-full ${color}`} title={event.eligibility?.[colorIdx] || ''} />
-                                ))}
+                          <motion.div
+                            key={day}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: globalIndex * 0.01 }}
+                            viewport={{ once: true }}
+                            className={`relative group min-h-[60px] md:min-h-[80px] ${
+                              hasEvents ? 'cursor-pointer' : ''
+                            }`}
+                            onClick={() => hasEvents && handleDateClick(day)}
+                          >
+                            <div className={`
+                              w-full rounded-lg p-2 transition-all duration-300 border
+                              ${hasEvents
+                                ? isSelected
+                                  ? 'bg-[#10B8D9]/10 border-[#10B8D9] shadow-[0_0_20px_-3px_rgba(16,184,217,0.5)]'
+                                  : 'bg-white border-[#10B8D9]/50 shadow-[0_0_15px_-3px_rgba(16,184,217,0.2)] hover:border-[#10B8D9] hover:shadow-[0_0_20px_-3px_rgba(16,184,217,0.4)] hover:bg-[#10B8D9]/5'
+                                : 'bg-stone-50 border-[#1E1F1C]/20 hover:bg-stone-100 hover:border-[#1E1F1C]/30'}
+                            `}>
+                              <div className={`text-sm font-bold mb-2 ${hasEvents ? 'text-[#10B8D9]' : 'text-[#1E1F1C]/60'}`}>
+                                {day}
                               </div>
-                              <div className="text-[10px] font-semibold leading-tight truncate flex-1">
-                                {event.title}
+
+                              {/* Desktop Event Indicators */}
+                              <div className="hidden md:flex flex-col gap-1">
+                                {events.map((event, i) => {
+                                  // Get unique eligibility colors for this event
+                                  const eligibilityColors = event.eligibility?.map(tag => {
+                                    const colorMap: { [key: string]: string } = {
+                                      '#explorer': 'bg-[#10B8D9]',
+                                      '#contributor': 'bg-[#00993E]',
+                                      '#backer': 'bg-[#FFD028]',
+                                    };
+                                    return colorMap[tag.toLowerCase()] || 'bg-[#10B8D9]';
+                                  }) || ['bg-[#10B8D9]'];
+                                  
+                                  return (
+                                    <div key={i} className="px-1.5 py-1 rounded bg-[#10B8D9]/10 text-[#10B8D9] border border-[#10B8D9]/30">
+                                      {/* Eligibility Dots */}
+                                      <div className="flex gap-1 items-center mb-1">
+                                        {eligibilityColors.map((color, colorIdx) => (
+                                          <div key={colorIdx} className={`w-2 h-2 rounded-full ${color}`} title={event.eligibility?.[colorIdx] || ''} />
+                                        ))}
+                                      </div>
+                                      <div className="text-sm font-semibold leading-tight truncate mb-0.5 text-[#1E1F1C]">
+                                        {event.title}
+                                      </div>
+                                      {event.location && (
+                                        <div className="text-[9px] text-[#1E1F1C]/70 leading-tight truncate flex items-center gap-1">
+                                          <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                          </svg>
+                                          <span className="truncate">{event.location}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Mobile Event Dots */}
+                              <div className="md:hidden flex flex-col gap-1 mt-2">
+                                {events.map((event, i) => {
+                                  // Get unique eligibility colors for this event
+                                  const eligibilityColors = event.eligibility?.map(tag => {
+                                    const colorMap: { [key: string]: string } = {
+                                      '#explorer': 'bg-[#10B8D9]',
+                                      '#contributor': 'bg-[#00993E]',
+                                      '#backer': 'bg-[#FFD028]',
+                                    };
+                                    return colorMap[tag.toLowerCase()] || 'bg-[#10B8D9]';
+                                  }) || ['bg-[#10B8D9]'];
+                                  
+                                  return (
+                                    <div key={i} className="flex gap-1 justify-center items-center">
+                                      {/* Eligibility dots */}
+                                      {eligibilityColors.map((color, colorIdx) => (
+                                        <div key={colorIdx} className={`w-1.5 h-1.5 rounded-full ${color}`} />
+                                      ))}
+                                      {/* If no eligibility, show default dot */}
+                                      {eligibilityColors.length === 0 && (
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[#10B8D9]" />
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
-                            {event.location && (
-                              <div className="text-[9px] text-[#10B8D9]/80 leading-tight truncate flex items-center gap-1">
-                                <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span className="truncate">{event.location}</span>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Mobile Event Dots */}
-                    <div className="md:hidden flex flex-col gap-1 mt-2">
-                      {events.map((event, i) => {
-                        // Get unique eligibility colors for this event
-                        const eligibilityColors = event.eligibility?.map(tag => {
-                          const colorMap: { [key: string]: string } = {
-                            '#explorer': 'bg-[#10B8D9]',
-                            '#contributor': 'bg-[#00993E]',
-                            '#backer': 'bg-[#FFD028]',
-                          };
-                          return colorMap[tag.toLowerCase()] || 'bg-[#10B8D9]';
-                        }) || ['bg-[#10B8D9]'];
-                        
-                        return (
-                          <div key={i} className="flex gap-1 justify-center items-center">
-                            {/* Eligibility dots */}
-                            {eligibilityColors.map((color, colorIdx) => (
-                              <div key={colorIdx} className={`w-1.5 h-1.5 rounded-full ${color}`} />
-                            ))}
-                            {/* If no eligibility, show default dot */}
-                            {eligibilityColors.length === 0 && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-[#10B8D9]" />
-                            )}
-                          </div>
+                          </motion.div>
                         );
                       })}
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
 
-          {/* Note/Legend */}
-          <div className="mt-8 text-center text-[#F6F6F6]/60 text-sm">
-            {t.timeline.clickDate}
-          </div>
+            {/* Note/Legend */}
+            <div className="mt-8 text-center text-[#1E1F1C]/60 text-sm">
+              {t.timeline.clickDate}
+            </div>
 
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-12 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
-          >
-            <a
-              href="https://forms.gle/EofTp9Qso27jEeeY7"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-                bg-[#10B8D9] text-[#FFFFFF]
-                hover:bg-[#10B8D9]/80
-                transition-all duration-200 shadow-lg hover:shadow-xl
-                transform hover:scale-105
-              "
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-12 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
             >
-              {t.footer.callForSideEvents}
-            </a>
-            <a
-              href="https://forms.gle/pVc6oTEi1XZ1pAR49"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-                bg-[#F6F6F6] text-[#1E1F1C] border-2 border-[#1E1F1C]
-                hover:bg-white
-                transition-all duration-200 shadow-lg hover:shadow-xl
-                transform hover:scale-105
-              "
-            >
-              {t.footer.callForSpeakers}
-            </a>
-          </motion.div>
+              <a
+                href="https://forms.gle/EofTp9Qso27jEeeY7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
+                  bg-[#10B8D9] text-[#FFFFFF]
+                  hover:bg-[#10B8D9]/80
+                  transition-all duration-200 shadow-lg hover:shadow-xl
+                  transform hover:scale-105
+                "
+              >
+                {t.footer.callForSideEvents}
+              </a>
+              <a
+                href="https://forms.gle/pVc6oTEi1XZ1pAR49"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
+                  bg-[#1E1F1C] text-white border-2 border-[#1E1F1C]
+                  hover:bg-[#1E1F1C]/90
+                  transition-all duration-200 shadow-lg hover:shadow-xl
+                  transform hover:scale-105
+                "
+              >
+                {t.footer.callForSpeakers}
+              </a>
+            </motion.div>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Event Modal */}
       <EventModal
@@ -572,6 +692,6 @@ export default function TicketTimelineSection() {
         events={getSelectedEvents()}
         date={selectedDate || 1}
       />
-    </section>
+    </>
   );
 }

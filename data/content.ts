@@ -2,7 +2,7 @@ export const content = {
   en: {
     hero: {
       title: "Taiwan Digital Fest 2026",
-      subtitle: "Where Digital Nomads Meet Nature & Innovation",
+      subtitle: "Where the Global Nomad Tribe Meets Nature & Innovation",
       dateLocation: "May 1 – May 31, 2026 | Taitung & Hualien, Taiwan",
       cta: "Register Now",
       ctaSpeakers: "Call for Speakers",
@@ -17,7 +17,7 @@ export const content = {
       highlights: "Highlights",
       schedule: "Schedule",
       gallery: "Gallery",
-      accommodation: "Accommodation",
+      accommodation: "Map",
       register: "Register"
     },
     navShort: {
@@ -26,13 +26,13 @@ export const content = {
       highlights: "Highlights",
       schedule: "Schedule",
       gallery: "Gallery",
-      accommodation: "Stay",
+      accommodation: "Map",
       register: "Register"
     },
     about: {
       title: "About The Event",
-      description: "Escape to where the mountains meet the sea. Join us for Taiwan Digital Fest 2026, a curated festival designed for the modern digital nomad. Immerse yourself in a landscape of rolling hills and endless coastlines, perfectly balancing professional growth with deep relaxation.\n\nEngage in cutting-edge AI workshops, productivity sessions, and startup pitches by day. As the sun sets, unwind with scenic biking trips through golden rice fields, refreshing ocean tours, and soothing hot springs. Connect with a global community at our exclusive VVIP lunches and networking parties. Whether you're brainstorming the next big idea or simply watching the sunset paint the sky, this is your destination to pause, breathe, and reconnect.",
-      tags: ["Digital Nomad", "Placemaking", "International", "Nature", "Culture"],
+      description: "Escape to where the mountains meet the sea. Join us for Taiwan Digital Fest 2026, a premier Digital Nomad Event and remote work summit designed for location-independent entrepreneurs, solopreneurs, and indie hackers. Experience the ultimate geo-arbitrage opportunity—earn in USD while living in one of Asia's most cost-effective destinations.\n\nEngage in cutting-edge AI workshops, productivity sessions on async work, and startup pitches from bootstrapped founders by day. As the sun sets, practice slow travel through scenic biking trips across golden rice fields, refreshing ocean tours, and soothing hot springs. Connect with your nomad tribe at exclusive VVIP lunches and networking parties. Whether you're building your next SaaS, optimizing passive income streams, or simply watching the sunset paint the sky, this is your destination to pause, breathe, and reconnect with what matters.",
+      tags: ["Taiwan Digital Fest", "Digital Nomad Event", "Remote Work Summit", "Geo-arbitrage", "Nomad Tribe"],
       info: {
         title: "Event Information",
         time: "Date:",
@@ -49,24 +49,24 @@ export const content = {
     },
     why: {
       taiwan: {
-        title: "Taiwan as Digital Nomad Destination",
-        desc: "Safe, convenient, and friendly. Taiwan is becoming Asia's top hub for remote workers."
+        title: "Taiwan: Asia's Premier Digital Nomad Destination",
+        desc: "Safe, convenient, and friendly. Taiwan offers world-class internet infrastructure, cost-effective living, and a thriving remote work community—perfect for geo-arbitrage and location-independent living."
       },
       reasons: [
         { icon: "🌐", text: "World-class 5G internet" },
-        { icon: "💼", text: "Affordable living costs" },
+        { icon: "💼", text: "Cost-effective living (geo-arbitrage)" },
         { icon: "🍜", text: "Incredible food culture" },
         { icon: "🏥", text: "Excellent healthcare" },
-        { icon: "⚡", text: "Visa-free entry" },
-        { icon: "🤝", text: "Thriving community" }
+        { icon: "⚡", text: "Visa-free entry (90 days)" },
+        { icon: "🤝", text: "Thriving nomad tribe" }
       ],
       taitung: {
-        title: "Taitung – Mountains, Ocean & Culture",
-        desc: "Experience the slow life, indigenous culture, and breathtaking coastline. Taitung is where time slows down and nature takes center stage. Wake up to golden rice fields stretching to the horizon, cycle through charming villages where locals greet you with warm smiles, and immerse yourself in the rich traditions of Taiwan's indigenous peoples. From pristine beaches perfect for sunrise meditation to hot springs nestled in mountain valleys, Taitung offers a sanctuary for digital nomads seeking balance between productivity and peace. Here, every sunset paints the sky in hues you've never seen, and every meal tells a story of the land and sea."
+        title: "Taitung – Mountains, Ocean & Culture | Nomad Events in Asia",
+        desc: "Experience slow travel, indigenous culture, and breathtaking coastline. Taitung is where time slows down and nature takes center stage—perfect for remote workers seeking work-life balance. Wake up to golden rice fields stretching to the horizon, cycle through charming villages where locals greet you with warm smiles, and immerse yourself in the rich traditions of Taiwan's indigenous peoples. From pristine beaches perfect for sunrise meditation to hot springs nestled in mountain valleys, Taitung offers a sanctuary for digital nomads seeking balance between productivity and peace. With fast WiFi available throughout the region and affordable coliving options, this is where you can truly practice geo-arbitrage while staying connected. Here, every sunset paints the sky in hues you've never seen, and every meal tells a story of the land and sea."
       },
       hualien: {
-        title: "Hualien – Travel, Community & Nature",
-        desc: "Majestic gorges, vibrant communities, and the perfect balance of work and adventure. Hualien is where dramatic landscapes meet a thriving digital nomad scene. Picture yourself working from a cafe overlooking the Pacific Ocean, then hiking through Taroko Gorge's marble canyons in the afternoon. The city pulses with creative energy—from artisanal coffee shops to night markets buzzing with local flavors. Connect with fellow nomads at co-working spaces, join community events, or simply wander through the streets where every corner reveals a new discovery. In Hualien, adventure is never far away, and the community is always welcoming. This is where your best work meets your best life."
+        title: "Hualien – Travel, Community & Nature | Best Digital Nomad Destinations 2026",
+        desc: "Majestic gorges, vibrant communities, and the perfect balance of work and adventure. Hualien is where dramatic landscapes meet a thriving digital nomad scene—one of the best digital nomad destinations in Asia for 2026. Picture yourself working from a specialty coffee shop with fast WiFi overlooking the Pacific Ocean, then hiking through Taroko Gorge's marble canyons in the afternoon. The city pulses with creative energy—from artisanal coffee shops perfect for async work to night markets buzzing with local flavors. Connect with fellow nomads at co-working spaces, join mastermind groups, or simply wander through the streets where every corner reveals a new discovery. With affordable cost of living and a welcoming nomad tribe, Hualien offers exceptional value for location-independent entrepreneurs. In Hualien, adventure is never far away, and the community is always welcoming. This is where your best work meets your best life."
       },
       ctas: [
         { type: "Register", text: "Start Your Journey", href: "#tickets-timeline" },
@@ -83,14 +83,14 @@ export const content = {
       items: [
         { 
           title: "🎉 Opening Party", 
-          summary: "Kick off your journey with a relaxed evening of networking. Connect with digital nomads, creators, and local partners over exquisite appetizers and drinks in a pressure-free atmosphere. An unforgettable start where making friends feels natural.",
-          desc: "The first night of the event, let's meet in the most relaxed way. Opening Party is not just an opening, but a starting point for everyone to quickly break the ice and build connections. With exquisite appetizers and refreshing drinks, you'll naturally connect with digital nomads, startup workers, creators, and local partners from around the world in a pressure-free atmosphere. You can talk about work, life, journeys, or nothing at all—just enjoy the music, the buzz, and the flowing energy. This is an evening where you can \"make friends without introducing yourself,\" and the moment you step in, you'll know: this journey will be worth it.", 
+          summary: "Kick off your journey with a relaxed evening of networking. Connect with your nomad tribe—digital nomads, solopreneurs, indie hackers, creators, and local partners over exquisite appetizers and drinks in a pressure-free atmosphere. An unforgettable start where making friends feels natural.",
+          desc: "The first night of the Digital Nomad Event 2026, let's meet in the most relaxed way. Opening Party is not just an opening, but a starting point for everyone to quickly break the ice and build meaningful connections within the global nomad community. With exquisite appetizers and refreshing drinks, you'll naturally connect with digital nomads, bootstrapped founders, solopreneurs, creators, and local partners from around the world in a pressure-free atmosphere. You can talk about geo-arbitrage strategies, passive income, async work, bootstrapping stories, life journeys, or nothing at all—just enjoy the music, the buzz, and the flowing energy. This is an evening where you can \"make friends without introducing yourself,\" and the moment you step in, you'll know: this journey with your nomad tribe will be worth it.", 
           icon: "Calendar" 
         },
         { 
-          title: "🌍 Digital Nomad Activity", 
-          summary: "Immerse yourself in diverse activities across the city—from inspiring bookstore talks to cafe creator meetups and evening bar discussions. Experience the true rhythm of \"Work, Live, Connect\" through art, culture, AI, and placemaking events in unique venues.",
-          desc: "This is not a single-format lecture, but a series of nomadic experiences that take you into the city and deep into life. We organize diverse activities around themes of art, culture, startups, AI, placemaking, and nature, hosted in bookstores, cafes, bars, accommodations, and co-working spaces. You might attend an inspiring talk at a bookstore in the morning, exchange ideas with creators at a cafe in the afternoon, and continue discussions at a bar in the evening. Each venue tells a story, and each activity creates a connection. This is the rhythm of living, learning, and expanding your world—a true experience of \"Work, Live, Connect.\"", 
+          title: "🌍 Digital Nomad Activities | Networking Opportunities", 
+          summary: "Immerse yourself in diverse activities across the city—from inspiring bookstore talks on passive income and SaaS growth to cafe creator meetups on SEO for bloggers, and evening bar discussions on tax optimization for nomads. Experience the true rhythm of \"Work, Live, Connect\" through art, culture, AI, and placemaking events in unique venues.",
+          desc: "This is not a single-format lecture, but a series of nomadic experiences that take you into the city and deep into life. We organize diverse activities around themes of art, culture, startups, AI, placemaking, and nature, hosted in bookstores, cafes, bars, coliving spaces, and co-working spaces. You might attend an inspiring talk on passive income streams or e-residency strategies at a bookstore in the morning, exchange ideas on bootstrapping SaaS with creators at a specialty coffee shop in the afternoon, and continue discussions on crypto nomad strategies or tax optimization at a bar in the evening. Each venue tells a story, and each activity creates a connection with like-minded people in your nomad tribe. This is the rhythm of living, learning, and expanding your world—a true experience of \"Work, Live, Connect\" that balances professional growth with wellness and work-life balance.", 
           icon: "CalendarCheck" 
         },
         { 
@@ -121,13 +121,13 @@ export const content = {
     },
     register: {
       title: "Join Taiwan Digital Fest 2026",
-      subtitle: "Be part of the journey. Be part of the community."
+      subtitle: "Be part of the journey. Be part of the global nomad tribe."
     },
     tickets: {
-      title: "Ticket Information",
-      subtitle: "Choose the ticket type that suits you and participate in different levels of activities",
-      saleBanner: "🎉 Limited Time Sale",
-      saleEnd: "Sale ends on",
+      title: "Event Pass & Early Bird Tickets",
+      subtitle: "Choose the event pass that suits you and participate in different levels of networking opportunities and activities",
+      saleBanner: "🎉 Early Bird Tickets - Limited Time",
+      saleEnd: "Early bird pricing ends on",
       save: "Save",
       explore: {
         name: "Explorer",
@@ -187,8 +187,8 @@ export const content = {
       }
     },
     accommodation: {
-      title: "Recommended Accommodations",
-      subtitle: "These establishments are certified Taiwan Digital Nomad Friendly businesses, providing excellent accommodation options for digital nomads.",
+      title: "Nomad Map",
+      subtitle: "These are our handpicked recommended venues and event locations for digital nomads in Taitung.",
       badge: "Certified Taiwan Digital Nomad Friendly",
       viewWebsite: "Visit Website",
       mapLoadError: "Unable to load map data",
@@ -427,11 +427,11 @@ export const content = {
       items: [
         {
           question: "What is Taiwan Digital Fest 2026?",
-          answer: "Taiwan Digital Fest 2026 is a curated festival for digital nomads taking place from May 1-31, 2026 in Taitung and Hualien, Taiwan. It combines professional development through AI workshops and networking events with breathtaking natural experiences in Taiwan's most beautiful regions."
+          answer: "Taiwan Digital Fest 2026 is a premier Digital Nomad Event and remote work summit for location-independent entrepreneurs, solopreneurs, and indie hackers. Taking place from May 1-31, 2026 in Taitung and Hualien, Taiwan, it combines professional development through AI workshops, networking opportunities, and startup pitches with breathtaking natural experiences. Perfect for those seeking geo-arbitrage opportunities while connecting with the global nomad tribe."
         },
         {
           question: "When and where does Taiwan Digital Fest 2026 take place?",
-          answer: "Taiwan Digital Fest 2026 runs from May 1 to May 31, 2026, in Taitung and Hualien, Taiwan. These are two of Taiwan's most scenic regions, known for their stunning coastlines, mountains, and rich indigenous culture."
+          answer: "Taiwan Digital Fest 2026 runs from May 1 to May 31, 2026, in Taitung and Hualien, Taiwan—two of Asia's best digital nomad destinations. These scenic regions offer cost-effective living, world-class internet infrastructure, coworking spaces, and visa-free entry for most visitors. Known for stunning coastlines, mountains, and rich indigenous culture, they're perfect for location-independent entrepreneurs seeking work-life balance."
         },
         {
           question: "What activities are included in Taiwan Digital Fest 2026?",
@@ -450,12 +450,16 @@ export const content = {
           answer: "Accommodation is not included in the ticket price, but we have partnered with certified Taiwan Digital Nomad Friendly accommodations in Taitung and Hualien. These are listed on our accommodation page with booking information."
         },
         {
-          question: "What makes Taiwan a good destination for digital nomads?",
-          answer: "Taiwan is safe, convenient, and friendly, making it an ideal destination for remote workers. It offers excellent internet infrastructure, affordable living costs, rich culture, and stunning natural landscapes. Taitung and Hualien specifically provide a perfect balance of work opportunities and relaxation."
+          question: "What makes Taiwan one of the best digital nomad destinations in Asia?",
+          answer: "Taiwan is safe, convenient, and friendly, making it an ideal destination for remote workers seeking geo-arbitrage opportunities. It offers world-class 5G internet infrastructure, cost-effective living (perfect for earning in USD while spending in TWD), rich culture, and stunning natural landscapes. Taitung and Hualien specifically provide a perfect balance of work opportunities and relaxation, with numerous coworking spaces, specialty coffee shops with fast WiFi, and affordable coliving options. Taiwan offers visa-free entry for 90 days for most Western nationals, making it one of the easiest destinations for digital nomads in Asia."
         },
         {
           question: "Do I need a visa to attend Taiwan Digital Fest 2026?",
-          answer: "Visa requirements depend on your nationality. Most visitors can enter Taiwan visa-free for 14-90 days. We recommend checking with the Taiwan Representative Office in your country for specific visa requirements."
+          answer: "Visa requirements depend on your nationality. Most Western visitors (US, EU, UK, Canada, Australia, etc.) can enter Taiwan visa-free for 90 days, making it extremely convenient for digital nomads. Citizens of some countries may need a visa or have shorter visa-free periods. We recommend checking with the Taiwan Representative Office in your country for specific visa requirements. The visa-free entry makes Taiwan one of the most accessible digital nomad destinations in Asia."
+        },
+        {
+          question: "What is the cost of living in Taitung and Hualien for digital nomads?",
+          answer: "Taitung and Hualien offer excellent geo-arbitrage opportunities with cost-effective living compared to Western countries. Accommodation ranges from affordable hostels to mid-range coliving spaces, typically $20-50 USD per night. Meals cost $5-15 USD, and coworking spaces are available for $10-30 USD per day. The overall cost of living is significantly lower than major Western cities, making it perfect for location-independent entrepreneurs and remote workers looking to maximize their savings while maintaining a high quality of life."
         },
         {
           question: "What language are the events conducted in?",
@@ -486,7 +490,7 @@ export const content = {
       highlights: "活動亮點",
       schedule: "重要時程",
       gallery: "精彩瞬間",
-      accommodation: "住宿推薦",
+      accommodation: "地圖",
       register: "立即報名"
     },
     navShort: {
@@ -495,7 +499,7 @@ export const content = {
       highlights: "亮點",
       schedule: "時程",
       gallery: "精彩瞬間",
-      accommodation: "住宿",
+      accommodation: "地圖",
       register: "報名"
     },
     about: {
@@ -656,8 +660,8 @@ export const content = {
       }
     },
     accommodation: {
-      title: "住宿推薦",
-      subtitle: "這些商家均為取得台灣數位遊牧友善標章的優良商家，為數位遊牧者提供優質的住宿選擇。",
+      title: "Nomad Map",
+      subtitle: "這些是我們為數位遊牧者精選推薦的場地以及活動場地。",
       badge: "台灣數位遊牧友善標章認證商家",
       viewWebsite: "查看網站",
       mapLoadError: "無法載入地圖資料",

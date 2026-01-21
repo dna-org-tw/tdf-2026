@@ -32,27 +32,64 @@ const notoSansTC = Noto_Sans_TC({
   fallback: ['system-ui', 'sans-serif'], // 提供 fallback 字體
 });
 
-// AEO优化：丰富的元数据，包含关键词和结构化信息
+// SEO Optimization: Rich metadata with core keyword strategy for Western digital nomads
 export const metadata: Metadata = {
   title: {
-    default: 'Taiwan Digital Fest 2026 | Where Digital Nomads Meet Nature & Innovation',
+    default: 'Taiwan Digital Fest 2026 | Digital Nomad Event & Remote Work Summit',
     template: '%s | Taiwan Digital Fest 2026',
   },
-  description: 'Taiwan Digital Fest 2026 is a curated month-long festival for digital nomads in Taitung and Hualien, Taiwan. Join us from May 1-31, 2026 for AI workshops, networking events, and breathtaking natural experiences.',
+  description: 'Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A month-long remote work summit combining AI workshops, networking events, and authentic cultural experiences in Taitung and Hualien. Connect with the global nomad tribe, learn from industry leaders, and experience geo-arbitrage in Asia\'s hidden gem.',
   keywords: [
+    // Primary Keywords (Brand & Event Type)
+    'Digital Nomad Event 2026',
+    'Remote Work Summit',
+    'Location Independent Event',
+    'Global Nomad Meetup',
+    'Entrepreneurship Event',
+    'Freelancer Summit',
+    'Online Business Expo',
+    // Location + Identity Keywords
+    'Taiwan Digital Nomad Event',
+    'Taitung Digital Nomad Event',
+    'Hualien Digital Nomad Event',
+    'Nomad Events in Asia',
+    'Best Digital Nomad Destinations 2026',
+    'Taiwan Remote Work',
+    // Secondary Keywords (LSI & Related Terms)
+    'Digital Nomad Community',
+    'Remote Work Culture',
+    'Networking Event',
+    'Speaker Lineup',
+    'Geo-arbitrage',
+    'Async Work',
+    'Bootstrapping',
+    'Solopreneur',
+    'Indie Hacker',
+    'Work-Life Balance',
+    'Slow Travel',
+    'Nomad Tribe',
+    // Location-Specific
+    'Cost of living Taiwan',
+    'Coworking spaces Taiwan',
+    'Visa for digital nomads Taiwan',
+    'Internet speed Taiwan',
+    'Taiwan digital nomad visa',
+    // Ticket/Pricing Keywords
+    'Early bird tickets digital nomad',
+    'Event Pass',
+    'VIP Access',
+    'Tax deductible events',
+    // Content Keywords
+    'Passive Income',
+    'SaaS Growth',
+    'SEO for Bloggers',
+    'Tax Optimization',
+    'E-residency',
+    'Crypto Nomad',
+    // Legacy/Alternative Names
     'Taiwan Digital Fest',
-    'digital nomad',
-    'Taiwan',
-    'Taitung',
-    'Hualien',
-    'remote work',
-    'digital nomad festival',
-    'AI workshops',
-    'placemaking',
-    'Taiwan travel',
-    'work-life balance',
-    '數位遊牧',
-    '台灣數位嘉年華',
+    'Taiwan Digital Fest 2026',
+    'TDF 2026',
   ],
   authors: [{ name: 'Taiwan Digital Nomad Association' }],
   creator: 'Taiwan Digital Nomad Association (TDNA)',
@@ -76,21 +113,21 @@ export const metadata: Metadata = {
     alternateLocale: ['zh_TW'],
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://fest.dna.org.tw',
     siteName: 'Taiwan Digital Fest 2026',
-    title: 'Taiwan Digital Fest 2026 | Where Digital Nomads Meet Nature & Innovation',
-    description: 'Join us for Taiwan Digital Fest 2026, a curated festival for digital nomads in Taitung and Hualien, Taiwan. May 1-31, 2026.',
+    title: 'Taiwan Digital Fest 2026 | Digital Nomad Event & Remote Work Summit',
+    description: 'Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. Connect with the global nomad tribe, learn from industry leaders, and experience geo-arbitrage in Asia\'s hidden gem. May 1-31, 2026.',
     images: [
       {
         url: '/images/tdf2025.webp',
         width: 1200,
         height: 630,
-        alt: 'Taiwan Digital Fest 2026',
+        alt: 'Digital Nomad Event 2026 Taiwan - Remote Work Summit',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Taiwan Digital Fest 2026',
-    description: 'Where Digital Nomads Meet Nature & Innovation',
+    title: 'Taiwan Digital Fest 2026 | Digital Nomad Event & Remote Work Summit',
+    description: 'Connect with the global nomad tribe. AI workshops, networking, and authentic experiences in Taitung & Hualien.',
     images: ['/images/tdf2025.webp'],
   },
   robots: {
