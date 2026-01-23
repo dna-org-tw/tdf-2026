@@ -12,7 +12,7 @@ export const content = {
       ctaSponsors: "Call for Sponsors"
     },
     nav: {
-      about: "About",
+      team: "Team",
       why: "Why Taiwan",
       highlights: "Highlights",
       schedule: "Schedule",
@@ -21,7 +21,7 @@ export const content = {
       register: "Register"
     },
     navShort: {
-      about: "About",
+      team: "Team",
       why: "Why",
       highlights: "Highlights",
       schedule: "Schedule",
@@ -485,7 +485,7 @@ export const content = {
       ctaSponsors: "徵求贊助商"
     },
     nav: {
-      about: "活動介紹",
+      team: "主辦團隊",
       why: "為什麼是這裡",
       highlights: "活動亮點",
       schedule: "重要時程",
@@ -494,7 +494,7 @@ export const content = {
       register: "立即報名"
     },
     navShort: {
-      about: "介紹",
+      team: "團隊",
       why: "為什麼",
       highlights: "亮點",
       schedule: "時程",

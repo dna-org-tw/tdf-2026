@@ -112,11 +112,11 @@ export default function Navbar() {
   }, [isHomePage, pathname]);
 
   const navLinks = [
-    { name: t.nav.about, nameShort: t.navShort?.about || t.nav.about, href: '#about' },
     { name: t.nav.why, nameShort: t.navShort?.why || t.nav.why, href: '#why' },
     { name: t.nav.highlights, nameShort: t.navShort?.highlights || t.nav.highlights, href: '#highlights' },
     { name: t.nav.schedule, nameShort: t.navShort?.schedule || t.nav.schedule, href: '#tickets-timeline' },
     { name: t.nav.accommodation, nameShort: t.navShort?.accommodation || t.nav.accommodation, href: '#accommodation' },
+    { name: t.nav.team, nameShort: t.navShort?.team || t.nav.team, href: '#organizer' },
   ];
 
   return (

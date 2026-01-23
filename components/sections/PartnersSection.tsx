@@ -43,7 +43,7 @@ export default function PartnersSection() {
   return (
     <section id="partners" className="text-center">
       {/* 主辦單位 Organizers */}
-      <div className="py-24 md:py-32 bg-[#F6F6F6]">
+      <div id="organizer" className="py-24 md:py-32 bg-[#F6F6F6]">
         <div className="container mx-auto px-4 sm:px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
