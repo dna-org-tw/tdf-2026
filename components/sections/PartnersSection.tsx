@@ -3,9 +3,42 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useState, useEffect } from 'react';
+import { Instagram, Globe, Youtube, Twitter, Linkedin, Music } from 'lucide-react';
+
+interface LumaPartner {
+  name: string;
+  logo?: string;
+  instagram?: string;
+  website?: string;
+  youtube?: string;
+  twitter?: string;
+  linkedin?: string;
+  tiktok?: string;
+}
 
 export default function PartnersSection() {
   const { t } = useTranslation();
+  const [lumaPartners, setLumaPartners] = useState<LumaPartner[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLumaPartners = async () => {
+      try {
+        const response = await fetch('/api/luma-partners');
+        if (response.ok) {
+          const data = await response.json();
+          setLumaPartners(data.partners || []);
+        }
+      } catch (error) {
+        console.error('Error fetching Luma partners:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLumaPartners();
+  }, []);
   
   return (
     <section id="partners" className="text-center">
@@ -106,6 +139,152 @@ export default function PartnersSection() {
           >
             {t.partners.partners.title}
           </motion.h2>
+          
+          {/* Display Luma Partners */}
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            </div>
+          ) : lumaPartners.filter(p => p.name && p.name.trim().length > 0).length > 0 ? (
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 mb-12">
+              {lumaPartners
+                .filter(p => p.name && p.name.trim().length > 0)
+                .map((partner, index) => (
+                <motion.div
+                  key={partner.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex flex-col items-center gap-4"
+                >
+                  {/* Partner Logo or Name */}
+                  {partner.logo ? (
+                    <div className="relative h-24 w-24 md:h-32 md:w-32 rounded-full bg-white p-1 flex items-center justify-center">
+                      <div className="relative w-full h-full rounded-full overflow-hidden">
+                        <Image
+                          src={partner.logo}
+                          alt={partner.name}
+                          width={128}
+                          height={128}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            // Fallback to text if image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `<span class="text-[#1E1F1C] font-bold text-lg">${partner.name}</span>`;
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative h-24 w-24 md:h-32 md:w-32 rounded-full bg-white flex items-center justify-center">
+                      <span className="text-[#1E1F1C] font-bold text-sm md:text-base text-center px-2">
+                        {partner.name}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Partner Name */}
+                  <h3 className="text-white font-semibold text-lg md:text-xl">
+                    {partner.name}
+                  </h3>
+                  
+                  {/* Social Links */}
+                  <div className="flex flex-wrap gap-3 items-center justify-center">
+                    {partner.instagram && (
+                      <motion.a
+                        href={partner.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-white hover:text-white/80 transition-colors"
+                        aria-label={`${partner.name} Instagram`}
+                        title="Instagram"
+                      >
+                        <Instagram size={20} />
+                      </motion.a>
+                    )}
+                    {partner.youtube && (
+                      <motion.a
+                        href={partner.youtube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-white hover:text-white/80 transition-colors"
+                        aria-label={`${partner.name} YouTube`}
+                        title="YouTube"
+                      >
+                        <Youtube size={20} />
+                      </motion.a>
+                    )}
+                    {partner.twitter && (
+                      <motion.a
+                        href={partner.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-white hover:text-white/80 transition-colors"
+                        aria-label={`${partner.name} Twitter`}
+                        title="Twitter"
+                      >
+                        <Twitter size={20} />
+                      </motion.a>
+                    )}
+                    {partner.linkedin && (
+                      <motion.a
+                        href={partner.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-white hover:text-white/80 transition-colors"
+                        aria-label={`${partner.name} LinkedIn`}
+                        title="LinkedIn"
+                      >
+                        <Linkedin size={20} />
+                      </motion.a>
+                    )}
+                    {partner.tiktok && (
+                      <motion.a
+                        href={partner.tiktok}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-white hover:text-white/80 transition-colors"
+                        aria-label={`${partner.name} TikTok`}
+                        title="TikTok"
+                      >
+                        <Music size={20} />
+                      </motion.a>
+                    )}
+                    {partner.website && (
+                      <motion.a
+                        href={partner.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-white hover:text-white/80 transition-colors"
+                        aria-label={`${partner.name} Website`}
+                        title="Website"
+                      >
+                        <Globe size={20} />
+                      </motion.a>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : null}
           
           {t.partners.partners.cta && (
             <motion.div

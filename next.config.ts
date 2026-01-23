@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
         hostname: 'img.youtube.com',
         pathname: '/vi/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.lu.ma',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.lumacdn.com',
+        pathname: '/**',
+      },
     ],
     // 對於外部圖片，使用 unoptimized 以減少處理時間
     unoptimized: false,
