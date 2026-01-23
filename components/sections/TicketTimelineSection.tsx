@@ -392,15 +392,33 @@ export default function TicketTimelineSection() {
                         }
                       }
                       
+                      // Check if this is a unique feature (not in previous tier)
+                      const isUniqueFeature = !isPreviousTierFeature;
+                      
+                      // Get tier-specific color for unique features
+                      const getTierColor = () => {
+                        if (!isUniqueFeature) return { icon: 'text-white/70', text: 'text-white/90' };
+                        switch (tier.key) {
+                          case 'contribute':
+                            return { icon: 'text-[#00993E]', text: 'text-[#00993E] font-semibold' };
+                          case 'backer':
+                            return { icon: 'text-[#FFD028]', text: 'text-[#FFD028] font-semibold' };
+                          default:
+                            return { icon: 'text-[#10B8D9]', text: 'text-[#10B8D9] font-semibold' };
+                        }
+                      };
+                      
+                      const colors = getTierColor();
+                      
                       return (
                         <div 
                           key={featureIndex} 
-                          className={`flex items-start gap-2 ${isPreviousTierFeature ? 'opacity-50' : ''}`}
+                          className="flex items-start gap-2"
                         >
-                          <svg className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isPreviousTierFeature ? 'text-[#10B8D9]/50' : 'text-[#10B8D9]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className={`w-5 h-5 flex-shrink-0 mt-0.5 ${colors.icon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span className={`text-sm ${isPreviousTierFeature ? 'text-white/50' : 'text-white/90'}`}>
+                          <span className={`text-sm ${colors.text}`}>
                             {feature}
                           </span>
                         </div>
