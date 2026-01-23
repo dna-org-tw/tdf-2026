@@ -117,7 +117,7 @@ export const metadata: Metadata = {
     description: 'Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. Connect with the global nomad tribe, learn from industry leaders, and experience geo-arbitrage in Asia\'s hidden gem. May 1-31, 2026.',
     images: [
       {
-        url: '/images/tdf2025.webp',
+        url: '/images/tdf2026_cover.webp',
         width: 1200,
         height: 630,
         alt: 'Digital Nomad Event 2026 Taiwan - Remote Work Summit',
@@ -128,7 +128,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Taiwan Digital Fest 2026 | Digital Nomad Event & Remote Work Summit',
     description: 'Connect with the global nomad tribe. AI workshops, networking, and authentic experiences in Taitung & Hualien.',
-    images: ['/images/tdf2025.webp'],
+    images: ['/images/tdf2026_cover.webp'],
   },
   robots: {
     index: true,
