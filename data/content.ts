@@ -179,7 +179,11 @@ export const content = {
       },
       sponsors: {
         title: "Sponsors",
-        cta: { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
+        cta: { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
+        platinum: "Platinum",
+        gold: "Gold",
+        silver: "Silver",
+        bronze: "Bronze"
       },
       partners: {
         title: "Partners",
@@ -652,7 +656,11 @@ export const content = {
       },
       sponsors: {
         title: "贊助單位",
-        cta: { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
+        cta: { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
+        platinum: "白金贊助",
+        gold: "金級贊助",
+        silver: "銀級贊助",
+        bronze: "銅級贊助"
       },
       partners: {
         title: "合作夥伴",

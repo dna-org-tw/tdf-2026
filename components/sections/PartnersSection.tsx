@@ -66,29 +66,6 @@ export default function PartnersSection() {
                 loading="lazy"
               />
             </div>
-            {/* Taitung 和 Hualien 同一排 */}
-            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 lg:gap-20">
-              <div className="relative h-28 md:h-36 lg:h-44 w-auto">
-                <Image
-                  src="/images/logo/taitung_gov_logo.png"
-                  alt="Taitung Government"
-                  width={200}
-                  height={192}
-                  className="h-full w-auto object-contain"
-                  loading="lazy"
-                />
-              </div>
-              <div className="relative h-28 md:h-36 lg:h-44 w-auto">
-                <Image
-                  src="/images/logo/hualien_gov_logo.png"
-                  alt="Hualien Government"
-                  width={200}
-                  height={192}
-                  className="h-full w-auto object-contain"
-                  loading="lazy"
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -104,6 +81,174 @@ export default function PartnersSection() {
           >
             {t.partners.sponsors.title}
           </motion.h2>
+          
+          {/* Platinum Sponsors */}
+          <div className="mb-16">
+            <motion.h3
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-2xl md:text-3xl font-display font-semibold text-[#1E1F1C] mb-8"
+            >
+              {t.partners.sponsors.platinum}
+            </motion.h3>
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 lg:gap-20">
+              <motion.a
+                href="https://www.taitung.gov.tw/"
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative h-28 md:h-36 lg:h-44 w-28 md:w-36 lg:w-44 bg-white p-4 rounded-lg border-4 border-[#e4003d] flex items-center justify-center"
+              >
+                <Image
+                  src="/images/logo/taitung_gov_logo.png"
+                  alt="Taitung Government"
+                  width={200}
+                  height={192}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                />
+              </motion.a>
+              <motion.a
+                href="https://www.hl.gov.tw/"
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative h-28 md:h-36 lg:h-44 w-28 md:w-36 lg:w-44 bg-white p-4 rounded-lg border-4 border-[#e4003d] flex items-center justify-center"
+              >
+                <Image
+                  src="/images/logo/hualien_gov_logo.png"
+                  alt="Hualien Government"
+                  width={200}
+                  height={192}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                />
+              </motion.a>
+            </div>
+          </div>
+
+          {/* Gold Sponsors */}
+          <div className="mb-16">
+            <motion.h3
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-2xl md:text-3xl font-display font-semibold text-[#1E1F1C] mb-8"
+            >
+              {t.partners.sponsors.gold}
+            </motion.h3>
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 lg:gap-20">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <motion.a
+                  key={`gold-${index}`}
+                  href={t.partners.sponsors.cta?.href || '#'}
+                  target={t.partners.sponsors.cta?.href?.startsWith('http') ? '_blank' : undefined}
+                  rel={t.partners.sponsors.cta?.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative h-24 md:h-32 lg:h-40 w-24 md:w-32 lg:w-40 bg-white p-4 rounded-lg border-4 border-[#ffd028] flex items-center justify-center"
+                >
+                  <Image
+                    src="/images/default_sponsor.jpg"
+                    alt="Sponsor"
+                    width={160}
+                    height={160}
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                  />
+                </motion.a>
+              ))}
+            </div>
+          </div>
+
+          {/* Silver Sponsors */}
+          <div className="mb-16">
+            <motion.h3
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-2xl md:text-3xl font-display font-semibold text-[#1E1F1C] mb-8"
+            >
+              {t.partners.sponsors.silver}
+            </motion.h3>
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 lg:gap-20">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <motion.a
+                  key={`silver-${index}`}
+                  href={t.partners.sponsors.cta?.href || '#'}
+                  target={t.partners.sponsors.cta?.href?.startsWith('http') ? '_blank' : undefined}
+                  rel={t.partners.sponsors.cta?.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative h-24 md:h-32 lg:h-40 w-24 md:w-32 lg:w-40 bg-white p-4 rounded-lg border-4 border-[#10b8d9] flex items-center justify-center"
+                >
+                  <Image
+                    src="/images/default_sponsor.jpg"
+                    alt="Sponsor"
+                    width={160}
+                    height={160}
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                  />
+                </motion.a>
+              ))}
+            </div>
+          </div>
+
+          {/* Bronze Sponsors */}
+          <div className="mb-16">
+            <motion.h3
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-2xl md:text-3xl font-display font-semibold text-[#1E1F1C] mb-8"
+            >
+              {t.partners.sponsors.bronze}
+            </motion.h3>
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 lg:gap-20">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <motion.a
+                  key={`bronze-${index}`}
+                  href={t.partners.sponsors.cta?.href || '#'}
+                  target={t.partners.sponsors.cta?.href?.startsWith('http') ? '_blank' : undefined}
+                  rel={t.partners.sponsors.cta?.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative h-24 md:h-32 lg:h-40 w-24 md:w-32 lg:w-40 bg-white p-4 rounded-lg border-4 border-[#00993e] flex items-center justify-center"
+                >
+                  <Image
+                    src="/images/default_sponsor.jpg"
+                    alt="Sponsor"
+                    width={160}
+                    height={160}
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                  />
+                </motion.a>
+              ))}
+            </div>
+          </div>
           
           {t.partners.sponsors.cta && (
             <motion.div
