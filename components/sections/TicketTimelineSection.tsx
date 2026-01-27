@@ -191,6 +191,22 @@ export default function TicketTimelineSection() {
       });
     }
     
+    // Sort events: all-day events (without startTime) first, then events with startTime sorted by time
+    filteredEvents.sort((a, b) => {
+      // If both have startTime, compare them by time
+      if (a.startTime && b.startTime) {
+        const timeA = new Date(a.startTime).getTime();
+        const timeB = new Date(b.startTime).getTime();
+        return timeA - timeB;
+      }
+      // If only a has startTime, b (all-day) comes first
+      if (a.startTime && !b.startTime) return 1;
+      // If only b has startTime, a (all-day) comes first
+      if (!a.startTime && b.startTime) return -1;
+      // If neither has startTime, maintain original order
+      return 0;
+    });
+    
     return filteredEvents;
   };
   
@@ -668,7 +684,7 @@ export default function TicketTimelineSection() {
                                   
                                   return (
                                     <div key={i} className={`px-1.5 py-1 rounded ${tierColors.bg} ${tierColors.text} border ${tierColors.border}`}>
-                                      <div className="text-sm font-semibold leading-tight truncate mb-0.5 text-[#1E1F1C]">
+                                      <div className="text-sm font-semibold leading-tight mb-0.5 text-[#1E1F1C] break-words">
                                         {timeStr && <span className="font-medium text-[#1E1F1C]/70 mr-1.5">{timeStr}</span>}
                                         {event.title}
                                       </div>
