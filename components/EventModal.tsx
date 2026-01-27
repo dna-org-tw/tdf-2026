@@ -10,6 +10,7 @@ interface CalendarEvent {
   description: string;
   startDate: string;
   endDate: string | null;
+  startTime?: string | null;
   eligibility?: string[];
 }
 
@@ -27,6 +28,33 @@ export default function EventModal({ isOpen, onClose, events, date }: EventModal
   const getGoogleMapsUrl = (location: string) => {
     const encodedLocation = encodeURIComponent(location);
     return `https://www.google.com/maps/search/?api=1&query=${encodedLocation}`;
+  };
+
+  // Format time to 12-hour format (HHam/HHpm)
+  const formatTime = (isoString: string | null | undefined): string | null => {
+    if (!isoString) return null;
+    
+    try {
+      const date = new Date(isoString);
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      
+      // Convert to 12-hour format
+      const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+      const ampm = hours < 12 ? 'am' : 'pm';
+      
+      // Format as HHam or HHpm (no minutes if 0)
+      if (minutes === 0) {
+        return `${hour12}${ampm}`;
+      } else {
+        // Include minutes if not 0
+        const minutesStr = String(minutes).padStart(2, '0');
+        return `${hour12}:${minutesStr}${ampm}`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return null;
+    }
   };
 
   return (
@@ -83,6 +111,11 @@ export default function EventModal({ isOpen, onClose, events, date }: EventModal
                       {/* Title */}
                       <div className="mb-3">
                         <h4 className="text-xl font-bold text-white mb-2">
+                          {formatTime(event.startTime) && (
+                            <span className="font-medium text-[#F6F6F6]/70 mr-2">
+                              {formatTime(event.startTime)}
+                            </span>
+                          )}
                           {event.title}
                         </h4>
                         {/* Eligibility Tags */}

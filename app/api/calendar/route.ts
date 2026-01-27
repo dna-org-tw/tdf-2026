@@ -44,21 +44,20 @@ export async function GET() {
         const startDate = e.start ? new Date(e.start) : null;
         let endDate = e.end ? new Date(e.end) : null;
         
+        // Check if it's an all-day event (before modifying endDate)
+        const isAllDay = startDate && 
+                        endDate &&
+                        startDate.getHours() === 0 && 
+                        startDate.getMinutes() === 0 &&
+                        endDate.getHours() === 0 && 
+                        endDate.getMinutes() === 0;
+        
         // ICS endDate is exclusive, so for all-day events we subtract one day
         // For regular events, we keep the end date as is
-        if (endDate && startDate) {
-          const isAllDay = e.start instanceof Date && 
-                          e.end instanceof Date &&
-                          e.start.getHours() === 0 && 
-                          e.start.getMinutes() === 0 &&
-                          e.end.getHours() === 0 && 
-                          e.end.getMinutes() === 0;
-          
-          if (isAllDay) {
-            // Subtract one day for all-day events (end is exclusive)
-            endDate = new Date(endDate);
-            endDate.setDate(endDate.getDate() - 1);
-          }
+        if (isAllDay && endDate) {
+          // Subtract one day for all-day events (end is exclusive)
+          endDate = new Date(endDate);
+          endDate.setDate(endDate.getDate() - 1);
         }
         
         // Extract eligibility tags from title (#explorer, #contributor, #backer)
@@ -84,6 +83,7 @@ export async function GET() {
           description: e.description || '',
           startDate: startDate ? formatDate(startDate) : null,
           endDate: endDate ? formatDate(endDate) : null,
+          startTime: startDate && !isAllDay ? startDate.toISOString() : null,
           eligibility: eligibilityTags,
         };
       })

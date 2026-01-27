@@ -24,6 +24,7 @@ interface CalendarEvent {
   description: string;
   startDate: string;
   endDate: string | null;
+  startTime?: string | null;
   eligibility?: string[];
 }
 
@@ -216,6 +217,78 @@ export default function TicketTimelineSection() {
   const getSelectedEvents = () => {
     if (selectedDate === null) return [];
     return getEventsForDay(selectedDate);
+  };
+
+  // Format time to 12-hour format (HHam/HHpm)
+  const formatTime = (isoString: string | null | undefined): string | null => {
+    if (!isoString) return null;
+    
+    try {
+      const date = new Date(isoString);
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      
+      // Convert to 12-hour format
+      const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+      const ampm = hours < 12 ? 'am' : 'pm';
+      
+      // Format as HHam or HHpm (no minutes if 0)
+      if (minutes === 0) {
+        return `${hour12}${ampm}`;
+      } else {
+        // Include minutes if not 0
+        const minutesStr = String(minutes).padStart(2, '0');
+        return `${hour12}:${minutesStr}${ampm}`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return null;
+    }
+  };
+
+  // Get the lowest tier color for an event based on eligibility
+  const getLowestTierColor = (eligibility?: string[]) => {
+    if (!eligibility || eligibility.length === 0) {
+      return {
+        bg: 'bg-[#10B8D9]/10',
+        text: 'text-[#10B8D9]',
+        border: 'border-[#10B8D9]/30',
+      };
+    }
+
+    // Priority: explorer < contributor < backer
+    const hasExplorer = eligibility.some(tag => tag.toLowerCase() === '#explorer');
+    const hasContributor = eligibility.some(tag => tag.toLowerCase() === '#contributor');
+    const hasBacker = eligibility.some(tag => tag.toLowerCase() === '#backer');
+
+    if (hasExplorer) {
+      return {
+        bg: 'bg-[#10B8D9]/10',
+        text: 'text-[#10B8D9]',
+        border: 'border-[#10B8D9]/30',
+      };
+    }
+    if (hasContributor) {
+      return {
+        bg: 'bg-[#00993E]/10',
+        text: 'text-[#00993E]',
+        border: 'border-[#00993E]/30',
+      };
+    }
+    if (hasBacker) {
+      return {
+        bg: 'bg-[#FFD028]/10',
+        text: 'text-[#FFD028]',
+        border: 'border-[#FFD028]/30',
+      };
+    }
+
+    // Default to explorer color
+    return {
+      bg: 'bg-[#10B8D9]/10',
+      text: 'text-[#10B8D9]',
+      border: 'border-[#10B8D9]/30',
+    };
   };
 
   return (
@@ -574,36 +647,24 @@ export default function TicketTimelineSection() {
                               w-full rounded-lg p-2 transition-all duration-300 border
                               ${hasEvents
                                 ? isSelected
-                                  ? 'bg-[#10B8D9]/10 border-[#10B8D9] shadow-[0_0_20px_-3px_rgba(16,184,217,0.5)]'
-                                  : 'bg-white border-[#10B8D9]/50 shadow-[0_0_15px_-3px_rgba(16,184,217,0.2)] hover:border-[#10B8D9] hover:shadow-[0_0_20px_-3px_rgba(16,184,217,0.4)] hover:bg-[#10B8D9]/5'
+                                  ? 'bg-[#10B8D9]/10 border-[#1E1F1C]/20 shadow-[0_0_20px_-3px_rgba(16,184,217,0.5)]'
+                                  : 'bg-white border-[#1E1F1C]/20 shadow-sm hover:bg-stone-100 hover:border-[#1E1F1C]/30'
                                 : 'bg-stone-50 border-[#1E1F1C]/20 hover:bg-stone-100 hover:border-[#1E1F1C]/30'}
                             `}>
-                              <div className={`text-sm font-bold mb-2 ${hasEvents ? 'text-[#10B8D9]' : 'text-[#1E1F1C]/60'}`}>
+                              <div className="text-sm font-bold mb-2 text-[#1E1F1C]/60">
                                 {day}
                               </div>
 
                               {/* Desktop Event Indicators */}
                               <div className="hidden md:flex flex-col gap-1">
                                 {events.map((event, i) => {
-                                  // Get unique eligibility colors for this event
-                                  const eligibilityColors = event.eligibility?.map(tag => {
-                                    const colorMap: { [key: string]: string } = {
-                                      '#explorer': 'bg-[#10B8D9]',
-                                      '#contributor': 'bg-[#00993E]',
-                                      '#backer': 'bg-[#FFD028]',
-                                    };
-                                    return colorMap[tag.toLowerCase()] || 'bg-[#10B8D9]';
-                                  }) || ['bg-[#10B8D9]'];
+                                  const tierColors = getLowestTierColor(event.eligibility);
+                                  const timeStr = formatTime(event.startTime);
                                   
                                   return (
-                                    <div key={i} className="px-1.5 py-1 rounded bg-[#10B8D9]/10 text-[#10B8D9] border border-[#10B8D9]/30">
-                                      {/* Eligibility Dots */}
-                                      <div className="flex gap-1 items-center mb-1">
-                                        {eligibilityColors.map((color, colorIdx) => (
-                                          <div key={colorIdx} className={`w-2 h-2 rounded-full ${color}`} title={event.eligibility?.[colorIdx] || ''} />
-                                        ))}
-                                      </div>
+                                    <div key={i} className={`px-1.5 py-1 rounded ${tierColors.bg} ${tierColors.text} border ${tierColors.border}`}>
                                       <div className="text-sm font-semibold leading-tight truncate mb-0.5 text-[#1E1F1C]">
+                                        {timeStr && <span className="font-medium text-[#1E1F1C]/70 mr-1.5">{timeStr}</span>}
                                         {event.title}
                                       </div>
                                       {event.location && (
@@ -620,30 +681,13 @@ export default function TicketTimelineSection() {
                                 })}
                               </div>
 
-                              {/* Mobile Event Dots */}
+                              {/* Mobile Event Indicators */}
                               <div className="md:hidden flex flex-col gap-1 mt-2">
                                 {events.map((event, i) => {
-                                  // Get unique eligibility colors for this event
-                                  const eligibilityColors = event.eligibility?.map(tag => {
-                                    const colorMap: { [key: string]: string } = {
-                                      '#explorer': 'bg-[#10B8D9]',
-                                      '#contributor': 'bg-[#00993E]',
-                                      '#backer': 'bg-[#FFD028]',
-                                    };
-                                    return colorMap[tag.toLowerCase()] || 'bg-[#10B8D9]';
-                                  }) || ['bg-[#10B8D9]'];
+                                  const tierColors = getLowestTierColor(event.eligibility);
                                   
                                   return (
-                                    <div key={i} className="flex gap-1 justify-center items-center">
-                                      {/* Eligibility dots */}
-                                      {eligibilityColors.map((color, colorIdx) => (
-                                        <div key={colorIdx} className={`w-1.5 h-1.5 rounded-full ${color}`} />
-                                      ))}
-                                      {/* If no eligibility, show default dot */}
-                                      {eligibilityColors.length === 0 && (
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#10B8D9]" />
-                                      )}
-                                    </div>
+                                    <div key={i} className={`w-full h-1.5 rounded ${tierColors.bg} ${tierColors.border} border`} />
                                   );
                                 })}
                               </div>
