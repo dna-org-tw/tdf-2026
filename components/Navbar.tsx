@@ -42,29 +42,12 @@ export default function Navbar() {
       // If on home page, just scroll to the section
       const element = document.getElementById(hash);
       if (element) {
-        // Account for navbar height (80px) and fixed footer height (150px)
-        const navbarHeight = 80;
-        const footerHeight = 150;
-        const viewportHeight = window.innerHeight;
-        
-        // Calculate base position accounting for navbar
-        const basePosition = element.offsetTop - navbarHeight;
-        
-        // Calculate where element bottom would be after scrolling
-        const elementBottomAfterScroll = basePosition + element.offsetHeight + navbarHeight;
-        
-        // Check if element would be hidden behind footer
-        const maxVisibleBottom = viewportHeight - footerHeight;
-        
-        // If element bottom would be below the max visible area, adjust scroll position
-        if (elementBottomAfterScroll > maxVisibleBottom) {
-          // Scroll so element bottom is just above footer
-          const adjustedPosition = element.offsetTop + element.offsetHeight - maxVisibleBottom;
-          window.scrollTo({ top: Math.max(0, adjustedPosition), behavior: 'smooth' });
-        } else {
-          // Normal case: just account for navbar
-          window.scrollTo({ top: basePosition, behavior: 'smooth' });
-        }
+        // Get navbar height and subtract 4x navbar height as negative offset
+        const navbarElement = document.querySelector('nav');
+        const navbarHeight = navbarElement ? navbarElement.offsetHeight : 80;
+        const extraOffset = navbarHeight * 1; // 1x navbar height as negative offset
+        const scrollPosition = element.offsetTop - extraOffset;
+        window.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
       }
     } else {
       // If on another page, navigate to home page with hash
@@ -82,29 +65,12 @@ export default function Navbar() {
         setTimeout(() => {
           const element = document.getElementById(hash.replace('#', ''));
           if (element) {
-            // Account for navbar height (80px) and fixed footer height (150px)
-            const navbarHeight = 80;
-            const footerHeight = 150;
-            const viewportHeight = window.innerHeight;
-            
-            // Calculate base position accounting for navbar
-            const basePosition = element.offsetTop - navbarHeight;
-            
-            // Calculate where element bottom would be after scrolling
-            const elementBottomAfterScroll = basePosition + element.offsetHeight + navbarHeight;
-            
-            // Check if element would be hidden behind footer
-            const maxVisibleBottom = viewportHeight - footerHeight;
-            
-            // If element bottom would be below the max visible area, adjust scroll position
-            if (elementBottomAfterScroll > maxVisibleBottom) {
-              // Scroll so element bottom is just above footer
-              const adjustedPosition = element.offsetTop + element.offsetHeight - maxVisibleBottom;
-              window.scrollTo({ top: Math.max(0, adjustedPosition), behavior: 'smooth' });
-            } else {
-              // Normal case: just account for navbar
-              window.scrollTo({ top: basePosition, behavior: 'smooth' });
-            }
+            // Get navbar height and subtract 4x navbar height as negative offset
+            const navbarElement = document.querySelector('nav');
+            const navbarHeight = navbarElement ? navbarElement.offsetHeight : 80;
+            const extraOffset = navbarHeight * 1; // 1x navbar height as negative offset
+            const scrollPosition = element.offsetTop - extraOffset;
+            window.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
           }
         }, 300);
       }
@@ -114,7 +80,7 @@ export default function Navbar() {
   const navLinks = [
     { name: t.nav.why, nameShort: t.navShort?.why || t.nav.why, href: '#why' },
     { name: t.nav.highlights, nameShort: t.navShort?.highlights || t.nav.highlights, href: '#highlights' },
-    { name: t.nav.schedule, nameShort: t.navShort?.schedule || t.nav.schedule, href: '#tickets-timeline' },
+    { name: t.nav.schedule, nameShort: t.navShort?.schedule || t.nav.schedule, href: '#schedule' },
     { name: t.nav.accommodation, nameShort: t.navShort?.accommodation || t.nav.accommodation, href: '#accommodation' },
     { name: t.nav.team, nameShort: t.navShort?.team || t.nav.team, href: '#organizer' },
   ];
@@ -184,8 +150,8 @@ export default function Navbar() {
           </button>
 
           <a
-            href="#tickets-timeline"
-            onClick={(e) => handleNavClick(e, '#tickets-timeline')}
+            href="#tickets"
+            onClick={(e) => handleNavClick(e, '#tickets')}
             className="bg-[#1E1F1C] text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#10B8D9] transition-colors cursor-pointer"
           >
             {t.nav.register}
@@ -195,8 +161,8 @@ export default function Navbar() {
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-2 sm:gap-4">
           <a
-            href="#tickets-timeline"
-            onClick={(e) => handleNavClick(e, '#tickets-timeline')}
+            href="#schedule"
+            onClick={(e) => handleNavClick(e, '#schedule')}
             className={`hover:text-[#10B8D9] transition-colors cursor-pointer ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}

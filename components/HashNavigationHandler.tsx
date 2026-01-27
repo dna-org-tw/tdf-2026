@@ -11,9 +11,12 @@ export default function HashNavigationHandler() {
         setTimeout(() => {
           const element = document.getElementById(hash.replace('#', ''));
           if (element) {
-            const navbarHeight = 80;
-            const elementPosition = element.offsetTop - navbarHeight;
-            window.scrollTo({ top: elementPosition, behavior: 'smooth' });
+            // Get navbar height and subtract 4x navbar height as negative offset
+            const navbarElement = document.querySelector('nav');
+            const navbarHeight = navbarElement ? navbarElement.offsetHeight : 80;
+            const extraOffset = navbarHeight * 1; // 1x navbar height as negative offset
+            const scrollPosition = element.offsetTop - extraOffset;
+            window.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
           }
         }, 100);
       });

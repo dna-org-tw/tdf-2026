@@ -128,7 +128,7 @@ export default function EventModal({ isOpen, onClose, events, date }: EventModal
                                 '#backer': { bg: 'bg-[#FFD028]/20', text: 'text-[#FFD028]', border: 'border-[#FFD028]/40', labelKey: 'backerLabel' },
                               };
                               const tagConfig = tagMap[tag.toLowerCase()] || { bg: 'bg-[#1E1F1C]/50', text: 'text-[#F6F6F6]/70', border: 'border-[#1E1F1C]/70', labelKey: null };
-                              const label = tagConfig.labelKey ? t.timeline[tagConfig.labelKey] : tag;
+                              const label = tagConfig.labelKey ? t.schedule[tagConfig.labelKey] : tag;
                               
                               return (
                                 <span

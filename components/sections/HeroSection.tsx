@@ -110,7 +110,7 @@ export default function HeroSection() {
             />
             {/* 主要按鈕 */}
             <motion.a
-              href="#tickets-timeline"
+              href="#tickets"
               whileHover={{ 
                 scale: 1.08,
                 boxShadow: "0 20px 40px rgba(16, 184, 217, 0.4)",
