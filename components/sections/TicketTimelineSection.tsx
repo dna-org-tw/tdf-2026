@@ -178,7 +178,11 @@ export default function TicketTimelineSection() {
     // Apply eligibility filter
     if (selectedFilter) {
       filteredEvents = filteredEvents.filter(event => {
-        // If event has no eligibility tags, exclude it when filter is active
+        // If filter is "other", show events with no eligibility tags
+        if (selectedFilter === '#other') {
+          return !event.eligibility || event.eligibility.length === 0;
+        }
+        // If event has no eligibility tags, exclude it when filter is active (and not "other")
         if (!event.eligibility || event.eligibility.length === 0) {
           return false;
         }
@@ -250,9 +254,9 @@ export default function TicketTimelineSection() {
   const getLowestTierColor = (eligibility?: string[]) => {
     if (!eligibility || eligibility.length === 0) {
       return {
-        bg: 'bg-[#10B8D9]/10',
-        text: 'text-[#10B8D9]',
-        border: 'border-[#10B8D9]/30',
+        bg: 'bg-gray-100',
+        text: 'text-gray-700',
+        border: 'border-gray-300',
       };
     }
 
@@ -283,11 +287,11 @@ export default function TicketTimelineSection() {
       };
     }
 
-    // Default to explorer color
+    // Default to other color (gray) if no matching tags
     return {
-      bg: 'bg-[#10B8D9]/10',
-      text: 'text-[#10B8D9]',
-      border: 'border-[#10B8D9]/30',
+      bg: 'bg-gray-100',
+      text: 'text-gray-700',
+      border: 'border-gray-300',
     };
   };
 
@@ -571,6 +575,7 @@ export default function TicketTimelineSection() {
                   { tag: '#explorer', label: t.timeline.explorer, bg: 'bg-[#10B8D9]/20', text: 'text-[#10B8D9]', border: 'border-[#10B8D9]/40', activeBg: 'bg-[#10B8D9]/40', activeBorder: 'border-[#10B8D9]' },
                   { tag: '#contributor', label: t.timeline.contributor, bg: 'bg-[#00993E]/20', text: 'text-[#00993E]', border: 'border-[#00993E]/40', activeBg: 'bg-[#00993E]/40', activeBorder: 'border-[#00993E]' },
                   { tag: '#backer', label: t.timeline.backer, bg: 'bg-[#FFD028]/20', text: 'text-[#FFD028]', border: 'border-[#FFD028]/40', activeBg: 'bg-[#FFD028]/40', activeBorder: 'border-[#FFD028]' },
+                  { tag: '#other', label: t.timeline.other, bg: 'bg-gray-200', text: 'text-gray-700', border: 'border-gray-300', activeBg: 'bg-gray-300', activeBorder: 'border-gray-500' },
                 ].map(({ tag, label, bg, text, border, activeBg, activeBorder }) => {
                   const isSelected = selectedFilter === tag.toLowerCase();
                   return (

@@ -399,13 +399,15 @@ export const content = {
     },
     timeline: {
       title: "Event Timeline",
-      filterLabel: "Filter by ticket type:",
+      filterLabel: "Filter by event type:",
       explorer: "Explorer",
       contributor: "Contributor",
       backer: "Backer",
+      other: "Other",
       explorerLabel: "Explorer",
       contributorLabel: "Contributor",
       backerLabel: "Backer",
+      otherLabel: "Other",
       clearFilter: "Clear Filter",
       clickDate: "Click on a date to view event details"
     },
@@ -876,13 +878,15 @@ export const content = {
     },
     timeline: {
       title: "活動時程",
-      filterLabel: "依票種篩選活動：",
+      filterLabel: "依活動類型篩選：",
       explorer: "Explorer",
       contributor: "Contributor",
       backer: "Backer",
+      other: "其他",
       explorerLabel: "Explorer",
       contributorLabel: "Contributor",
       backerLabel: "Backer",
+      otherLabel: "其他",
       clearFilter: "清除篩選",
       clickDate: "點擊日期查看活動詳情"
     },
