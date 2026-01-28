@@ -25,15 +25,15 @@ export default function HighlightsSection() {
   const items = t.highlights.items;
 
   return (
-    <section id="highlights" className="bg-stone-100 py-24 md:py-32">
+    <section id="highlights" className="bg-stone-100 py-20 md:py-28 lg:py-32 transition-colors duration-500">
       <div className="container mx-auto px-4 sm:px-6">
         {/* 标题区域 */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-10 md:mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-16">
           <motion.h2 
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-display font-bold text-slate-900 max-w-lg leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-slate-900 max-w-lg leading-tight"
           >
             {t.highlights.title}
           </motion.h2>
@@ -46,7 +46,7 @@ export default function HighlightsSection() {
         </div>
 
         {/* 卡片网格布局 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {items.map((item, index) => {
             // 获取图标：优先使用 item.icon，否则使用默认图标
             const itemWithIcon = item as { icon?: string; title: string; desc: string; summary?: string };

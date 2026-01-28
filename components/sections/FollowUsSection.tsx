@@ -103,14 +103,14 @@ export default function FollowUsSection() {
 
   return (
     <>
-      <section id="follow-us" className="bg-gradient-to-b from-[#1E1F1C] to-[#0F0F0E] py-20 px-4 sm:px-6 relative overflow-hidden">
+      <section id="follow-us" className="bg-gradient-to-b from-[#1E1F1C] to-[#0F0F0E] py-20 md:py-28 lg:py-32 px-4 sm:px-6 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#10B8D9] rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#00993E] rounded-full blur-3xl"></div>
         </div>
 
-        <div className="container mx-auto max-w-4xl relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -118,7 +118,7 @@ export default function FollowUsSection() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6">
               {t.followUs.title}
             </h2>
             <p className="text-lg sm:text-xl text-white/80 mb-8 max-w-2xl mx-auto">

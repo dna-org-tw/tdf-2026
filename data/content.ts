@@ -56,7 +56,7 @@ export const content = {
         themeValue: "Digital Nomad, AI Workshops, Placemaking, Nature Experience"
       },
       ctas: [
-        { type: "Register", text: "Follow for Free", href: "#follow-us" },
+        { type: "Register", text: "Start Your Journey", href: "#tickets" },
         { type: "Gallery", text: "View 2025 Gallery", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -82,7 +82,7 @@ export const content = {
         desc: "Majestic gorges, vibrant communities, and the perfect balance of work and adventure. Hualien is where dramatic landscapes meet a thriving digital nomad scene—one of the best digital nomad destinations in Asia for 2026. Picture yourself working from a specialty coffee shop with fast WiFi overlooking the Pacific Ocean, then hiking through Taroko Gorge's marble canyons in the afternoon. The city pulses with creative energy—from artisanal coffee shops perfect for async work to night markets buzzing with local flavors. Connect with fellow nomads at co-working spaces, join mastermind groups, or simply wander through the streets where every corner reveals a new discovery. With affordable cost of living and a welcoming nomad tribe, Hualien offers exceptional value for location-independent entrepreneurs. In Hualien, adventure is never far away, and the community is always welcoming. This is where your best work meets your best life."
       },
       ctas: [
-        { type: "Register", text: "Start Your Journey", href: "#follow-us" },
+        { type: "Register", text: "Start Your Journey", href: "#tickets" },
         { type: "Gallery", text: "View Past Memories", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -464,6 +464,7 @@ export const content = {
       callForPartners: "Call for Partners",
       callForVolunteers: "Call for Volunteers",
       callForSideEvents: "Host Your Side Event",
+      orderQuery: "Order Query",
       recaptcha: "This site is protected by reCAPTCHA and the Google",
       privacyPolicy: "Privacy Policy",
       termsOfService: "Terms of Service",
@@ -578,7 +579,7 @@ export const content = {
         themeValue: "數位遊牧、AI 工作坊、地方創生、自然體驗"
       },
       ctas: [
-        { type: "Register", text: "免費關注", href: "#follow-us" },
+        { type: "Register", text: "開始旅程", href: "#tickets" },
         { type: "Gallery", text: "查看 2025 精彩瞬間", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -604,7 +605,7 @@ export const content = {
         desc: "壯麗的峽谷、充滿活力的社群，以及工作與冒險的完美平衡。花蓮，是壯麗景觀與蓬勃數位遊牧社群的交匯點。想像自己在俯瞰太平洋的咖啡廳工作，下午則漫步在太魯閣的大理石峽谷中。這座城市充滿創意能量——從手工咖啡店到充滿在地風味的夜市。在共創空間與同行的遊牧者交流，參與社群活動，或只是漫步街頭，每個轉角都有新發現。在花蓮，冒險從不遙遠，社群總是熱情歡迎。這裡是你最佳工作與最佳生活的完美結合。"
       },
       ctas: [
-        { type: "Register", text: "開始旅程", href: "#follow-us" },
+        { type: "Register", text: "開始旅程", href: "#tickets" },
         { type: "Gallery", text: "查看活動回顧", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -986,6 +987,7 @@ export const content = {
       callForPartners: "徵求合作夥伴",
       callForVolunteers: "徵求志工",
       callForSideEvents: "立即舉辦 Side Event",
+      orderQuery: "查詢訂單",
       recaptcha: "此網站受 reCAPTCHA 保護，並適用 Google",
       privacyPolicy: "隱私權政策",
       termsOfService: "服務條款",

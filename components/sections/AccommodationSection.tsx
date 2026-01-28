@@ -131,7 +131,7 @@ export default function AccommodationSection() {
 
 
   return (
-    <section id="accommodation" className="bg-white py-24 md:py-32">
+    <section id="accommodation" className="bg-white py-20 md:py-28 lg:py-32 transition-colors duration-500">
       <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -139,13 +139,13 @@ export default function AccommodationSection() {
           viewport={{ once: true }}
           className="mb-8 text-center"
         >
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1E1F1C] mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-6">
             {t.accommodation.title}
           </h2>
-          <p className="text-lg md:text-xl text-[#1E1F1C]/80 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-[#1E1F1C]/80 max-w-3xl mx-auto leading-relaxed mb-6">
             {t.accommodation.subtitle}
           </p>
-          <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="flex items-center justify-center gap-2 mb-8">
             <svg
               className="w-5 h-5"
               viewBox="0 0 24 24"
@@ -237,10 +237,10 @@ export default function AccommodationSection() {
                   rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg ${
+                  className={`inline-block px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
                     isPrimary
-                      ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/80 text-white shadow-[#004E9D]/20'
-                      : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C]'
+                      ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white shadow-[#10B8D9]/30 hover:shadow-[#10B8D9]/50'
+                      : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C] hover:border-[#10B8D9]'
                   }`}
                 >
                   {cta.text}

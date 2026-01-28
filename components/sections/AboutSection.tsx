@@ -98,7 +98,7 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section id="about" className="py-24 md:py-32 bg-white overflow-hidden relative">
+    <section id="about" className="py-20 md:py-28 lg:py-32 bg-white overflow-hidden relative transition-colors duration-500">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row items-center gap-16">
 
@@ -139,12 +139,12 @@ export default function AboutSection() {
             className="w-full md:w-1/2"
           >
             {/* AEO优化：BLUF原则 - 结论先行，问题导向标题 */}
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1E1F1C] mb-6 leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-8 leading-tight">
               {t.about.title}
             </h2>
             
             {/* SEO优化：答案块格式 - 整合关键信息，包含核心關鍵字 */}
-            <div className="mb-6 p-6 bg-teal-50 rounded-xl border-l-4 border-teal-500">
+            <div className="mb-8 p-6 bg-teal-50 rounded-xl border-l-4 border-teal-500">
               <p className="text-lg md:text-xl font-semibold text-[#1E1F1C] leading-relaxed">
                 {lang === 'en' 
                   ? 'Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A curated remote work summit combining AI workshops, networking opportunities, and startup pitches with scenic biking, ocean tours, and hot springs. Experience geo-arbitrage while connecting with the global nomad tribe in Asia\'s hidden gem.'
@@ -200,10 +200,10 @@ export default function AboutSection() {
                     transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg ${
+                    className={`inline-block px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
                       isPrimary
-                        ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/80 text-white shadow-[#004E9D]/20'
-                        : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C]'
+                        ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white shadow-[#10B8D9]/30 hover:shadow-[#10B8D9]/50'
+                        : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C] hover:border-[#10B8D9]'
                     }`}
                   >
                     {cta.text}

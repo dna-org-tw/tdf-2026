@@ -165,7 +165,7 @@ export default function TicketsSection() {
   };
 
   return (
-    <section id="tickets" className="bg-gradient-to-r from-[#1E1F1C] via-[#1E1F1C] to-[#1E1F1C] text-white py-24 md:py-32">
+    <section id="tickets" className="bg-gradient-to-r from-[#1E1F1C] via-[#1E1F1C] to-[#1E1F1C] text-white py-20 md:py-28 lg:py-32 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Sale Banner Info - Only show if on sale */}
         {isOnSale && countdown && countdown.total > 0 && (
@@ -248,7 +248,7 @@ export default function TicketsSection() {
         )}
 
         {/* Ticket Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10 mb-12 md:mb-16">
           {ticketTiers.map((tier, index) => (
             <motion.div
               key={tier.name}

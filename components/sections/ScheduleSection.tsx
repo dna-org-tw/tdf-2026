@@ -219,16 +219,16 @@ export default function ScheduleSection() {
   return (
     <>
       {/* Schedule Section */}
-      <section id="schedule" className="bg-gray-50 text-[#1E1F1C] py-24 md:py-32">
+      <section id="schedule" className="bg-gray-50 text-[#1E1F1C] py-20 md:py-28 lg:py-32 transition-colors duration-500">
         <div className="container mx-auto px-4 sm:px-6">
           {/* Timeline Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 md:mb-16"
           >
-            <h2 className="text-4xl font-display font-bold mb-4 text-[#1E1F1C]">{t.schedule.title}</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6 text-[#1E1F1C]">{t.schedule.title}</h2>
             <div className="text-[#10B8D9] font-bold tracking-widest text-xl uppercase">May 2026</div>
           </motion.div>
 
@@ -278,7 +278,7 @@ export default function ScheduleSection() {
             </div>
 
             {/* Calendar Grid */}
-            <div className="space-y-2 sm:space-y-3 md:space-y-4">
+            <div className="space-y-3 sm:space-y-4 md:space-y-5">
               {weeks.map((week, weekIndex) => {
                 const globalIndexOffset = weekIndex * 7;
                 return (
@@ -289,7 +289,7 @@ export default function ScheduleSection() {
                     )}
                     
                     {/* Week Grid */}
-                    <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4">
+                    <div className="grid grid-cols-7 gap-2 sm:gap-3 md:gap-4">
                       {week.map((day, dayIndex) => {
                         const globalIndex = globalIndexOffset + dayIndex;
                         
