@@ -45,10 +45,12 @@ export default function LazyYouTubeEmbed({
 
   const handleClick = () => {
     setIsLoaded(true);
-    // Track video play event
-    trackEvent('VideoPlay', {
+    // Track video play event (using custom event as Meta doesn't have a standard VideoPlay event)
+    // Using ViewContent for video view tracking
+    trackEvent('ViewContent', {
       content_name: title,
       content_category: 'Video',
+      content_type: 'video',
       content_ids: [videoId],
     });
     trackCustomEvent('YouTubeVideoPlay', {

@@ -77,8 +77,8 @@ export default function FollowUsSection() {
           message: data.message || t.followUs.successMessage,
         });
         setEmail('');
-        // Track Lead event for successful subscription
-        trackEvent('Lead', {
+        // Track CompleteRegistration event for successful subscription (Meta standard event)
+        trackEvent('CompleteRegistration', {
           content_name: 'Follow Us Form',
           content_category: 'Newsletter Subscription',
         });

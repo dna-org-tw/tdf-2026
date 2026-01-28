@@ -91,9 +91,10 @@ export default function TicketFollowSection() {
       setModalMessage(result.message || t.followUs?.successMessage || t.hero.followForm.successMessage);
       setEmail('');
       setModalOpen(true);
-      trackEvent('Lead', {
+      // Track CompleteRegistration event for successful subscription (Meta standard event)
+      trackEvent('CompleteRegistration', {
         content_name: 'Tickets Free Follow Form',
-        content_category: 'Engagement',
+        content_category: 'Newsletter Subscription',
       });
       trackCustomEvent('TicketsFollowSuccess', { location: 'tickets_section' });
     } catch (err) {
