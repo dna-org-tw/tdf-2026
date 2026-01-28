@@ -34,6 +34,16 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Helper function to calculate scroll position
+  const calculateScrollPosition = (element: HTMLElement) => {
+    // Dynamically get navbar height
+    const navbarElement = document.querySelector('nav');
+    const navbarHeight = navbarElement ? navbarElement.offsetHeight : 80;
+    
+    // Scroll offset is simply the navbar height
+    return Math.max(0, element.offsetTop - navbarHeight);
+  };
+
   // Handle smooth scroll to section
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -49,29 +59,8 @@ export default function Navbar() {
       // If on home page, just scroll to the section
       const element = document.getElementById(hash);
       if (element) {
-        // Account for navbar height (80px) and fixed footer height (150px)
-        const navbarHeight = 80;
-        const footerHeight = 150;
-        const viewportHeight = window.innerHeight;
-        
-        // Calculate base position accounting for navbar
-        const basePosition = element.offsetTop - navbarHeight;
-        
-        // Calculate where element bottom would be after scrolling
-        const elementBottomAfterScroll = basePosition + element.offsetHeight + navbarHeight;
-        
-        // Check if element would be hidden behind footer
-        const maxVisibleBottom = viewportHeight - footerHeight;
-        
-        // If element bottom would be below the max visible area, adjust scroll position
-        if (elementBottomAfterScroll > maxVisibleBottom) {
-          // Scroll so element bottom is just above footer
-          const adjustedPosition = element.offsetTop + element.offsetHeight - maxVisibleBottom;
-          window.scrollTo({ top: Math.max(0, adjustedPosition), behavior: 'smooth' });
-        } else {
-          // Normal case: just account for navbar
-          window.scrollTo({ top: basePosition, behavior: 'smooth' });
-        }
+        const scrollPosition = calculateScrollPosition(element);
+        window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
       }
     } else {
       // If on another page, navigate to home page with hash
@@ -89,29 +78,8 @@ export default function Navbar() {
         setTimeout(() => {
           const element = document.getElementById(hash.replace('#', ''));
           if (element) {
-            // Account for navbar height (80px) and fixed footer height (150px)
-            const navbarHeight = 80;
-            const footerHeight = 150;
-            const viewportHeight = window.innerHeight;
-            
-            // Calculate base position accounting for navbar
-            const basePosition = element.offsetTop - navbarHeight;
-            
-            // Calculate where element bottom would be after scrolling
-            const elementBottomAfterScroll = basePosition + element.offsetHeight + navbarHeight;
-            
-            // Check if element would be hidden behind footer
-            const maxVisibleBottom = viewportHeight - footerHeight;
-            
-            // If element bottom would be below the max visible area, adjust scroll position
-            if (elementBottomAfterScroll > maxVisibleBottom) {
-              // Scroll so element bottom is just above footer
-              const adjustedPosition = element.offsetTop + element.offsetHeight - maxVisibleBottom;
-              window.scrollTo({ top: Math.max(0, adjustedPosition), behavior: 'smooth' });
-            } else {
-              // Normal case: just account for navbar
-              window.scrollTo({ top: basePosition, behavior: 'smooth' });
-            }
+            const scrollPosition = calculateScrollPosition(element);
+            window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
           }
         }, 300);
       }
@@ -122,7 +90,7 @@ export default function Navbar() {
     { name: t.nav.about, href: '#about' },
     { name: t.nav.why, href: '#why' },
     { name: t.nav.highlights, href: '#highlights' },
-    { name: t.nav.schedule, href: '#tickets-timeline' },
+    { name: t.nav.schedule, href: '#tickets' },
     { name: t.nav.accommodation, href: '#accommodation' },
   ];
 
@@ -200,9 +168,9 @@ export default function Navbar() {
           </button>
 
           <a
-            href="#tickets-timeline"
+            href="#schedule"
             onClick={(e) => {
-              handleNavClick(e, '#tickets-timeline');
+              handleNavClick(e, '#schedule');
               trackEvent('Lead', {
                 content_name: 'Register CTA',
                 content_category: 'Navigation',
@@ -217,8 +185,8 @@ export default function Navbar() {
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
           <a
-            href="#tickets-timeline"
-            onClick={(e) => handleNavClick(e, '#tickets-timeline')}
+            href="#schedule"
+            onClick={(e) => handleNavClick(e, '#schedule')}
             className={`hover:text-[#10B8D9] transition-colors cursor-pointer ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}
