@@ -23,6 +23,7 @@ export const content = {
       }
     },
     nav: {
+      about: "About",
       team: "Team",
       why: "Why Taiwan",
       highlights: "Highlights",
@@ -33,6 +34,7 @@ export const content = {
       register: "Learn More"
     },
     navShort: {
+      about: "About",
       team: "Team",
       why: "Why",
       highlights: "Highlights",
@@ -433,6 +435,9 @@ export const content = {
       explorer: "Explorer",
       contributor: "Contributor",
       backer: "Backer",
+      explorerLabel: "Explorer",
+      contributorLabel: "Contributor",
+      backerLabel: "Backer",
       other: "Other",
       clearFilter: "Clear Filter",
       clickDate: "Click on a date to view event details"
@@ -474,6 +479,65 @@ export const content = {
       termsOfService: "Terms of Service",
       and: "and",
       apply: "apply."
+    },
+    checkout: {
+      orderError: "Unable to load order details.",
+      cancelledTitle: "Payment cancelled",
+      cancelledDescription: "Your payment was not completed. No charges have been made.",
+      cancelledAmountNote: "No charge was made for this amount.",
+      successTitle: "Payment Successful",
+      successDescription: "Thank you for your purchase! Your order has been confirmed.",
+      ticketInfoPrefix: "Your ticket type:",
+      orderSummaryTitle: "Order summary",
+      orderLoading: "Loading your order details...",
+      orderStatusLabel: "Payment status",
+      orderItemsLabel: "Items",
+      orderItemQuantity: "Quantity",
+      orderItemPrice: "Price",
+      orderSubtotalLabel: "Subtotal",
+      orderDiscountLabel: "Discount",
+      orderTaxLabel: "Tax",
+      orderAmountLabel: "Total amount",
+      orderEmailLabel: "Confirmation sent to",
+      orderNameLabel: "Customer name",
+      orderPhoneLabel: "Phone",
+      orderAddressLabel: "Billing address",
+      orderTimeLabel: "Order time",
+      orderIdLabel: "Order ID",
+      orderPaymentIntentLabel: "Payment intent ID",
+      orderInvoiceLabel: "Invoice",
+      orderCardLabel: "Paid with card ending in",
+      tryAgain: "Go back and try again",
+      backToHome: "Back to homepage"
+    },
+    orderDetail: {
+      title: "Order Details",
+      orderIdLabel: "Order ID",
+      tryQueryAgain: "Try Query Again",
+      ticketTierLabel: "Ticket Tier",
+      queryAnother: "Query Another Order"
+    },
+    orderQuery: {
+      title: "Order Query",
+      description: "Enter your order ID to view your order details and payment status.",
+      orderIdLabel: "Order ID",
+      orderIdPlaceholder: "Enter your order ID",
+      orderIdHint: "You can find your order ID in the confirmation email or on the payment page.",
+      orderIdRequired: "Please enter an order ID.",
+      queryButton: "Query Order",
+      querying: "Querying...",
+      queryError: "Failed to query order. Please try again.",
+      recaptchaError: "reCAPTCHA verification failed. Please try again.",
+      backToHome: "Back to homepage"
+    },
+    sideEvents: {
+      title: "Side Events Calendar",
+      subtitle: "Discover community-organized side events happening throughout May 2026",
+      errorMessage: "Please try again later or visit the Luma calendar directly.",
+      visitLuma: "Visit Luma Calendar",
+      noEvents: "No side events found at the moment.",
+      viewEvent: "View Event",
+      viewAllEvents: "View All Events on Luma"
     },
     faq: {
       title: "Frequently Asked Questions",
@@ -550,6 +614,7 @@ export const content = {
       }
     },
     nav: {
+      about: "關於",
       team: "主辦團隊",
       why: "為什麼是這裡",
       highlights: "活動亮點",
@@ -560,6 +625,7 @@ export const content = {
       register: "了解更多"
     },
     navShort: {
+      about: "關於",
       team: "團隊",
       why: "為什麼",
       highlights: "亮點",
@@ -758,7 +824,7 @@ export const content = {
           longitude: 121.13720,
           website: "https://www.facebook.com/share/16CYARGnHe/?mibextid=wwXIfr",
           description: "東糖官邸民宿位於台東市中興路二段，結合復古與現代設計，提供寧靜舒適的住宿環境。周邊交通便利，適合喜愛探索台東市區的旅客。",
-          phone: "932615060"
+          phone: "886932615060"
         },
         {
           name: "樂知旅店（知森開發有限公司）",
@@ -803,7 +869,7 @@ export const content = {
           longitude: 121.12841,
           website: "https://www.facebook.com/share/15RkLfSDkX/",
           description: "仲夏綠茵民宿位於台東市，提供寧靜舒適的住宿環境，適合喜愛大自然與放鬆的旅客。每間客房皆設有免費Wi-Fi、空調與私人衛浴，讓您在台東享受放鬆的時光。",
-          phone: "987661688"
+          phone: "886987661688"
         },
         {
           name: "路得行旅 台東1館",
@@ -833,7 +899,7 @@ export const content = {
           longitude: 121.12402,
           website: "https://www.onmywayhostel.com/hostels/taitung",
           description: "途中台東青年旅舍位於台東市安和路102巷30號，距離台東火車站僅需步行7分鐘，交通便利。旅舍提供免費 Wi-Fi、床頭燈、床簾、床頭籃、多國萬用插座、個人置物櫃等設施，並設有共享廚房、閱讀空間與桌遊區，讓旅客在舒適的環境中交流與放鬆。",
-          phone: "965577167"
+          phone: "886965577167"
         },
         {
           name: "ㄧ品苑民宿",
@@ -848,7 +914,7 @@ export const content = {
           longitude: 121.12380,
           website: "https://www.facebook.com/share/1L8HSjurGu/?mibextid=wwXIfr",
           description: "一品苑民宿位於台東市，距離台東火車站僅約10至15分鐘步行路程，交通便利。民宿環境寧靜，設有綠意盎然的庭院和陽光露台，提供免費Wi-Fi、空調、免費停車場等設施。客房寬敞明亮，配備舒適床鋪和完善的衛浴設備，部分房型設有陽台或露台。民宿主人親切熱情，致力於為旅客營造如家的住宿體驗，讓您在旅途中感受到溫馨與放鬆。",
-          phone: "932923009"
+          phone: "886932923009"
         },
         {
           name: "花東民宿",
@@ -923,7 +989,7 @@ export const content = {
           longitude: 121.12580,
           website: "https://www.instagram.com/wo.inn?igsh=MW00d3pkMzFib2RxYg%3D%3D&utm_source=qr",
           description: "窩Wo Style Inn位於台東市，融合現代設計與舒適住宿，提供獨特的旅宿體驗。每間客房皆設有免費Wi-Fi、空調與私人衛浴，讓您在台東享受放鬆的時光。",
-          phone: "920451022"
+          phone: "886920451022"
         },
         {
           name: "路得行旅 台東2館",
@@ -960,6 +1026,9 @@ export const content = {
       explorer: "Explorer",
       contributor: "Contributor",
       backer: "Backer",
+      explorerLabel: "Explorer",
+      contributorLabel: "Contributor",
+      backerLabel: "Backer",
       other: "其他",
       clearFilter: "清除篩選",
       clickDate: "點擊日期查看活動詳情"
@@ -1001,6 +1070,65 @@ export const content = {
       termsOfService: "服務條款",
       and: "和",
       apply: "適用。"
+    },
+    checkout: {
+      orderError: "無法載入訂單詳情。",
+      cancelledTitle: "付款已取消",
+      cancelledDescription: "您的付款未完成。未產生任何費用。",
+      cancelledAmountNote: "此金額未產生任何費用。",
+      successTitle: "付款成功",
+      successDescription: "感謝您的購買！您的訂單已確認。",
+      ticketInfoPrefix: "您的票種：",
+      orderSummaryTitle: "訂單摘要",
+      orderLoading: "載入訂單詳情中...",
+      orderStatusLabel: "付款狀態",
+      orderItemsLabel: "項目",
+      orderItemQuantity: "數量",
+      orderItemPrice: "價格",
+      orderSubtotalLabel: "小計",
+      orderDiscountLabel: "折扣",
+      orderTaxLabel: "稅額",
+      orderAmountLabel: "總金額",
+      orderEmailLabel: "確認信將發送至",
+      orderNameLabel: "客戶姓名",
+      orderPhoneLabel: "電話",
+      orderAddressLabel: "帳單地址",
+      orderTimeLabel: "訂單時間",
+      orderIdLabel: "訂單 ID",
+      orderPaymentIntentLabel: "付款意圖 ID",
+      orderInvoiceLabel: "發票",
+      orderCardLabel: "付款卡號末四碼",
+      tryAgain: "返回重試",
+      backToHome: "返回首頁"
+    },
+    orderDetail: {
+      title: "訂單詳情",
+      orderIdLabel: "訂單 ID",
+      tryQueryAgain: "重試查詢",
+      ticketTierLabel: "票種",
+      queryAnother: "查詢其他訂單"
+    },
+    orderQuery: {
+      title: "查詢訂單",
+      description: "輸入您的訂單 ID 以查看訂單詳情和付款狀態。",
+      orderIdLabel: "訂單 ID",
+      orderIdPlaceholder: "請輸入您的訂單 ID",
+      orderIdHint: "您可以在確認郵件或付款頁面上找到您的訂單 ID。",
+      orderIdRequired: "請輸入訂單 ID。",
+      queryButton: "查詢訂單",
+      querying: "查詢中...",
+      queryError: "查詢訂單失敗，請稍後再試。",
+      recaptchaError: "reCAPTCHA 驗證失敗，請稍後再試。",
+      backToHome: "返回首頁"
+    },
+    sideEvents: {
+      title: "Side Events 行事曆",
+      subtitle: "探索 2026 年 5 月期間由社群組織的 Side Events",
+      errorMessage: "請稍後再試，或直接造訪 Luma 行事曆。",
+      visitLuma: "造訪 Luma 行事曆",
+      noEvents: "目前沒有找到 Side Events。",
+      viewEvent: "查看活動",
+      viewAllEvents: "在 Luma 上查看所有活動"
     },
     faq: {
       title: "常見問題",

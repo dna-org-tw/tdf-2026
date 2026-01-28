@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';

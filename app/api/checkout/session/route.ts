@@ -5,7 +5,7 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-12-15.clover',
     })
   : null;
 
@@ -25,12 +25,23 @@ export async function GET(req: NextRequest) {
     }
 
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['payment_intent', 'line_items', 'line_items.data.price.product'],
+      expand: ['payment_intent', 'payment_intent.latest_charge', 'line_items', 'line_items.data.price.product'],
     });
 
     const paymentIntent = session.payment_intent as Stripe.PaymentIntent | null;
 
-    const charge = paymentIntent?.charges?.data?.[0];
+    // Retrieve charge if latest_charge exists
+    let charge: Stripe.Charge | null = null;
+    if (paymentIntent?.latest_charge) {
+      const chargeId = typeof paymentIntent.latest_charge === 'string' 
+        ? paymentIntent.latest_charge 
+        : paymentIntent.latest_charge.id;
+      try {
+        charge = await stripe.charges.retrieve(chargeId);
+      } catch (error) {
+        console.error('[Stripe] Error retrieving charge:', error);
+      }
+    }
 
     // Extract line items details
     const lineItems = session.line_items?.data || [];

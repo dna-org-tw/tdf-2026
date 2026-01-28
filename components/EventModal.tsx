@@ -144,13 +144,14 @@ export default function EventModal({ isOpen, onClose, events, date }: EventModal
                         {event.eligibility && event.eligibility.length > 0 && (
                           <div className="flex flex-wrap gap-2">
                             {event.eligibility.map((tag, tagIdx) => {
-                              const tagMap: { [key: string]: { bg: string; text: string; border: string; labelKey: 'explorerLabel' | 'contributorLabel' | 'backerLabel' } } = {
+                              type LabelKey = 'explorerLabel' | 'contributorLabel' | 'backerLabel';
+                              const tagMap: { [key: string]: { bg: string; text: string; border: string; labelKey: LabelKey | null } } = {
                                 '#explorer': { bg: 'bg-[#10B8D9]/20', text: 'text-[#10B8D9]', border: 'border-[#10B8D9]/40', labelKey: 'explorerLabel' },
                                 '#contributor': { bg: 'bg-[#00993E]/20', text: 'text-[#00993E]', border: 'border-[#00993E]/40', labelKey: 'contributorLabel' },
                                 '#backer': { bg: 'bg-[#FFD028]/20', text: 'text-[#FFD028]', border: 'border-[#FFD028]/40', labelKey: 'backerLabel' },
                               };
                               const tagConfig = tagMap[tag.toLowerCase()] || { bg: 'bg-[#1E1F1C]/50', text: 'text-[#F6F6F6]/70', border: 'border-[#1E1F1C]/70', labelKey: null };
-                              const label = tagConfig.labelKey ? t.schedule[tagConfig.labelKey] : tag;
+                              const label = tagConfig.labelKey ? t.schedule[tagConfig.labelKey as LabelKey] : tag;
                               
                               return (
                                 <span

@@ -8,7 +8,7 @@ const recaptchaProjectId = process.env.RECAPTCHA_PROJECT_ID || 'tdna-17695991688
 
 const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-12-15.clover',
     })
   : null;
 
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
     try {
       // Try as checkout session ID first
       session = await stripe.checkout.sessions.retrieve(orderId, {
-        expand: ['payment_intent', 'line_items', 'line_items.data.price.product'],
+        expand: ['payment_intent', 'payment_intent.latest_charge', 'line_items', 'line_items.data.price.product'],
       });
     } catch (error) {
       // If not found, try to find by payment intent
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
           session = await stripe.checkout.sessions.retrieve(
             paymentIntent.metadata.checkout_session_id,
             {
-              expand: ['payment_intent', 'line_items', 'line_items.data.price.product'],
+              expand: ['payment_intent', 'payment_intent.latest_charge', 'line_items', 'line_items.data.price.product'],
             }
           );
         } else {
@@ -134,7 +134,19 @@ export async function POST(req: NextRequest) {
     }
 
     const paymentIntent = session.payment_intent as Stripe.PaymentIntent | null;
-    const charge = paymentIntent?.charges?.data?.[0];
+
+    // Retrieve charge if latest_charge exists
+    let charge: Stripe.Charge | null = null;
+    if (paymentIntent?.latest_charge && stripe) {
+      const chargeId = typeof paymentIntent.latest_charge === 'string' 
+        ? paymentIntent.latest_charge 
+        : paymentIntent.latest_charge.id;
+      try {
+        charge = await stripe.charges.retrieve(chargeId);
+      } catch (error) {
+        console.error('[Stripe] Error retrieving charge:', error);
+      }
+    }
 
     // Extract line items details
     const lineItems = session.line_items?.data || [];
