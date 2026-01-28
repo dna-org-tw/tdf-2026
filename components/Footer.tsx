@@ -26,7 +26,13 @@ export default function Footer() {
                 href="https://forms.gle/pVc6oTEi1XZ1pAR49"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackCustomEvent('CallForSpeakersClick', { location: 'footer' })}
+                onClick={() => {
+                  trackEvent('Lead', {
+                    content_name: 'Call for Speakers',
+                    content_category: 'CTA',
+                  });
+                  trackCustomEvent('CallForSpeakersClick', { location: 'footer' });
+                }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForSpeakers}
@@ -35,7 +41,13 @@ export default function Footer() {
                 href="https://forms.gle/aN3LbaHy8iV5xqyi8"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackCustomEvent('CallForSponsorsClick', { location: 'footer' })}
+                onClick={() => {
+                  trackEvent('Lead', {
+                    content_name: 'Call for Sponsors',
+                    content_category: 'CTA',
+                  });
+                  trackCustomEvent('CallForSponsorsClick', { location: 'footer' });
+                }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForSponsors}
@@ -44,7 +56,13 @@ export default function Footer() {
                 href="https://forms.gle/KqJGkQhdWmSZVTdv6"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackCustomEvent('CallForPartnersClick', { location: 'footer' })}
+                onClick={() => {
+                  trackEvent('Lead', {
+                    content_name: 'Call for Partners',
+                    content_category: 'CTA',
+                  });
+                  trackCustomEvent('CallForPartnersClick', { location: 'footer' });
+                }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForPartners}
@@ -53,7 +71,13 @@ export default function Footer() {
                 href="https://forms.gle/SPCggMHifbE3oqkk7"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackCustomEvent('CallForVolunteersClick', { location: 'footer' })}
+                onClick={() => {
+                  trackEvent('Lead', {
+                    content_name: 'Call for Volunteers',
+                    content_category: 'CTA',
+                  });
+                  trackCustomEvent('CallForVolunteersClick', { location: 'footer' });
+                }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForVolunteers}
@@ -62,7 +86,13 @@ export default function Footer() {
                 href="https://forms.gle/EofTp9Qso27jEeeY7"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackCustomEvent('CallForSideEventsClick', { location: 'footer' })}
+                onClick={() => {
+                  trackEvent('Lead', {
+                    content_name: 'Call for Side Events',
+                    content_category: 'CTA',
+                  });
+                  trackCustomEvent('CallForSideEventsClick', { location: 'footer' });
+                }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForSideEvents}
@@ -93,7 +123,18 @@ export default function Footer() {
             <a 
               href="http://instagram.com/taiwandigitalfest" 
               target="_blank" 
-              rel="noopener noreferrer" 
+              rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent('Lead', {
+                  content_name: 'Taiwan Digital Fest Instagram',
+                  content_category: 'Social Media',
+                });
+                trackCustomEvent('ExternalLinkClick', {
+                  link_type: 'instagram',
+                  location: 'footer',
+                  account: 'taiwandigitalfest',
+                });
+              }}
               className="hover:text-[#10B8D9] transition-colors"
             >
               <span className="font-semibold">Taiwan Digital Fest </span>
@@ -102,7 +143,18 @@ export default function Footer() {
             <a 
               href="https://www.instagram.com/dna.org.tw" 
               target="_blank" 
-              rel="noopener noreferrer" 
+              rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent('Lead', {
+                  content_name: 'TDNA Instagram',
+                  content_category: 'Social Media',
+                });
+                trackCustomEvent('ExternalLinkClick', {
+                  link_type: 'instagram',
+                  location: 'footer',
+                  account: 'dna.org.tw',
+                });
+              }}
               className="hover:text-[#10B8D9] transition-colors"
             >
               <span className="font-semibold">TDNA </span>

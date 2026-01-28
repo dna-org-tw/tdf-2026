@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useState, useEffect } from 'react';
 import { Instagram, Globe, Youtube, Twitter, Linkedin, Music } from 'lucide-react';
-import { trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 interface LumaPartner {
   name: string;
@@ -22,6 +23,7 @@ export default function PartnersSection() {
   const { t } = useTranslation();
   const [lumaPartners, setLumaPartners] = useState<LumaPartner[]>([]);
   const [loading, setLoading] = useState(true);
+  useSectionTracking({ sectionId: 'partners', sectionName: 'Partners Section', category: 'Event Information' });
 
   useEffect(() => {
     const fetchLumaPartners = async () => {
@@ -348,6 +350,17 @@ export default function PartnersSection() {
                         href={partner.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => {
+                          trackEvent('Lead', {
+                            content_name: `${partner.name} Instagram`,
+                            content_category: 'Social Media',
+                          });
+                          trackCustomEvent('ExternalLinkClick', {
+                            link_type: 'instagram',
+                            location: 'partners_section',
+                            partner_name: partner.name,
+                          });
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         className="text-white hover:text-white/80 transition-colors"
@@ -418,6 +431,17 @@ export default function PartnersSection() {
                         href={partner.website}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => {
+                          trackEvent('Lead', {
+                            content_name: `${partner.name} Website`,
+                            content_category: 'External Link',
+                          });
+                          trackCustomEvent('ExternalLinkClick', {
+                            link_type: 'website',
+                            location: 'partners_section',
+                            partner_name: partner.name,
+                          });
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         className="text-white hover:text-white/80 transition-colors"

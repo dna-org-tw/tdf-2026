@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import EventModal from '@/components/EventModal';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 interface CalendarEvent {
   title: string;
@@ -21,6 +22,7 @@ export default function ScheduleSection() {
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [icsEvents, setIcsEvents] = useState<CalendarEvent[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  useSectionTracking({ sectionId: 'schedule', sectionName: 'Schedule Section', category: 'Event Information' });
 
   // Fetch ICS calendar data
   useEffect(() => {

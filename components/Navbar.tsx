@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import MobileMenu from './MobileMenu';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
@@ -37,6 +38,12 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const hash = href.replace('#', '');
+    
+    // Track navigation click
+    trackCustomEvent('NavClick', {
+      section: hash,
+      location: 'navbar',
+    });
     
     if (isHomePage) {
       // If on home page, just scroll to the section
@@ -147,7 +154,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <a
-              key={link.name}
+              key={link.href}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
               className={`text-sm font-medium hover:text-[#10B8D9] transition-colors cursor-pointer ${
@@ -162,6 +169,16 @@ export default function Navbar() {
             href="http://instagram.com/taiwandigitalfest"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              trackEvent('Lead', {
+                content_name: 'Instagram Link',
+                content_category: 'Social Media',
+              });
+              trackCustomEvent('ExternalLinkClick', {
+                link_type: 'instagram',
+                location: 'navbar_desktop',
+              });
+            }}
             className={`hover:text-[#10B8D9] transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}
@@ -184,7 +201,13 @@ export default function Navbar() {
 
           <a
             href="#tickets-timeline"
-            onClick={(e) => handleNavClick(e, '#tickets-timeline')}
+            onClick={(e) => {
+              handleNavClick(e, '#tickets-timeline');
+              trackEvent('Lead', {
+                content_name: 'Register CTA',
+                content_category: 'Navigation',
+              });
+            }}
             className="bg-[#1E1F1C] text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#10B8D9] transition-colors cursor-pointer"
           >
             {t.nav.register}
@@ -207,6 +230,16 @@ export default function Navbar() {
             href="http://instagram.com/taiwandigitalfest"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              trackEvent('Lead', {
+                content_name: 'Instagram Link',
+                content_category: 'Social Media',
+              });
+              trackCustomEvent('ExternalLinkClick', {
+                link_type: 'instagram',
+                location: 'navbar_mobile',
+              });
+            }}
             className={`hover:text-[#10B8D9] transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}

@@ -3,9 +3,11 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import LazyYouTubeEmbed from '@/components/LazyYouTubeEmbed';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 export default function WhySection() {
   const { t } = useTranslation();
+  useSectionTracking({ sectionId: 'why', sectionName: 'Why Taiwan Section', category: 'Event Information' });
 
   const taitungContent = (t.why as any).taitung;
   const hualienContent = (t.why as any).hualien;

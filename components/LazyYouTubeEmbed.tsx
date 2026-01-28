@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 interface LazyYouTubeEmbedProps {
   videoId: string;
@@ -44,6 +45,16 @@ export default function LazyYouTubeEmbed({
 
   const handleClick = () => {
     setIsLoaded(true);
+    // Track video play event
+    trackEvent('VideoPlay', {
+      content_name: title,
+      content_category: 'Video',
+      content_ids: [videoId],
+    });
+    trackCustomEvent('YouTubeVideoPlay', {
+      video_id: videoId,
+      video_title: title,
+    });
   };
 
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${thumbnailQuality}.jpg`;

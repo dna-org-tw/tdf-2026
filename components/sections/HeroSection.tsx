@@ -264,6 +264,10 @@ export default function HeroSection() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
+                trackEvent('Lead', {
+                  content_name: 'Call for Speakers',
+                  content_category: 'CTA',
+                });
                 trackCustomEvent('CallForSpeakersClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -280,6 +284,10 @@ export default function HeroSection() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
+                trackEvent('Lead', {
+                  content_name: 'Call for Volunteers',
+                  content_category: 'CTA',
+                });
                 trackCustomEvent('CallForVolunteersClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -300,6 +308,10 @@ export default function HeroSection() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
+                trackEvent('Lead', {
+                  content_name: 'Call for Partners',
+                  content_category: 'CTA',
+                });
                 trackCustomEvent('CallForPartnersClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -316,6 +328,10 @@ export default function HeroSection() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
+                trackEvent('Lead', {
+                  content_name: 'Call for Side Events',
+                  content_category: 'CTA',
+                });
                 trackCustomEvent('CallForSideEventsClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}

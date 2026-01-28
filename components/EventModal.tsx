@@ -213,6 +213,17 @@ export default function EventModal({ isOpen, onClose, events, date }: EventModal
                             href={getGoogleMapsUrl(event.location)}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => {
+                              trackEvent('Lead', {
+                                content_name: 'Google Maps Link',
+                                content_category: 'Event Location',
+                              });
+                              trackCustomEvent('ExternalLinkClick', {
+                                link_type: 'google_maps',
+                                location: 'event_modal',
+                                event_title: event.title,
+                              });
+                            }}
                             className="flex-1 leading-relaxed text-[#10B8D9] hover:text-[#10B8D9]/80 transition-colors flex items-center gap-1.5 group"
                           >
                             <span className="flex-1">{event.location}</span>

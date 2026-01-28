@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
@@ -70,6 +70,20 @@ export default function CheckoutSuccessPage() {
       source: 'stripe_checkout',
     });
   }, [tier]);
+
+  // Track Purchase event when order data is loaded
+  useEffect(() => {
+    if (!order || !order.amount_total || !order.currency) return;
+
+    trackEvent('Purchase', {
+      value: order.amount_total / 100, // Convert from cents to dollars
+      currency: order.currency.toUpperCase(),
+      content_name: order.ticket_tier ? `${order.ticket_tier} Ticket` : 'Event Ticket',
+      content_category: 'Tickets',
+      content_ids: order.id ? [order.id] : undefined,
+      num_items: order.line_items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 1,
+    });
+  }, [order]);
 
   useEffect(() => {
     if (!sessionId) return;

@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { MapPin } from 'lucide-react';
 import type { StructuredAddress } from '@/components/NomadMap';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 interface Coordinates {
   lat: number;
@@ -66,6 +67,7 @@ export default function AccommodationSection() {
   const { t } = useTranslation();
   const items = t.accommodation.items;
   const [coordinatesMap, setCoordinatesMap] = useState<Map<string, Coordinates>>(new Map());
+  useSectionTracking({ sectionId: 'accommodation', sectionName: 'Accommodation Section', category: 'Event Information' });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

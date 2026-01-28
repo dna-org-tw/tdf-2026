@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { Mail, CheckCircle2, Zap, Users } from 'lucide-react';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 export default function FollowUsSection() {
   const { t } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
+  useSectionTracking({ sectionId: 'follow-us', sectionName: 'Follow Us Section', category: 'Engagement' });
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalState, setModalState] = useState<{
@@ -72,6 +74,11 @@ export default function FollowUsSection() {
           message: data.message || t.followUs.successMessage,
         });
         setEmail('');
+        // Track Lead event for successful subscription
+        trackEvent('Lead', {
+          content_name: 'Follow Us Form',
+          content_category: 'Newsletter Subscription',
+        });
         trackCustomEvent('FollowUsSuccess', { location: 'follow_us_section' });
       } else if (response.status === 409) {
         setModalState({

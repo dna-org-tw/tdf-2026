@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function OrderQueryPage() {
   const router = useRouter();
@@ -62,6 +63,15 @@ export default function OrderQueryPage() {
       setError(t.orderQuery?.orderIdRequired ?? 'Please enter an order ID.');
       return;
     }
+
+    // Track search event
+    trackEvent('Search', {
+      search_string: orderId.trim(),
+      content_category: 'Order Query',
+    });
+    trackCustomEvent('OrderQuerySearch', {
+      order_id: orderId.trim(),
+    });
 
     // 如果有 reCAPTCHA，使用 grecaptcha.enterprise.execute() 获取 token
     if (recaptchaSiteKey) {

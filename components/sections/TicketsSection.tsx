@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 interface TicketTier {
   name: string;
@@ -69,6 +70,7 @@ export default function TicketsSection() {
   const { t } = useTranslation();
   const [countdown, setCountdown] = useState<CountdownTime | null>(null);
   const [loadingTier, setLoadingTier] = useState<'explore' | 'contribute' | 'backer' | null>(null);
+  useSectionTracking({ sectionId: 'tickets', sectionName: 'Tickets Section', category: 'Tickets' });
   
   const saleEndDate = '2/28';
   

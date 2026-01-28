@@ -6,10 +6,12 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { ArrowUpRight, Calendar, CalendarCheck, Users, Heart } from 'lucide-react';
 import HighlightModal from '@/components/HighlightModal';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 export default function HighlightsSection() {
   const { t } = useTranslation();
   const [selectedItem, setSelectedItem] = useState<{ title: string; desc: string; icon?: React.ComponentType<{ className?: string }> } | null>(null);
+  useSectionTracking({ sectionId: 'highlights', sectionName: 'Highlights Section', category: 'Event Information' });
 
   // 图标映射
   const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {

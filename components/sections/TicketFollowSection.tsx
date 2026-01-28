@@ -6,11 +6,13 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 export default function TicketFollowSection() {
   const { t } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
   const [email, setEmail] = useState('');
+  useSectionTracking({ sectionId: 'tickets-follow', sectionName: 'Ticket Follow Section', category: 'Engagement' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'success' | 'error' | 'duplicate' | null>(null);

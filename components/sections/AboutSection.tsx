@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 export default function AboutSection() {
   const { t, lang } = useTranslation();
   const instagramRef = useRef<HTMLDivElement>(null);
+  useSectionTracking({ sectionId: 'about', sectionName: 'About Section', category: 'Event Information' });
 
   useEffect(() => {
     if (!instagramRef.current) return;

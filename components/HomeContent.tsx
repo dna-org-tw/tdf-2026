@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/sections/HeroSection';
 import HashNavigationHandler from '@/components/HashNavigationHandler';
+import { useScrollDepth } from '@/hooks/useScrollDepth';
 
 // 動態導入非首屏組件，大幅減少初始 bundle 大小
 // 使用 loading 狀態提升 UX，並設定 ssr: false 避免不必要的 SSR
@@ -60,6 +61,9 @@ const TicketFollowSection = dynamic(() => import('@/components/sections/TicketFo
 });
 
 export default function HomeContent() {
+  // Track scroll depth
+  useScrollDepth();
+
   return (
     <>
       <Navbar />

@@ -24,7 +24,7 @@ export default function MobileMenu({ isOpen, navLinks, handleNavClick }: MobileM
           <div className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <a
-                key={link.name}
+                key={link.href}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
                 className="text-lg font-medium text-[#1E1F1C] cursor-pointer"
