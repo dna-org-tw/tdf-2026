@@ -81,7 +81,7 @@ export default function OrderQueryPage() {
           const token = await window.grecaptcha.enterprise.execute(recaptchaSiteKey, { action: 'submit' });
           submitOrderQuery(token);
         } else {
-          setError(t.orderQuery?.recaptchaError ?? 'reCAPTCHA is not loaded. Please refresh the page.');
+          setError(t.orderQuery?.recaptchaNotLoaded ?? t.orderQuery?.recaptchaError ?? 'reCAPTCHA is not loaded. Please refresh the page.');
         }
       } catch (err) {
         console.error('reCAPTCHA execution failed:', err);

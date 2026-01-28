@@ -8,6 +8,7 @@ import FollowModal from '@/components/FollowModal';
 import { Mail, CheckCircle2, Zap, Users } from 'lucide-react';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
+import { getUserInfo } from '@/lib/userInfo';
 
 export default function FollowUsSection() {
   const { t } = useTranslation();
@@ -44,14 +45,14 @@ export default function FollowUsSection() {
         setModalState({
           isOpen: true,
           type: 'error',
-          message:
-            recaptchaError instanceof Error
-              ? recaptchaError.message
-              : 'reCAPTCHA 验证失败，请刷新页面后重试。',
+          message: t.hero.followForm.recaptchaError,
         });
         setIsSubmitting(false);
         return;
       }
+
+      // 获取用户信息
+      const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
@@ -62,6 +63,8 @@ export default function FollowUsSection() {
           email: email.trim(),
           source: 'follow_us_section',
           recaptchaToken,
+          timezone: userInfo.timezone,
+          locale: userInfo.locale,
         }),
       });
 

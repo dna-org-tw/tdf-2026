@@ -164,7 +164,7 @@ export default function Navbar() {
             }`}
           >
             <Globe className="w-3 h-3" />
-            {lang === 'en' ? '中文' : 'EN'}
+            {lang === 'en' ? t.nav.languageToggle : 'EN'}
           </button>
 
           <a

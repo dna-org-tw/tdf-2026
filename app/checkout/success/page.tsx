@@ -215,7 +215,7 @@ export default function CheckoutSuccessPage() {
                     {order.line_items.map((item, idx) => (
                       <div key={item.id || idx} className="bg-white/5 rounded-lg p-3">
                         <p className="text-white font-medium">
-                          {item.product_name || item.description || `Item ${idx + 1}`}
+                          {item.product_name || item.description || `${t.checkout?.orderItemPrefix || 'Item'} ${idx + 1}`}
                         </p>
                         {item.product_description && (
                           <p className="text-white/60 text-xs mt-1">{item.product_description}</p>

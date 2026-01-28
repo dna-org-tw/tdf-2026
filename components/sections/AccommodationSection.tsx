@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -20,14 +20,17 @@ const NomadMap = dynamic(
   () => import('@/components/NomadMap'),
   { 
     ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-full bg-stone-50">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#10B8D9] mb-4"></div>
-          <p className="text-sm text-slate-600">載入地圖中...</p>
+    loading: () => {
+      // This will be replaced by the actual translation in the component
+      return (
+        <div className="flex items-center justify-center h-full bg-stone-50">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#10B8D9] mb-4"></div>
+            <p className="text-sm text-slate-600">Loading map...</p>
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   }
 );
 
@@ -66,18 +69,10 @@ function formatAddressToString(address: string | StructuredAddress): string {
 export default function AccommodationSection() {
   const { t } = useTranslation();
   const items = t.accommodation.items;
-  const [coordinatesMap, setCoordinatesMap] = useState<Map<string, Coordinates>>(new Map());
   useSectionTracking({ sectionId: 'accommodation', sectionName: 'Accommodation Section', category: 'Event Information' });
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    // 直接从数据中获取经纬度，而不是通过 geocoding API
+  
+  // 直接从数据中获取经纬度，而不是通过 geocoding API
+  const coordinatesMap = useMemo(() => {
     const coords = new Map<string, Coordinates>();
     items.forEach((item) => {
       // 检查数据中是否有经纬度字段
@@ -90,8 +85,8 @@ export default function AccommodationSection() {
         });
       }
     });
-    setCoordinatesMap(coords);
-  }, [items, mounted]);
+    return coords;
+  }, [items]);
 
   const generateOpenStreetMapUrl = (address: string) => {
     return `https://www.openstreetmap.org/search?query=${encodeURIComponent(address)}`;
@@ -173,7 +168,7 @@ export default function AccommodationSection() {
 
         {/* Map Container */}
         <div className="max-w-5xl mx-auto mb-12">
-          {mounted && coordinatesMap.size > 0 ? (
+          {coordinatesMap.size > 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -186,19 +181,19 @@ export default function AccommodationSection() {
                   <div className="flex flex-col items-center justify-center h-full bg-stone-50 p-8">
                     <MapPin className="w-16 h-16 text-amber-500 mb-4" />
                     <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                      地圖暫時無法載入
+                      {t.accommodation.mapErrorTitle}
                     </h3>
                     <p className="text-sm text-slate-600 mb-4 text-center max-w-md">
-                      您可以在下方查看住宿資訊，或使用{' '}
+                      {t.accommodation.mapErrorDescription}{' '}
                       <a
                         href="https://www.google.com/maps/search/?api=1&query=台東+花蓮+住宿"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[#10B8D9] hover:underline"
                       >
-                        Google Maps
+                        {t.accommodation.mapErrorSearchLink}
                       </a>
-                      {' '}搜尋位置。
+                      {' '}{t.accommodation.mapErrorSearchSuffix}
                     </p>
                   </div>
                 }

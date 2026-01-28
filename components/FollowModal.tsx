@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface FollowModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface FollowModalProps {
 }
 
 export default function FollowModal({ isOpen, onClose, type, message }: FollowModalProps) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const getIcon = () => {
@@ -29,11 +31,11 @@ export default function FollowModal({ isOpen, onClose, type, message }: FollowMo
   const getTitle = () => {
     switch (type) {
       case 'success':
-        return '訂閱成功！';
+        return t.followModal.successTitle;
       case 'duplicate':
-        return '已經訂閱過了';
+        return t.followModal.duplicateTitle;
       case 'error':
-        return '訂閱失敗';
+        return t.followModal.errorTitle;
       default:
         return '';
     }
@@ -71,7 +73,7 @@ export default function FollowModal({ isOpen, onClose, type, message }: FollowMo
                 <button
                   onClick={onClose}
                   className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/60 hover:text-white"
-                  aria-label="關閉"
+                  aria-label={t.followModal.close}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -91,7 +93,7 @@ export default function FollowModal({ isOpen, onClose, type, message }: FollowMo
                   whileTap={{ scale: 0.95 }}
                   className="mt-6 w-full bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md shadow-[#10B8D9]/40"
                 >
-                  確定
+                  {t.followModal.confirm}
                 </motion.button>
               </div>
             </div>

@@ -7,6 +7,7 @@ import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
+import { getUserInfo } from '@/lib/userInfo';
 
 export default function TicketFollowSection() {
   const { t } = useTranslation();
@@ -25,7 +26,7 @@ export default function TicketFollowSection() {
     
     if (!trimmedEmail) {
       setModalType('error');
-      setModalMessage(t.followUs?.emailPlaceholder || '請輸入您的 Email');
+      setModalMessage(t.hero.followForm.emptyEmailError);
       setModalOpen(true);
       return;
     }
@@ -39,15 +40,14 @@ export default function TicketFollowSection() {
         recaptchaToken = await executeRecaptcha();
       } catch (recaptchaError) {
         setModalType('error');
-        setModalMessage(
-          recaptchaError instanceof Error
-            ? recaptchaError.message
-            : 'reCAPTCHA 验证失败，请刷新页面后重试。'
-        );
+        setModalMessage(t.hero.followForm.recaptchaError);
         setModalOpen(true);
         setIsSubmitting(false);
         return;
       }
+
+      // 获取用户信息
+      const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
@@ -58,6 +58,8 @@ export default function TicketFollowSection() {
           email: trimmedEmail,
           source: 'tickets_section',
           recaptchaToken,
+          timezone: userInfo.timezone,
+          locale: userInfo.locale,
         }),
       });
 
@@ -66,7 +68,7 @@ export default function TicketFollowSection() {
       if (!response.ok) {
         if (response.status === 409) {
           setModalType('duplicate');
-          setModalMessage(t.followUs?.duplicateMessage || '您已經訂閱過了！歡迎回來！');
+          setModalMessage(result.error || t.followUs?.duplicateMessage || t.hero.followForm.duplicateMessage);
           setEmail('');
           setModalOpen(true);
           trackCustomEvent('TicketsFollowDuplicate', { location: 'tickets_section' });
@@ -74,7 +76,7 @@ export default function TicketFollowSection() {
         }
 
         setModalType('error');
-        setModalMessage(result.error || t.followUs?.errorMessage || '訂閱失敗，請稍後再試。');
+        setModalMessage(result.error || t.followUs?.errorMessage || t.hero.followForm.errorMessage);
         setModalOpen(true);
         trackCustomEvent('TicketsFollowError', {
           location: 'tickets_section',
@@ -86,7 +88,7 @@ export default function TicketFollowSection() {
       }
 
       setModalType('success');
-      setModalMessage(result.message || t.followUs?.successMessage || '訂閱成功！感謝您的關注 🙌');
+      setModalMessage(result.message || t.followUs?.successMessage || t.hero.followForm.successMessage);
       setEmail('');
       setModalOpen(true);
       trackEvent('Lead', {
@@ -97,7 +99,7 @@ export default function TicketFollowSection() {
     } catch (err) {
       console.error('Tickets follow submit error:', err);
       setModalType('error');
-      setModalMessage(t.followUs?.errorMessage || '訂閱失敗，請稍後再試。');
+      setModalMessage(t.followUs?.errorMessage || t.hero.followForm.errorMessage);
       setModalOpen(true);
       trackCustomEvent('TicketsFollowError', {
         location: 'tickets_section',
@@ -181,7 +183,7 @@ export default function TicketFollowSection() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t.followUs?.emailPlaceholder || '請輸入您的 Email'}
+                      placeholder={t.followUs?.emailPlaceholder || t.hero.followForm.emailPlaceholder}
                       disabled={isSubmitting}
                       className="
                         w-full px-6 py-5 rounded-xl
@@ -218,8 +220,8 @@ export default function TicketFollowSection() {
                   >
                     <span className="relative z-10">
                       {isSubmitting
-                        ? (t.followUs?.submitting || '訂閱中...')
-                        : (t.followUs?.submitButton || '立即關注')}
+                        ? (t.followUs?.submitting || t.hero.followForm.submitting)
+                        : (t.followUs?.submitButton || t.hero.followForm.submitButton)}
                     </span>
                     {/* 按鈕內部光效 */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />

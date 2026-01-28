@@ -1,16 +1,96 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { sendSubscriptionThankYouEmail } from '@/lib/email';
+import { content } from '@/data/content';
 
 const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
 const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6Lcu81gsAAAAAIrVoGK7urIEt9_w7gOoUSjzC5Uv';
 const recaptchaProjectId = process.env.RECAPTCHA_PROJECT_ID || 'tdna-1769599168858';
 
+// Helper function to get language from request
+function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
+  const url = new URL(req.url);
+  const langParam = url.searchParams.get('lang');
+  if (langParam === 'en' || langParam === 'zh') {
+    return langParam;
+  }
+  // Try to get from referer header
+  const referer = req.headers.get('referer');
+  if (referer) {
+    try {
+      const refererUrl = new URL(referer);
+      const refererLang = refererUrl.searchParams.get('lang');
+      if (refererLang === 'en' || refererLang === 'zh') {
+        return refererLang;
+      }
+    } catch {
+      // Ignore URL parsing errors
+    }
+  }
+  return 'zh'; // Default to Chinese
+}
+
+// Helper function to get client IP address
+function getClientIP(req: NextRequest): string | null {
+  // 尝试从各种请求头获取真实IP
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    // x-forwarded-for 可能包含多个IP，取第一个
+    return forwardedFor.split(',')[0].trim();
+  }
+  
+  const realIP = req.headers.get('x-real-ip');
+  if (realIP) {
+    return realIP;
+  }
+  
+  const cfConnectingIP = req.headers.get('cf-connecting-ip'); // Cloudflare
+  if (cfConnectingIP) {
+    return cfConnectingIP;
+  }
+  
+  // 如果都没有，尝试从请求URL获取（开发环境）
+  try {
+    const url = new URL(req.url);
+    return url.hostname;
+  } catch {
+    return null;
+  }
+}
+
+// Helper function to get country from IP using ipapi.co (free tier)
+async function getCountryFromIP(ip: string | null): Promise<string | null> {
+  if (!ip || ip === 'localhost' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+    return null; // 本地IP或私有IP
+  }
+
+  try {
+    // 使用 ipapi.co 免费API（无需API key，限制：1000次/天）
+    const response = await fetch(`https://ipapi.co/${ip}/country/`, {
+      headers: {
+        'User-Agent': 'Taiwan-Digital-Fest-2026',
+      },
+    });
+
+    if (response.ok) {
+      const country = await response.text();
+      return country.trim() || null;
+    }
+  } catch (error) {
+    console.error('[IP Geolocation] Failed to get country from IP:', error);
+  }
+
+  return null;
+}
+
 export async function POST(req: NextRequest) {
+  const lang = getLangFromRequest(req);
+  const t = content[lang].api;
+  
   try {
     if (!supabaseServer) {
       return NextResponse.json(
-        { error: 'Supabase 服務端尚未設定完成。' },
+        { error: t.supabaseNotConfigured },
         { status: 500 }
       );
     }
@@ -19,7 +99,7 @@ export async function POST(req: NextRequest) {
 
     if (!body || !body.email) {
       return NextResponse.json(
-        { error: '請提供有效的 Email 地址。' },
+        { error: t.emailRequired },
         { status: 400 }
       );
     }
@@ -30,7 +110,7 @@ export async function POST(req: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { error: 'Email 格式不正確。' },
+        { error: t.invalidEmailFormat },
         { status: 400 }
       );
     }
@@ -41,7 +121,7 @@ export async function POST(req: NextRequest) {
       
       if (!recaptchaToken) {
         return NextResponse.json(
-          { error: 'reCAPTCHA 验证是必需的。' },
+          { error: t.recaptchaRequired },
           { status: 400 }
         );
       }
@@ -70,7 +150,7 @@ export async function POST(req: NextRequest) {
           const errorData = await recaptchaResponse.text();
           console.error('[reCAPTCHA Enterprise] API error:', errorData);
           return NextResponse.json(
-            { error: 'reCAPTCHA 验证失败，请稍后重试。' },
+            { error: t.recaptchaFailed },
             { status: 400 }
           );
         }
@@ -80,7 +160,7 @@ export async function POST(req: NextRequest) {
         // Enterprise API 返回的格式不同，检查 tokenProperties
         if (!recaptchaData.tokenProperties?.valid || recaptchaData.tokenProperties?.action !== 'subscribe') {
           return NextResponse.json(
-            { error: 'reCAPTCHA 验证失败，请稍后重试。' },
+            { error: t.recaptchaFailed },
             { status: 400 }
           );
         }
@@ -92,7 +172,7 @@ export async function POST(req: NextRequest) {
           // 可以根据需要设置阈值，例如低于 0.5 拒绝
           if (score < 0.5) {
             return NextResponse.json(
-              { error: 'reCAPTCHA 验证失败，请稍后重试。' },
+              { error: t.recaptchaFailed },
               { status: 400 }
             );
           }
@@ -100,20 +180,44 @@ export async function POST(req: NextRequest) {
       } catch (error) {
         console.error('[reCAPTCHA Enterprise] Verification error:', error);
         return NextResponse.json(
-          { error: 'reCAPTCHA 验证失败，请稍后重试。' },
+          { error: t.recaptchaFailed },
           { status: 400 }
         );
       }
     }
 
+    // 获取IP地址和国家信息
+    const clientIP = getClientIP(req);
+    const country = clientIP ? await getCountryFromIP(clientIP) : null;
+    
+    // 获取时区和语言区域（从前端发送）
+    const timezone = body.timezone || null;
+    const locale = body.locale || null;
+
     // 插入資料到 Supabase
+    const insertData: Record<string, any> = {
+      email,
+      source: body.source || 'hero_section',
+      created_at: new Date().toISOString(),
+    };
+
+    // 添加可选字段
+    if (timezone) {
+      insertData.timezone = timezone;
+    }
+    if (clientIP) {
+      insertData.ip_address = clientIP;
+    }
+    if (country) {
+      insertData.country = country;
+    }
+    if (locale) {
+      insertData.locale = locale;
+    }
+
     const { error, data } = await supabaseServer
       .from('newsletter_subscriptions')
-      .insert({
-        email,
-        source: body.source || 'hero_section',
-        created_at: new Date().toISOString(),
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -121,14 +225,14 @@ export async function POST(req: NextRequest) {
       // 如果是重複的 email（根據你的資料表設定，可能會有唯一約束）
       if (error.code === '23505') {
         return NextResponse.json(
-          { error: '此 Email 已經訂閱過了。', duplicate: true },
+          { error: t.alreadySubscribed, duplicate: true },
           { status: 409 }
         );
       }
 
       console.error('[Newsletter API] Supabase insert error:', error);
       return NextResponse.json(
-        { error: '訂閱失敗，請稍後再試。' },
+        { error: t.subscriptionFailed },
         { status: 500 }
       );
     }
@@ -140,13 +244,13 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { success: true, message: '已成功訂閱！感謝你的關注 🙌', data },
+      { success: true, message: t.subscriptionSuccess, data },
       { status: 200 }
     );
   } catch (error) {
     console.error('[Newsletter API] Unexpected error:', error);
     return NextResponse.json(
-      { error: '訂閱失敗，請稍後再試。' },
+      { error: t.subscriptionFailed },
       { status: 500 }
     );
   }

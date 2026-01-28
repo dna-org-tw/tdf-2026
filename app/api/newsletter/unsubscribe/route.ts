@@ -1,12 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { verifyUnsubscribeToken } from '@/lib/email';
+import { content } from '@/data/content';
+
+// Helper function to get language from request
+function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
+  const url = new URL(req.url);
+  const langParam = url.searchParams.get('lang');
+  if (langParam === 'en' || langParam === 'zh') {
+    return langParam;
+  }
+  // Try to get from referer header
+  const referer = req.headers.get('referer');
+  if (referer) {
+    try {
+      const refererUrl = new URL(referer);
+      const refererLang = refererUrl.searchParams.get('lang');
+      if (refererLang === 'en' || refererLang === 'zh') {
+        return refererLang;
+      }
+    } catch {
+      // Ignore URL parsing errors
+    }
+  }
+  return 'zh'; // Default to Chinese
+}
 
 export async function GET(req: NextRequest) {
+  const lang = getLangFromRequest(req);
+  const t = content[lang].api;
+  
   try {
     if (!supabaseServer) {
       return NextResponse.json(
-        { error: 'Supabase 服務端尚未設定完成。' },
+        { error: t.supabaseNotConfigured },
         { status: 500 }
       );
     }
@@ -16,7 +43,7 @@ export async function GET(req: NextRequest) {
 
     if (!token) {
       return NextResponse.json(
-        { error: '缺少取消訂閱的 token。' },
+        { error: t.unsubscribeTokenRequired },
         { status: 400 }
       );
     }
@@ -26,7 +53,7 @@ export async function GET(req: NextRequest) {
 
     if (!email) {
       return NextResponse.json(
-        { error: '無效的取消訂閱連結。' },
+        { error: t.invalidUnsubscribeToken },
         { status: 400 }
       );
     }
@@ -40,29 +67,32 @@ export async function GET(req: NextRequest) {
     if (error) {
       console.error('[Unsubscribe API] Supabase delete error:', error);
       return NextResponse.json(
-        { error: '取消訂閱失敗，請稍後再試。' },
+        { error: t.unsubscribeFailed },
         { status: 500 }
       );
     }
 
     return NextResponse.json(
-      { success: true, message: '已成功取消訂閱。' },
+      { success: true, message: t.unsubscribeSuccess },
       { status: 200 }
     );
   } catch (error) {
     console.error('[Unsubscribe API] Unexpected error:', error);
     return NextResponse.json(
-      { error: '取消訂閱失敗，請稍後再試。' },
+      { error: t.unsubscribeFailed },
       { status: 500 }
     );
   }
 }
 
 export async function POST(req: NextRequest) {
+  const lang = getLangFromRequest(req);
+  const t = content[lang].api;
+  
   try {
     if (!supabaseServer) {
       return NextResponse.json(
-        { error: 'Supabase 服務端尚未設定完成。' },
+        { error: t.supabaseNotConfigured },
         { status: 500 }
       );
     }
@@ -71,7 +101,7 @@ export async function POST(req: NextRequest) {
 
     if (!body || !body.token) {
       return NextResponse.json(
-        { error: '請提供有效的取消訂閱 token。' },
+        { error: t.unsubscribeTokenRequired },
         { status: 400 }
       );
     }
@@ -83,7 +113,7 @@ export async function POST(req: NextRequest) {
 
     if (!email) {
       return NextResponse.json(
-        { error: '無效的取消訂閱 token。' },
+        { error: t.invalidUnsubscribeToken },
         { status: 400 }
       );
     }
@@ -97,19 +127,19 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error('[Unsubscribe API] Supabase delete error:', error);
       return NextResponse.json(
-        { error: '取消訂閱失敗，請稍後再試。' },
+        { error: t.unsubscribeFailed },
         { status: 500 }
       );
     }
 
     return NextResponse.json(
-      { success: true, message: '已成功取消訂閱。' },
+      { success: true, message: t.unsubscribeSuccess },
       { status: 200 }
     );
   } catch (error) {
     console.error('[Unsubscribe API] Unexpected error:', error);
     return NextResponse.json(
-      { error: '取消訂閱失敗，請稍後再試。' },
+      { error: t.unsubscribeFailed },
       { status: 500 }
     );
   }

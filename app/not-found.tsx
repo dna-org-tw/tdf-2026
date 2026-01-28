@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function NotFound() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // 从当前 URL 获取查询参数（特别是 lang 参数）
@@ -22,7 +24,7 @@ export default function NotFound() {
     <div className="h-screen w-full flex items-center justify-center bg-stone-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
-        <p className="text-slate-600">正在跳转到首页...</p>
+        <p className="text-slate-600">{t.notFound.redirecting}</p>
       </div>
     </div>
   );

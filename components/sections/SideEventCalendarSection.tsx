@@ -29,18 +29,18 @@ export default function SideEventCalendarSection() {
           const data = await response.json();
           setEvents(data.events || []);
         } else {
-          setError('Failed to load events');
+          setError(t.sideEvents?.loadError || 'Failed to load events');
         }
       } catch (err) {
         console.error('Failed to fetch Luma events:', err);
-        setError('Failed to load events');
+        setError(t.sideEvents?.loadError || 'Failed to load events');
       } finally {
         setLoading(false);
       }
     };
 
     fetchLumaEvents();
-  }, []);
+  }, [t.sideEvents?.loadError]);
 
   return (
     <section id="side-events" className="bg-white text-[#1E1F1C] py-24 md:py-32">

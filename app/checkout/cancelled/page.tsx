@@ -144,7 +144,7 @@ export default function CheckoutCancelledPage() {
         </p>
         {tier && (
           <p className="text-white/90 text-sm md:text-base">
-            {t.checkout?.ticketInfoPrefix ?? 'Selected ticket type:'}{' '}
+            {t.checkout?.cancelledTicketInfoPrefix ?? t.checkout?.ticketInfoPrefix ?? 'Selected ticket type:'}{' '}
             <span className="font-semibold text-[#FFD028]">
               {tierLabel || tier.toUpperCase()}
             </span>
@@ -190,7 +190,7 @@ export default function CheckoutCancelledPage() {
                     {order.line_items.map((item, idx) => (
                       <div key={item.id || idx} className="bg-white/5 rounded-lg p-3">
                         <p className="text-white font-medium">
-                          {item.product_name || item.description || `Item ${idx + 1}`}
+                          {item.product_name || item.description || `${t.checkout?.orderItemPrefix || 'Item'} ${idx + 1}`}
                         </p>
                         {item.product_description && (
                           <p className="text-white/60 text-xs mt-1">{item.product_description}</p>
@@ -249,7 +249,7 @@ export default function CheckoutCancelledPage() {
               <div className="pt-2 border-t border-white/10 space-y-2">
                 {order.customer_email && (
                   <p className="text-white/80">
-                    <span className="text-white/60">{t.checkout?.orderEmailLabel ?? 'Confirmation would be sent to'}:</span>{' '}
+                    <span className="text-white/60">{t.checkout?.cancelledEmailLabel ?? t.checkout?.orderEmailLabel ?? 'Confirmation would be sent to'}:</span>{' '}
                     <span className="font-mono break-all">{order.customer_email}</span>
                   </p>
                 )}
@@ -290,7 +290,7 @@ export default function CheckoutCancelledPage() {
               {order.created && (
                 <div className="pt-2 border-t border-white/10">
                   <p className="text-white/70 text-xs">
-                    {t.checkout?.orderTimeLabel ?? 'Attempt time'}:{' '}
+                    {t.checkout?.cancelledTimeLabel ?? t.checkout?.orderTimeLabel ?? 'Attempt time'}:{' '}
                     {new Date(order.created * 1000).toLocaleString()}
                   </p>
                 </div>
@@ -299,7 +299,7 @@ export default function CheckoutCancelledPage() {
               {/* Order ID */}
               <div className="pt-2 border-t border-white/10">
                 <p className="text-white/60 text-xs">
-                  {t.checkout?.orderIdLabel ?? 'Session ID'}:{' '}
+                  {t.checkout?.cancelledOrderIdLabel ?? t.checkout?.orderIdLabel ?? 'Session ID'}:{' '}
                   <span className="font-mono break-all">{order.id}</span>
                 </p>
               </div>

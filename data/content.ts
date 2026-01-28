@@ -19,7 +19,8 @@ export const content = {
         emptyEmailError: "Please enter your email address",
         duplicateMessage: "You're already subscribed! Welcome back!",
         errorMessage: "Subscription failed. Please try again later.",
-        successMessage: "Successfully subscribed! Thank you for following us 🙌"
+        successMessage: "Successfully subscribed! Thank you for following us 🙌",
+        recaptchaError: "reCAPTCHA verification failed. Please refresh the page and try again."
       }
     },
     nav: {
@@ -31,7 +32,8 @@ export const content = {
       tickets: "Tickets",
       gallery: "Gallery",
       accommodation: "Map",
-      register: "Learn More"
+      register: "Learn More",
+      languageToggle: "中文"
     },
     navShort: {
       about: "About",
@@ -216,6 +218,11 @@ export const content = {
       badge: "Certified Taiwan Digital Nomad Friendly",
       viewWebsite: "Visit Website",
       mapLoadError: "Unable to load map data",
+      loadingMap: "Loading map...",
+      mapErrorTitle: "Map temporarily unavailable",
+      mapErrorDescription: "You can view accommodation information below, or use",
+      mapErrorSearchLink: "Google Maps",
+      mapErrorSearchSuffix: "to search for locations.",
       ctas: [
         { type: "Register", text: "Become a Venue Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ],
@@ -465,6 +472,13 @@ export const content = {
       errorMessage: "Subscription failed. Please try again later.",
       privacyNote: "We respect your privacy. Unsubscribe at any time."
     },
+    followModal: {
+      successTitle: "Subscription Successful!",
+      duplicateTitle: "Already Subscribed",
+      errorTitle: "Subscription Failed",
+      close: "Close",
+      confirm: "OK"
+    },
     footer: {
       copyright: "© 2026 Taiwan Digital Fest. All rights reserved.",
       getInvolved: "Get Involved",
@@ -482,9 +496,14 @@ export const content = {
     },
     checkout: {
       orderError: "Unable to load order details.",
+      loadOrderError: "Failed to load order",
       cancelledTitle: "Payment cancelled",
       cancelledDescription: "Your payment was not completed. No charges have been made.",
       cancelledAmountNote: "No charge was made for this amount.",
+      cancelledTicketInfoPrefix: "Selected ticket type:",
+      cancelledEmailLabel: "Confirmation would be sent to",
+      cancelledTimeLabel: "Attempt time",
+      cancelledOrderIdLabel: "Session ID",
       successTitle: "Payment Successful",
       successDescription: "Thank you for your purchase! Your order has been confirmed.",
       ticketInfoPrefix: "Your ticket type:",
@@ -494,6 +513,7 @@ export const content = {
       orderItemsLabel: "Items",
       orderItemQuantity: "Quantity",
       orderItemPrice: "Price",
+      orderItemPrefix: "Item",
       orderSubtotalLabel: "Subtotal",
       orderDiscountLabel: "Discount",
       orderTaxLabel: "Tax",
@@ -528,16 +548,57 @@ export const content = {
       querying: "Querying...",
       queryError: "Failed to query order. Please try again.",
       recaptchaError: "reCAPTCHA verification failed. Please try again.",
+      recaptchaNotLoaded: "reCAPTCHA is not loaded. Please refresh the page.",
       backToHome: "Back to homepage"
     },
     sideEvents: {
       title: "Side Events Calendar",
       subtitle: "Discover community-organized side events happening throughout May 2026",
       errorMessage: "Please try again later or visit the Luma calendar directly.",
+      loadError: "Failed to load events",
       visitLuma: "Visit Luma Calendar",
       noEvents: "No side events found at the moment.",
       viewEvent: "View Event",
       viewAllEvents: "View All Events on Luma"
+    },
+    errorBoundary: {
+      title: "Error loading content",
+      description: "We couldn't load this content. Please refresh the page or try again later.",
+      reload: "Reload"
+    },
+    unsubscribe: {
+      loading: "Processing...",
+      processing: "Processing unsubscribe request...",
+      successTitle: "Successfully unsubscribed",
+      successMessage: "You have successfully unsubscribed from the Taiwan Digital Nomad Community newsletter. We're sorry to see you go, but we respect your decision.",
+      successNote: "If you change your mind, you're welcome to resubscribe to our newsletter at any time.",
+      errorTitle: "Unsubscribe failed",
+      errorReasons: "Possible reasons:",
+      errorReason1: "Unsubscribe link has expired or is invalid",
+      errorReason2: "You have already unsubscribed",
+      errorReason3: "System temporarily unable to process your request",
+      errorHelp: "If you need assistance, please contact our customer service team.",
+      retry: "Try Again",
+      backToHome: "Back to homepage",
+      missingToken: "Missing unsubscribe link parameter.",
+      preparing: "Preparing to unsubscribe..."
+    },
+    notFound: {
+      redirecting: "Redirecting to homepage..."
+    },
+    api: {
+      supabaseNotConfigured: "Supabase server is not configured.",
+      emailRequired: "Please provide a valid email address.",
+      invalidEmailFormat: "Email format is incorrect.",
+      recaptchaRequired: "reCAPTCHA verification is required.",
+      recaptchaFailed: "reCAPTCHA verification failed. Please try again later.",
+      subscriptionFailed: "Subscription failed. Please try again later.",
+      alreadySubscribed: "This email is already subscribed.",
+      subscriptionSuccess: "Successfully subscribed! Thank you for your attention 🙌",
+      unsubscribeTokenRequired: "Missing unsubscribe token.",
+      invalidUnsubscribeToken: "Invalid unsubscribe link.",
+      unsubscribeFailed: "Unsubscribe failed. Please try again later.",
+      unsubscribeSuccess: "Successfully unsubscribed."
     },
     faq: {
       title: "Frequently Asked Questions",
@@ -610,7 +671,8 @@ export const content = {
         emptyEmailError: "請輸入您的 Email",
         duplicateMessage: "您已經訂閱過了！歡迎回來！",
         errorMessage: "訂閱失敗，請稍後再試。",
-        successMessage: "訂閱成功！感謝您的關注 🙌"
+        successMessage: "訂閱成功！感謝您的關注 🙌",
+        recaptchaError: "reCAPTCHA 驗證失敗，請刷新頁面後重試。"
       }
     },
     nav: {
@@ -622,7 +684,8 @@ export const content = {
       tickets: "票券資訊",
       gallery: "精彩瞬間",
       accommodation: "地圖",
-      register: "了解更多"
+      register: "了解更多",
+      languageToggle: "中文"
     },
     navShort: {
       about: "關於",
@@ -807,6 +870,11 @@ export const content = {
       badge: "台灣數位遊牧友善標章認證商家",
       viewWebsite: "查看網站",
       mapLoadError: "無法載入地圖資料",
+      loadingMap: "載入地圖中...",
+      mapErrorTitle: "地圖暫時無法載入",
+      mapErrorDescription: "您可以在下方查看住宿資訊，或使用",
+      mapErrorSearchLink: "Google Maps",
+      mapErrorSearchSuffix: "搜尋位置。",
       ctas: [
         { type: "Register", text: "成為場地伙伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ],
@@ -1056,6 +1124,13 @@ export const content = {
       errorMessage: "訂閱失敗，請稍後再試。",
       privacyNote: "我們尊重您的隱私，隨時可以取消訂閱。"
     },
+    followModal: {
+      successTitle: "訂閱成功！",
+      duplicateTitle: "已經訂閱過了",
+      errorTitle: "訂閱失敗",
+      close: "關閉",
+      confirm: "確定"
+    },
     footer: {
       copyright: "© 2026 Taiwan Digital Fest. All rights reserved.",
       getInvolved: "參與我們",
@@ -1073,9 +1148,14 @@ export const content = {
     },
     checkout: {
       orderError: "無法載入訂單詳情。",
+      loadOrderError: "無法載入訂單",
       cancelledTitle: "付款已取消",
       cancelledDescription: "您的付款未完成。未產生任何費用。",
       cancelledAmountNote: "此金額未產生任何費用。",
+      cancelledTicketInfoPrefix: "已選擇的票種：",
+      cancelledEmailLabel: "確認信將發送至",
+      cancelledTimeLabel: "嘗試時間",
+      cancelledOrderIdLabel: "會話 ID",
       successTitle: "付款成功",
       successDescription: "感謝您的購買！您的訂單已確認。",
       ticketInfoPrefix: "您的票種：",
@@ -1085,6 +1165,7 @@ export const content = {
       orderItemsLabel: "項目",
       orderItemQuantity: "數量",
       orderItemPrice: "價格",
+      orderItemPrefix: "項目",
       orderSubtotalLabel: "小計",
       orderDiscountLabel: "折扣",
       orderTaxLabel: "稅額",
@@ -1119,16 +1200,57 @@ export const content = {
       querying: "查詢中...",
       queryError: "查詢訂單失敗，請稍後再試。",
       recaptchaError: "reCAPTCHA 驗證失敗，請稍後再試。",
+      recaptchaNotLoaded: "reCAPTCHA 尚未載入，請刷新頁面。",
       backToHome: "返回首頁"
     },
     sideEvents: {
       title: "Side Events 行事曆",
       subtitle: "探索 2026 年 5 月期間由社群組織的 Side Events",
       errorMessage: "請稍後再試，或直接造訪 Luma 行事曆。",
+      loadError: "無法載入活動",
       visitLuma: "造訪 Luma 行事曆",
       noEvents: "目前沒有找到 Side Events。",
       viewEvent: "查看活動",
       viewAllEvents: "在 Luma 上查看所有活動"
+    },
+    errorBoundary: {
+      title: "載入時發生錯誤",
+      description: "我們無法載入此內容。請重新整理頁面或稍後再試。",
+      reload: "重新載入"
+    },
+    unsubscribe: {
+      loading: "處理中...",
+      processing: "正在處理取消訂閱...",
+      successTitle: "已成功取消訂閱",
+      successMessage: "已成功取消訂閱。",
+      successNote: "您已成功取消訂閱台灣數位遊牧者社群的電子報。我們很遺憾看到您離開，但我們尊重您的決定。如果您改變主意，隨時歡迎重新訂閱我們的電子報。",
+      errorTitle: "取消訂閱失敗",
+      errorReasons: "可能的原因：",
+      errorReason1: "取消訂閱連結已過期或無效",
+      errorReason2: "您已經取消訂閱",
+      errorReason3: "系統暫時無法處理您的請求",
+      errorHelp: "如果您需要協助，請聯繫我們的客服團隊。",
+      retry: "重新嘗試",
+      backToHome: "返回首頁",
+      missingToken: "缺少取消訂閱的連結參數。",
+      preparing: "準備取消訂閱..."
+    },
+    notFound: {
+      redirecting: "正在跳转到首页..."
+    },
+    api: {
+      supabaseNotConfigured: "Supabase 服務端尚未設定完成。",
+      emailRequired: "請提供有效的 Email 地址。",
+      invalidEmailFormat: "Email 格式不正確。",
+      recaptchaRequired: "reCAPTCHA 验证是必需的。",
+      recaptchaFailed: "reCAPTCHA 验证失败，请稍后重试。",
+      subscriptionFailed: "訂閱失敗，請稍後再試。",
+      alreadySubscribed: "此 Email 已經訂閱過了。",
+      subscriptionSuccess: "已成功訂閱！感謝你的關注 🙌",
+      unsubscribeTokenRequired: "缺少取消訂閱的 token。",
+      invalidUnsubscribeToken: "無效的取消訂閱連結。",
+      unsubscribeFailed: "取消訂閱失敗，請稍後再試。",
+      unsubscribeSuccess: "已成功取消訂閱。"
     },
     faq: {
       title: "常見問題",

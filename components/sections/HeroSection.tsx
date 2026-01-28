@@ -9,6 +9,7 @@ import { ChevronDown } from 'lucide-react';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import { getUserInfo } from '@/lib/userInfo';
 
 export default function HeroSection() {
   const { t } = useTranslation();
@@ -47,15 +48,14 @@ export default function HeroSection() {
         recaptchaToken = await executeRecaptcha();
       } catch (recaptchaError) {
         setModalType('error');
-        setModalMessage(
-          recaptchaError instanceof Error
-            ? recaptchaError.message
-            : 'reCAPTCHA 验证失败，请刷新页面后重试。'
-        );
+        setModalMessage(t.hero.followForm.recaptchaError);
         setModalOpen(true);
         setIsSubmitting(false);
         return;
       }
+
+      // 获取用户信息
+      const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
@@ -66,6 +66,8 @@ export default function HeroSection() {
           email: trimmedEmail,
           source: 'hero_section',
           recaptchaToken,
+          timezone: userInfo.timezone,
+          locale: userInfo.locale,
         }),
       });
 
