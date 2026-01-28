@@ -68,6 +68,7 @@ const ticketTiers: TicketTier[] = [
 export default function TicketsSection() {
   const { t } = useTranslation();
   const [countdown, setCountdown] = useState<CountdownTime | null>(null);
+  const [loadingTier, setLoadingTier] = useState<'explore' | 'contribute' | 'backer' | null>(null);
   
   const saleEndDate = '2/28';
   
@@ -113,6 +114,55 @@ export default function TicketsSection() {
   }, []);
   
   const isOnSale = countdown !== null && countdown.total > 0;
+
+  const handleCheckout = async (tier: TicketTier) => {
+    try {
+      setLoadingTier(tier.key);
+
+      const price = isOnSale ? tier.salePrice : tier.originalPrice;
+
+      trackEvent('InitiateCheckout', {
+        content_name: `${tier.name} Ticket`,
+        content_category: 'Tickets',
+        value: price,
+        currency: 'USD',
+      });
+
+      trackCustomEvent('StripeCheckoutClick', {
+        location: 'tickets_section',
+        tier: tier.key,
+        price,
+        on_sale: isOnSale,
+      });
+
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tier: tier.key }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to create checkout session', await response.text());
+        alert('Unable to start checkout. Please try again later or contact us.');
+        return;
+      }
+
+      const data: { url?: string } = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Checkout URL is missing. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error during checkout', error);
+      alert('Unexpected error starting checkout. Please try again.');
+    } finally {
+      setLoadingTier(null);
+    }
+  };
 
   return (
     <section id="tickets" className="bg-gradient-to-r from-[#1E1F1C] via-[#1E1F1C] to-[#1E1F1C] text-white py-24 md:py-32">
@@ -210,6 +260,7 @@ export default function TicketsSection() {
                 relative rounded-2xl p-8 border-2 transition-all duration-300
                 bg-gradient-to-br from-[#1E1F1C] to-[#1E1F1C]/90 backdrop-blur-sm ${tier.color.border}
                 hover:shadow-2xl hover:shadow-[#10B8D9]/20 hover:scale-105 hover:from-[#1E1F1C]/95 hover:to-[#1E1F1C]/85
+                flex flex-col h-full
               `}
             >
               {/* Badge */}
@@ -218,7 +269,7 @@ export default function TicketsSection() {
               </div>
 
               {/* Content */}
-              <div className="mt-4">
+              <div className="mt-4 flex-1 flex flex-col">
                 <h3 className="text-2xl font-display font-bold mb-2 text-white">
                   {t.tickets[tier.key].label}
                 </h3>
@@ -253,7 +304,7 @@ export default function TicketsSection() {
                 </div>
 
                 {/* Features */}
-                <div className="space-y-3">
+                <div className="space-y-3 mb-6 flex-1">
                   {t.tickets[tier.key].features.map((feature, featureIndex) => {
                     // Extract core feature name (remove quantity suffix like " x 1", " x 10+", etc.)
                     const getCoreFeatureName = (f: string) => {
@@ -319,68 +370,27 @@ export default function TicketsSection() {
                     );
                   })}
                 </div>
+
+                {/* Stripe Checkout Button */}
+                <button
+                  onClick={() => handleCheckout(tier)}
+                  disabled={loadingTier === tier.key}
+                  className={`
+                    w-full mt-auto px-4 py-3 rounded-lg font-semibold text-sm md:text-base
+                    ${tier.color.badge} text-white
+                    hover:opacity-90
+                    disabled:opacity-60 disabled:cursor-not-allowed
+                    transition-all duration-200 shadow-md hover:shadow-lg
+                  `}
+                >
+                  {loadingTier === tier.key
+                    ? t.tickets?.processing ?? 'Processing...'
+                    : t.tickets?.payWithCard ?? 'Pay with card'}
+                </button>
               </div>
             </motion.div>
           ))}
         </div>
-
-        {/* Register and Partner Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="text-center space-y-4"
-        >
-          {/* Register Button - Full Width */}
-          <div className="w-full max-w-2xl mx-auto">
-            <button
-              onClick={() => {
-                trackEvent('InitiateCheckout', { 
-                  content_name: 'Ticket Registration',
-                  content_category: 'Tickets',
-                  value: isOnSale ? 20 : 30,
-                  currency: 'USD'
-                });
-                trackCustomEvent('TicketRegistrationClick', { 
-                  location: 'tickets_section',
-                  on_sale: isOnSale
-                });
-                window.open('https://luma.com/bghtt5zv', '_blank');
-              }}
-              className="
-                w-full px-6 sm:px-8 py-4 sm:py-5 rounded-lg font-bold text-base sm:text-lg md:text-xl
-                bg-[#10B8D9] text-[#FFFFFF]
-                hover:bg-[#10B8D9]/80
-                transition-all duration-200 shadow-lg hover:shadow-xl
-                transform hover:scale-[1.02]
-              "
-            >
-              {t.tickets.cta}
-            </button>
-          </div>
-
-          {/* Partner Button - Next Line */}
-          <div className="w-full max-w-2xl mx-auto">
-            <a
-              href="https://forms.gle/KqJGkQhdWmSZVTdv6"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                trackCustomEvent('BecomePartnerClick', { location: 'tickets_section' });
-              }}
-              className="
-                inline-block w-full px-6 sm:px-8 py-4 sm:py-5 rounded-lg font-bold text-base sm:text-lg md:text-xl text-center
-                bg-white/10 text-white border-2 border-white/30
-                hover:bg-white/20 hover:border-white/50
-                transition-all duration-200 shadow-lg hover:shadow-xl
-                transform hover:scale-[1.02]
-              "
-            >
-              {t.tickets.becomePartner}
-            </a>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

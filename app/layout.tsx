@@ -5,6 +5,7 @@ import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
+import RecaptchaScript from '@/components/RecaptchaScript';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -168,6 +169,8 @@ export default async function RootLayout({
         <StructuredData lang={lang === 'zh-TW' ? 'zh' : 'en'} />
         {/* Facebook Pixel 追踪 */}
         <FacebookPixel />
+        {/* reCAPTCHA Enterprise API */}
+        <RecaptchaScript />
         {children}
       </body>
     </html>

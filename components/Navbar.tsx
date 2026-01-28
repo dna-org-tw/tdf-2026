@@ -87,7 +87,7 @@ export default function Navbar() {
   const navLinks = [
     { name: t.nav.why, nameShort: t.navShort?.why || t.nav.why, href: '#why' },
     { name: t.nav.highlights, nameShort: t.navShort?.highlights || t.nav.highlights, href: '#highlights' },
-    { name: t.nav.schedule, nameShort: t.navShort?.schedule || t.nav.schedule, href: '#schedule' },
+    { name: t.nav.tickets, nameShort: t.navShort?.tickets || t.nav.tickets, href: '#tickets' },
     { name: t.nav.accommodation, nameShort: t.navShort?.accommodation || t.nav.accommodation, href: '#accommodation' },
     { name: t.nav.team, nameShort: t.navShort?.team || t.nav.team, href: '#organizer' },
   ];
@@ -157,10 +157,10 @@ export default function Navbar() {
           </button>
 
           <a
-            href="#tickets"
+            href="#schedule"
             onClick={(e) => {
-              trackCustomEvent('NavbarRegisterClick', { location: 'navbar_desktop' });
-              handleNavClick(e, '#tickets');
+              trackCustomEvent('NavbarFollowClick', { location: 'navbar_desktop' });
+              handleNavClick(e, '#schedule');
             }}
             className="bg-[#1E1F1C] text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#10B8D9] transition-colors cursor-pointer"
           >

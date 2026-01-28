@@ -41,7 +41,13 @@ export function useTranslation() {
   const pathname = usePathname();
   
   // 初始值從 URL 參數獲取，確保服務端和客戶端一致
-  const [lang, setLang] = useState<Language>(() => getInitialLanguage(searchParams));
+  const [lang, setLang] = useState<Language>(() => {
+    try {
+      return getInitialLanguage(searchParams);
+    } catch (error) {
+      return 'zh'; // 如果出錯，使用預設值
+    }
+  });
   const [mounted, setMounted] = useState(false);
 
   // 標記組件已掛載（hydration 完成）
@@ -55,36 +61,53 @@ export function useTranslation() {
   useEffect(() => {
     if (!mounted) return; // 等待 hydration 完成
     
-    const langParam = searchParams.get('lang');
-    if (langParam === 'en' || langParam === 'zh') {
-      // 使用 setTimeout 來避免在 effect 中直接調用 setState
-      setTimeout(() => {
-        setLang(langParam);
-      }, 0);
-    } else {
-      // 如果 URL 參數中沒有指定語系，使用瀏覽器語系（僅在客戶端）
-      setTimeout(() => {
-        setLang(getBrowserLanguage());
-      }, 0);
+    try {
+      const langParam = searchParams?.get('lang');
+      if (langParam === 'en' || langParam === 'zh') {
+        // 使用 setTimeout 來避免在 effect 中直接調用 setState
+        setTimeout(() => {
+          setLang(langParam);
+        }, 0);
+      } else {
+        // 如果 URL 參數中沒有指定語系，使用瀏覽器語系（僅在客戶端）
+        setTimeout(() => {
+          setLang(getBrowserLanguage());
+        }, 0);
+      }
+    } catch (error) {
+      // 如果出錯，保持當前語言或使用預設值
+      console.error('Error updating language:', error);
     }
   }, [searchParams, mounted]);
 
   const toggleLanguage = () => {
     const newLang = lang === 'zh' ? 'en' : 'zh';
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('lang', newLang);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    try {
+      const params = new URLSearchParams(searchParams?.toString() || '');
+      params.set('lang', newLang);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    } catch (error) {
+      console.error('Error toggling language:', error);
+    }
   };
 
   const setLanguage = (newLang: Language) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('lang', newLang);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    try {
+      const params = new URLSearchParams(searchParams?.toString() || '');
+      params.set('lang', newLang);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    } catch (error) {
+      console.error('Error setting language:', error);
+    }
   }
 
+  // 確保 lang 是有效的語言代碼，並確保 content[lang] 存在
+  const safeLang: Language = (lang === 'en' || lang === 'zh') ? lang : 'zh';
+  const safeContent = content[safeLang] || content.zh; // 如果找不到對應的翻譯，使用中文作為後備
+
   return {
-    lang,
-    t: content[lang],
+    lang: safeLang,
+    t: safeContent,
     toggleLanguage,
     setLanguage
   };

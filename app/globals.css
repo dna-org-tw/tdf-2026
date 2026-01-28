@@ -43,3 +43,18 @@ html {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
+
+/* Hide reCAPTCHA badge and footer elements (required by Google guidelines when hiding badge) */
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+/* Hide reCAPTCHA anchor footer elements */
+.rc-anchor-normal-footer,
+.rc-anchor-logo-large,
+.rc-anchor-pt,
+.rc-anchor-logo-img,
+.rc-anchor-logo-img-large {
+  display: none !important;
+  visibility: hidden !important;
+}

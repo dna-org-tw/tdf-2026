@@ -4,30 +4,43 @@ export const content = {
       title: "Taiwan Digital Fest 2026",
       subtitle: "Where the Global Nomad Tribe Meets Nature & Innovation",
       dateLocation: "May 1 – May 31, 2026 | Taitung & Hualien, Taiwan",
-      cta: "Register Now",
+      cta: "Follow for Free",
       ctaSpeakers: "Call for Speakers",
       ctaVolunteers: "Call for Volunteers",
       ctaPartners: "Call for Partners",
       ctaSideEvents: "Call for Side Events",
-      ctaSponsors: "Call for Sponsors"
+      ctaSponsors: "Call for Sponsors",
+      followForm: {
+        title: "Follow Us",
+        description: "Stay updated with the latest news, exclusive updates, and join our digital nomad community!",
+        emailPlaceholder: "Enter your email address",
+        submitButton: "Subscribe",
+        submitting: "Subscribing...",
+        emptyEmailError: "Please enter your email address",
+        duplicateMessage: "You're already subscribed! Welcome back!",
+        errorMessage: "Subscription failed. Please try again later.",
+        successMessage: "Successfully subscribed! Thank you for following us 🙌"
+      }
     },
     nav: {
       team: "Team",
       why: "Why Taiwan",
       highlights: "Highlights",
       schedule: "Schedule",
+      tickets: "Tickets",
       gallery: "Gallery",
       accommodation: "Map",
-      register: "Register"
+      register: "Learn More"
     },
     navShort: {
       team: "Team",
       why: "Why",
       highlights: "Highlights",
       schedule: "Schedule",
+      tickets: "Tickets",
       gallery: "Gallery",
       accommodation: "Map",
-      register: "Register"
+      register: "Learn More"
     },
     about: {
       title: "About The Event",
@@ -43,7 +56,7 @@ export const content = {
         themeValue: "Digital Nomad, AI Workshops, Placemaking, Nature Experience"
       },
       ctas: [
-        { type: "Register", text: "Register Now", href: "#tickets" },
+        { type: "Register", text: "Follow for Free", href: "#follow-us" },
         { type: "Gallery", text: "View 2025 Gallery", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -69,7 +82,7 @@ export const content = {
         desc: "Majestic gorges, vibrant communities, and the perfect balance of work and adventure. Hualien is where dramatic landscapes meet a thriving digital nomad scene—one of the best digital nomad destinations in Asia for 2026. Picture yourself working from a specialty coffee shop with fast WiFi overlooking the Pacific Ocean, then hiking through Taroko Gorge's marble canyons in the afternoon. The city pulses with creative energy—from artisanal coffee shops perfect for async work to night markets buzzing with local flavors. Connect with fellow nomads at co-working spaces, join mastermind groups, or simply wander through the streets where every corner reveals a new discovery. With affordable cost of living and a welcoming nomad tribe, Hualien offers exceptional value for location-independent entrepreneurs. In Hualien, adventure is never far away, and the community is always welcoming. This is where your best work meets your best life."
       },
       ctas: [
-        { type: "Register", text: "Start Your Journey", href: "#tickets" },
+        { type: "Register", text: "Start Your Journey", href: "#follow-us" },
         { type: "Gallery", text: "View Past Memories", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -77,8 +90,8 @@ export const content = {
       title: "Event Highlights",
       viewMore: "See More",
       ctas: [
-        { type: "Register", text: "Register Now", href: "#tickets" },
-        { type: "Call for Side Events", text: "Call for Side Events", href: "https://forms.gle/EofTp9Qso27jEeeY7" }
+        { type: "Register", text: "Follow for Free", href: "#follow-us" },
+        { type: "Call for Side Events", text: "Host Your Own Side Event →", href: "https://forms.gle/EofTp9Qso27jEeeY7" }
       ],
       items: [
         { 
@@ -163,10 +176,15 @@ export const content = {
           "Digital Nomad Activities x 20+"
         ]
       },
-      cta: "Register Now",
+      cta: "Follow for Free",
       becomePartner: "Join as Partner",
       reviewLink: "2025 Gallery",
-      note: "💡 Tip: Different ticket types have access to different activities. Please use the filter below in the schedule to see activities available for each ticket type."
+      note: "💡 Tip: Different ticket types have access to different activities. Please use the filter below in the schedule to see activities available for each ticket type.",
+      undecidedTitle: "Haven't Decided Yet? Follow Us for Free!",
+      undecidedSubtitle: "Enter your email to stay updated with the latest news, exclusive updates, and join our digital nomad community!",
+      followerCta: "Follow for Free",
+      payWithCard: "Start Your Journey",
+      processing: "Preparing your journey..."
     },
     gallery: {
       title: "Highlights",
@@ -179,11 +197,7 @@ export const content = {
       },
       sponsors: {
         title: "Sponsors",
-        cta: { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
-        platinum: "Platinum",
-        gold: "Gold",
-        silver: "Silver",
-        bronze: "Bronze"
+        cta: { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
       },
       partners: {
         title: "Partners",
@@ -197,7 +211,7 @@ export const content = {
       viewWebsite: "Visit Website",
       mapLoadError: "Unable to load map data",
       ctas: [
-        { type: "Register", text: "Register Now", href: "#tickets" }
+        { type: "Register", text: "Become a Venue Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ],
       items: [
         {
@@ -397,17 +411,25 @@ export const content = {
         }
       ]
     },
+    timeline: {
+      title: "Event Timeline",
+      filterLabel: "Filter by ticket type:",
+      explorer: "Explorer",
+      contributor: "Contributor",
+      backer: "Backer",
+      explorerLabel: "Explorer",
+      contributorLabel: "Contributor",
+      backerLabel: "Backer",
+      clearFilter: "Clear Filter",
+      clickDate: "Click on a date to view event details"
+    },
     schedule: {
-      title: "Event Schedule",
-      filterLabel: "Filter by event type:",
+      title: "Event Timeline",
+      filterLabel: "Filter by ticket type:",
       explorer: "Explorer",
       contributor: "Contributor",
       backer: "Backer",
       other: "Other",
-      explorerLabel: "Explorer",
-      contributorLabel: "Contributor",
-      backerLabel: "Backer",
-      otherLabel: "Other",
       clearFilter: "Clear Filter",
       clickDate: "Click on a date to view event details"
     },
@@ -418,14 +440,35 @@ export const content = {
       event: "event",
       close: "Close"
     },
+    followUs: {
+      title: "Follow Us",
+      subtitle: "Stay updated with the latest news, exclusive updates, and join our digital nomad community!",
+      benefits: {
+        free: "100% Free",
+        realTime: "Real-time Updates",
+        community: "Join Nomad Community"
+      },
+      emailPlaceholder: "Enter your email address",
+      submitButton: "Subscribe",
+      submitting: "Subscribing...",
+      successMessage: "Successfully subscribed! Thank you for following us 🙌",
+      duplicateMessage: "You're already subscribed! Welcome back!",
+      errorMessage: "Subscription failed. Please try again later.",
+      privacyNote: "We respect your privacy. Unsubscribe at any time."
+    },
     footer: {
       copyright: "© 2026 Taiwan Digital Fest. All rights reserved.",
       getInvolved: "Get Involved",
-      callForSpeakers: "Call for Speakers",
+      callForSpeakers: "Become a Speaker",
       callForSponsors: "Call for Sponsors",
       callForPartners: "Call for Partners",
       callForVolunteers: "Call for Volunteers",
-      callForSideEvents: "Call for Side Events"
+      callForSideEvents: "Host Your Side Event",
+      recaptcha: "This site is protected by reCAPTCHA and the Google",
+      privacyPolicy: "Privacy Policy",
+      termsOfService: "Terms of Service",
+      and: "and",
+      apply: "apply."
     },
     faq: {
       title: "Frequently Asked Questions",
@@ -483,30 +526,43 @@ export const content = {
       title: "2026 台灣數位嘉年華",
       subtitle: "在山海之間，遇見世界的數位遊牧者",
       dateLocation: "2026/05/01 – 2026/05/31 | 台灣 台東 & 花蓮",
-      cta: "立即報名",
+      cta: "免費關注",
       ctaSpeakers: "徵求講者",
       ctaVolunteers: "徵求志工",
       ctaPartners: "徵求合作夥伴",
       ctaSideEvents: "徵求 Side Event",
-      ctaSponsors: "徵求贊助商"
+      ctaSponsors: "徵求贊助商",
+      followForm: {
+        title: "關注我們",
+        description: "填寫 Email 關注我們，免費獲得即時資訊，並加入數位遊牧專屬社群！",
+        emailPlaceholder: "請輸入您的 Email",
+        submitButton: "立即關注",
+        submitting: "訂閱中...",
+        emptyEmailError: "請輸入您的 Email",
+        duplicateMessage: "您已經訂閱過了！歡迎回來！",
+        errorMessage: "訂閱失敗，請稍後再試。",
+        successMessage: "訂閱成功！感謝您的關注 🙌"
+      }
     },
     nav: {
       team: "主辦團隊",
       why: "為什麼是這裡",
       highlights: "活動亮點",
       schedule: "重要時程",
+      tickets: "票券資訊",
       gallery: "精彩瞬間",
       accommodation: "地圖",
-      register: "立即報名"
+      register: "了解更多"
     },
     navShort: {
       team: "團隊",
       why: "為什麼",
       highlights: "亮點",
       schedule: "時程",
+      tickets: "票券",
       gallery: "精彩瞬間",
       accommodation: "地圖",
-      register: "報名"
+      register: "了解更多"
     },
     about: {
       title: "關於本活動",
@@ -522,7 +578,7 @@ export const content = {
         themeValue: "數位遊牧、AI 工作坊、地方創生、自然體驗"
       },
       ctas: [
-        { type: "Register", text: "立即報名", href: "#tickets" },
+        { type: "Register", text: "免費關注", href: "#follow-us" },
         { type: "Gallery", text: "查看 2025 精彩瞬間", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -548,7 +604,7 @@ export const content = {
         desc: "壯麗的峽谷、充滿活力的社群，以及工作與冒險的完美平衡。花蓮，是壯麗景觀與蓬勃數位遊牧社群的交匯點。想像自己在俯瞰太平洋的咖啡廳工作，下午則漫步在太魯閣的大理石峽谷中。這座城市充滿創意能量——從手工咖啡店到充滿在地風味的夜市。在共創空間與同行的遊牧者交流，參與社群活動，或只是漫步街頭，每個轉角都有新發現。在花蓮，冒險從不遙遠，社群總是熱情歡迎。這裡是你最佳工作與最佳生活的完美結合。"
       },
       ctas: [
-        { type: "Register", text: "開始旅程", href: "#tickets" },
+        { type: "Register", text: "開始旅程", href: "#follow-us" },
         { type: "Gallery", text: "查看活動回顧", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
       ]
     },
@@ -556,8 +612,8 @@ export const content = {
       title: "活動亮點",
       viewMore: "查看更多",
       ctas: [
-        { type: "Register", text: "立即報名", href: "#tickets" },
-        { type: "Call for Side Events", text: "徵求 Side Event", href: "https://forms.gle/EofTp9Qso27jEeeY7" }
+        { type: "Register", text: "免費追蹤", href: "#follow-us" },
+        { type: "Call for Side Events", text: "舉辦你的 Side Event →", href: "https://forms.gle/EofTp9Qso27jEeeY7" }
       ],
       items: [
         { 
@@ -642,10 +698,15 @@ export const content = {
           "數位遊牧活動 x 20+"
         ]
       },
-      cta: "立即報名",
+      cta: "免費關注",
       becomePartner: "成為合作夥伴",
       reviewLink: "2025 活動回顧",
-      note: "💡 提示：不同票種可參加的活動不同，請在下方時程表中使用篩選器查看各票種可參加的活動"
+      note: "💡 提示：不同票種可參加的活動不同，請在下方時程表中使用篩選器查看各票種可參加的活動",
+      undecidedTitle: "還沒決定好嗎？歡迎免費關注我們！",
+      undecidedSubtitle: "填寫 Email 關注我們，免費獲得即時資訊，並加入數位遊牧專屬社群！",
+      followerCta: "免費關注",
+      payWithCard: "開始你的旅程",
+      processing: "馬上就好..."
     },
     gallery: {
       title: "精彩瞬間",
@@ -658,11 +719,7 @@ export const content = {
       },
       sponsors: {
         title: "贊助單位",
-        cta: { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" },
-        platinum: "白金贊助",
-        gold: "金級贊助",
-        silver: "銀級贊助",
-        bronze: "銅級贊助"
+        cta: { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
       },
       partners: {
         title: "合作夥伴",
@@ -676,7 +733,7 @@ export const content = {
       viewWebsite: "查看網站",
       mapLoadError: "無法載入地圖資料",
       ctas: [
-        { type: "Register", text: "立即報名", href: "#tickets" }
+        { type: "Register", text: "成為場地伙伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ],
       items: [
         {
@@ -876,17 +933,25 @@ export const content = {
         }
       ]
     },
+    timeline: {
+      title: "活動時程",
+      filterLabel: "依票種篩選活動：",
+      explorer: "Explorer",
+      contributor: "Contributor",
+      backer: "Backer",
+      explorerLabel: "Explorer",
+      contributorLabel: "Contributor",
+      backerLabel: "Backer",
+      clearFilter: "清除篩選",
+      clickDate: "點擊日期查看活動詳情"
+    },
     schedule: {
       title: "活動時程",
-      filterLabel: "依活動類型篩選：",
+      filterLabel: "依票種篩選活動：",
       explorer: "Explorer",
       contributor: "Contributor",
       backer: "Backer",
       other: "其他",
-      explorerLabel: "Explorer",
-      contributorLabel: "Contributor",
-      backerLabel: "Backer",
-      otherLabel: "其他",
       clearFilter: "清除篩選",
       clickDate: "點擊日期查看活動詳情"
     },
@@ -897,14 +962,35 @@ export const content = {
       event: "個活動",
       close: "關閉"
     },
+    followUs: {
+      title: "關注我們",
+      subtitle: "填寫 Email 關注我們，免費獲得即時資訊，並加入數位遊牧專屬社群！",
+      benefits: {
+        free: "完全免費",
+        realTime: "即時資訊",
+        community: "加入數位遊牧社群"
+      },
+      emailPlaceholder: "請輸入您的 Email",
+      submitButton: "立即關注",
+      submitting: "訂閱中...",
+      successMessage: "訂閱成功！感謝您的關注 🙌",
+      duplicateMessage: "您已經訂閱過了！歡迎回來！",
+      errorMessage: "訂閱失敗，請稍後再試。",
+      privacyNote: "我們尊重您的隱私，隨時可以取消訂閱。"
+    },
     footer: {
       copyright: "© 2026 Taiwan Digital Fest. All rights reserved.",
       getInvolved: "參與我們",
-      callForSpeakers: "徵求講者",
+      callForSpeakers: "成為講者",
       callForSponsors: "徵求贊助商",
       callForPartners: "徵求合作夥伴",
       callForVolunteers: "徵求志工",
-      callForSideEvents: "徵求 Side Event"
+      callForSideEvents: "立即舉辦 Side Event",
+      recaptcha: "此網站受 reCAPTCHA 保護，並適用 Google",
+      privacyPolicy: "隱私權政策",
+      termsOfService: "服務條款",
+      and: "和",
+      apply: "適用。"
     },
     faq: {
       title: "常見問題",

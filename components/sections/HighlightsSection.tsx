@@ -109,7 +109,7 @@ export default function HighlightsSection() {
         </div>
 
         {/* CTA Buttons */}
-        {t.highlights.ctas && t.highlights.ctas.length > 0 && (
+        {t.highlights.ctas && t.highlights.ctas.filter(cta => cta.type !== "Register").length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -117,37 +117,26 @@ export default function HighlightsSection() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mt-12 flex flex-wrap justify-center gap-4"
           >
-            {t.highlights.ctas.map((cta) => {
-              const isPrimary = cta.type === "Register";
-              return (
-                <motion.a
-                  key={cta.type}
-                  href={cta.href}
-                  target={cta.href.startsWith('http') ? '_blank' : undefined}
-                  rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  onClick={() => {
-                    if (isPrimary) {
-                      trackEvent('Lead', { 
-                        content_name: 'Highlights Register Button',
-                        content_category: 'Registration'
-                      });
-                      trackCustomEvent('HighlightsRegisterClick', { location: 'highlights_section' });
-                    } else {
+            {t.highlights.ctas
+              .filter(cta => cta.type !== "Register")
+              .map((cta) => {
+                return (
+                  <motion.a
+                    key={cta.type}
+                    href={cta.href}
+                    target={cta.href.startsWith('http') ? '_blank' : undefined}
+                    rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    onClick={() => {
                       trackCustomEvent('CallForSideEventsClick', { location: 'highlights_section' });
-                    }
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`inline-block px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all shadow-lg ${
-                    isPrimary
-                      ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/80 text-white shadow-[#004E9D]/20'
-                      : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C]'
-                  }`}
-                >
-                  {cta.text}
-                </motion.a>
-              );
-            })}
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-block px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-base sm:text-lg md:text-xl font-bold tracking-wide transition-all shadow-xl bg-gradient-to-r from-[#10B8D9] to-teal-600 hover:from-[#10B8D9]/90 hover:to-teal-600/90 text-white shadow-[#10B8D9]/30 hover:shadow-[#10B8D9]/50 transform hover:-translate-y-0.5"
+                  >
+                    {cta.text}
+                  </motion.a>
+                );
+              })}
           </motion.div>
         )}
       </div>

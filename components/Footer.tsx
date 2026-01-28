@@ -2,6 +2,7 @@
 
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import Link from 'next/link';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -71,6 +72,13 @@ export default function Footer() {
           
           {/* Contact Section */}
           <div className="flex flex-col gap-1 text-xs">
+            <Link 
+              href="/order/query"
+              onClick={() => trackCustomEvent('OrderQueryClick', { location: 'footer' })}
+              className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
+            >
+              {t.footer.orderQuery}
+            </Link>
             <a 
               href="mailto:fest@dna.org.tw"
               onClick={() => {
@@ -101,6 +109,30 @@ export default function Footer() {
               <span className="text-[#F6F6F6]/60">Instagram</span>
             </a>
           </div>
+        </div>
+        {/* reCAPTCHA branding (required when hiding badge) */}
+        <div className="text-center mt-2 pt-2 border-t border-[#F6F6F6]/10">
+          <p className="text-xs text-[#F6F6F6]/60">
+            {t.footer.recaptcha}{' '}
+            <a 
+              href="https://policies.google.com/privacy" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-[#10B8D9] transition-colors underline"
+            >
+              {t.footer.privacyPolicy}
+            </a>{' '}
+            {t.footer.and}{' '}
+            <a 
+              href="https://policies.google.com/terms" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-[#10B8D9] transition-colors underline"
+            >
+              {t.footer.termsOfService}
+            </a>{' '}
+            {t.footer.apply}
+          </p>
         </div>
       </div>
     </footer>

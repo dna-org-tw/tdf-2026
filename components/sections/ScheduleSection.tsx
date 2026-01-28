@@ -393,14 +393,24 @@ export default function ScheduleSection() {
                   trackCustomEvent('CallForSideEventsClick', { location: 'schedule_section' });
                 }}
                 className="
-                  inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
+                  group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                   bg-[#10B8D9] text-[#FFFFFF]
-                  hover:bg-[#10B8D9]/80
-                  transition-all duration-200 shadow-lg hover:shadow-xl
-                  transform hover:scale-105
+                  hover:bg-[#10B8D9]/90 hover:shadow-2xl
+                  transition-all duration-300 shadow-lg
+                  transform hover:scale-105 hover:-translate-y-0.5
+                  relative overflow-hidden
                 "
               >
-                {t.footer.callForSideEvents}
+                <span className="relative z-10">{t.footer.callForSideEvents}</span>
+                <svg 
+                  className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+                <span className="absolute inset-0 bg-gradient-to-r from-[#10B8D9] to-[#0EA5C9] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               </a>
               <a
                 href="https://forms.gle/pVc6oTEi1XZ1pAR49"
@@ -410,14 +420,24 @@ export default function ScheduleSection() {
                   trackCustomEvent('CallForSpeakersClick', { location: 'schedule_section' });
                 }}
                 className="
-                  inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
+                  group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                   bg-[#1E1F1C] text-white border-2 border-[#1E1F1C]
-                  hover:bg-[#1E1F1C]/90
-                  transition-all duration-200 shadow-lg hover:shadow-xl
-                  transform hover:scale-105
+                  hover:bg-[#1E1F1C]/95 hover:border-[#10B8D9] hover:shadow-2xl
+                  transition-all duration-300 shadow-lg
+                  transform hover:scale-105 hover:-translate-y-0.5
+                  relative overflow-hidden
                 "
               >
-                {t.footer.callForSpeakers}
+                <span className="relative z-10">{t.footer.callForSpeakers}</span>
+                <svg 
+                  className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+                <span className="absolute inset-0 bg-gradient-to-r from-[#1E1F1C] to-[#2D2F2C] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               </a>
             </motion.div>
           </div>
