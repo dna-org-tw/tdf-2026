@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useState, useEffect } from 'react';
 import { Instagram, Globe, Youtube, Twitter, Linkedin, Music } from 'lucide-react';
+import { trackCustomEvent } from '@/components/FacebookPixel';
 
 interface LumaPartner {
   name: string;
@@ -262,6 +263,7 @@ export default function PartnersSection() {
                 href={t.partners.sponsors.cta.href}
                 target={t.partners.sponsors.cta.href.startsWith('http') ? '_blank' : undefined}
                 rel={t.partners.sponsors.cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                onClick={() => trackCustomEvent('CallForSponsorsClick', { location: 'partners_section' })}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg bg-[#C54090] hover:bg-[#C54090]/80 text-white shadow-[#C54090]/20"
@@ -443,6 +445,7 @@ export default function PartnersSection() {
                 href={t.partners.partners.cta.href}
                 target={t.partners.partners.cta.href.startsWith('http') ? '_blank' : undefined}
                 rel={t.partners.partners.cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                onClick={() => trackCustomEvent('CallForPartnersClick', { location: 'partners_section' })}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-block px-6 sm:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold tracking-wide transition-all shadow-lg bg-white hover:bg-white/90 text-[#1E1F1C] shadow-[#004E9D]/20"

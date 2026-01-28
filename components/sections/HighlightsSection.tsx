@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ArrowUpRight, Calendar, CalendarCheck, Users, Heart } from 'lucide-react';
 import HighlightModal from '@/components/HighlightModal';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function HighlightsSection() {
   const { t } = useTranslation();
@@ -67,6 +68,14 @@ export default function HighlightsSection() {
                 className={`bg-white p-6 md:p-7 lg:p-8 rounded-2xl hover:bg-teal-50 transition-colors group border border-stone-200 hover:border-teal-100 ${hasFullDesc ? 'cursor-pointer' : ''}`}
                 onClick={() => {
                   if (hasFullDesc) {
+                    trackEvent('ViewContent', {
+                      content_name: item.title,
+                      content_category: 'Event Highlight',
+                      content_type: 'highlight'
+                    });
+                    trackCustomEvent('HighlightView', {
+                      highlight_title: item.title
+                    });
                     setSelectedItem({
                       title: item.title,
                       desc: item.desc,
@@ -116,6 +125,17 @@ export default function HighlightsSection() {
                   href={cta.href}
                   target={cta.href.startsWith('http') ? '_blank' : undefined}
                   rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  onClick={() => {
+                    if (isPrimary) {
+                      trackEvent('Lead', { 
+                        content_name: 'Highlights Register Button',
+                        content_category: 'Registration'
+                      });
+                      trackCustomEvent('HighlightsRegisterClick', { location: 'highlights_section' });
+                    } else {
+                      trackCustomEvent('CallForSideEventsClick', { location: 'highlights_section' });
+                    }
+                  }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className={`inline-block px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all shadow-lg ${

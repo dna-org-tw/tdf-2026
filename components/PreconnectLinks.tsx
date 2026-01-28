@@ -8,6 +8,8 @@ export default function PreconnectLinks() {
       <link rel="preconnect" href="https://www.instagram.com" />
       <link rel="preconnect" href="https://www.youtube.com" />
       <link rel="dns-prefetch" href="https://img.youtube.com" />
+      <link rel="preconnect" href="https://connect.facebook.net" />
+      <link rel="dns-prefetch" href="https://www.facebook.com" />
     </>
   );
 }

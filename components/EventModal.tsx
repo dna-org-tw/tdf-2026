@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { useEffect } from 'react';
 
 interface CalendarEvent {
   title: string;
@@ -23,6 +25,26 @@ interface EventModalProps {
 
 export default function EventModal({ isOpen, onClose, events, date }: EventModalProps) {
   const { t } = useTranslation();
+  
+  // Track event modal view
+  useEffect(() => {
+    if (isOpen && events.length > 0) {
+      events.forEach((event) => {
+        trackEvent('ViewContent', {
+          content_name: event.title,
+          content_category: 'Event Schedule',
+          content_type: 'calendar_event',
+          content_ids: [event.title]
+        });
+        trackCustomEvent('EventDetailView', {
+          event_title: event.title,
+          event_date: date,
+          event_location: event.location
+        });
+      });
+    }
+  }, [isOpen, events, date]);
+  
   if (!isOpen || events.length === 0) return null;
 
   const getGoogleMapsUrl = (location: string) => {

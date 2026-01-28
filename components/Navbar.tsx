@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import MobileMenu from './MobileMenu';
+import { trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
@@ -37,6 +38,12 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const hash = href.replace('#', '');
+    
+    // Track navigation clicks
+    trackCustomEvent('NavigationClick', {
+      section: hash,
+      location: 'navbar'
+    });
     
     if (isHomePage) {
       // If on home page, just scroll to the section
@@ -151,7 +158,10 @@ export default function Navbar() {
 
           <a
             href="#tickets"
-            onClick={(e) => handleNavClick(e, '#tickets')}
+            onClick={(e) => {
+              trackCustomEvent('NavbarRegisterClick', { location: 'navbar_desktop' });
+              handleNavClick(e, '#tickets');
+            }}
             className="bg-[#1E1F1C] text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#10B8D9] transition-colors cursor-pointer"
           >
             {t.nav.register}

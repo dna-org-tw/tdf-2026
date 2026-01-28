@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 interface TicketTier {
   name: string;
@@ -334,7 +335,19 @@ export default function TicketsSection() {
           {/* Register Button - Full Width */}
           <div className="w-full max-w-2xl mx-auto">
             <button
-              onClick={() => window.open('https://luma.com/bghtt5zv', '_blank')}
+              onClick={() => {
+                trackEvent('InitiateCheckout', { 
+                  content_name: 'Ticket Registration',
+                  content_category: 'Tickets',
+                  value: isOnSale ? 20 : 30,
+                  currency: 'USD'
+                });
+                trackCustomEvent('TicketRegistrationClick', { 
+                  location: 'tickets_section',
+                  on_sale: isOnSale
+                });
+                window.open('https://luma.com/bghtt5zv', '_blank');
+              }}
               className="
                 w-full px-6 sm:px-8 py-4 sm:py-5 rounded-lg font-bold text-base sm:text-lg md:text-xl
                 bg-[#10B8D9] text-[#FFFFFF]
@@ -353,6 +366,9 @@ export default function TicketsSection() {
               href="https://forms.gle/KqJGkQhdWmSZVTdv6"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackCustomEvent('BecomePartnerClick', { location: 'tickets_section' });
+              }}
               className="
                 inline-block w-full px-6 sm:px-8 py-4 sm:py-5 rounded-lg font-bold text-base sm:text-lg md:text-xl text-center
                 bg-white/10 text-white border-2 border-white/30

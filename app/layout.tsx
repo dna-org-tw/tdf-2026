@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PreconnectLinks from '@/components/PreconnectLinks';
+import FacebookPixel from '@/components/FacebookPixel';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -165,6 +166,8 @@ export default async function RootLayout({
         <PreconnectLinks />
         {/* AEO优化：添加结构化数据 - Next.js会自动将其移到head */}
         <StructuredData lang={lang === 'zh-TW' ? 'zh' : 'en'} />
+        {/* Facebook Pixel 追踪 */}
+        <FacebookPixel />
         {children}
       </body>
     </html>

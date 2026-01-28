@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ChevronDown } from 'lucide-react';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function HeroSection() {
   const { t } = useTranslation();
@@ -111,6 +112,10 @@ export default function HeroSection() {
             {/* 主要按鈕 */}
             <motion.a
               href="#tickets"
+              onClick={() => {
+                trackEvent('Lead', { content_name: 'Hero Register Button', content_category: 'Registration' });
+                trackCustomEvent('HeroRegisterClick', { button_location: 'hero_section' });
+              }}
               whileHover={{ 
                 scale: 1.08,
                 boxShadow: "0 20px 40px rgba(16, 184, 217, 0.4)",
@@ -163,6 +168,9 @@ export default function HeroSection() {
               href="https://forms.gle/pVc6oTEi1XZ1pAR49"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackCustomEvent('CallForSpeakersClick', { location: 'hero_section' });
+              }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}
@@ -176,6 +184,9 @@ export default function HeroSection() {
               href="https://forms.gle/SPCggMHifbE3oqkk7"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackCustomEvent('CallForVolunteersClick', { location: 'hero_section' });
+              }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}
@@ -193,6 +204,9 @@ export default function HeroSection() {
               href="https://forms.gle/KqJGkQhdWmSZVTdv6"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackCustomEvent('CallForPartnersClick', { location: 'hero_section' });
+              }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}
@@ -206,6 +220,9 @@ export default function HeroSection() {
               href="https://forms.gle/EofTp9Qso27jEeeY7"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackCustomEvent('CallForSideEventsClick', { location: 'hero_section' });
+              }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}
@@ -219,6 +236,9 @@ export default function HeroSection() {
               href="https://forms.gle/aN3LbaHy8iV5xqyi8"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackCustomEvent('CallForSponsorsClick', { location: 'hero_section' });
+              }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}

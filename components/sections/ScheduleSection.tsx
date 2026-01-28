@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import EventModal from '@/components/EventModal';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 interface CalendarEvent {
   title: string;
@@ -105,6 +106,16 @@ export default function ScheduleSection() {
   };
   
   const toggleFilter = (filter: string) => {
+    // Track filter usage
+    if (selectedFilter !== filter) {
+      trackEvent('Search', {
+        search_string: filter,
+        content_category: 'Schedule Filter'
+      });
+      trackCustomEvent('ScheduleFilter', {
+        filter_type: filter
+      });
+    }
     // If clicking the same filter, deselect it
     if (selectedFilter === filter) {
       setSelectedFilter(null);
@@ -378,6 +389,9 @@ export default function ScheduleSection() {
                 href="https://forms.gle/EofTp9Qso27jEeeY7"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  trackCustomEvent('CallForSideEventsClick', { location: 'schedule_section' });
+                }}
                 className="
                   inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                   bg-[#10B8D9] text-[#FFFFFF]
@@ -392,6 +406,9 @@ export default function ScheduleSection() {
                 href="https://forms.gle/pVc6oTEi1XZ1pAR49"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  trackCustomEvent('CallForSpeakersClick', { location: 'schedule_section' });
+                }}
                 className="
                   inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
                   bg-[#1E1F1C] text-white border-2 border-[#1E1F1C]

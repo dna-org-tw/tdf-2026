@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from '@/hooks/useTranslation';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ export default function Footer() {
                 href="https://forms.gle/pVc6oTEi1XZ1pAR49"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackCustomEvent('CallForSpeakersClick', { location: 'footer' })}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForSpeakers}
@@ -32,6 +34,7 @@ export default function Footer() {
                 href="https://forms.gle/aN3LbaHy8iV5xqyi8"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackCustomEvent('CallForSponsorsClick', { location: 'footer' })}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForSponsors}
@@ -40,6 +43,7 @@ export default function Footer() {
                 href="https://forms.gle/KqJGkQhdWmSZVTdv6"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackCustomEvent('CallForPartnersClick', { location: 'footer' })}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForPartners}
@@ -48,6 +52,7 @@ export default function Footer() {
                 href="https://forms.gle/SPCggMHifbE3oqkk7"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackCustomEvent('CallForVolunteersClick', { location: 'footer' })}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForVolunteers}
@@ -56,6 +61,7 @@ export default function Footer() {
                 href="https://forms.gle/EofTp9Qso27jEeeY7"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackCustomEvent('CallForSideEventsClick', { location: 'footer' })}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
                 {t.footer.callForSideEvents}
@@ -67,6 +73,10 @@ export default function Footer() {
           <div className="flex flex-col gap-1 text-xs">
             <a 
               href="mailto:fest@dna.org.tw"
+              onClick={() => {
+                trackEvent('Contact', { content_category: 'Email Contact' });
+                trackCustomEvent('EmailClick', { location: 'footer' });
+              }}
               className="hover:text-[#10B8D9] transition-colors"
             >
               <span className="font-semibold">Contact: </span>
