@@ -197,6 +197,10 @@ export const content = {
       },
       sponsors: {
         title: "Sponsors",
+        platinum: "Platinum Sponsors",
+        gold: "Gold Sponsors",
+        silver: "Silver Sponsors",
+        bronze: "Bronze Sponsors",
         cta: { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
       },
       partners: {
@@ -720,6 +724,10 @@ export const content = {
       },
       sponsors: {
         title: "贊助單位",
+        platinum: "白金贊助",
+        gold: "黃金贊助",
+        silver: "銀級贊助",
+        bronze: "銅級贊助",
         cta: { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
       },
       partners: {
