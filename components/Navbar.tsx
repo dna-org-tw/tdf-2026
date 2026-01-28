@@ -90,7 +90,7 @@ export default function Navbar() {
     { name: t.nav.about, href: '#about' },
     { name: t.nav.why, href: '#why' },
     { name: t.nav.highlights, href: '#highlights' },
-    { name: t.nav.schedule, href: '#tickets' },
+    { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.accommodation, href: '#accommodation' },
   ];
 
@@ -185,8 +185,8 @@ export default function Navbar() {
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
           <a
-            href="#schedule"
-            onClick={(e) => handleNavClick(e, '#schedule')}
+            href="#tickets"
+            onClick={(e) => handleNavClick(e, '#tickets')}
             className={`hover:text-[#10B8D9] transition-colors cursor-pointer ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}
