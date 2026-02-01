@@ -92,6 +92,7 @@ export default function Navbar() {
     { name: t.nav.highlights, href: '#highlights' },
     { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.accommodation, href: '#accommodation' },
+    { name: t.nav.followUs, href: '#follow-us' },
   ];
 
   return (

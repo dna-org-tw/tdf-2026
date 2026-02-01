@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
@@ -10,12 +10,67 @@ import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { getUserInfo } from '@/lib/userInfo';
 
+// 计数器动画组件
+function AnimatedCounter({ value, duration = 2000 }: { value: number; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const prevValueRef = useRef(0);
+
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      setIsAnimating(true);
+      const startValue = prevValueRef.current;
+      const endValue = value;
+      const startTime = Date.now();
+
+      const animate = () => {
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // 使用缓动函数 (ease-out)
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentValue = Math.floor(startValue + (endValue - startValue) * easeOut);
+        
+        setDisplayValue(currentValue);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setDisplayValue(endValue);
+          setIsAnimating(false);
+        }
+      };
+
+      requestAnimationFrame(animate);
+      prevValueRef.current = value;
+    }
+  }, [value, duration]);
+
+  // 格式化数字，添加千位分隔符
+  const formatNumber = (num: number) => {
+    return num.toLocaleString('en-US');
+  };
+
+  return (
+    <motion.span
+      className="inline-block"
+      animate={isAnimating ? { scale: [1, 1.1, 1] } : {}}
+      transition={{ duration: 0.3 }}
+    >
+      {formatNumber(displayValue)}
+    </motion.span>
+  );
+}
+
 export default function FollowUsSection() {
   const { t } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
   useSectionTracking({ sectionId: 'follow-us', sectionName: 'Follow Us Section', category: 'Engagement' });
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [isLoadingCount, setIsLoadingCount] = useState(true);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     type: 'success' | 'error' | 'duplicate' | null;
@@ -25,6 +80,25 @@ export default function FollowUsSection() {
     type: null,
     message: '',
   });
+
+  // 获取关注者数量
+  useEffect(() => {
+    const fetchFollowerCount = async () => {
+      try {
+        const response = await fetch('/api/newsletter/count');
+        const data = await response.json();
+        if (response.ok && data.count !== undefined) {
+          setFollowerCount(data.count);
+        }
+      } catch (error) {
+        console.error('Failed to fetch follower count:', error);
+      } finally {
+        setIsLoadingCount(false);
+      }
+    };
+
+    fetchFollowerCount();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +151,8 @@ export default function FollowUsSection() {
           message: data.message || t.followUs.successMessage,
         });
         setEmail('');
+        // 更新关注者数量
+        setFollowerCount((prev) => prev + 1);
         // Track CompleteRegistration event for successful subscription (Meta standard event)
         trackEvent('CompleteRegistration', {
           content_name: 'Follow Us Form',
@@ -135,6 +211,29 @@ export default function FollowUsSection() {
               {t.followUs.subtitle}
             </p>
 
+            {/* Follower Count */}
+            {!isLoadingCount && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.15, duration: 0.5 }}
+                className="mb-8"
+              >
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#10B8D9]/20 to-[#00993E]/20 backdrop-blur-sm px-6 py-3 rounded-full border border-[#10B8D9]/30 shadow-lg">
+                  <Users className="w-5 h-5 text-[#10B8D9]" />
+                  <span className="text-white/90 text-sm sm:text-base font-medium">
+                    <span className="text-white/70">{t.followUs.followerCountPrefix}</span>{' '}
+                    <span className="text-[#10B8D9] font-bold text-lg sm:text-xl">
+                      <AnimatedCounter value={followerCount} />
+                    </span>
+                    {' '}
+                    <span className="text-white/70">{t.followUs.followerCountSuffix}</span>
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
             {/* Benefits */}
             <div className="flex flex-wrap justify-center gap-6 mb-10">
               <motion.div
@@ -186,7 +285,7 @@ export default function FollowUsSection() {
             className="max-w-2xl mx-auto"
           >
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
+              <div className="flex-1 relative" suppressHydrationWarning>
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                 <input
                   type="email"
@@ -196,6 +295,7 @@ export default function FollowUsSection() {
                   required
                   className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:border-transparent transition-all"
                   disabled={isSubmitting}
+                  suppressHydrationWarning
                 />
               </div>
               <motion.button

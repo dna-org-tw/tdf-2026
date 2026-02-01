@@ -179,7 +179,7 @@ export default function TicketFollowSection() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-[#10B8D9] via-[#0EA5E9] to-[#10B8D9] rounded-2xl blur-lg opacity-30 animate-pulse" />
                 
                 <div className="relative flex flex-col sm:flex-row gap-4 p-2 bg-white/5 backdrop-blur-md rounded-2xl border-2 border-white/20 shadow-2xl">
-                  <div className="flex-1 relative">
+                  <div className="flex-1 relative" suppressHydrationWarning>
                     <input
                       type="email"
                       value={email}
@@ -199,6 +199,7 @@ export default function TicketFollowSection() {
                         text-base sm:text-lg
                       "
                       required
+                      suppressHydrationWarning
                     />
                   </div>
                   

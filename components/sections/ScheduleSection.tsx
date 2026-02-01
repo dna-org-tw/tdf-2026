@@ -21,6 +21,7 @@ interface CalendarEvent {
   endDate: string | null;
   startTime?: string | null;
   eligibility?: string[];
+  tags?: Array<{ name: string; color?: string }>;
   url?: string;
   tickets?: TicketInfo;
 }
@@ -84,46 +85,50 @@ export default function ScheduleSection() {
     // Higher tier tickets can see lower tier events
     if (selectedFilter) {
       filteredEvents = filteredEvents.filter(event => {
-        // If filter is "follower", show events where follower ticket is free
+        // Get tag names from tags array (preferred) or fallback to eligibility
+        const tagNames = event.tags?.map(tag => tag.name.toLowerCase()) || 
+                        event.eligibility?.map(tag => tag.toLowerCase().replace('#', '')) || [];
+        
+        // If filter is "follower", show events with follower tag
         if (selectedFilter === '#follower') {
-          if (!event.tickets) return false;
-          return event.tickets.follower?.free === true;
+          return tagNames.includes('follower');
         }
         
-        // If filter is "explorer", show events where explorer or follower ticket is free
+        // If filter is "explorer", show events with explorer or follower tag
         if (selectedFilter === '#explorer') {
-          if (!event.tickets) return false;
-          return event.tickets.follower?.free === true || event.tickets.explorer?.free === true;
+          return tagNames.includes('follower') || tagNames.includes('explorer');
         }
         
-        // If filter is "contributor", show events where contributor, explorer, or follower ticket is free
+        // If filter is "contributor", show events with contributor, explorer, or follower tag
         if (selectedFilter === '#contributor') {
-          if (!event.tickets) return false;
-          return event.tickets.follower?.free === true || 
-                 event.tickets.explorer?.free === true || 
-                 event.tickets.contributor?.free === true;
+          return tagNames.includes('follower') || 
+                 tagNames.includes('explorer') || 
+                 tagNames.includes('contributor');
         }
         
-        // If filter is "backer", show events where any ticket is free
+        // If filter is "backer", show events with any ticket tier tag
         if (selectedFilter === '#backer') {
-          if (!event.tickets) return false;
-          return event.tickets.follower?.free === true || 
-                 event.tickets.explorer?.free === true || 
-                 event.tickets.contributor?.free === true || 
-                 event.tickets.backer?.free === true;
+          return tagNames.includes('follower') || 
+                 tagNames.includes('explorer') || 
+                 tagNames.includes('contributor') || 
+                 tagNames.includes('backer');
         }
         
-        // If filter is "other", show events with no eligibility tags
+        // If filter is "other", show events with no tags
         if (selectedFilter === '#other') {
-          return !event.eligibility || event.eligibility.length === 0;
+          return (!event.tags || event.tags.length === 0) && 
+                 (!event.eligibility || event.eligibility.length === 0);
         }
         
-        // If event has no eligibility tags, exclude it when filter is active (and not "other")
-        if (!event.eligibility || event.eligibility.length === 0) {
+        // If event has no tags, exclude it when filter is active (and not "other")
+        if ((!event.tags || event.tags.length === 0) && 
+            (!event.eligibility || event.eligibility.length === 0)) {
           return false;
         }
-        // Check if event has the matching eligibility tag
-        return event.eligibility.some(tag => tag.toLowerCase() === selectedFilter);
+        
+        // Check if event has the matching tag (remove # from selectedFilter for comparison)
+        const filterName = selectedFilter.replace('#', '').toLowerCase();
+        return tagNames.includes(filterName);
       });
     }
     
@@ -211,10 +216,11 @@ export default function ScheduleSection() {
     }
   };
 
-  // Get the lowest tier color for an event based on ticket pricing
+  // Get the lowest tier color for an event based on tags
   // Priority: follower < explorer < contributor < backer
-  const getLowestTierColor = (tickets?: TicketInfo) => {
-    if (!tickets) {
+  // If no tags match, use #other (gray)
+  const getLowestTierColor = (tags?: Array<{ name: string; color?: string }>) => {
+    if (!tags || tags.length === 0) {
       return {
         bg: 'bg-gray-100',
         text: 'text-gray-700',
@@ -222,29 +228,32 @@ export default function ScheduleSection() {
       };
     }
 
+    // Extract tag names and convert to lowercase for comparison
+    const tagNames = tags.map(tag => tag.name.toLowerCase());
+    
     // Check in priority order: follower < explorer < contributor < backer
-    if (tickets.follower?.free) {
+    if (tagNames.includes('follower')) {
       return {
         bg: 'bg-purple-100',
         text: 'text-purple-700',
         border: 'border-purple-300',
       };
     }
-    if (tickets.explorer?.free) {
+    if (tagNames.includes('explorer')) {
       return {
         bg: 'bg-[#10B8D9]/10',
         text: 'text-[#10B8D9]',
         border: 'border-[#10B8D9]/30',
       };
     }
-    if (tickets.contributor?.free) {
+    if (tagNames.includes('contributor')) {
       return {
         bg: 'bg-[#00993E]/10',
         text: 'text-[#00993E]',
         border: 'border-[#00993E]/30',
       };
     }
-    if (tickets.backer?.free) {
+    if (tagNames.includes('backer')) {
       return {
         bg: 'bg-[#FFD028]/10',
         text: 'text-[#FFD028]',
@@ -252,7 +261,7 @@ export default function ScheduleSection() {
       };
     }
 
-    // Default to other color (gray) if no tickets are free
+    // Default to other color (gray) if no matching tags
     return {
       bg: 'bg-gray-100',
       text: 'text-gray-700',
@@ -362,7 +371,7 @@ export default function ScheduleSection() {
                               {/* Desktop Event Indicators */}
                               <div className="hidden md:flex flex-col gap-1">
                                 {events.map((event, i) => {
-                                  const tierColors = getLowestTierColor(event.tickets);
+                                  const tierColors = getLowestTierColor(event.tags);
                                   const timeStr = formatTime(event.startTime);
                                   const hasUrl = !!event.url;
                                   
@@ -396,7 +405,7 @@ export default function ScheduleSection() {
                               {/* Mobile Event Indicators */}
                               <div className="md:hidden flex flex-col gap-1 mt-2">
                                 {events.map((event, i) => {
-                                  const tierColors = getLowestTierColor(event.tickets);
+                                  const tierColors = getLowestTierColor(event.tags);
                                   const hasUrl = !!event.url;
                                   
                                   return (
@@ -420,75 +429,6 @@ export default function ScheduleSection() {
                 );
               })}
             </div>
-
-            {/* Note/Legend */}
-            <div className="mt-8 text-center text-[#1E1F1C]/60 text-sm">
-              {t.schedule.clickEvent}
-            </div>
-
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-12 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
-            >
-              <a
-                href="https://forms.gle/EofTp9Qso27jEeeY7"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  trackCustomEvent('CallForSideEventsClick', { location: 'schedule_section' });
-                }}
-                className="
-                  group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-                  bg-[#10B8D9] text-[#FFFFFF]
-                  hover:bg-[#10B8D9]/90 hover:shadow-2xl
-                  transition-all duration-300 shadow-lg
-                  transform hover:scale-105 hover:-translate-y-0.5
-                  relative overflow-hidden
-                "
-              >
-                <span className="relative z-10">{t.footer.callForSideEvents}</span>
-                <svg 
-                  className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-                <span className="absolute inset-0 bg-gradient-to-r from-[#10B8D9] to-[#0EA5C9] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              </a>
-              <a
-                href="https://forms.gle/pVc6oTEi1XZ1pAR49"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  trackCustomEvent('CallForSpeakersClick', { location: 'schedule_section' });
-                }}
-                className="
-                  group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-                  bg-[#1E1F1C] text-white border-2 border-[#1E1F1C]
-                  hover:bg-[#1E1F1C]/95 hover:border-[#10B8D9] hover:shadow-2xl
-                  transition-all duration-300 shadow-lg
-                  transform hover:scale-105 hover:-translate-y-0.5
-                  relative overflow-hidden
-                "
-              >
-                <span className="relative z-10">{t.footer.callForSpeakers}</span>
-                <svg 
-                  className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-                <span className="absolute inset-0 bg-gradient-to-r from-[#1E1F1C] to-[#2D2F2C] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              </a>
-            </motion.div>
           </div>
         </div>
       </section>

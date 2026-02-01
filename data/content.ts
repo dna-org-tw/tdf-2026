@@ -27,24 +27,25 @@ export const content = {
       about: "About",
       team: "Team",
       why: "Why Taiwan",
-      highlights: "Highlights",
+      highlights: "Events",
       schedule: "Schedule",
       tickets: "Tickets",
       gallery: "Gallery",
       accommodation: "Map",
-      register: "Learn More",
+      followUs: "Follow Us",
+      register: "Schedule",
       languageToggle: "中文"
     },
     navShort: {
       about: "About",
       team: "Team",
       why: "Why",
-      highlights: "Highlights",
+      highlights: "Events",
       schedule: "Schedule",
       tickets: "Tickets",
       gallery: "Gallery",
       accommodation: "Map",
-      register: "Learn More"
+      register: "Schedule"
     },
     about: {
       title: "About The Event",
@@ -92,6 +93,9 @@ export const content = {
     },
     highlights: {
       title: "Event Highlights",
+      carouselTitle: "Featured Events",
+      carouselDescription: "Discover exciting events happening during Taiwan Digital Fest 2026",
+      carouselHint: "Click to view event details",
       viewMore: "See More",
       ctas: [
         { type: "Register", text: "Follow for Free", href: "#follow-us" },
@@ -462,6 +466,9 @@ export const content = {
     followUs: {
       title: "Follow Us",
       subtitle: "Stay updated with the latest news, exclusive updates, and join our digital nomad community!",
+      followerCount: "Followers",
+      followerCountPrefix: "Join",
+      followerCountSuffix: "digital nomads",
       benefits: {
         free: "100% Free",
         realTime: "Real-time Updates",
@@ -682,19 +689,20 @@ export const content = {
       about: "關於",
       team: "主辦團隊",
       why: "為什麼是這裡",
-      highlights: "活動亮點",
+      highlights: "活動",
       schedule: "重要時程",
       tickets: "票券資訊",
       gallery: "精彩瞬間",
       accommodation: "地圖",
-      register: "了解更多",
+      followUs: "關注我們",
+      register: "時程",
       languageToggle: "中文"
     },
     navShort: {
       about: "關於",
       team: "團隊",
       why: "為什麼",
-      highlights: "亮點",
+      highlights: "活動",
       schedule: "時程",
       tickets: "票券",
       gallery: "精彩瞬間",
@@ -747,6 +755,9 @@ export const content = {
     },
     highlights: {
       title: "活動亮點",
+      carouselTitle: "精選活動",
+      carouselDescription: "探索 2026 台灣數位嘉年華期間的精彩活動",
+      carouselHint: "點擊查看活動詳情",
       viewMore: "查看更多",
       ctas: [
         { type: "Register", text: "免費追蹤", href: "#follow-us" },
@@ -1117,6 +1128,9 @@ export const content = {
     followUs: {
       title: "關注我們",
       subtitle: "填寫 Email 關注我們，免費獲得即時資訊，並加入數位遊牧專屬社群！",
+      followerCount: "位關注者",
+      followerCountPrefix: "已有",
+      followerCountSuffix: "位數位遊牧者加入",
       benefits: {
         free: "完全免費",
         realTime: "即時資訊",

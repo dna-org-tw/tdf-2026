@@ -215,7 +215,7 @@ export default function HeroSection() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <div className="flex-1">
+                  <div className="flex-1" suppressHydrationWarning>
                     <input
                       type="email"
                       inputMode="email"
@@ -225,6 +225,7 @@ export default function HeroSection() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isSubmitting}
+                      suppressHydrationWarning
                     />
                   </div>
                   <motion.button

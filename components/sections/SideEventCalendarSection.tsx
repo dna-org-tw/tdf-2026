@@ -27,12 +27,12 @@ export default function SideEventCalendarSection() {
         const response = await fetch('/api/luma-events');
         if (response.ok) {
           const data = await response.json();
-          setEvents(data.events || []);
+          const eventsData = data.events || [];
+          setEvents(eventsData);
         } else {
           setError(t.sideEvents?.loadError || 'Failed to load events');
         }
       } catch (err) {
-        console.error('Failed to fetch Luma events:', err);
         setError(t.sideEvents?.loadError || 'Failed to load events');
       } finally {
         setLoading(false);
