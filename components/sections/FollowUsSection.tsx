@@ -11,7 +11,7 @@ import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { getUserInfo } from '@/lib/userInfo';
 
 // 计数器动画组件
-function AnimatedCounter({ value, duration = 2000 }: { value: number; duration?: number }) {
+function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
   const [displayValue, setDisplayValue] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const prevValueRef = useRef(0);
@@ -28,8 +28,9 @@ function AnimatedCounter({ value, duration = 2000 }: { value: number; duration?:
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // 使用缓动函数 (ease-out)
-        const easeOut = 1 - Math.pow(1 - progress, 3);
+        // 自定义缓动函数：前面快后面慢（更明显的 ease-out）
+        // 使用更高次方的 ease-out，让前面更快，后面更慢
+        const easeOut = 1 - Math.pow(1 - progress, 5);
         const currentValue = Math.floor(startValue + (endValue - startValue) * easeOut);
         
         setDisplayValue(currentValue);

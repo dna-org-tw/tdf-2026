@@ -12,6 +12,8 @@ export const content = {
       ctaSponsors: "Call for Sponsors",
       followForm: {
         title: "Follow Us",
+        followerCountPrefix: "Follow us like",
+        followerCountSuffix: "nomads",
         description: "Stay updated with the latest news, exclusive updates, and join our digital nomad community!",
         emailPlaceholder: "Enter your email address",
         submitButton: "Subscribe",
@@ -674,6 +676,8 @@ export const content = {
       ctaSponsors: "徵求贊助商",
       followForm: {
         title: "關注我們",
+        followerCountPrefix: "像",
+        followerCountSuffix: "位數位遊牧者一樣關注我們",
         description: "填寫 Email 關注我們，免費獲得即時資訊，並加入數位遊牧專屬社群！",
         emailPlaceholder: "請輸入您的 Email",
         submitButton: "立即關注",

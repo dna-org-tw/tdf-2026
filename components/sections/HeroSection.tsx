@@ -1,15 +1,69 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Users } from 'lucide-react';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
+
+// 计数器动画组件
+function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const prevValueRef = useRef(0);
+
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      setIsAnimating(true);
+      const startValue = prevValueRef.current;
+      const endValue = value;
+      const startTime = Date.now();
+
+      const animate = () => {
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // 自定义缓动函数：前面快后面慢（更明显的 ease-out）
+        // 使用更高次方的 ease-out，让前面更快，后面更慢
+        const easeOut = 1 - Math.pow(1 - progress, 5);
+        const currentValue = Math.floor(startValue + (endValue - startValue) * easeOut);
+        
+        setDisplayValue(currentValue);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setDisplayValue(endValue);
+          setIsAnimating(false);
+        }
+      };
+
+      requestAnimationFrame(animate);
+      prevValueRef.current = value;
+    }
+  }, [value, duration]);
+
+  // 格式化数字，添加千位分隔符
+  const formatNumber = (num: number) => {
+    return num.toLocaleString('en-US');
+  };
+
+  return (
+    <motion.span
+      className="inline-block"
+      animate={isAnimating ? { scale: [1, 1.1, 1] } : {}}
+      transition={{ duration: 0.3 }}
+    >
+      {formatNumber(displayValue)}
+    </motion.span>
+  );
+}
 
 export default function HeroSection() {
   const { t } = useTranslation();
@@ -22,9 +76,30 @@ export default function HeroSection() {
 
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [isLoadingCount, setIsLoadingCount] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'success' | 'error' | 'duplicate' | null>(null);
   const [modalMessage, setModalMessage] = useState('');
+
+  // 获取关注者数量
+  useEffect(() => {
+    const fetchFollowerCount = async () => {
+      try {
+        const response = await fetch('/api/newsletter/count');
+        const data = await response.json();
+        if (response.ok && data.count !== undefined) {
+          setFollowerCount(data.count);
+        }
+      } catch (error) {
+        console.error('Failed to fetch follower count:', error);
+      } finally {
+        setIsLoadingCount(false);
+      }
+    };
+
+    fetchFollowerCount();
+  }, []);
 
   const handleFollowSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -100,6 +175,8 @@ export default function HeroSection() {
       setModalMessage(result.message || t.hero.followForm.successMessage);
       setEmail('');
       setModalOpen(true);
+      // 更新关注者数量
+      setFollowerCount((prev) => prev + 1);
       // Track CompleteRegistration event for successful subscription (Meta standard event)
       trackEvent('CompleteRegistration', {
         content_name: 'Hero Free Follow Form',
@@ -207,9 +284,31 @@ export default function HeroSection() {
               />
               
               <div className="relative z-10">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 text-center">
-                  {t.hero.followForm.title}
-                </h3>
+                {/* Title with Follower Count */}
+                {!isLoadingCount ? (
+                  <motion.h3
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.85, duration: 0.5 }}
+                    className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 text-center"
+                  >
+                    <span className="text-white">{t.hero.followForm.followerCountPrefix}</span>{' '}
+                    <span className="text-[#10B8D9]">
+                      <AnimatedCounter value={followerCount} />
+                    </span>
+                    {' '}
+                    <span className="text-white">{t.hero.followForm.followerCountSuffix}</span>
+                  </motion.h3>
+                ) : (
+                  <motion.h3
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.85, duration: 0.5 }}
+                    className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 text-center"
+                  >
+                    {t.hero.followForm.title}
+                  </motion.h3>
+                )}
                 <p className="text-sm sm:text-base text-white/70 mb-6 text-center">
                   {t.hero.followForm.description}
                 </p>
