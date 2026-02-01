@@ -14,6 +14,7 @@ interface CalendarEvent {
   endDate: string | null;
   startTime?: string | null;
   eligibility?: string[];
+  url?: string;
 }
 
 interface EventModalProps {
@@ -258,6 +259,38 @@ export default function EventModal({ isOpen, onClose, events, date }: EventModal
                             [&_td]:border [&_td]:border-[#1E1F1C]/70 [&_td]:px-3 [&_td]:py-2 [&_td]:text-[#F6F6F6]/60"
                           dangerouslySetInnerHTML={{ __html: event.description }}
                         />
+                      )}
+
+                      {/* Luma Link Button */}
+                      {event.url && (
+                        <div className="mt-4">
+                          <a
+                            href={event.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => {
+                              trackEvent('Lead', {
+                                content_name: 'Luma Event Link',
+                                content_category: 'Event Details',
+                              });
+                              trackCustomEvent('ExternalLinkClick', {
+                                link_type: 'luma_event',
+                                location: 'event_modal',
+                                event_title: event.title,
+                                event_url: event.url,
+                              });
+                            }}
+                            className="
+                              inline-flex items-center gap-2 px-4 py-2.5 rounded-lg
+                              bg-[#10B8D9] text-white font-medium text-sm
+                              hover:bg-[#10B8D9]/90 transition-colors
+                              group
+                            "
+                          >
+                            <span>{t.eventModal.viewOnLuma}</span>
+                            <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                          </a>
+                        </div>
                       )}
                     </div>
                   ))}

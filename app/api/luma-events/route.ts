@@ -20,7 +20,9 @@ export async function GET() {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
       },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: process.env.NODE_ENV === 'development' 
+        ? { revalidate: 0 } // No cache in development
+        : { revalidate: 3600 }, // Cache for 1 hour in production
     });
 
     if (!response.ok) {

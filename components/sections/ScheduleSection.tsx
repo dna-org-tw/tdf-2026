@@ -3,9 +3,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
-import EventModal from '@/components/EventModal';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
+
+interface TicketInfo {
+  follower: { free: boolean; price?: number };
+  explorer: { free: boolean; price?: number };
+  contributor: { free: boolean; price?: number };
+  backer: { free: boolean; price?: number };
+}
 
 interface CalendarEvent {
   title: string;
@@ -15,23 +21,24 @@ interface CalendarEvent {
   endDate: string | null;
   startTime?: string | null;
   eligibility?: string[];
+  url?: string;
+  tickets?: TicketInfo;
 }
 
 export default function ScheduleSection() {
   const { t } = useTranslation();
-  const [selectedDate, setSelectedDate] = useState<number | null>(null);
-  const [icsEvents, setIcsEvents] = useState<CalendarEvent[]>([]);
+  const [lumaEvents, setLumaEvents] = useState<CalendarEvent[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   useSectionTracking({ sectionId: 'schedule', sectionName: 'Schedule Section', category: 'Event Information' });
 
-  // Fetch ICS calendar data
+  // Fetch Luma calendar data
   useEffect(() => {
     const fetchCalendarData = async () => {
       try {
-        const response = await fetch('/api/calendar');
+        const response = await fetch('/api/luma-schedule');
         if (response.ok) {
           const data = await response.json();
-          setIcsEvents(data.events || []);
+          setLumaEvents(data.events || []);
         }
       } catch (error) {
         console.error('Failed to fetch calendar data:', error);
@@ -64,21 +71,53 @@ export default function ScheduleSection() {
   }
 
   // Pre-process events for easier lookup by day
-  // Only use ICS events (real data from Google Calendar)
+  // Only use Luma events (real data from Luma calendar)
   const getEventsForDay = (day: number) => {
     const dateStr = `2026-05-${day.toString().padStart(2, '0')}`;
-    let filteredEvents = icsEvents.filter(item => {
+    let filteredEvents = lumaEvents.filter(item => {
       if (!item.startDate) return false;
       return dateStr >= item.startDate && dateStr <= (item.endDate || item.startDate);
     });
     
-    // Apply eligibility filter
+    // Apply filter
+    // Ticket tier hierarchy: follower < explorer < contributor < backer
+    // Higher tier tickets can see lower tier events
     if (selectedFilter) {
       filteredEvents = filteredEvents.filter(event => {
+        // If filter is "follower", show events where follower ticket is free
+        if (selectedFilter === '#follower') {
+          if (!event.tickets) return false;
+          return event.tickets.follower?.free === true;
+        }
+        
+        // If filter is "explorer", show events where explorer or follower ticket is free
+        if (selectedFilter === '#explorer') {
+          if (!event.tickets) return false;
+          return event.tickets.follower?.free === true || event.tickets.explorer?.free === true;
+        }
+        
+        // If filter is "contributor", show events where contributor, explorer, or follower ticket is free
+        if (selectedFilter === '#contributor') {
+          if (!event.tickets) return false;
+          return event.tickets.follower?.free === true || 
+                 event.tickets.explorer?.free === true || 
+                 event.tickets.contributor?.free === true;
+        }
+        
+        // If filter is "backer", show events where any ticket is free
+        if (selectedFilter === '#backer') {
+          if (!event.tickets) return false;
+          return event.tickets.follower?.free === true || 
+                 event.tickets.explorer?.free === true || 
+                 event.tickets.contributor?.free === true || 
+                 event.tickets.backer?.free === true;
+        }
+        
         // If filter is "other", show events with no eligibility tags
         if (selectedFilter === '#other') {
           return !event.eligibility || event.eligibility.length === 0;
         }
+        
         // If event has no eligibility tags, exclude it when filter is active (and not "other")
         if (!event.eligibility || event.eligibility.length === 0) {
           return false;
@@ -130,20 +169,19 @@ export default function ScheduleSection() {
     setSelectedFilter(null);
   };
 
-  const handleDateClick = (day: number) => {
-    const events = getEventsForDay(day);
-    if (events.length > 0) {
-      setSelectedDate(day);
+  const handleEventClick = (event: CalendarEvent) => {
+    if (event.url) {
+      trackEvent('Lead', {
+        content_name: 'Luma Event Link',
+        content_category: 'Event Schedule',
+      });
+      trackCustomEvent('EventClick', {
+        event_title: event.title,
+        event_url: event.url,
+        location: 'schedule_calendar',
+      });
+      window.open(event.url, '_blank', 'noopener,noreferrer');
     }
-  };
-
-  const handleCloseModal = () => {
-    setSelectedDate(null);
-  };
-
-  const getSelectedEvents = () => {
-    if (selectedDate === null) return [];
-    return getEventsForDay(selectedDate);
   };
 
   // Format time to 12-hour format (HHam/HHpm)
@@ -173,9 +211,10 @@ export default function ScheduleSection() {
     }
   };
 
-  // Get the lowest tier color for an event based on eligibility
-  const getLowestTierColor = (eligibility?: string[]) => {
-    if (!eligibility || eligibility.length === 0) {
+  // Get the lowest tier color for an event based on ticket pricing
+  // Priority: follower < explorer < contributor < backer
+  const getLowestTierColor = (tickets?: TicketInfo) => {
+    if (!tickets) {
       return {
         bg: 'bg-gray-100',
         text: 'text-gray-700',
@@ -183,26 +222,29 @@ export default function ScheduleSection() {
       };
     }
 
-    // Priority: explorer < contributor < backer
-    const hasExplorer = eligibility.some(tag => tag.toLowerCase() === '#explorer');
-    const hasContributor = eligibility.some(tag => tag.toLowerCase() === '#contributor');
-    const hasBacker = eligibility.some(tag => tag.toLowerCase() === '#backer');
-
-    if (hasExplorer) {
+    // Check in priority order: follower < explorer < contributor < backer
+    if (tickets.follower?.free) {
+      return {
+        bg: 'bg-purple-100',
+        text: 'text-purple-700',
+        border: 'border-purple-300',
+      };
+    }
+    if (tickets.explorer?.free) {
       return {
         bg: 'bg-[#10B8D9]/10',
         text: 'text-[#10B8D9]',
         border: 'border-[#10B8D9]/30',
       };
     }
-    if (hasContributor) {
+    if (tickets.contributor?.free) {
       return {
         bg: 'bg-[#00993E]/10',
         text: 'text-[#00993E]',
         border: 'border-[#00993E]/30',
       };
     }
-    if (hasBacker) {
+    if (tickets.backer?.free) {
       return {
         bg: 'bg-[#FFD028]/10',
         text: 'text-[#FFD028]',
@@ -210,7 +252,7 @@ export default function ScheduleSection() {
       };
     }
 
-    // Default to other color (gray) if no matching tags
+    // Default to other color (gray) if no tickets are free
     return {
       bg: 'bg-gray-100',
       text: 'text-gray-700',
@@ -240,6 +282,7 @@ export default function ScheduleSection() {
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center">
                 <span className="text-sm text-[#1E1F1C]/70 font-medium">{t.schedule.filterLabel}</span>
                 {[
+                  { tag: '#follower', label: t.schedule.follower, bg: 'bg-purple-200', text: 'text-purple-700', border: 'border-purple-400', activeBg: 'bg-purple-300', activeBorder: 'border-purple-500' },
                   { tag: '#explorer', label: t.schedule.explorer, bg: 'bg-[#10B8D9]/20', text: 'text-[#10B8D9]', border: 'border-[#10B8D9]/40', activeBg: 'bg-[#10B8D9]/40', activeBorder: 'border-[#10B8D9]' },
                   { tag: '#contributor', label: t.schedule.contributor, bg: 'bg-[#00993E]/20', text: 'text-[#00993E]', border: 'border-[#00993E]/40', activeBg: 'bg-[#00993E]/40', activeBorder: 'border-[#00993E]' },
                   { tag: '#backer', label: t.schedule.backer, bg: 'bg-[#FFD028]/20', text: 'text-[#FFD028]', border: 'border-[#FFD028]/40', activeBg: 'bg-[#FFD028]/40', activeBorder: 'border-[#FFD028]' },
@@ -301,8 +344,6 @@ export default function ScheduleSection() {
                         }
 
                         const events = getEventsForDay(day);
-                        const hasEvents = events.length > 0;
-                        const isSelected = selectedDate === day;
 
                         return (
                           <motion.div
@@ -311,19 +352,9 @@ export default function ScheduleSection() {
                             whileInView={{ opacity: 1, scale: 1 }}
                             transition={{ delay: globalIndex * 0.01 }}
                             viewport={{ once: true }}
-                            className={`relative group min-h-[60px] md:min-h-[80px] ${
-                              hasEvents ? 'cursor-pointer' : ''
-                            }`}
-                            onClick={() => hasEvents && handleDateClick(day)}
+                            className="relative group min-h-[60px] md:min-h-[80px]"
                           >
-                            <div className={`
-                              w-full rounded-lg p-2 transition-all duration-300 border
-                              ${hasEvents
-                                ? isSelected
-                                  ? 'bg-[#10B8D9]/10 border-[#1E1F1C]/20 shadow-[0_0_20px_-3px_rgba(16,184,217,0.5)]'
-                                  : 'bg-white border-[#1E1F1C]/20 shadow-sm hover:bg-stone-100 hover:border-[#1E1F1C]/30'
-                                : 'bg-stone-50 border-[#1E1F1C]/20 hover:bg-stone-100 hover:border-[#1E1F1C]/30'}
-                            `}>
+                            <div className="w-full rounded-lg p-2 transition-all duration-300 border bg-white border-[#1E1F1C]/20 shadow-sm hover:bg-stone-50 hover:border-[#1E1F1C]/30">
                               <div className="text-sm font-bold mb-2 text-[#1E1F1C]/60">
                                 {day}
                               </div>
@@ -331,11 +362,19 @@ export default function ScheduleSection() {
                               {/* Desktop Event Indicators */}
                               <div className="hidden md:flex flex-col gap-1">
                                 {events.map((event, i) => {
-                                  const tierColors = getLowestTierColor(event.eligibility);
+                                  const tierColors = getLowestTierColor(event.tickets);
                                   const timeStr = formatTime(event.startTime);
+                                  const hasUrl = !!event.url;
                                   
                                   return (
-                                    <div key={i} className={`px-1.5 py-1 rounded ${tierColors.bg} ${tierColors.text} border ${tierColors.border}`}>
+                                    <div
+                                      key={i}
+                                      onClick={() => hasUrl && handleEventClick(event)}
+                                      className={`
+                                        px-1.5 py-1 rounded ${tierColors.bg} ${tierColors.text} border ${tierColors.border}
+                                        ${hasUrl ? 'cursor-pointer hover:opacity-80 hover:shadow-md transition-all duration-200' : ''}
+                                      `}
+                                    >
                                       <div className="text-sm font-semibold leading-tight mb-0.5 text-[#1E1F1C] break-words">
                                         {timeStr && <span className="font-medium text-[#1E1F1C]/70 mr-1.5">{timeStr}</span>}
                                         {event.title}
@@ -357,10 +396,18 @@ export default function ScheduleSection() {
                               {/* Mobile Event Indicators */}
                               <div className="md:hidden flex flex-col gap-1 mt-2">
                                 {events.map((event, i) => {
-                                  const tierColors = getLowestTierColor(event.eligibility);
+                                  const tierColors = getLowestTierColor(event.tickets);
+                                  const hasUrl = !!event.url;
                                   
                                   return (
-                                    <div key={i} className={`w-full h-1.5 rounded ${tierColors.bg} ${tierColors.border} border`} />
+                                    <div
+                                      key={i}
+                                      onClick={() => hasUrl && handleEventClick(event)}
+                                      className={`
+                                        w-full h-1.5 rounded ${tierColors.bg} ${tierColors.border} border
+                                        ${hasUrl ? 'cursor-pointer hover:opacity-80 transition-opacity duration-200' : ''}
+                                      `}
+                                    />
                                   );
                                 })}
                               </div>
@@ -376,7 +423,7 @@ export default function ScheduleSection() {
 
             {/* Note/Legend */}
             <div className="mt-8 text-center text-[#1E1F1C]/60 text-sm">
-              {t.schedule.clickDate}
+              {t.schedule.clickEvent}
             </div>
 
             {/* CTA Buttons */}
@@ -445,14 +492,6 @@ export default function ScheduleSection() {
           </div>
         </div>
       </section>
-
-      {/* Event Modal */}
-      <EventModal
-        isOpen={selectedDate !== null}
-        onClose={handleCloseModal}
-        events={getSelectedEvents()}
-        date={selectedDate || 1}
-      />
     </>
   );
 }

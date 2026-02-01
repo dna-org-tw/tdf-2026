@@ -446,15 +446,18 @@ export const content = {
       contributorLabel: "Contributor",
       backerLabel: "Backer",
       other: "Other",
+      follower: "Follower",
       clearFilter: "Clear Filter",
-      clickDate: "Click on a date to view event details"
+      clickDate: "Click on a date to view event details",
+      clickEvent: "Click on events to view details on Luma"
     },
     eventModal: {
       day: "May",
       daySuffix: "",
       events: "events",
       event: "event",
-      close: "Close"
+      close: "Close",
+      viewOnLuma: "View on Luma"
     },
     followUs: {
       title: "Follow Us",
@@ -1098,15 +1101,18 @@ export const content = {
       contributorLabel: "Contributor",
       backerLabel: "Backer",
       other: "其他",
+      follower: "Follower",
       clearFilter: "清除篩選",
-      clickDate: "點擊日期查看活動詳情"
+      clickDate: "點擊日期查看活動詳情",
+      clickEvent: "點擊活動查看 Luma 詳情"
     },
     eventModal: {
       day: "年 5 月",
       daySuffix: "日",
       events: "個活動",
       event: "個活動",
-      close: "關閉"
+      close: "關閉",
+      viewOnLuma: "在 Luma 查看"
     },
     followUs: {
       title: "關注我們",
