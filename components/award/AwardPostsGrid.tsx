@@ -6,10 +6,11 @@ interface AwardPostsGridProps {
   posts: InstagramPost[];
   loading: boolean;
   votingPostId: string | null;
-  onVoteClick: (post: InstagramPost) => void;
+  onVoteClick: (post: InstagramPost, email: string) => void;
+  onOpenFollowModal?: () => void;
 }
 
-export default function AwardPostsGrid({ posts, loading, votingPostId, onVoteClick }: AwardPostsGridProps) {
+export default function AwardPostsGrid({ posts, loading, votingPostId, onVoteClick, onOpenFollowModal }: AwardPostsGridProps) {
   const { t } = useTranslation();
 
   // Sort posts by vote count (descending)
@@ -41,6 +42,7 @@ export default function AwardPostsGrid({ posts, loading, votingPostId, onVoteCli
           index={index}
           votingPostId={votingPostId}
           onVoteClick={onVoteClick}
+          onOpenFollowModal={onOpenFollowModal}
         />
       ))}
     </div>

@@ -246,7 +246,7 @@ export async function POST(req: NextRequest) {
     // 检查是否已关注（检查 newsletter_subscriptions 表）
     const { data: subscription, error: subscriptionError } = await supabaseServer
       .from('newsletter_subscriptions')
-      .select('id')
+      .select('email')
       .eq('email', emailLower)
       .limit(1);
 

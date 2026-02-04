@@ -1,18 +1,22 @@
+import { useState } from 'react';
 import Image from 'next/image';
 import { Trophy, Heart, MessageCircle, Play, Image as ImageIcon, Users, Hash } from 'lucide-react';
 import { InstagramPost } from './types';
 import { getPostImage, getPostLink, getPostUsername, formatNumber, formatDate } from './utils';
 import { useTranslation } from '@/hooks/useTranslation';
+import VoteEmailModal from './VoteEmailModal';
 
 interface AwardPostCardProps {
   post: InstagramPost;
   index: number;
   votingPostId: string | null;
-  onVoteClick: (post: InstagramPost) => void;
+  onVoteClick: (post: InstagramPost, email: string) => void;
+  onOpenFollowModal?: () => void;
 }
 
-export default function AwardPostCard({ post, index, votingPostId, onVoteClick }: AwardPostCardProps) {
+export default function AwardPostCard({ post, index, votingPostId, onVoteClick, onOpenFollowModal }: AwardPostCardProps) {
   const { t, lang } = useTranslation();
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   const postImage = getPostImage(post);
   const postLink = getPostLink(post);
@@ -213,7 +217,7 @@ export default function AwardPostCard({ post, index, votingPostId, onVoteClick }
 
         {/* Vote Button */}
         <button
-          onClick={() => onVoteClick(post)}
+          onClick={() => setShowEmailModal(true)}
           disabled={votingPostId === post.id || post.has_voted}
           className={`w-full px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 mt-auto ${
             post.has_voted
@@ -230,6 +234,18 @@ export default function AwardPostCard({ post, index, votingPostId, onVoteClick }
             : t.award?.posts?.vote || 'Vote'}
         </button>
       </div>
+
+      {/* Vote Email Modal */}
+      <VoteEmailModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        onEmailSubmit={(email) => {
+          setShowEmailModal(false);
+          onVoteClick(post, email);
+        }}
+        onOpenFollowModal={onOpenFollowModal}
+        postId={post.id}
+      />
     </div>
   );
 }

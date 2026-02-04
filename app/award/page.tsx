@@ -225,11 +225,8 @@ export default function AwardPage() {
     setPendingVote(null);
   };
 
-  const handleVoteClick = (post: InstagramPost) => {
-    const email = prompt(lang === 'en' ? 'Please enter your email address:' : '請輸入您的電子郵件地址：');
-    if (email) {
-      handleVote(post.id, email);
-    }
+  const handleVoteClick = (post: InstagramPost, email: string) => {
+    handleVote(post.id, email);
   };
 
   return (
@@ -251,6 +248,7 @@ export default function AwardPage() {
             loading={loading}
             votingPostId={votingPostId}
             onVoteClick={handleVoteClick}
+            onOpenFollowModal={() => setShowFollowModal(true)}
           />
         </div>
       </main>
