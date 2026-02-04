@@ -177,7 +177,7 @@ export default function HeroSection() {
       setModalOpen(true);
       // 更新关注者数量
       setFollowerCount((prev) => prev + 1);
-      // Track CompleteRegistration event for successful subscription (Meta standard event)
+      // Track CompleteRegistration event for free newsletter subscription (Meta standard event)
       trackEvent('CompleteRegistration', {
         content_name: 'Hero Free Follow Form',
         content_category: 'Newsletter Subscription',

@@ -33,8 +33,8 @@ export default function MobileMenu({ isOpen, navLinks, handleNavClick }: MobileM
               </a>
             ))}
             <a
-              href="#schedule"
-              onClick={(e) => handleNavClick(e, '#schedule')}
+              href="#events"
+              onClick={(e) => handleNavClick(e, '#events')}
               className="bg-[#10B8D9] text-white px-6 py-3 rounded-lg text-center font-semibold cursor-pointer"
             >
               {t.nav.register}

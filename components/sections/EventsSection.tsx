@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { Calendar, MapPin } from 'lucide-react';
+import ScheduleModal from '@/components/ScheduleModal';
 
 interface TicketInfo {
   follower: { free: boolean; price?: number };
@@ -29,9 +30,10 @@ interface CalendarEvent {
   imageUrl?: string;
 }
 
-export default function HighlightsSection() {
+export default function EventsSection() {
   const { t } = useTranslation();
   const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   
   // 两行轮播，每行独立的 motion value 和 animation ref
   const x1 = useMotionValue(0);
@@ -40,7 +42,7 @@ export default function HighlightsSection() {
   const animationRef2 = useRef<number | null>(null);
   const initializedRef2 = useRef(false);
   
-  useSectionTracking({ sectionId: 'highlights', sectionName: 'Highlights Section', category: 'Event Information' });
+  useSectionTracking({ sectionId: 'events', sectionName: 'Events Section', category: 'Event Information' });
 
   // Fetch Luma calendar data
   useEffect(() => {
@@ -313,7 +315,7 @@ export default function HighlightsSection() {
       trackCustomEvent('EventCarouselClick', {
         event_title: event.title,
         event_url: event.url,
-        location: 'highlights_section',
+        location: 'events_section',
       });
       window.open(event.url, '_blank', 'noopener,noreferrer');
     }
@@ -462,7 +464,7 @@ export default function HighlightsSection() {
   };
 
   return (
-    <section id="highlights" className="bg-stone-100 py-16 md:py-24 lg:py-32 overflow-hidden">
+    <section id="events" className="bg-stone-100 py-16 md:py-24 lg:py-32 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6">
         {/* Header */}
         <motion.div
@@ -472,7 +474,7 @@ export default function HighlightsSection() {
           className="text-center mb-12 md:mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4 text-[#1E1F1C]">
-            {t.highlights?.carouselTitle || 'Featured Events'}
+            {t.highlights?.carouselTitle || 'All Events'}
           </h2>
           <p className="text-lg md:text-xl text-[#1E1F1C]/70 max-w-2xl mx-auto">
             {t.highlights?.carouselDescription || 'Discover exciting events happening during Taiwan Digital Fest 2026'}
@@ -486,6 +488,44 @@ export default function HighlightsSection() {
         {renderCarouselRow(x2, 2, row2Events)}
       </div>
 
+      {/* View All Events Button - Independent Row - Prominent */}
+      <div className="container mx-auto px-4 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-16 md:mt-20 text-center"
+        >
+          <button
+            onClick={() => {
+              trackCustomEvent('ViewAllEventsClick', { location: 'events_section' });
+              setIsScheduleModalOpen(true);
+            }}
+            className="
+              group inline-flex items-center gap-3 px-10 sm:px-12 md:px-16 py-5 sm:py-6 md:py-7 rounded-xl font-bold text-xl sm:text-2xl md:text-3xl
+              bg-gradient-to-r from-[#10B8D9] to-[#0EA5C9] text-white border-2 border-[#10B8D9]
+              hover:from-[#10B8D9]/90 hover:to-[#0EA5C9]/90 hover:border-[#10B8D9] hover:shadow-2xl
+              transition-all duration-300 shadow-xl
+              transform hover:scale-110 hover:-translate-y-1
+              relative overflow-hidden
+            "
+          >
+            <span className="relative z-10">{t.highlights?.viewAllSchedule || 'View All Events'}</span>
+            <svg 
+              className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 relative z-10 transition-transform duration-300 group-hover:translate-x-2" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth={2.5}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+            <span className="absolute inset-0 bg-gradient-to-r from-[#10B8D9] via-[#0EA5C9] to-[#10B8D9] opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-shimmer"></span>
+          </button>
+        </motion.div>
+      </div>
+
       {/* CTA Buttons */}
       <div className="container mx-auto px-4 sm:px-6">
         <motion.div
@@ -493,20 +533,20 @@ export default function HighlightsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-12 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
+          className="mt-8 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
         >
           <a
             href="https://forms.gle/EofTp9Qso27jEeeY7"
             target="_blank"
             rel="noopener noreferrer"
                     onClick={() => {
-                      trackCustomEvent('CallForSideEventsClick', { location: 'highlights_section' });
+                      trackCustomEvent('CallForSideEventsClick', { location: 'events_section' });
                     }}
             className="
               group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-              bg-[#10B8D9] text-[#FFFFFF]
-              hover:bg-[#10B8D9]/90 hover:shadow-2xl
-              transition-all duration-300 shadow-lg
+              bg-transparent text-[#10B8D9] border-2 border-[#10B8D9]
+              hover:bg-[#10B8D9] hover:text-white hover:shadow-2xl
+              transition-all duration-300
               transform hover:scale-105 hover:-translate-y-0.5
               relative overflow-hidden
             "
@@ -527,13 +567,13 @@ export default function HighlightsSection() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => {
-              trackCustomEvent('CallForSpeakersClick', { location: 'highlights_section' });
+              trackCustomEvent('CallForSpeakersClick', { location: 'events_section' });
             }}
             className="
               group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
-              bg-[#1E1F1C] text-white border-2 border-[#1E1F1C]
-              hover:bg-[#1E1F1C]/95 hover:border-[#10B8D9] hover:shadow-2xl
-              transition-all duration-300 shadow-lg
+              bg-transparent text-[#1E1F1C] border-2 border-[#1E1F1C]
+              hover:bg-[#1E1F1C] hover:text-white hover:shadow-2xl
+              transition-all duration-300
               transform hover:scale-105 hover:-translate-y-0.5
               relative overflow-hidden
             "
@@ -551,6 +591,12 @@ export default function HighlightsSection() {
           </a>
         </motion.div>
       </div>
+
+      {/* Schedule Modal */}
+      <ScheduleModal 
+        isOpen={isScheduleModalOpen} 
+        onClose={() => setIsScheduleModalOpen(false)} 
+      />
     </section>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function UnsubscribePage() {
   const searchParams = useSearchParams();
@@ -35,10 +36,24 @@ export default function UnsubscribePage() {
         const data = await res.json();
         setStatus('success');
         setMessage(data.message || t.unsubscribe.successMessage);
+        
+        // Track unsubscribe success
+        trackEvent('Unsubscribe', {
+          content_category: 'Newsletter',
+        });
+        trackCustomEvent('NewsletterUnsubscribe', {
+          success: true,
+        });
       } catch (error) {
         console.error('Unsubscribe error:', error);
         setStatus('error');
         setMessage(error instanceof Error ? error.message : t.unsubscribe.errorTitle);
+        
+        // Track unsubscribe error
+        trackCustomEvent('NewsletterUnsubscribe', {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
     };
 

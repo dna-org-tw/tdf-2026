@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { trackEvent } from '@/components/FacebookPixel';
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -68,7 +69,7 @@ export default function OrderDetailPage() {
           throw new Error(errorData.error || t.checkout?.loadOrderError || 'Failed to load order');
         }
         const data = await res.json();
-        setOrder({
+        const orderData = {
           id: data.id,
           status: data.status ?? null,
           payment_status: data.payment_status ?? null,
@@ -90,6 +91,16 @@ export default function OrderDetailPage() {
           ticket_tier: data.ticket_tier ?? null,
           line_items: Array.isArray(data.line_items) ? data.line_items : null,
           discount: data.discount ?? null,
+        };
+        setOrder(orderData);
+        
+        // Track ViewContent event for order detail page
+        trackEvent('ViewContent', {
+          content_name: 'Order Details',
+          content_category: 'Order',
+          content_ids: [orderData.id],
+          value: orderData.amount_total ? orderData.amount_total / 100 : undefined,
+          currency: orderData.currency?.toUpperCase(),
         });
       } catch (err) {
         console.error('Failed to load order details', err);

@@ -25,14 +25,9 @@ const WhySection = dynamic(() => import('@/components/sections/WhySection'), {
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
-const HighlightsSection = dynamic(() => import('@/components/sections/HighlightsSection'), {
+const EventsSection = dynamic(() => import('@/components/sections/EventsSection'), {
   ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-stone-100 animate-pulse" />,
-});
-
-const ScheduleSection = dynamic(() => import('@/components/sections/ScheduleSection'), {
-  ssr: true, // AEO优化：启用SSR
-  loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
 });
 
 const TicketsSection = dynamic(() => import('@/components/sections/TicketsSection'), {
@@ -71,8 +66,7 @@ export default function HomeContent() {
       <HashNavigationHandler />
       <AboutSection />
       <WhySection />
-      <HighlightsSection />
-      <ScheduleSection />
+      <EventsSection />
       <TicketsSection />
       <TicketFollowSection />
       <AccommodationSection />

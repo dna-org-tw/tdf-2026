@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
         hostname: 'images.lumacdn.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
     ],
     // 對於外部圖片，使用 unoptimized 以減少處理時間
     unoptimized: false,

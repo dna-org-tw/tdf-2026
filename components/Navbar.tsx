@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Globe, Instagram, Calendar } from 'lucide-react';
+import { Menu, X, Globe, Instagram } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -89,9 +89,10 @@ export default function Navbar() {
   const navLinks = [
     { name: t.nav.about, href: '#about' },
     { name: t.nav.why, href: '#why' },
-    { name: t.nav.highlights, href: '#highlights' },
+    { name: t.nav.highlights, href: '#events' },
     { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.accommodation, href: '#accommodation' },
+    { name: t.nav.team, href: '#partners' },
     { name: t.nav.followUs, href: '#follow-us' },
   ];
 
@@ -167,34 +168,10 @@ export default function Navbar() {
             <Globe className="w-3 h-3" />
             {lang === 'en' ? t.nav.languageToggle : 'EN'}
           </button>
-
-          <a
-            href="#schedule"
-            onClick={(e) => {
-              handleNavClick(e, '#schedule');
-              trackEvent('Lead', {
-                content_name: 'Register CTA',
-                content_category: 'Navigation',
-              });
-            }}
-            className="bg-[#1E1F1C] text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#10B8D9] transition-colors cursor-pointer"
-          >
-            {t.nav.register}
-          </a>
         </div>
 
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
-          <a
-            href="#tickets"
-            onClick={(e) => handleNavClick(e, '#tickets')}
-            className={`hover:text-[#10B8D9] transition-colors cursor-pointer ${
-              scrolled ? 'text-[#1E1F1C]' : 'text-white'
-            }`}
-            aria-label="Event Timeline"
-          >
-            <Calendar className="w-5 h-5" />
-          </a>
           <a
             href="http://instagram.com/taiwandigitalfest"
             target="_blank"

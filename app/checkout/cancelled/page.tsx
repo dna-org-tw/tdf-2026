@@ -57,6 +57,12 @@ export default function CheckoutCancelledPage() {
     | '';
 
   useEffect(() => {
+    // Track ViewContent for cancelled checkout page
+    trackEvent('ViewContent', {
+      content_name: 'Checkout Cancelled',
+      content_category: 'Checkout',
+    });
+    
     if (!tier) return;
 
     trackCustomEvent('TicketPurchaseCancelled', {

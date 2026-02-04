@@ -99,6 +99,7 @@ export const content = {
       carouselDescription: "Discover exciting events happening during Taiwan Digital Fest 2026",
       carouselHint: "Click to view event details",
       viewMore: "See More",
+      viewAllSchedule: "View All Events",
       ctas: [
         { type: "Register", text: "Follow for Free", href: "#follow-us" },
         { type: "Call for Side Events", text: "Host Your Own Side Event →", href: "https://forms.gle/EofTp9Qso27jEeeY7" }
@@ -763,6 +764,7 @@ export const content = {
       carouselDescription: "探索 2026 台灣數位嘉年華期間的精彩活動",
       carouselHint: "點擊查看活動詳情",
       viewMore: "查看更多",
+      viewAllSchedule: "查看所有活動",
       ctas: [
         { type: "Register", text: "免費追蹤", href: "#follow-us" },
         { type: "Call for Side Events", text: "舉辦你的 Side Event →", href: "https://forms.gle/EofTp9Qso27jEeeY7" }

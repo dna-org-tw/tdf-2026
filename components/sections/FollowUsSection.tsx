@@ -154,7 +154,7 @@ export default function FollowUsSection() {
         setEmail('');
         // 更新关注者数量
         setFollowerCount((prev) => prev + 1);
-        // Track CompleteRegistration event for successful subscription (Meta standard event)
+        // Track CompleteRegistration event for free newsletter subscription (Meta standard event)
         trackEvent('CompleteRegistration', {
           content_name: 'Follow Us Form',
           content_category: 'Newsletter Subscription',

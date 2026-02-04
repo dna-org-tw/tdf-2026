@@ -72,6 +72,16 @@ export default function TicketsSection() {
   const [loadingTier, setLoadingTier] = useState<'explore' | 'contribute' | 'backer' | null>(null);
   useSectionTracking({ sectionId: 'tickets', sectionName: 'Tickets Section', category: 'Tickets' });
   
+  // Track ViewContent for ticket tiers when section is viewed
+  useEffect(() => {
+    // This will be tracked by useSectionTracking, but we can also track individual ticket views
+    trackEvent('ViewContent', {
+      content_name: 'Tickets Section',
+      content_category: 'Tickets',
+      content_type: 'product_listing',
+    });
+  }, []);
+  
   const saleEndDate = '2/28';
   
   // Calculate countdown to February 28, 2026 (end of day UTC)
@@ -123,9 +133,21 @@ export default function TicketsSection() {
 
       const price = isOnSale ? tier.salePrice : tier.originalPrice;
 
+      // Track InitiateCheckout (Meta standard event)
       trackEvent('InitiateCheckout', {
         content_name: `${tier.name} Ticket`,
         content_category: 'Tickets',
+        content_ids: [tier.key],
+        value: price,
+        currency: 'USD',
+        num_items: 1,
+      });
+
+      // Track AddPaymentInfo (Meta standard event) - user is about to enter payment info
+      trackEvent('AddPaymentInfo', {
+        content_name: `${tier.name} Ticket`,
+        content_category: 'Tickets',
+        content_ids: [tier.key],
         value: price,
         currency: 'USD',
       });

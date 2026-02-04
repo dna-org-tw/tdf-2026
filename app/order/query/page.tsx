@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
@@ -92,6 +92,14 @@ export default function OrderQueryPage() {
       submitOrderQuery('');
     }
   };
+
+  // Track ViewContent when page loads
+  useEffect(() => {
+    trackEvent('ViewContent', {
+      content_name: 'Order Query Page',
+      content_category: 'Order',
+    });
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#1E1F1C] text-white flex items-center justify-center px-4 py-12">

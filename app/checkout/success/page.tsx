@@ -63,6 +63,12 @@ export default function CheckoutSuccessPage() {
     | '';
 
   useEffect(() => {
+    // Track ViewContent for success page
+    trackEvent('ViewContent', {
+      content_name: 'Checkout Success',
+      content_category: 'Checkout',
+    });
+    
     if (!tier) return;
 
     trackCustomEvent('TicketPurchaseSuccess', {
