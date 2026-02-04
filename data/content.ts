@@ -36,7 +36,7 @@ export const content = {
       accommodation: "Map",
       followUs: "Follow Us",
       register: "Schedule",
-      award: "Award",
+      award: "IG Contest",
       languageToggle: "中文"
     },
     navShort: {
@@ -616,49 +616,49 @@ export const content = {
     },
     award: {
       title: "Nomad Award",
-      subtitle: "Short Video Contest",
-      description: "Join our short video contest! Share your Taiwan Digital Fest experience with tag #taiwandigitalfest on Instagram to participate. Vote for your favorite entries and win amazing prizes!",
+      subtitle: "IG Short Video Contest",
+      description: "🎬 Showcase your creativity! Share your Taiwan Digital Fest moments with #taiwandigitalfest on Instagram Reels. Watch amazing entries, vote for your favorites, and compete for incredible cash prizes!",
       deadline: "Voting ends: April 30, 2026 12:00 (Taiwan Time)",
       awards: {
-        title: "Prizes",
+        title: "💰 Prize Pool",
         first: "$600 USD",
         second: "$300 USD",
         third: "$150 USD"
       },
-      ceremony: "Awards ceremony will be held on May 1st evening during the opening event.",
+      ceremony: "🏆 Winners will be announced at the Opening Party on May 1st evening!",
       voting: {
         title: "How to Vote",
-        step1: "Browse entries below",
-        step2: "Click 'Vote' on your favorite post",
-        step3: "If you haven't followed yet, you'll need to follow first",
-        step4: "If already following, you'll receive an email confirmation",
-        step5: "Click the confirmation link in the email to complete your vote"
+        step1: "✨ Browse amazing short videos below",
+        step2: "❤️ Click 'Vote' on your favorite Reel",
+        step3: "📱 Follow Taiwan Digital Fest 2026",
+        step4: "📧 Check your email for confirmation",
+        step5: "✅ Click the link to complete your vote!"
       },
       rules: {
-        title: "Rules",
-        rule1: "Each email can vote once per day",
-        rule2: "Voting requires reCAPTCHA verification",
-        rule3: "Must follow the account to vote",
-        rule4: "Voting ends on April 30, 2026 at 12:00 (Taiwan Time)"
+        title: "Contest Rules",
+        rule1: "One vote per email per day",
+        rule2: "reCAPTCHA verification required",
+        rule3: "Must follow @taiwandigitalfest to vote",
+        rule4: "Voting closes April 30, 2026 at 12:00 (Taiwan Time)"
       },
       posts: {
-        loading: "Loading posts...",
-        error: "Failed to load posts. Please try again later.",
-        empty: "No posts found. Check back later!",
-        vote: "Vote",
-        voting: "Voting...",
-        voted: "Voted",
-        followFirst: "Follow First",
-        voteSuccess: "Vote submitted! Please check your email to confirm.",
-        voteError: "Failed to submit vote. Please try again.",
-        alreadyVoted: "You have already voted today. Come back tomorrow!",
-        recaptchaError: "reCAPTCHA verification failed. Please try again."
+        loading: "Loading amazing entries...",
+        error: "Oops! Couldn't load entries. Please refresh and try again!",
+        empty: "No entries yet. Be the first to share your Reel! 🎬",
+        vote: "Vote Now",
+        voting: "Submitting your vote...",
+        voted: "✓ Voted",
+        followFirst: "Follow to Vote",
+        voteSuccess: "🎉 Vote submitted! Check your email to confirm and make it count!",
+        voteError: "Hmm, something went wrong. Please try again!",
+        alreadyVoted: "You've already voted today! Come back tomorrow for another vote! 🗓️",
+        recaptchaError: "Verification failed. Please refresh and try again!"
       },
       confirm: {
         title: "Confirm Your Vote",
-        success: "Your vote has been confirmed! Thank you for participating.",
-        error: "Failed to confirm vote. The link may be invalid or expired.",
-        alreadyConfirmed: "This vote has already been confirmed."
+        success: "🎊 Your vote is confirmed! Thank you for supporting amazing creators!",
+        error: "This link is invalid or expired. Please vote again!",
+        alreadyConfirmed: "This vote was already confirmed. Thanks for your support! 🙌"
       }
     },
     faq: {
@@ -749,7 +749,7 @@ export const content = {
       accommodation: "地圖",
       followUs: "關注我們",
       register: "時程",
-      award: "短影音大賽",
+      award: "IG 短影音大賽",
       languageToggle: "中文"
     },
     navShort: {
@@ -1329,49 +1329,49 @@ export const content = {
     },
     award: {
       title: "Nomad Award",
-      subtitle: "短影音大賽",
-      description: "參加我們的短影音大賽！在 Instagram 上標記 taiwandigitalfest 分享您的台灣數位嘉年華體驗即可參與。為您喜歡的作品投票，贏得豐厚獎品！",
+      subtitle: "IG 短影音大賽",
+      description: "🎬 展現你的創意！在 Instagram Reels 上分享你的台灣數位嘉年華精彩時刻，標記 #taiwandigitalfest 即可參賽。欣賞精彩作品、為最愛投票，就有機會贏得豐厚獎金！",
       deadline: "投票截止：2026 年 4 月 30 日 12:00（台灣時間）",
       awards: {
-        title: "獎項",
+        title: "💰 獎金池",
         first: "$600 USD",
         second: "$300 USD",
         third: "$150 USD"
       },
-      ceremony: "頒獎典禮將於 5 月 1 日晚上開幕時進行。",
+      ceremony: "🏆 得獎名單將於 5 月 1 日晚上開幕派對揭曉！",
       voting: {
         title: "投票方式",
-        step1: "瀏覽下方的參賽作品",
-        step2: "點擊您喜歡的貼文上的「投票」按鈕",
-        step3: "如果還沒有追蹤，需要先追蹤",
-        step4: "如果已經追蹤，會收到郵件確認",
-        step5: "點擊郵件中的確認連結完成投票"
+        step1: "✨ 瀏覽下方精彩短影音作品",
+        step2: "❤️ 點擊你最愛的 Reel 上的「投票」",
+        step3: "📱 追蹤 Taiwan Digital Fest 2026",
+        step4: "📧 檢查你的 Email 確認信",
+        step5: "✅ 點擊連結完成投票！"
       },
       rules: {
-        title: "規則",
-        rule1: "每個信箱每天至多投票一次",
-        rule2: "投票需要 reCAPTCHA 驗證",
-        rule3: "必須追蹤帳號才能投票",
-        rule4: "投票至台灣時間 2026/04/30 12:00 止"
+        title: "參賽規則",
+        rule1: "每個 Email 每天可投票一次",
+        rule2: "投票需通過 reCAPTCHA 驗證",
+        rule3: "必須追蹤 @taiwandigitalfest 才能投票",
+        rule4: "投票至台灣時間 2026/04/30 12:00 截止"
       },
       posts: {
-        loading: "載入貼文中...",
-        error: "載入貼文失敗，請稍後再試。",
-        empty: "目前沒有貼文，請稍後再來查看！",
-        vote: "投票",
-        voting: "投票中...",
-        voted: "已投票",
-        followFirst: "先追蹤",
-        voteSuccess: "投票已提交！請檢查您的郵件以確認。",
-        voteError: "投票提交失敗，請稍後再試。",
-        alreadyVoted: "您今天已經投過票了，明天再來吧！",
-        recaptchaError: "reCAPTCHA 驗證失敗，請重試。"
+        loading: "載入精彩作品中...",
+        error: "哎呀！載入失敗了，請重新整理再試一次！",
+        empty: "還沒有作品，快來成為第一個分享 Reel 的人吧！🎬",
+        vote: "立即投票",
+        voting: "提交投票中...",
+        voted: "✓ 已投票",
+        followFirst: "追蹤後投票",
+        voteSuccess: "🎉 投票已提交！請檢查 Email 確認，讓你的投票生效！",
+        voteError: "哎呀，出了點問題，請再試一次！",
+        alreadyVoted: "你今天已經投過票了！明天再來投一票吧！🗓️",
+        recaptchaError: "驗證失敗，請重新整理再試一次！"
       },
       confirm: {
         title: "確認您的投票",
-        success: "您的投票已確認！感謝您的參與。",
-        error: "確認投票失敗。連結可能無效或已過期。",
-        alreadyConfirmed: "此投票已經確認過了。"
+        success: "🎊 投票確認成功！感謝你支持優秀的創作者！",
+        error: "這個連結無效或已過期，請重新投票！",
+        alreadyConfirmed: "這個投票已經確認過了，感謝你的支持！🙌"
       }
     },
     faq: {

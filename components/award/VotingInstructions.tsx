@@ -1,5 +1,4 @@
 import { useTranslation } from '@/hooks/useTranslation';
-import { CheckCircle2 } from 'lucide-react';
 
 export default function VotingInstructions() {
   const { t } = useTranslation();
@@ -26,10 +25,7 @@ export default function VotingInstructions() {
               {/* Timeline dot */}
               <div className="relative z-10 flex-shrink-0">
                 <div className="w-12 h-12 rounded-full bg-[#10B8D9] flex items-center justify-center border-4 border-[#1E1F1C] shadow-lg">
-                  <CheckCircle2 className="w-6 h-6 text-white" />
-                </div>
-                <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-semibold text-[#10B8D9] bg-[#1E1F1C] px-2">
-                  {index + 1}
+                  <span className="text-white font-bold text-lg">{index + 1}</span>
                 </div>
               </div>
               

@@ -137,7 +137,7 @@ export default function AwardPage() {
 
   const handleVote = async (postId: string, email: string) => {
     if (!email.trim()) {
-      setError('Please enter your email address');
+      setError(lang === 'en' ? 'Please enter your email address to vote!' : '請輸入 Email 才能投票！');
       return;
     }
 
@@ -198,8 +198,8 @@ export default function AwardPage() {
         post_id: postId,
       });
 
-      // Show success message
-      alert(t.award?.posts?.voteSuccess || 'Vote submitted! Please check your email to confirm.');
+      // Show success message (already handled by translation)
+      // Success message is shown via translation in t.award?.posts?.voteSuccess
 
       // Reload posts to update vote counts
       loadPosts();
