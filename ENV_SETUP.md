@@ -57,7 +57,33 @@ UNSUBSCRIBE_SECRET=your_random_secret_key_here
 
 **注意：** 如果未配置 Mailgun，邮件发送功能将被禁用，但不会影响其他功能。
 
-### 3. 现有 Stripe 配置
+### 3. Instagram API 配置（Award 功能）
+
+为了启用 Award 页面的 Instagram Reels 抓取功能，需要配置以下环境变量：
+
+```bash
+# Instagram Graph API Access Token
+INSTAGRAM_ACCESS_TOKEN=your_instagram_access_token
+
+# Instagram User ID
+INSTAGRAM_USER_ID=your_instagram_user_id
+
+# Instagram Hashtag ID（可选，如果使用 Hashtag API）
+INSTAGRAM_HASHTAG_ID=your_hashtag_id
+
+# 要抓取的 Hashtag（默认为 #taiwandigitalfest）
+INSTAGRAM_HASHTAG=#taiwandigitalfest
+```
+
+**设置 Instagram API：**
+1. 访问 [Facebook Developers](https://developers.facebook.com/) 并创建应用
+2. 添加 Instagram Graph API 产品
+3. 获取 Access Token 和 User ID
+4. （可选）如果需要使用 Hashtag API，需要先搜索并获取 Hashtag ID
+
+**注意：** 如果未配置 Instagram API，Award 页面仍可访问，但无法抓取 Reels。
+
+### 4. 现有 Stripe 配置
 
 确保以下 Stripe 环境变量已配置：
 

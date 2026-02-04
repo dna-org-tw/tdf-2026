@@ -176,10 +176,129 @@ Unsubscribe: ${unsubscribeUrl}
       return false;
     }
 
-    console.log('[Email] Subscription thank you email sent successfully', response.id);
     return true;
   } catch (error) {
     console.error('[Email] Error sending subscription thank you email', error);
+    return false;
+  }
+}
+
+/**
+ * 发送投票确认邮件
+ */
+export async function sendVoteConfirmationEmail(
+  email: string,
+  postId: string,
+  confirmToken: string
+): Promise<boolean> {
+  if (!mailgunClient || !mailgunDomain) {
+    console.warn('[Email] Mailgun is not configured. Vote confirmation email will not be sent.');
+    return false;
+  }
+
+  try {
+    const confirmUrl = `${baseUrl}/api/award/confirm-vote?token=${encodeURIComponent(confirmToken)}`;
+
+    const subject = 'Confirm Your Nomad Award Vote - Taiwan Digital Fest 2026';
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background-color: #1E1F1C; padding: 30px; border-radius: 8px; margin-bottom: 20px;">
+    <h1 style="color: #10B8D9; margin: 0; font-size: 24px;">Taiwan Digital Fest 2026</h1>
+  </div>
+  
+  <div style="background-color: #f9f9f9; padding: 30px; border-radius: 8px; margin-bottom: 20px;">
+    <h2 style="color: #10B8D9; margin-top: 0;">Confirm Your Vote for Nomad Award</h2>
+    
+    <p>Dear ${email},</p>
+    
+    <p>
+      Thank you for voting in the Nomad Award short video contest! To complete your vote, please click the confirmation button below.
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${confirmUrl}" style="display: inline-block; background-color: #10B8D9; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+        Confirm Your Vote
+      </a>
+    </div>
+    
+    <p style="color: #666; font-size: 14px;">
+      If the button doesn't work, you can copy and paste this link into your browser:
+    </p>
+    <p style="color: #10B8D9; font-size: 12px; word-break: break-all;">
+      ${confirmUrl}
+    </p>
+    
+    <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10B8D9;">
+      <h3 style="margin-top: 0; color: #1E1F1C;">Important Notes:</h3>
+      <ul style="color: #666; padding-left: 20px;">
+        <li>Each email can vote once per day</li>
+        <li>Voting ends on April 30, 2026 at 12:00 (Taiwan Time)</li>
+        <li>Awards ceremony will be held on May 1st evening during the opening event</li>
+      </ul>
+    </div>
+    
+    <p style="color: #666; font-size: 14px; margin-top: 30px;">
+      Thank you for participating in the Nomad Award contest!<br>
+      Taiwan Digital Fest 2026 Team
+    </p>
+  </div>
+  
+  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
+    <p>This is an automated email. Please do not reply directly to this message.</p>
+  </div>
+</body>
+</html>
+    `;
+
+    const textContent = `
+Taiwan Digital Fest 2026
+
+Confirm Your Vote for Nomad Award
+
+Dear ${email},
+
+Thank you for voting in the Nomad Award short video contest! To complete your vote, please click the confirmation link below:
+
+${confirmUrl}
+
+Important Notes:
+- Each email can vote once per day
+- Voting ends on April 30, 2026 at 12:00 (Taiwan Time)
+- Awards ceremony will be held on May 1st evening during the opening event
+
+Thank you for participating in the Nomad Award contest!
+Taiwan Digital Fest 2026 Team
+
+---
+This is an automated email. Please do not reply directly to this message.
+    `;
+
+    const messageData = {
+      from: fromEmail,
+      to: email,
+      subject,
+      html: htmlContent,
+      text: textContent,
+    };
+
+    const response = await mailgunClient.messages.create(mailgunDomain, messageData);
+
+    if (!response || !response.id) {
+      console.error('[Email] Failed to send vote confirmation email', response);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('[Email] Error sending vote confirmation email', error);
     return false;
   }
 }

@@ -135,6 +135,16 @@ export default function Navbar() {
             </a>
           ))}
           
+          <button 
+            onClick={toggleLanguage}
+            className={`hover:text-[#10B8D9] transition-colors ${
+              scrolled ? 'text-[#1E1F1C]' : 'text-white'
+            }`}
+            aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+          >
+            <Globe className="w-5 h-5" />
+          </button>
+          
           <a
             href="http://instagram.com/taiwandigitalfest"
             target="_blank"
@@ -157,21 +167,33 @@ export default function Navbar() {
             <Instagram className="w-5 h-5" />
           </a>
           
-          <button 
-            onClick={toggleLanguage}
-            className={`flex items-center gap-1 text-xs font-semibold uppercase tracking-wider border rounded-full px-3 py-1 hover:bg-[#F9D2E5] transition-colors ${
-              scrolled 
-                ? 'border-[#F6F6F6] text-[#1E1F1C]' 
-                : 'border-white/30 text-white'
+          <Link
+            href="/award"
+            onClick={() => {
+              trackCustomEvent('NavClick', {
+                section: 'award',
+                location: 'navbar_desktop',
+              });
+            }}
+            className={`bg-[#10B8D9] hover:bg-[#0EA5C4] text-white font-semibold px-4 py-2 rounded-full transition-colors text-sm whitespace-nowrap ${
+              scrolled ? 'shadow-md' : ''
             }`}
           >
-            <Globe className="w-3 h-3" />
-            {lang === 'en' ? t.nav.languageToggle : 'EN'}
-          </button>
+            {t.nav.award || 'Award'}
+          </Link>
         </div>
 
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
+          <button 
+            onClick={toggleLanguage}
+            className={`hover:text-[#10B8D9] transition-colors ${
+              scrolled ? 'text-[#1E1F1C]' : 'text-white'
+            }`}
+            aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+          >
+            <Globe className="w-5 h-5" />
+          </button>
           <a
             href="http://instagram.com/taiwandigitalfest"
             target="_blank"
@@ -193,15 +215,6 @@ export default function Navbar() {
           >
             <Instagram className="w-5 h-5" />
           </a>
-          <button 
-            onClick={toggleLanguage}
-            className={`hover:text-[#10B8D9] transition-colors ${
-              scrolled ? 'text-[#1E1F1C]' : 'text-white'
-            }`}
-            aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
-          >
-            <Globe className="w-5 h-5" />
-          </button>
           <button 
             className={`transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'

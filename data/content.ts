@@ -36,6 +36,7 @@ export const content = {
       accommodation: "Map",
       followUs: "Follow Us",
       register: "Schedule",
+      award: "Award",
       languageToggle: "中文"
     },
     navShort: {
@@ -613,6 +614,53 @@ export const content = {
       unsubscribeFailed: "Unsubscribe failed. Please try again later.",
       unsubscribeSuccess: "Successfully unsubscribed."
     },
+    award: {
+      title: "Nomad Award",
+      subtitle: "Short Video Contest",
+      description: "Join our short video contest! Share your Taiwan Digital Fest experience with tag #taiwandigitalfest on Instagram to participate. Vote for your favorite entries and win amazing prizes!",
+      deadline: "Voting ends: April 30, 2026 12:00 (Taiwan Time)",
+      awards: {
+        title: "Prizes",
+        first: "$600 USD",
+        second: "$300 USD",
+        third: "$150 USD"
+      },
+      ceremony: "Awards ceremony will be held on May 1st evening during the opening event.",
+      voting: {
+        title: "How to Vote",
+        step1: "Browse entries below",
+        step2: "Click 'Vote' on your favorite post",
+        step3: "If you haven't followed yet, you'll need to follow first",
+        step4: "If already following, you'll receive an email confirmation",
+        step5: "Click the confirmation link in the email to complete your vote"
+      },
+      rules: {
+        title: "Rules",
+        rule1: "Each email can vote once per day",
+        rule2: "Voting requires reCAPTCHA verification",
+        rule3: "Must follow the account to vote",
+        rule4: "Voting ends on April 30, 2026 at 12:00 (Taiwan Time)"
+      },
+      posts: {
+        loading: "Loading posts...",
+        error: "Failed to load posts. Please try again later.",
+        empty: "No posts found. Check back later!",
+        vote: "Vote",
+        voting: "Voting...",
+        voted: "Voted",
+        followFirst: "Follow First",
+        voteSuccess: "Vote submitted! Please check your email to confirm.",
+        voteError: "Failed to submit vote. Please try again.",
+        alreadyVoted: "You have already voted today. Come back tomorrow!",
+        recaptchaError: "reCAPTCHA verification failed. Please try again."
+      },
+      confirm: {
+        title: "Confirm Your Vote",
+        success: "Your vote has been confirmed! Thank you for participating.",
+        error: "Failed to confirm vote. The link may be invalid or expired.",
+        alreadyConfirmed: "This vote has already been confirmed."
+      }
+    },
     faq: {
       title: "Frequently Asked Questions",
       subtitle: "Common questions about Taiwan Digital Fest 2026",
@@ -701,6 +749,7 @@ export const content = {
       accommodation: "地圖",
       followUs: "關注我們",
       register: "時程",
+      award: "短影音大賽",
       languageToggle: "中文"
     },
     navShort: {
@@ -1277,6 +1326,53 @@ export const content = {
       invalidUnsubscribeToken: "無效的取消訂閱連結。",
       unsubscribeFailed: "取消訂閱失敗，請稍後再試。",
       unsubscribeSuccess: "已成功取消訂閱。"
+    },
+    award: {
+      title: "Nomad Award",
+      subtitle: "短影音大賽",
+      description: "參加我們的短影音大賽！在 Instagram 上標記 taiwandigitalfest 分享您的台灣數位嘉年華體驗即可參與。為您喜歡的作品投票，贏得豐厚獎品！",
+      deadline: "投票截止：2026 年 4 月 30 日 12:00（台灣時間）",
+      awards: {
+        title: "獎項",
+        first: "$600 USD",
+        second: "$300 USD",
+        third: "$150 USD"
+      },
+      ceremony: "頒獎典禮將於 5 月 1 日晚上開幕時進行。",
+      voting: {
+        title: "投票方式",
+        step1: "瀏覽下方的參賽作品",
+        step2: "點擊您喜歡的貼文上的「投票」按鈕",
+        step3: "如果還沒有追蹤，需要先追蹤",
+        step4: "如果已經追蹤，會收到郵件確認",
+        step5: "點擊郵件中的確認連結完成投票"
+      },
+      rules: {
+        title: "規則",
+        rule1: "每個信箱每天至多投票一次",
+        rule2: "投票需要 reCAPTCHA 驗證",
+        rule3: "必須追蹤帳號才能投票",
+        rule4: "投票至台灣時間 2026/04/30 12:00 止"
+      },
+      posts: {
+        loading: "載入貼文中...",
+        error: "載入貼文失敗，請稍後再試。",
+        empty: "目前沒有貼文，請稍後再來查看！",
+        vote: "投票",
+        voting: "投票中...",
+        voted: "已投票",
+        followFirst: "先追蹤",
+        voteSuccess: "投票已提交！請檢查您的郵件以確認。",
+        voteError: "投票提交失敗，請稍後再試。",
+        alreadyVoted: "您今天已經投過票了，明天再來吧！",
+        recaptchaError: "reCAPTCHA 驗證失敗，請重試。"
+      },
+      confirm: {
+        title: "確認您的投票",
+        success: "您的投票已確認！感謝您的參與。",
+        error: "確認投票失敗。連結可能無效或已過期。",
+        alreadyConfirmed: "此投票已經確認過了。"
+      }
     },
     faq: {
       title: "常見問題",

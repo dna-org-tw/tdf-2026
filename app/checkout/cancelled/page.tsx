@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 
 export default function CheckoutCancelledPage() {
   const searchParams = useSearchParams();
