@@ -84,8 +84,7 @@
   - `components/sections/HeroSection.tsx` - Call for Speakers/Volunteers/Partners/Side Events
   - `components/Navbar.tsx` - Instagram 链接、Register CTA
   - `components/Footer.tsx` - 所有 CTA 链接、Instagram 链接
-  - `components/sections/ScheduleSection.tsx` - Luma 活动链接
-  - `components/sections/HighlightsSection.tsx` - 活动轮播链接
+  - `components/sections/EventsSection.tsx` - Luma 活动链接和活动轮播链接
 - **参数**:
   - `content_name`: CTA 名称
   - `content_category`: 分类（'CTA', 'Social Media', 'Event Schedule' 等）
@@ -97,7 +96,7 @@
   - 用户在日程表中使用筛选器
 - **实现位置**:
   - `app/order/query/page.tsx` - 订单查询
-  - `components/sections/ScheduleSection.tsx` - 日程筛选
+  - `components/sections/EventsSection.tsx` - 日程筛选
 - **参数**:
   - `search_string`: 搜索关键词或筛选类型
   - `content_category`: 搜索类别
@@ -134,9 +133,9 @@
 - `OrderQuerySearch` - 订单查询搜索
 
 ### 活动相关
-- `EventClick` - 日程表活动点击
-- `EventCarouselClick` - 活动轮播点击
-- `ScheduleFilter` - 日程筛选器使用
+- `EventClick` - 日程表活动点击（EventsSection）
+- `EventCarouselClick` - 活动轮播点击（EventsSection）
+- `ScheduleFilter` - 日程筛选器使用（EventsSection）
 
 ### CTA 相关
 - `CallForSpeakersClick` - Call for Speakers 点击

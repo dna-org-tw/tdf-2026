@@ -1,12 +1,10 @@
 # 視頻優化指南
 
-## 當前視頻文件大小
+## 當前視頻文件狀態
 
-根據檢查，以下視頻文件需要優化：
+**注意**：目前項目中沒有本地視頻文件。所有視頻內容都是通過 YouTube 嵌入（使用 `LazyYouTubeEmbed` 組件）來實現的。
 
-- `hualien_view.mp4`: **17MB** ⚠️ 極大
-- `taiwan_view.mp4`: **15MB** ⚠️ 極大
-- `taitung_view.mp4`: **2.7MB** ✅ 相對較小
+如果未來需要添加本地視頻文件，可以參考以下優化建議。
 
 ## 優化建議
 
@@ -40,10 +38,12 @@ ffmpeg -i taitung_view.mp4 -ss 00:00:01 -vframes 1 -q:v 2 taitung_view_poster.we
 
 ### 4. 更新組件使用
 
-已實作 `LazyVideo` 組件，會自動：
+如果添加本地視頻，建議創建 `LazyVideo` 組件，功能包括：
 - 使用 Intersection Observer 延遲載入
 - 顯示 poster 圖片直到視頻載入
 - 只在進入視窗時才開始載入視頻
+
+**注意**：目前項目使用 `LazyYouTubeEmbed` 組件處理 YouTube 視頻嵌入。
 
 ### 5. 多格式支援
 
@@ -58,8 +58,8 @@ ffmpeg -i taitung_view.mp4 -ss 00:00:01 -vframes 1 -q:v 2 taitung_view_poster.we
 
 ## 預期效果
 
-優化後預期：
-- 初始頁面載入減少 **30-40MB**
+如果添加本地視頻並進行優化，預期：
+- 初始頁面載入減少 **30-40MB**（取決於視頻大小）
 - 首屏載入時間減少 **2-4秒**（在慢速網路環境）
 - 改善 LCP (Largest Contentful Paint) 指標
 - 減少頻寬使用，特別適合遠距離伺服器

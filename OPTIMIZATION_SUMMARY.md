@@ -16,10 +16,12 @@
 **影響的組件**：
 - `AboutSection`
 - `WhySection`
-- `HighlightsSection`
-- `TicketTimelineSection`
+- `EventsSection`
+- `TicketsSection`
+- `TicketFollowSection`
 - `AccommodationSection`
 - `PartnersSection`
+- `FollowUsSection`
 - `Footer`
 
 **預期效果**：
@@ -41,14 +43,12 @@
 ### 3. 視頻延遲載入 🎬
 
 **實施內容**：
-- 創建 `LazyVideo` 組件使用 Intersection Observer
-- 視頻只在進入視窗時才載入
-- 使用 poster 圖片作為佔位符
-- 應用於 `AboutSection` 和 `WhySection`
+- 創建 `LazyYouTubeEmbed` 組件使用 Intersection Observer
+- YouTube 視頻只在進入視窗時才載入
+- 應用於 `WhySection`
 
 **預期效果**：
-- 初始頁面載入減少 **50-60MB**
-- 首屏載入時間減少 **3-5秒**（慢速網路）
+- 減少初始載入時間
 - 改善 LCP 指標
 
 ### 4. Next.js 配置優化 ⚙️
@@ -111,18 +111,9 @@
 
 ## ⚠️ 待完成優化
 
-### 視頻格式轉換（高優先級）
+### 視頻格式轉換（如需要）
 
-**需要手動執行**：
-1. 將 MOV/MP4 轉換為 WebM 格式
-2. 生成 poster 圖片
-3. 更新組件使用新格式
-
-**詳細步驟見**：`VIDEO_OPTIMIZATION.md`
-
-**預期效果**：
-- 視頻文件大小減少 **30-50%**
-- 進一步減少初始載入時間
+**注意**：目前項目中沒有本地視頻文件，所有視頻都是通過 YouTube 嵌入。如果未來需要添加本地視頻文件，可以參考 `VIDEO_OPTIMIZATION.md` 中的優化建議。
 
 ## 🧪 測試建議
 
@@ -145,7 +136,7 @@
 
 ## 📝 注意事項
 
-1. **視頻優化**：需要手動轉換視頻格式（見 `VIDEO_OPTIMIZATION.md`）
+1. **視頻優化**：目前使用 YouTube 嵌入，無需本地視頻優化
 2. **CDN 配置**：建議使用台灣節點的 CDN 進一步優化
 3. **測試**：所有優化都應在實際環境中測試驗證
 4. **監控**：部署後持續監控效能指標

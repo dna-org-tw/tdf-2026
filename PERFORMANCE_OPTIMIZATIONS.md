@@ -80,7 +80,8 @@
 
 1. **代碼分割與動態導入**：
    - ✅ 將所有非首屏組件改為動態導入 (`next/dynamic`)
-   - ✅ 設定 `ssr: false` 避免不必要的伺服器端渲染
+   - ✅ 關鍵內容組件設定 `ssr: true` 以確保 AI 爬蟲可訪問（AEO 優化）
+   - ✅ 非關鍵組件（如 Footer）設定 `ssr: false` 避免不必要的伺服器端渲染
    - ✅ 添加 loading 狀態提升 UX
    - ✅ 預期減少初始 bundle 大小 **60-70%**
 
@@ -90,10 +91,9 @@
    - ✅ 大幅減少 TTFB (Time to First Byte)
 
 3. **視頻延遲載入**：
-   - ✅ 實作 `LazyVideo` 組件使用 Intersection Observer
-   - ✅ 視頻只在進入視窗時才載入
-   - ✅ 使用 poster 圖片作為佔位符
-   - ✅ 預期減少初始載入 **50-60MB**
+   - ✅ 實作 `LazyYouTubeEmbed` 組件使用 Intersection Observer
+   - ✅ YouTube 視頻只在進入視窗時才載入
+   - ✅ 預期減少初始載入時間
 
 4. **Next.js 配置優化**：
    - ✅ 圖片快取 TTL 設為 1 年 (`minimumCacheTTL: 31536000`)
@@ -116,10 +116,9 @@
 
 ### 高優先級
 
-1. **視頻格式轉換**：
-   - ⚠️ 將 MOV/MP4 轉換為 WebM 格式（見 `VIDEO_OPTIMIZATION.md`）
-   - ⚠️ 生成 poster 圖片用於延遲載入
-   - ⚠️ 目標：主視頻 < 5MB，背景視頻 < 2MB each
+1. **視頻格式轉換**（如需要）：
+   - ⚠️ 如果未來添加本地視頻文件，可參考 `VIDEO_OPTIMIZATION.md` 進行優化
+   - ⚠️ 目前所有視頻都通過 YouTube 嵌入，無需本地視頻優化
 
 2. **WordPress API 優化**（如果未來整合）：
    - 使用 `_fields` 參數僅請求必要欄位
@@ -168,12 +167,12 @@
 | FID | > 100ms | < 10ms | Code Splitting, Partytown | ✅ 已優化 |
 | CLS | > 0.10 | < 0.05 | next/font, 明確尺寸定義 | ✅ 已優化 |
 | JS Bundle | > 500KB | < 150KB | Dynamic Imports, Tree Shaking | ✅ 已優化 |
-| 初始載入 | > 80MB | < 20MB | LazyVideo, 代碼分割 | ✅ 已優化 |
+| 初始載入 | > 80MB | < 20MB | LazyYouTubeEmbed, 代碼分割 | ✅ 已優化 |
 
 ### 針對遠距離慢速網路的額外優化
 
 - ✅ **代碼分割**：初始 bundle 減少 60-70%
-- ✅ **視頻延遲載入**：減少初始載入 50-60MB
+- ✅ **視頻延遲載入**：YouTube 視頻延遲載入，減少初始載入時間
 - ✅ **長期快取**：靜態資源快取 1 年，減少重複請求
 - ✅ **ISR**：減少伺服器回應時間
 - ⚠️ **視頻格式優化**：待轉換為 WebM（見 `VIDEO_OPTIMIZATION.md`）

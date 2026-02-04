@@ -60,10 +60,12 @@
 **优化的组件：**
 - AboutSection
 - WhySection
-- HighlightsSection
-- TicketTimelineSection
+- EventsSection
+- TicketsSection
+- TicketFollowSection
 - AccommodationSection
 - PartnersSection
+- FollowUsSection
 
 **文件位置：** `components/HomeContent.tsx`
 
