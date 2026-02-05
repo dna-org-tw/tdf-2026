@@ -227,7 +227,7 @@ export default function HeroSection() {
       {/* Content Layer */}
       <motion.div
         style={{ opacity }}
-        className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto text-white"
+        className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto text-white pt-20 sm:pt-24 md:pt-32"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
