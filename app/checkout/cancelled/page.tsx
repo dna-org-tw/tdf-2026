@@ -103,6 +103,23 @@ export default function CheckoutCancelledPage() {
         };
         setOrder(orderData);
 
+        // 同步更新 Supabase 订单状态为 cancelled
+        try {
+          await fetch('/api/order/sync', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              session_id: sessionId,
+              force_status: 'cancelled', // 强制设置为取消状态
+            }),
+          });
+        } catch (syncErr) {
+          console.error('Failed to sync order status', syncErr);
+          // Don't show error to user, sync failure is not critical for display
+        }
+
         // Send email notification
         if (orderData.customer_email) {
           try {

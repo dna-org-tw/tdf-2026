@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createOrder } from '@/lib/orders';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -47,6 +48,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 获取价格信息以获取金额
+    const price = await stripe.prices.retrieve(priceId);
+    const amount = price.unit_amount || 0;
+
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     const session = await stripe.checkout.sessions.create({
@@ -64,6 +69,24 @@ export async function POST(req: NextRequest) {
         ticket_tier: tier,
       },
     });
+
+    // 在 Supabase 中创建订单记录
+    const order = await createOrder({
+      stripe_session_id: session.id,
+      ticket_tier: tier,
+      amount_subtotal: amount,
+      amount_total: amount,
+      amount_tax: 0,
+      amount_discount: 0,
+      currency: price.currency || 'usd',
+    });
+
+    if (!order) {
+      console.warn('[Checkout] Failed to create order in Supabase, but Stripe session was created:', session.id);
+      // 不阻止返回，因为 Stripe session 已创建成功
+    } else {
+      console.log('[Checkout] Order created in Supabase:', order.id);
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
