@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
-import { Calendar, MapPin } from 'lucide-react';
 import ScheduleModal from '@/components/ScheduleModal';
 
 interface TicketInfo {
@@ -35,12 +34,15 @@ export default function EventsSection() {
   const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   
-  // 两行轮播，每行独立的 motion value 和 animation ref
+  // 三行轮播，每行独立的 motion value 和 animation ref
   const x1 = useMotionValue(0);
   const x2 = useMotionValue(0);
+  const x3 = useMotionValue(0);
   const animationRef1 = useRef<number | null>(null);
   const animationRef2 = useRef<number | null>(null);
+  const animationRef3 = useRef<number | null>(null);
   const initializedRef2 = useRef(false);
+  const initializedRef3 = useRef(false);
   
   useSectionTracking({ sectionId: 'events', sectionName: 'Events Section', category: 'Event Information' });
 
@@ -69,8 +71,9 @@ export default function EventsSection() {
   // Ticket tier hierarchy (lowest to highest): follower < explorer < contributor < backer
   const getLowestTicketTier = (event: CalendarEvent): string | null => {
     // Get tag names from tags array (preferred) or fallback to eligibility
-    const tagNames = event.tags?.map(tag => tag.name.toLowerCase()) || 
-                    event.eligibility?.map(tag => tag.toLowerCase().replace('#', '')) || [];
+    const tagsFromTags = event.tags?.map(tag => tag.name.toLowerCase()) || [];
+    const tagsFromEligibility = event.eligibility?.map(tag => tag.toLowerCase().replace('#', '')) || [];
+    const tagNames = tagsFromTags.length > 0 ? tagsFromTags : tagsFromEligibility;
     
     // Check for ticket tier tags in order from lowest to highest
     const tierOrder = ['follower', 'explorer', 'contributor', 'backer'];
@@ -85,44 +88,70 @@ export default function EventsSection() {
     return null;
   };
 
+  // Remove duplicate events by title (case-insensitive)
+  const uniqueEvents = allEvents.filter((event, index, self) =>
+    index === self.findIndex(e => 
+      e.title.toLowerCase().trim() === event.title.toLowerCase().trim()
+    )
+  );
+
   // Categorize events by their lowest ticket tier
-  const row1Events: CalendarEvent[] = []; // #backer and #contributor
-  const row2Events: CalendarEvent[] = []; // Others (lowest tier = explorer, follower, or null)
+  const row1Events: CalendarEvent[] = []; // #backer and #contributor (largest)
+  const row2Events: CalendarEvent[] = []; // #explorer and #follower (medium)
+  const row3Events: CalendarEvent[] = []; // Others (smallest)
   
-  allEvents.forEach((event) => {
+  uniqueEvents.forEach((event) => {
     const lowestTier = getLowestTicketTier(event);
     
     if (lowestTier === 'backer' || lowestTier === 'contributor') {
       row1Events.push(event);
-    } else {
-      // explorer, follower, or no tier tag -> row 2
+    } else if (lowestTier === 'explorer' || lowestTier === 'follower') {
       row2Events.push(event);
+    } else {
+      // no tier tag or other -> row 3
+      row3Events.push(event);
     }
   });
 
+  // Debug: Log event distribution
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('Event distribution:', {
+      row1: row1Events.length,
+      row2: row2Events.length,
+      row3: row3Events.length,
+      total: allEvents.length,
+      unique: uniqueEvents.length
+    });
+  }
+
   // Calculate carousel dimensions based on row index
-  // Row 1 (largest): sm: 260px, md: 320px, lg: 360px
-  // Row 2 (medium): sm: 180px, md: 220px, lg: 260px
+  // Row 1 (largest): sm: 200px, md: 240px, lg: 280px
+  // Row 2 (medium): sm: 140px, md: 170px, lg: 200px
+  // Row 3 (smallest): sm: 110px, md: 130px, lg: 160px
   const getEventWidth = (rowIndex: number) => {
     if (typeof window === 'undefined') {
       // Default values for SSR
-      if (rowIndex === 1) return 260 + 20;
-      return 180 + 20;
+      if (rowIndex === 1) return 200 + 20;
+      if (rowIndex === 2) return 140 + 20;
+      return 110 + 20; // Row 3
     }
     
     if (window.innerWidth >= 1024) {
       // lg breakpoint
-      if (rowIndex === 1) return 360 + 24; // Row 1: largest
-      return 260 + 24; // Row 2: medium
+      if (rowIndex === 1) return 280 + 24; // Row 1: largest
+      if (rowIndex === 2) return 200 + 24; // Row 2: medium
+      return 160 + 24; // Row 3: smallest
     }
     if (window.innerWidth >= 768) {
       // md breakpoint
-      if (rowIndex === 1) return 320 + 24;
-      return 220 + 24;
+      if (rowIndex === 1) return 240 + 24;
+      if (rowIndex === 2) return 170 + 24;
+      return 130 + 24; // Row 3
     }
     // sm breakpoint
-    if (rowIndex === 1) return 260 + 20;
-    return 180 + 20;
+    if (rowIndex === 1) return 200 + 20;
+    if (rowIndex === 2) return 140 + 20;
+    return 110 + 20; // Row 3
   };
 
   // Handle infinite scroll reset for each row - seamless loop
@@ -149,11 +178,23 @@ export default function EventsSection() {
       }
     });
 
+    const unsubscribe3 = x3.on('change', (latest) => {
+      if (row3Events.length > 0) {
+        const eventWidth = getEventWidth(3);
+        const singleSetWidth = eventWidth * row3Events.length;
+        // Reset when we've moved one full set, seamlessly loop back
+        if (latest <= -singleSetWidth) {
+          x3.set(latest + singleSetWidth);
+        }
+      }
+    });
+
     return () => {
       unsubscribe1();
       unsubscribe2();
+      unsubscribe3();
     };
-  }, [row1Events.length, row2Events.length, x1, x2]);
+  }, [row1Events.length, row2Events.length, row3Events.length, x1, x2, x3]);
 
   // Auto-scroll animation for row 1 (40s)
   useEffect(() => {
@@ -202,7 +243,7 @@ export default function EventsSection() {
     };
   }, [row1Events.length, x1]);
 
-  // Auto-scroll animation for row 2 (30s, offset start)
+  // Auto-scroll animation for row 2 (45s, offset start)
   useEffect(() => {
     if (row2Events.length === 0) return;
 
@@ -222,7 +263,7 @@ export default function EventsSection() {
       const singleSetWidth = eventWidth * row2Events.length;
       const currentX = x2.get();
       const targetX = currentX - singleSetWidth;
-      const duration = 30; // 30 seconds for one cycle
+      const duration = 45; // 45 seconds for one cycle
       
       const animation = animate(x2, targetX, {
         duration,
@@ -249,41 +290,62 @@ export default function EventsSection() {
     };
   }, [row2Events.length, x2]);
 
-
-  // Format date to readable format
-  const formatDate = (dateStr: string): string => {
-    try {
-      const date = new Date(dateStr);
-      const month = date.toLocaleDateString('en-US', { month: 'short' });
-      const day = date.getDate();
-      return `${month} ${day}`;
-    } catch (error) {
-      return dateStr;
-    }
-  };
-
-  // Format time to 12-hour format
-  const formatTime = (isoString: string | null | undefined): string | null => {
-    if (!isoString) return null;
-    
-    try {
-      const date = new Date(isoString);
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      
-      const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-      const ampm = hours < 12 ? 'am' : 'pm';
-      
-      if (minutes === 0) {
-        return `${hour12}${ampm}`;
-      } else {
-        const minutesStr = String(minutes).padStart(2, '0');
-        return `${hour12}:${minutesStr}${ampm}`;
+  // Auto-scroll animation for row 3 (50s, offset start)
+  useEffect(() => {
+    if (row3Events.length === 0) {
+      if (animationRef3.current) {
+        const currentAnimation = animationRef3.current as any;
+        if (currentAnimation && typeof currentAnimation.stop === 'function') {
+          currentAnimation.stop();
+        }
+        animationRef3.current = null;
       }
-    } catch (error) {
-      return null;
+      return;
     }
-  };
+
+    // Set initial offset position for row 3 (only once)
+    if (!initializedRef3.current) {
+      const eventWidth = getEventWidth(3);
+      const singleSetWidth = eventWidth * row3Events.length;
+      const initialOffset = -(singleSetWidth * 0.5); // Offset by 50% of one set
+      x3.set(initialOffset);
+      initializedRef3.current = true;
+    }
+
+    const startAnimation = () => {
+      if (row3Events.length === 0) return;
+      
+      const eventWidth = getEventWidth(3);
+      const singleSetWidth = eventWidth * row3Events.length;
+      const currentX = x3.get();
+      const targetX = currentX - singleSetWidth;
+      const duration = 50; // 50 seconds for one cycle
+      
+      const animation = animate(x3, targetX, {
+        duration,
+        ease: 'linear',
+        onComplete: () => {
+          // Reset will be handled by the change listener for seamless loop
+          startAnimation();
+        },
+      });
+
+      animationRef3.current = animation as unknown as number;
+    };
+
+    startAnimation();
+
+    return () => {
+      if (animationRef3.current) {
+        const currentAnimation = animationRef3.current as any;
+        if (currentAnimation && typeof currentAnimation.stop === 'function') {
+          currentAnimation.stop();
+        }
+        animationRef3.current = null;
+      }
+    };
+  }, [row3Events.length, x3]);
+
 
   // Get gradient color based on ticket tier
   const getGradientColor = (tickets?: TicketInfo): string => {
@@ -349,15 +411,15 @@ export default function EventsSection() {
         >
           {duplicatedEvents.map((event, index) => {
             const gradientColor = getGradientColor(event.tickets);
-            const dateStr = formatDate(event.startDate);
-            const timeStr = formatTime(event.startTime);
             const hasUrl = !!event.url;
 
-            // Card sizes based on row index
+            // Card sizes based on row index (largest to smallest)
             const cardSizeClasses = 
               rowIndex === 1 
-                ? "w-[260px] h-[260px] md:w-[320px] md:h-[320px] lg:w-[360px] lg:h-[360px]" // Row 1: largest
-                : "w-[180px] h-[180px] md:w-[220px] md:h-[220px] lg:w-[260px] lg:h-[260px]"; // Row 2: medium
+                ? "w-[200px] h-[200px] md:w-[240px] md:h-[240px] lg:w-[280px] lg:h-[280px]" // Row 1: largest
+                : rowIndex === 2
+                ? "w-[140px] h-[140px] md:w-[170px] md:h-[170px] lg:w-[200px] lg:h-[200px]" // Row 2: medium
+                : "w-[110px] h-[110px] md:w-[130px] md:h-[130px] lg:w-[160px] lg:h-[160px]"; // Row 3: smallest
 
             return (
               <motion.div
@@ -379,76 +441,37 @@ export default function EventsSection() {
                       className="object-cover"
                       sizes={
                         rowIndex === 1
-                          ? "(max-width: 768px) 260px, (max-width: 1024px) 320px, 360px"
-                          : "(max-width: 768px) 180px, (max-width: 1024px) 220px, 260px"
+                          ? "(max-width: 768px) 200px, (max-width: 1024px) 240px, 280px"
+                          : rowIndex === 2
+                          ? "(max-width: 768px) 140px, (max-width: 1024px) 170px, 200px"
+                          : "(max-width: 768px) 110px, (max-width: 1024px) 130px, 160px"
                       }
                     />
                   ) : (
                     <div className={`absolute inset-0 bg-gradient-to-br ${gradientColor}`} />
                   )}
 
-                  {/* Bottom Overlay Mask - Increased height for better visibility */}
-                  <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/85 to-black/60 ${
-                    rowIndex === 1 
-                      ? "h-[50%]" // Row 1: 50% height
-                      : "h-[55%]" // Row 2: 55% height
-                  }`} />
-
-                  {/* Content on Mask */}
+                  {/* Content Container - Auto-sizing based on content */}
                   <div className={`absolute bottom-0 left-0 right-0 flex flex-col justify-end ${
                     rowIndex === 1 
-                      ? "h-[50%] p-3 md:p-4 lg:p-5" 
-                      : "h-[55%] p-2.5 md:p-3 lg:p-4"
+                      ? "p-3 md:p-4 lg:p-5" 
+                      : rowIndex === 2
+                      ? "p-2.5 md:p-3 lg:p-4"
+                      : "p-2 md:p-2.5 lg:p-3"
                   } text-white`}>
+                    {/* Bottom Overlay Mask - Auto-sizing to cover content */}
+                    <div className={`absolute inset-0 bg-gradient-to-t from-black/95 via-black/85 to-black/60 pointer-events-none`} />
+                    
                     {/* Title - More prominent, allow 2-3 lines based on row */}
-                    <h3 className={`font-bold group-hover:text-[#10B8D9] transition-colors leading-tight ${
+                    <h3 className={`relative z-10 font-bold group-hover:text-[#10B8D9] transition-colors leading-tight ${
                       rowIndex === 1
-                        ? "text-base md:text-lg lg:text-xl line-clamp-2 mb-2.5 md:mb-3" // Row 1: larger, 2 lines
-                        : "text-sm md:text-base lg:text-lg line-clamp-2 mb-2 md:mb-2.5" // Row 2: medium, 2 lines
+                        ? "text-base md:text-lg lg:text-xl line-clamp-3" // Row 1: larger, 3 lines
+                        : rowIndex === 2
+                        ? "text-sm md:text-base lg:text-lg line-clamp-3" // Row 2: medium, 3 lines
+                        : "text-xs md:text-sm lg:text-base line-clamp-3" // Row 3: smallest, 3 lines
                     }`}>
                       {event.title}
                     </h3>
-
-                    {/* Date & Time - More prominent display */}
-                    <div className="flex flex-col gap-1 mb-2">
-                      <div className={`flex items-center gap-1.5 flex-wrap ${
-                        rowIndex === 1
-                          ? "text-xs md:text-sm gap-1.5"
-                          : "text-[10px] md:text-xs gap-1"
-                      } font-semibold`}>
-                        <div className={`flex items-center gap-1 bg-white/25 backdrop-blur-md rounded-lg border border-white/20 ${
-                          rowIndex === 1 
-                            ? "px-2 py-1 gap-1"
-                            : "px-1.5 py-0.5 gap-1"
-                        }`}>
-                          <Calendar className={`${
-                            rowIndex === 1 ? "w-3 h-3 md:w-3.5 md:h-3.5" : "w-2.5 h-2.5 md:w-3 md:h-3"
-                          }`} />
-                          <span>{dateStr}</span>
-                        </div>
-                        {timeStr && (
-                          <div className={`flex items-center gap-1 bg-white/25 backdrop-blur-md rounded-lg border border-white/20 ${
-                            rowIndex === 1 
-                              ? "px-2 py-1"
-                              : "px-1.5 py-0.5"
-                          }`}>
-                            <span className="font-medium">{timeStr}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Location */}
-                    <div className={`flex items-center gap-1 text-white/90 ${
-                      rowIndex === 1
-                        ? "text-[10px] md:text-xs"
-                        : "text-[9px] md:text-[10px]"
-                    }`}>
-                      <MapPin className={`${
-                        rowIndex === 1 ? "w-3 h-3 md:w-3.5 md:h-3.5" : "w-2.5 h-2.5 md:w-3 md:h-3"
-                      } flex-shrink-0`} />
-                      <span className="line-clamp-1">{event.location || 'TBD'}</span>
-                    </div>
                   </div>
 
                   {/* Hover Effect Overlay */}
@@ -482,10 +505,11 @@ export default function EventsSection() {
         </motion.div>
       </div>
 
-      {/* Two Row Carousels - Full Width */}
+      {/* Three Row Carousels - Full Width */}
       <div className="w-full space-y-6 md:space-y-8">
         {renderCarouselRow(x1, 1, row1Events)}
         {renderCarouselRow(x2, 2, row2Events)}
+        {renderCarouselRow(x3, 3, row3Events)}
       </div>
 
       {/* View All Events Button - Independent Row - Prominent */}
