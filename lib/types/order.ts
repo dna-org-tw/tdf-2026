@@ -42,17 +42,17 @@ export interface CreateOrderInput {
   currency: string;
 }
 
-// 更新订单的输入类型
+// 更新订单的输入类型（可选字段传 undefined 表示不更新，传 null 表示清空）
 export interface UpdateOrderInput {
-  stripe_payment_intent_id?: string;
+  stripe_payment_intent_id?: string | null;
   status?: OrderStatus;
   amount_subtotal?: number;
   amount_total?: number;
   amount_tax?: number;
   amount_discount?: number;
-  customer_email?: string;
-  customer_name?: string;
-  customer_phone?: string;
+  customer_email?: string | null;
+  customer_name?: string | null;
+  customer_phone?: string | null;
   customer_address?: {
     line1: string | null;
     line2: string | null;
@@ -61,7 +61,7 @@ export interface UpdateOrderInput {
     postal_code: string | null;
     country: string | null;
   } | null;
-  payment_method_brand?: string;
-  payment_method_last4?: string;
-  payment_method_type?: string;
+  payment_method_brand?: string | null;
+  payment_method_last4?: string | null;
+  payment_method_type?: string | null;
 }

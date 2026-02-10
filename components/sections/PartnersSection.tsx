@@ -54,7 +54,17 @@ export default function PartnersSection() {
           
           <div className="flex flex-col items-center gap-12 md:gap-16 lg:gap-20 opacity-70 hover:opacity-100 transition-all duration-500">
             {/* TDNA 獨立一排 */}
-            <div className="relative h-28 md:h-36 lg:h-44 w-auto">
+            <motion.a
+              href="https://dna.org.tw"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative h-28 md:h-36 lg:h-44 w-auto block"
+            >
               <Image
                 src="/images/logo/tdna_logo.png"
                 alt="Taiwan Digital Nomad Association"
@@ -63,7 +73,7 @@ export default function PartnersSection() {
                 className="h-full w-auto object-contain"
                 loading="lazy"
               />
-            </div>
+            </motion.a>
           </div>
         </div>
       </div>
