@@ -90,11 +90,11 @@ export default function EventsSection() {
       }
     }
     
-    // If no tier tag found, return null (will be categorized as "other")
+    // If no tier tag found, return null (will be categorized as "side event")
     return null;
   };
 
-  // 取得事件實際使用的票種等級（無標籤則視為 other）
+  // 取得事件實際使用的票種等級（無標籤則視為 side event）
   const getEventTicketTier = (event: CalendarEvent): TicketTier => {
     const lowest = getLowestTicketTier(event);
     return lowest ?? 'other';
@@ -103,7 +103,7 @@ export default function EventsSection() {
   // 依票券等級篩選活動：
   // - All：顯示全部
   // - Follower/Explorer/Contributor/Backer：顯示「小於等於」該等級的活動
-  // - Other：僅顯示 other（無對應票券標籤）的活動
+  // - Side Event：僅顯示 side event（無對應票券標籤）的活動
   const filteredByTicketTier = allEvents.filter((event) => {
     if (selectedTierFilter === 'all') return true;
 
@@ -273,7 +273,7 @@ export default function EventsSection() {
               explorer: 'Explorer',
               contributor: 'Contributor',
               backer: 'Backer',
-              other: 'Other',
+              other: 'Side Event',
             };
 
             return (
@@ -324,18 +324,19 @@ export default function EventsSection() {
             </div>
           ))}
 
-          {/* 每週分隔列：合併整列儲存格，週主題置中顯示（淡灰底） */}
+          {/* 每週分隔列：合併整列儲存格，主題週置中顯示（淡灰底） */}
           {WEEK_THEMES.map((w, weekIndex) => {
             const gridRow = getWeekSeparatorGridRow(weekIndex);
+            const themeLabel = t.schedule?.weekThemes?.[weekIndex] ?? w.theme;
             return (
               <div
                 key={`week-separator-${w.start}-${w.end}`}
                 className="border-b border-[#D4D4CF] bg-stone-50 px-3 py-1 text-xs sm:text-sm font-bold text-[#1E1F1C] flex items-center justify-center leading-tight"
                 style={{ gridRow, gridColumn: '1 / -1' }}
-                title={w.theme}
+                title={themeLabel}
               >
                 <span className="text-center">
-                  {w.theme}
+                  {themeLabel}
                 </span>
               </div>
             );
