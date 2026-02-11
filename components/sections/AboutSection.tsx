@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
+import LazyYouTubeEmbed from '@/components/LazyYouTubeEmbed';
 
 export default function AboutSection() {
   const { t, lang } = useTranslation();
@@ -100,19 +101,24 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section id="about" className="py-20 md:py-28 lg:py-32 bg-white overflow-hidden relative transition-colors duration-500">
+    <section
+      id="about"
+      className="pt-20 md:pt-28 lg:pt-32 bg-white overflow-hidden relative transition-colors duration-500"
+    >
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row items-center gap-16">
-
           {/* Instagram Reel Side */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.8 }}
             className="w-full md:w-1/2"
           >
-            <div ref={instagramRef} className="relative rounded-2xl overflow-hidden shadow-2xl bg-white">
+            <div
+              ref={instagramRef}
+              className="relative rounded-2xl overflow-hidden shadow-2xl bg-white"
+            >
               <blockquote
                 className="instagram-media"
                 data-instgrm-permalink="https://www.instagram.com/reel/DLKU-cjpk7G/"
@@ -121,7 +127,8 @@ export default function AboutSection() {
                   background: '#FFF',
                   border: 0,
                   borderRadius: '12px',
-                  boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)',
+                  boxShadow:
+                    '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)',
                   margin: '1px',
                   maxWidth: '100%',
                   minWidth: '280px',
@@ -136,7 +143,7 @@ export default function AboutSection() {
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="w-full md:w-1/2"
           >
@@ -144,29 +151,34 @@ export default function AboutSection() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-8 leading-tight">
               {t.about.title}
             </h2>
-            
+
             {/* SEO优化：答案块格式 - 整合关键信息，包含核心關鍵字 */}
             <div className="mb-8 p-6 bg-teal-50 rounded-xl border-l-4 border-teal-500">
               <p className="text-lg md:text-xl font-semibold text-[#1E1F1C] leading-relaxed">
-                {lang === 'en' 
-                  ? 'Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A curated remote work summit combining AI workshops, networking opportunities, and startup pitches with scenic biking, ocean tours, and hot springs. Experience geo-arbitrage while connecting with the global nomad tribe in Asia\'s hidden gem.'
-                  : '前往山海交界的壯麗之地。專為數位遊牧者策劃的節慶，結合 AI 工作坊、社交活動與創業路演，以及稻浪單車、海洋導覽與溫泉體驗，在台灣最美麗的地區。'
-                }
+                {lang === 'en'
+                  ? "Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A curated remote work summit combining AI workshops, networking opportunities, and startup pitches with scenic biking, ocean tours, and hot springs. Experience geo-arbitrage while connecting with the global nomad tribe in Asia's hidden gem."
+                  : '前往山海交界的壯麗之地。專為數位遊牧者策劃的節慶，結合 AI 工作坊、社交活動與創業路演，以及稻浪單車、海洋導覽與溫泉體驗，在台灣最美麗的地區。'}
               </p>
             </div>
-            
+
             {/* 關鍵活動資訊摘要 - AEO 優化：結構化數據 */}
             <div className="mb-6 p-6 bg-[#F6F6F6] rounded-xl border border-[#1E1F1C]/10">
-              <h3 className="text-xl font-semibold text-[#1E1F1C] mb-4">{t.about.info.title}</h3>
+              <h3 className="text-xl font-semibold text-[#1E1F1C] mb-4">
+                {t.about.info.title}
+              </h3>
               <dl className="space-y-2 text-[#1E1F1C]/80">
                 <div>
                   <dt className="font-semibold inline">{t.about.info.time}</dt>
                   <dd className="inline">
-                    <time dateTime="2026-05-01/2026-05-31">{t.about.info.timeValue}</time>
+                    <time dateTime="2026-05-01/2026-05-31">
+                      {t.about.info.timeValue}
+                    </time>
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-semibold inline">{t.about.info.location}</dt>
+                  <dt className="font-semibold inline">
+                    {t.about.info.location}
+                  </dt>
                   <dd className="inline">{t.about.info.locationValue}</dd>
                 </div>
                 <div>
@@ -189,17 +201,24 @@ export default function AboutSection() {
 
             <div className="flex flex-wrap gap-4">
               {t.about.ctas?.map((cta, index) => {
-                const isPrimary = cta.type === "Register";
+                const isPrimary = cta.type === 'Register';
                 return (
                   <motion.a
                     key={cta.type}
                     href={cta.href}
                     target={cta.href.startsWith('http') ? '_blank' : undefined}
-                    rel={cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    rel={
+                      cta.href.startsWith('http')
+                        ? 'noopener noreferrer'
+                        : undefined
+                    }
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                    viewport={{ once: true, margin: '-100px' }}
+                    transition={{
+                      duration: 0.5,
+                      delay: 0.4 + index * 0.1,
+                    }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className={`inline-block px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
@@ -214,9 +233,36 @@ export default function AboutSection() {
               })}
             </div>
           </motion.div>
-
         </div>
       </div>
+
+      {/* 花東影片：滿版、無文字覆蓋，自動靜音播放 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw]"
+      >
+        <div className="grid md:grid-cols-2 gap-0">
+          <div className="relative">
+            <LazyYouTubeEmbed
+              videoId="i7WnQn7c5bc"
+              title="Taitung"
+              autoPlayMuted
+              loop
+            />
+          </div>
+          <div className="relative">
+            <LazyYouTubeEmbed
+              videoId="U40EpRW5p-c"
+              title="Hualien"
+              autoPlayMuted
+              loop
+            />
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 }

@@ -20,11 +20,6 @@ const AboutSection = dynamic(() => import('@/components/sections/AboutSection'),
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
-const WhySection = dynamic(() => import('@/components/sections/WhySection'), {
-  ssr: true, // AEO优化：启用SSR
-  loading: () => <div className="h-96 bg-white animate-pulse" />,
-});
-
 const EventsSection = dynamic(() => import('@/components/sections/EventsSection'), {
   ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-stone-100 animate-pulse" />,
@@ -65,7 +60,6 @@ export default function HomeContent() {
       <HeroSection />
       <HashNavigationHandler />
       <AboutSection />
-      <WhySection />
       <EventsSection />
       <TicketsSection />
       <TicketFollowSection />

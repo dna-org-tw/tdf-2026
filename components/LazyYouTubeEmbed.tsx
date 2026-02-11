@@ -8,12 +8,16 @@ interface LazyYouTubeEmbedProps {
   videoId: string;
   title: string;
   thumbnailQuality?: 'default' | 'mqdefault' | 'hqdefault' | 'sddefault' | 'maxresdefault';
+  autoPlayMuted?: boolean;
+  loop?: boolean;
 }
 
 export default function LazyYouTubeEmbed({ 
   videoId, 
   title,
-  thumbnailQuality = 'hqdefault' // Use hqdefault (480x360) instead of maxresdefault (1280x720) for better performance
+  thumbnailQuality = 'hqdefault', // Use hqdefault (480x360) instead of maxresdefault (1280x720) for better performance
+  autoPlayMuted = false,
+  loop = false,
 }: LazyYouTubeEmbedProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
@@ -43,6 +47,23 @@ export default function LazyYouTubeEmbed({
     };
   }, []);
 
+  // 自動靜音播放：進入 viewport 後自動載入 iframe 並播放（符合瀏覽器自動播放需靜音的規則）
+  useEffect(() => {
+    if (autoPlayMuted && isInView && !isLoaded) {
+      setIsLoaded(true);
+      trackEvent('ViewContent', {
+        content_name: title,
+        content_category: 'Video',
+        content_type: 'video',
+        content_ids: [videoId],
+      });
+      trackCustomEvent('YouTubeVideoPlay', {
+        video_id: videoId,
+        video_title: title,
+      });
+    }
+  }, [autoPlayMuted, isInView, isLoaded, title, videoId]);
+
   const handleClick = () => {
     setIsLoaded(true);
     // Track video play event (using custom event as Meta doesn't have a standard VideoPlay event)
@@ -60,11 +81,11 @@ export default function LazyYouTubeEmbed({
   };
 
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${thumbnailQuality}.jpg`;
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&mute=${autoPlayMuted ? 1 : 0}&playsinline=1${loop ? `&loop=1&playlist=${videoId}` : ''}`;
 
   return (
     <div ref={containerRef} className="relative aspect-video w-full overflow-hidden">
-      {!isLoaded ? (
+      {!isLoaded && !autoPlayMuted ? (
         <button
           onClick={handleClick}
           className="relative w-full h-full group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:ring-offset-2"
@@ -94,7 +115,7 @@ export default function LazyYouTubeEmbed({
             </div>
           </div>
         </button>
-      ) : (
+      ) : isLoaded ? (
         <iframe
           src={embedUrl}
           title={title}
@@ -103,7 +124,7 @@ export default function LazyYouTubeEmbed({
           className="w-full h-full"
           loading="lazy"
         />
-      )}
+      ) : null}
     </div>
   );
 }
