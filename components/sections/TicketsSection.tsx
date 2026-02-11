@@ -287,6 +287,13 @@ export default function TicketsSection() {
                 flex flex-col h-full
               `}
             >
+              {/* Most Popular badge for Contributor */}
+              {tier.key === 'contribute' && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FFD028] text-[#1E1F1C] text-xs font-bold px-4 py-1 rounded-full shadow-lg tracking-wide uppercase">
+                  Most popular
+                </div>
+              )}
+
               {/* Badge */}
               <div className={`absolute top-4 right-4 ${tier.color.badge} text-white text-xs font-bold px-3 py-1 rounded-full`}>
                 {tier.name}
