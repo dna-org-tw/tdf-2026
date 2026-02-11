@@ -40,11 +40,22 @@ export default function FacebookPixel() {
   );
 }
 
+// 轉發事件至 webhook（與 Pixel 並行，不 await）
+function forwardToWebhook(eventType: 'standard' | 'custom', eventName: string, parameters?: Record<string, any>) {
+  if (typeof window === 'undefined') return;
+  fetch('/api/events/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ eventType, eventName, parameters: parameters ?? {} }),
+  }).catch(() => {});
+}
+
 // 導出追蹤函數供其他組件使用
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('track', eventName, parameters);
   }
+  forwardToWebhook('standard', eventName, parameters);
 };
 
 // 導出自定義事件追蹤函數
@@ -52,4 +63,5 @@ export const trackCustomEvent = (eventName: string, parameters?: Record<string, 
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('trackCustom', eventName, parameters);
   }
+  forwardToWebhook('custom', eventName, parameters);
 };
