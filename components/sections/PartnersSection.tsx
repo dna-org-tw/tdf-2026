@@ -6,7 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useState, useEffect } from 'react';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Instagram, Mail, Globe } from 'lucide-react';
 
 interface Partner {
   name: string;
@@ -52,7 +52,7 @@ export default function PartnersSection() {
             {t.partners.organizers.title}
           </motion.h2>
           
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 opacity-70 hover:opacity-100 transition-all duration-500">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500">
             {/* TDNA 獨立一排 */}
             <motion.a
               href="https://dna.org.tw"
@@ -63,7 +63,7 @@ export default function PartnersSection() {
               viewport={{ once: true }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="relative h-28 md:h-36 lg:h-44 w-auto block flex-shrink-0"
+              className="relative h-20 md:h-28 lg:h-32 w-auto block flex-shrink-0"
             >
               <Image
                 src="/images/logo/tdna_logo.png"
@@ -74,15 +74,47 @@ export default function PartnersSection() {
                 loading="lazy"
               />
             </motion.a>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left mt-4 md:mt-0"
-            >
-              {t.partners.organizers.description}
-            </motion.p>
+            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
+              >
+                {t.partners.organizers.description}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.15 }}
+                className="flex items-center gap-4 justify-center md:justify-start w-full"
+              >
+                <a
+                  href="https://www.instagram.com/dna.org.tw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="mailto:us@dna.org.tw"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                >
+                  <Mail className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://dna.org.tw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                >
+                  <Globe className="w-5 h-5" />
+                </a>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>
