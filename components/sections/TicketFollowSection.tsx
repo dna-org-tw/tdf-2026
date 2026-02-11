@@ -164,6 +164,9 @@ export default function TicketFollowSection() {
               <p className="text-white text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed font-normal">
                 {t.tickets.undecidedSubtitle}
               </p>
+              <p className="text-[#B3E5FC] text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-normal">
+                {t.tickets.undecidedFollowerNote}
+              </p>
             </div>
 
             {/* Email Subscription Form - 更大的卡片式設計 */}

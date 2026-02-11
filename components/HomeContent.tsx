@@ -45,11 +45,6 @@ const FollowUsSection = dynamic(() => import('@/components/sections/FollowUsSect
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
 });
 
-const TicketFollowSection = dynamic(() => import('@/components/sections/TicketFollowSection'), {
-  ssr: true, // AEO优化：启用SSR
-  loading: () => <div className="h-96 bg-[#2A2B28] animate-pulse" />,
-});
-
 export default function HomeContent() {
   // Track scroll depth
   useScrollDepth();
@@ -62,7 +57,6 @@ export default function HomeContent() {
       <AboutSection />
       <EventsSection />
       <TicketsSection />
-      <TicketFollowSection />
       <AccommodationSection />
       <PartnersSection />
       <FollowUsSection />

@@ -159,8 +159,8 @@ export const content = {
         label: "Explorer",
         features: [
           "Exclusive Digital Nomad Community",
-          "Opening Party x 1",
-          "Digital Nomad Activities x 10+"
+          "Opening Marketplace + Limited drinks",
+          "Digital Nomad Activities x 30+"
         ]
       },
       contribute: {
@@ -168,10 +168,10 @@ export const content = {
         label: "Contributor",
         features: [
           "Exclusive Digital Nomad Community",
-          "Opening Party x 1",
+          "Opening Marketplace + Unlimited drinks",
           "Five-Star Nomad Buffet x 1",
           "VIP Dinner x 4",
-          "Digital Nomad Activities x 15+"
+          "Digital Nomad Activities x 40+"
         ]
       },
       backer: {
@@ -179,24 +179,32 @@ export const content = {
         label: "Backer",
         features: [
           "Exclusive Digital Nomad Community",
-          "Opening Party x 1",
+          "Opening Marketplace + Unlimited drinks & food",
           "Five-Star Nomad Buffet x 1",
           "VIP Dinner x 4",
           "VIP Lunch x 4",
           "VVIP Experience x 4",
           "3-Day 2-Night Hualien Digital Nomad Trip x 1",
-          "Digital Nomad Activities x 20+"
+          "Digital Nomad Activities x 50+"
         ]
       },
       cta: "Follow for Free",
       becomePartner: "Join as Partner",
       reviewLink: "2025 Gallery",
       note: "💡 Tip: Different ticket types have access to different activities. Please use the filter below in the schedule to see activities available for each ticket type.",
-      undecidedTitle: "Haven't Decided Yet? Follow Us for Free!",
-      undecidedSubtitle: "Enter your email to stay updated with the latest news, exclusive updates, and join our digital nomad community!",
+      undecidedTitle: "Still on the fence? Follow us for free!",
+      undecidedSubtitle: "Drop your email for instant updates and event alerts.",
+      undecidedFollowerNote: "Join the nomad community and participate in 10+ curated events.",
       followerCta: "Follow for Free",
       payWithCard: "Start Your Journey",
-      processing: "Preparing your journey..."
+      processing: "Preparing your journey...",
+      follower: {
+        title: "Follower",
+        subtitle: "Still on the fence? Follow us for free!",
+        features: ["Exclusive Digital Nomad Community", "Opening Marketplace", "Digital Nomad Activities x 10+"],
+        price: "Free",
+        cta: "Become our follower"
+      }
     },
     gallery: {
       title: "Highlights",
@@ -681,7 +689,7 @@ export const content = {
         },
         {
           question: "What are the ticket types available?",
-          answer: "There are three ticket types: Explorer (basic access with community, opening party, and 10+ activities), Contributor (includes five-star buffet, VIP dinners, and 15+ activities), and Backer (full access including VIP lunches, VVIP experiences, Hualien trip, and 20+ activities)."
+          answer: "There are three ticket types: Explorer (basic access with community, opening party, and 30+ activities), Contributor (includes five-star buffet, VIP dinners, and 40+ activities), and Backer (full access including VIP lunches, VVIP experiences, Hualien trip, and 50+ activities)."
         },
         {
           question: "How do I register for Taiwan Digital Fest 2026?",
@@ -874,8 +882,8 @@ export const content = {
         label: "Explorer",
         features: [
           "專屬數位遊牧社群",
-          "開幕派對 x 1",
-          "數位遊牧活動 x 10+"
+          "開幕市集＋有限酒水",
+          "數位遊牧活動 x 30+"
         ]
       },
       contribute: {
@@ -883,10 +891,10 @@ export const content = {
         label: "Contributor",
         features: [
           "專屬數位遊牧社群",
-          "開幕派對 x 1",
+          "開幕市集＋無限酒水",
           "五星級 Nomad Buffet x 1",
           "VIP 晚餐 x 4",
-          "數位遊牧活動 x 15+"
+          "數位遊牧活動 x 40+"
         ]
       },
       backer: {
@@ -894,24 +902,32 @@ export const content = {
         label: "Backer",
         features: [
           "專屬數位遊牧社群",
-          "開幕派對 x 1",
+          "開幕市集＋無限酒水餐食",
           "五星級 Nomad Buffet x 1",
           "VIP 晚餐 x 4",
           "VIP 午餐 x 4",
           "VVIP 體驗活動 x 4",
           "三天兩夜花蓮數位遊牧旅行 x 1",
-          "數位遊牧活動 x 20+"
+          "數位遊牧活動 x 50+"
         ]
       },
       cta: "免費關注",
       becomePartner: "成為合作夥伴",
       reviewLink: "2025 活動回顧",
       note: "💡 提示：不同票種可參加的活動不同，請在下方時程表中使用篩選器查看各票種可參加的活動",
-      undecidedTitle: "還沒決定好嗎？歡迎免費關注我們！",
-      undecidedSubtitle: "填寫 Email 關注我們，免費獲得即時資訊，並加入數位遊牧專屬社群！",
+      undecidedTitle: "還沒決定好嗎？先來免費關注吧！",
+      undecidedSubtitle: "留下 Email，即時接收最新消息與活動資訊。",
+      undecidedFollowerNote: "加入專屬數位遊牧社群，暢玩 10+ 場精選活動。",
       followerCta: "免費關注",
       payWithCard: "開始你的旅程",
-      processing: "馬上就好..."
+      processing: "馬上就好...",
+      follower: {
+        title: "Follower",
+        subtitle: "還沒決定好嗎？先來免費關注吧！",
+        features: ["專屬數位遊牧社群", "開幕市集", "數位遊牧活動 x 10+"],
+        price: "免費",
+        cta: "成為我們的 follower"
+      }
     },
     gallery: {
       title: "精彩瞬間",
@@ -1396,7 +1412,7 @@ export const content = {
         },
         {
           question: "有哪些票種可以選擇？",
-          answer: "共有三種票種：Explorer（基本參與，包含社群、開幕派對和 10+ 活動）、Contributor（包含五星級饗宴、VIP 晚餐和 15+ 活動），以及 Backer（完整參與，包含 VIP 午餐、VVIP 體驗、花蓮之旅和 20+ 活動）。"
+          answer: "共有三種票種：Explorer（基本參與，包含社群、開幕派對和 30+ 活動）、Contributor（包含五星級饗宴、VIP 晚餐和 40+ 活動），以及 Backer（完整參與，包含 VIP 午餐、VVIP 體驗、花蓮之旅和 50+ 活動）。"
         },
         {
           question: "如何報名 2026 台灣數位嘉年華？",
