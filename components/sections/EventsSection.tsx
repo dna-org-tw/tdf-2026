@@ -128,8 +128,8 @@ export default function EventsSection() {
     }
   };
 
-  // 日曆網格：8:00–21:00，每小時一欄
-  const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+  // 日曆網格：8:00–23:00，每小時一欄
+  const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
   const WEEK_THEMES = [
     { start: 1, end: 7, theme: 'Regional Revitalization & Startups' },
     { start: 8, end: 14, theme: 'Art, Humanities & Design' },
@@ -138,26 +138,15 @@ export default function EventsSection() {
     { start: 29, end: 31, theme: 'Tour' },
   ];
 
-  // 第一欄週底色（表格內只顯示色塊，圖例在表格外）
-  const WEEK_THEME_BG = [
-    'bg-blue-100',
-    'bg-violet-100',
-    'bg-emerald-100',
-    'bg-amber-100',
-    'bg-rose-100',
-  ];
-
   const DAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const mayDays = Array.from({ length: 31 }, (_, i) => {
     const d = new Date(2026, 4, i + 1);
     const weekInfo = WEEK_THEMES.find((w) => i + 1 >= w.start && i + 1 <= w.end);
-    const weekIndex = weekInfo ? WEEK_THEMES.indexOf(weekInfo) : 0;
     return {
       dayIndex: i,
       label: `5/${i + 1} ${DAY_NAMES[d.getDay()]}`,
       dateKey: `2026-05-${String(i + 1).padStart(2, '0')}`,
       theme: weekInfo?.theme ?? '',
-      weekBgClass: WEEK_THEME_BG[weekIndex],
     };
   });
 
@@ -174,13 +163,13 @@ export default function EventsSection() {
       startH = start.getHours();
       if (event.endTime) {
         const end = new Date(event.endTime);
-        endH = Math.min(22, end.getHours() + (end.getMinutes() > 0 ? 1 : 0));
+        endH = Math.min(24, end.getHours() + (end.getMinutes() > 0 ? 1 : 0));
       } else {
-        endH = Math.min(22, startH + 1);
+        endH = Math.min(24, startH + 1);
       }
     }
-    startH = Math.max(8, Math.min(21, startH));
-    endH = Math.max(startH + 1, Math.min(22, endH));
+    startH = Math.max(8, Math.min(23, startH));
+    endH = Math.max(startH + 1, Math.min(24, endH));
     return { dayIndex, startH, endH };
   };
 
@@ -215,6 +204,26 @@ export default function EventsSection() {
       .filter((x): x is NonNullable<typeof x> => x !== null);
     return { ...day, events };
   });
+
+  // 日曆網格：本體列數 = 31 天 + 每週分隔列數
+  const BODY_ROW_COUNT = 31 + WEEK_THEMES.length;
+
+  // 每週分隔列所在的 grid row（含表頭，因此 +2）
+  const getWeekSeparatorGridRow = (weekIndex: number) => {
+    const week = WEEK_THEMES[weekIndex];
+    const daysBefore = week.start - 1; // 在本週開始前的天數
+    const separatorsBefore = weekIndex; // 在本週之前已經插入的分隔列數
+    const bodyRowIndex = daysBefore + separatorsBefore; // 0-based，本體列索引
+    return bodyRowIndex + 2; // +1 表頭列，+1 轉成 1-based grid row
+  };
+
+  // 某一天所在的 grid row（含所有在它之前的分隔列）
+  const getDayGridRow = (dayIndex: number) => {
+    const dayNumber = dayIndex + 1; // 1–31
+    const separatorsBefore = WEEK_THEMES.filter((w) => w.start <= dayNumber).length;
+    const bodyRowIndex = dayIndex + separatorsBefore;
+    return bodyRowIndex + 2;
+  };
 
 
   const handleEventClick = (event: CalendarEvent) => {
@@ -291,56 +300,55 @@ export default function EventsSection() {
         </motion.div>
       </div>
 
-      {/* 圖例：週主題（表格外） */}
-      <div className="container mx-auto px-4 sm:px-6 mt-6">
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4">
-          {WEEK_THEMES.map((w, i) => (
-            <div key={w.theme} className="flex items-center gap-2">
-              <span className={`w-4 h-4 rounded border border-[#D4D4CF] flex-shrink-0 ${WEEK_THEME_BG[i]}`} />
-              <span className="text-sm text-[#1E1F1C]/90">{w.theme}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 日曆網格：左側週底色、日期、頂部 8:00–21:00，活動方塊依時段放置 */}
+      {/* 日曆網格：固定高度，縱向可捲動；日期、頂部 8:00–21:00，活動方塊依時段放置 */}
       <div className="container mx-auto px-4 sm:px-6 overflow-x-auto mt-2">
         <div
-          className="inline-block min-w-[800px] border border-[#D4D4CF] rounded-xl overflow-hidden bg-white shadow-sm"
+          className="inline-block min-w-[800px] border border-[#D4D4CF] rounded-xl bg-white shadow-sm max-h-[480px] overflow-y-auto"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(28px, 36px) min-content repeat(14, 1fr)',
-            gridTemplateRows: 'auto repeat(31, minmax(52px, 64px))',
+            gridTemplateColumns: `min-content repeat(${HOURS.length}, 1fr)`,
+            gridTemplateRows: `auto repeat(${BODY_ROW_COUNT}, minmax(52px, 64px))`,
           }}
         >
-          {/* 表頭：空白 | Date | 8:00 … 21:00 */}
-          <div className="border-b border-r border-[#D4D4CF] bg-stone-50 px-2 py-2 text-xs font-semibold text-[#1E1F1C]/60" style={{ gridColumn: 1, gridRow: 1 }} />
-          <div className="border-b border-r border-[#D4D4CF] bg-stone-50 px-2 py-2 text-xs font-semibold text-[#1E1F1C]" style={{ gridColumn: 2, gridRow: 1 }}>
+          {/* 表頭：Date | 8:00 … 21:00（固定在頂端） */}
+          <div className="sticky top-0 z-20 border-b border-r border-[#D4D4CF] bg-stone-50 px-2 py-2 text-xs font-semibold text-[#1E1F1C]" style={{ gridColumn: 1, gridRow: 1 }}>
             Date
           </div>
           {HOURS.map((h, i) => (
             <div
               key={h}
-              className="border-b border-r border-[#D4D4CF] bg-stone-50 px-1 py-2 text-center text-xs font-medium text-[#1E1F1C]/70"
-              style={{ gridColumn: i + 3, gridRow: 1 }}
+              className="sticky top-0 z-20 border-b border-r border-[#D4D4CF] bg-stone-50 px-1 py-2 text-center text-xs font-medium text-[#1E1F1C]/70"
+              style={{ gridColumn: i + 2, gridRow: 1 }}
             >
               {h}:00
             </div>
           ))}
 
-          {/* 每一行 = 一天：週主題（直書）| 日期 | 14 個時間格 */}
-          {eventsByDay.map((day, rowIdx) => {
-            const gridRow = rowIdx + 2;
+          {/* 每週分隔列：合併整列儲存格，週主題置中顯示（淡灰底） */}
+          {WEEK_THEMES.map((w, weekIndex) => {
+            const gridRow = getWeekSeparatorGridRow(weekIndex);
+            return (
+              <div
+                key={`week-separator-${w.start}-${w.end}`}
+                className="border-b border-[#D4D4CF] bg-stone-50 px-3 py-1.5 text-[11px] font-semibold text-[#1E1F1C] flex items-center justify-center"
+                style={{ gridRow, gridColumn: '1 / -1' }}
+                title={w.theme}
+              >
+                <span className="text-center">
+                  {w.theme} ({`5/${w.start}`}–{`5/${w.end}`})
+                </span>
+              </div>
+            );
+          })}
+
+          {/* 每一行 = 一天：日期 | 14 個時間格 */}
+          {eventsByDay.map((day) => {
+            const gridRow = getDayGridRow(day.dayIndex);
             return (
               <React.Fragment key={day.dateKey}>
                 <div
-                  className={`border-b border-r border-[#D4D4CF] ${day.weekBgClass}`}
-                  style={{ gridRow, gridColumn: 1 }}
-                  title={day.theme}
-                />
-                <div
                   className="border-b border-r border-[#D4D4CF] px-2 py-1.5 text-xs font-medium text-[#1E1F1C]"
-                  style={{ gridRow, gridColumn: 2 }}
+                  style={{ gridRow, gridColumn: 1 }}
                 >
                   {day.label}
                 </div>
@@ -348,7 +356,7 @@ export default function EventsSection() {
                   <div
                     key={`${day.dateKey}-${colIdx}`}
                     className="border-b border-r border-[#E7E5E4] bg-white min-h-[52px]"
-                    style={{ gridRow, gridColumn: colIdx + 3 }}
+                    style={{ gridRow, gridColumn: colIdx + 2 }}
                   />
                 ))}
               </React.Fragment>
@@ -356,8 +364,8 @@ export default function EventsSection() {
           })}
 
           {/* 活動方塊：網格直接子元素，依 gridColumn 跨欄 */}
-          {eventsByDay.map((day, rowIdx) => {
-            const gridRow = rowIdx + 2;
+          {eventsByDay.map((day) => {
+            const gridRow = getDayGridRow(day.dayIndex);
             return day.events.map(({ event, startCol, span, color }) => (
               <motion.div
                 key={`${day.dateKey}-${event.title}-${event.startTime ?? ''}`}
@@ -366,7 +374,7 @@ export default function EventsSection() {
                 className={`border rounded overflow-hidden ${color} cursor-pointer hover:shadow-md transition-shadow text-left flex items-stretch min-w-0 min-h-[44px]`}
                 style={{
                   gridRow,
-                  gridColumn: `${startCol + 3} / span ${span}`,
+                  gridColumn: `${startCol + 2} / span ${span}`,
                   zIndex: 5,
                   margin: 2,
                 }}
