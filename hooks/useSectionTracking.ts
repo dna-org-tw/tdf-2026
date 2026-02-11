@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 
 interface UseSectionTrackingOptions {
   sectionId: string;
@@ -36,9 +36,6 @@ export function useSectionTracking({ sectionId, sectionName, category = 'Page Se
               content_name: sectionName,
               content_category: category,
               content_type: 'section',
-            });
-            
-            trackCustomEvent('SectionView', {
               section_id: sectionId,
               section_name: sectionName,
             });

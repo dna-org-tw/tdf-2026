@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 
 interface TicketInfo {
@@ -231,8 +231,6 @@ export default function EventsSection() {
       trackEvent('Lead', {
         content_name: 'Luma Event Link',
         content_category: 'Event Carousel',
-      });
-      trackCustomEvent('EventCarouselClick', {
         event_title: event.title,
         event_url: event.url,
         location: 'events_section',
@@ -282,7 +280,10 @@ export default function EventsSection() {
                 type="button"
                 onClick={() => {
                   setSelectedTierFilter(tier);
-                  trackCustomEvent('EventsTicketFilterClick', {
+                  trackEvent('SelectContent', {
+                    content_type: 'product_filter',
+                    content_name: 'Events Ticket Tier',
+                    content_category: 'Event Information',
                     tier,
                     location: 'events_section',
                   });
@@ -422,7 +423,11 @@ export default function EventsSection() {
             target="_blank"
             rel="noopener noreferrer"
                     onClick={() => {
-                      trackCustomEvent('CallForSideEventsClick', { location: 'events_section' });
+                      trackEvent('Lead', {
+                        content_name: 'Call for Side Events',
+                        content_category: 'CTA',
+                        location: 'events_section',
+                      });
                     }}
             className="
               group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg
@@ -449,7 +454,11 @@ export default function EventsSection() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => {
-              trackCustomEvent('CallForSpeakersClick', { location: 'events_section' });
+              trackEvent('Lead', {
+                content_name: 'Call for Speakers',
+                content_category: 'CTA',
+                location: 'events_section',
+              });
             }}
             className="
               group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg

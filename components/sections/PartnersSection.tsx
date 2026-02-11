@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useState, useEffect } from 'react';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { ExternalLink, Instagram, Mail, Globe } from 'lucide-react';
 
@@ -311,7 +311,7 @@ export default function PartnersSection() {
                 href={t.partners.sponsors.cta.href}
                 target={t.partners.sponsors.cta.href.startsWith('http') ? '_blank' : undefined}
                 rel={t.partners.sponsors.cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                onClick={() => trackCustomEvent('CallForSponsorsClick', { location: 'partners_section' })}
+                onClick={() => trackEvent('Lead', { content_name: 'Call for Sponsors', content_category: 'CTA', location: 'partners_section' })}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-block px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 bg-[#C54090] hover:bg-[#C54090]/90 text-white shadow-[#C54090]/30 hover:shadow-[#C54090]/50"
@@ -381,8 +381,6 @@ export default function PartnersSection() {
                         trackEvent('Lead', {
                           content_name: `${partner.name} Link`,
                           content_category: 'External Link',
-                        });
-                        trackCustomEvent('ExternalLinkClick', {
                           link_type: 'partner_link',
                           location: 'partners_section',
                           partner_name: partner.name,
@@ -412,7 +410,7 @@ export default function PartnersSection() {
                 href={t.partners.partners.cta.href}
                 target={t.partners.partners.cta.href.startsWith('http') ? '_blank' : undefined}
                 rel={t.partners.partners.cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                onClick={() => trackCustomEvent('CallForPartnersClick', { location: 'partners_section' })}
+                onClick={() => trackEvent('Lead', { content_name: 'Call for Partners', content_category: 'CTA', location: 'partners_section' })}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-block px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 bg-white hover:bg-white/90 text-[#1E1F1C] shadow-white/20 hover:shadow-white/30"

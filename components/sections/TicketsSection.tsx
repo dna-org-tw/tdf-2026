@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
@@ -82,17 +82,7 @@ export default function TicketsSection() {
   const [resultModalType, setResultModalType] = useState<'success' | 'error' | 'duplicate' | null>(null);
   const [resultModalMessage, setResultModalMessage] = useState('');
   useSectionTracking({ sectionId: 'tickets', sectionName: 'Tickets Section', category: 'Tickets' });
-  
-  // Track ViewContent for ticket tiers when section is viewed
-  useEffect(() => {
-    // This will be tracked by useSectionTracking, but we can also track individual ticket views
-    trackEvent('ViewContent', {
-      content_name: 'Tickets Section',
-      content_category: 'Tickets',
-      content_type: 'product_listing',
-    });
-  }, []);
-  
+
   const saleEndDate = '2/28';
   
   // Calculate countdown to February 28, 2026 (end of day UTC)
@@ -144,7 +134,6 @@ export default function TicketsSection() {
 
       const price = isOnSale ? tier.salePrice : tier.originalPrice;
 
-      // Track InitiateCheckout (Meta standard event)
       trackEvent('InitiateCheckout', {
         content_name: `${tier.name} Ticket`,
         content_category: 'Tickets',
@@ -152,22 +141,21 @@ export default function TicketsSection() {
         value: price,
         currency: 'USD',
         num_items: 1,
+        location: 'tickets_section',
+        checkout_provider: 'stripe',
+        tier: tier.key,
+        on_sale: isOnSale,
       });
 
-      // Track AddPaymentInfo (Meta standard event) - user is about to enter payment info
       trackEvent('AddPaymentInfo', {
         content_name: `${tier.name} Ticket`,
         content_category: 'Tickets',
         content_ids: [tier.key],
         value: price,
         currency: 'USD',
-      });
-
-      trackCustomEvent('StripeCheckoutClick', {
         location: 'tickets_section',
+        checkout_provider: 'stripe',
         tier: tier.key,
-        price,
-        on_sale: isOnSale,
       });
 
       const response = await fetch('/api/checkout', {
@@ -258,7 +246,6 @@ export default function TicketsSection() {
         content_name: 'Tickets Follower',
         content_category: 'Newsletter Subscription',
       });
-      trackCustomEvent('TicketsFollowerSuccess', { location: 'tickets_section' });
     } catch (err) {
       console.error('Follower subscribe error:', err);
       setResultModalType('error');

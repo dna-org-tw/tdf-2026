@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 
 interface LazyYouTubeEmbedProps {
   videoId: string;
@@ -56,27 +56,19 @@ export default function LazyYouTubeEmbed({
         content_category: 'Video',
         content_type: 'video',
         content_ids: [videoId],
-      });
-      trackCustomEvent('YouTubeVideoPlay', {
         video_id: videoId,
-        video_title: title,
       });
     }
   }, [autoPlayMuted, isInView, isLoaded, title, videoId]);
 
   const handleClick = () => {
     setIsLoaded(true);
-    // Track video play event (using custom event as Meta doesn't have a standard VideoPlay event)
-    // Using ViewContent for video view tracking
     trackEvent('ViewContent', {
       content_name: title,
       content_category: 'Video',
       content_type: 'video',
       content_ids: [videoId],
-    });
-    trackCustomEvent('YouTubeVideoPlay', {
       video_id: videoId,
-      video_title: title,
     });
   };
 

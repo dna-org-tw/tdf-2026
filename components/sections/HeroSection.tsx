@@ -112,7 +112,6 @@ export default function HeroSection() {
       return;
     }
 
-    trackCustomEvent('HeroFollowSubmit', { location: 'hero_section' });
 
     try {
       setIsSubmitting(true);
@@ -155,14 +154,15 @@ export default function HeroSection() {
           setModalMessage(t.hero.followForm.duplicateMessage);
           setEmail('');
           setModalOpen(true);
-          trackCustomEvent('HeroFollowDuplicate', { location: 'hero_section' });
+          trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'hero_section' });
           return;
         }
 
         setModalType('error');
         setModalMessage(result.error || t.hero.followForm.errorMessage);
         setModalOpen(true);
-        trackCustomEvent('HeroFollowError', {
+        trackCustomEvent('NewsletterSubmitResult', {
+          result: 'error',
           location: 'hero_section',
           reason: 'api_error',
           status: response.status,
@@ -177,19 +177,18 @@ export default function HeroSection() {
       setModalOpen(true);
       // 更新关注者数量
       setFollowerCount((prev) => prev + 1);
-      // Track CompleteRegistration event for free newsletter subscription (Meta standard event)
       trackEvent('CompleteRegistration', {
         content_name: 'Hero Free Follow Form',
         content_category: 'Newsletter Subscription',
       });
-      trackCustomEvent('HeroFollowSuccess', { location: 'hero_section' });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Hero follow submit error:', err);
       setModalType('error');
       setModalMessage(t.hero.followForm.errorMessage);
       setModalOpen(true);
-      trackCustomEvent('HeroFollowError', {
+      trackCustomEvent('NewsletterSubmitResult', {
+        result: 'error',
         location: 'hero_section',
         reason: 'network_error',
       });
@@ -370,8 +369,8 @@ export default function HeroSection() {
                 trackEvent('Lead', {
                   content_name: 'Call for Speakers',
                   content_category: 'CTA',
+                  location: 'hero_section',
                 });
-                trackCustomEvent('CallForSpeakersClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -390,8 +389,8 @@ export default function HeroSection() {
                 trackEvent('Lead', {
                   content_name: 'Call for Volunteers',
                   content_category: 'CTA',
+                  location: 'hero_section',
                 });
-                trackCustomEvent('CallForVolunteersClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -414,8 +413,8 @@ export default function HeroSection() {
                 trackEvent('Lead', {
                   content_name: 'Call for Partners',
                   content_category: 'CTA',
+                  location: 'hero_section',
                 });
-                trackCustomEvent('CallForPartnersClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -434,8 +433,8 @@ export default function HeroSection() {
                 trackEvent('Lead', {
                   content_name: 'Call for Side Events',
                   content_category: 'CTA',
+                  location: 'hero_section',
                 });
-                trackCustomEvent('CallForSideEventsClick', { location: 'hero_section' });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -451,7 +450,11 @@ export default function HeroSection() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                trackCustomEvent('CallForSponsorsClick', { location: 'hero_section' });
+                trackEvent('Lead', {
+                  content_name: 'Call for Sponsors',
+                  content_category: 'CTA',
+                  location: 'hero_section',
+                });
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

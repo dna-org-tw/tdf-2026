@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 import Navbar from '@/components/Navbar';
 import FollowModalWithForm from '@/components/FollowModalWithForm';
 import AwardHeader from '@/components/award/AwardHeader';
@@ -189,12 +189,9 @@ export default function AwardPage() {
         throw new Error(errorMessage);
       }
 
-      // Track vote event
       trackEvent('Lead', {
         content_name: 'Award Vote',
         content_category: 'Award',
-      });
-      trackCustomEvent('AwardVote', {
         post_id: postId,
       });
 

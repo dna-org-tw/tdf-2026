@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import MobileMenu from './MobileMenu';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
@@ -49,8 +49,9 @@ export default function Navbar() {
     e.preventDefault();
     const hash = href.replace('#', '');
     
-    // Track navigation click
-    trackCustomEvent('NavClick', {
+    trackEvent('Lead', {
+      content_name: 'Navigation',
+      content_category: 'Navigation',
       section: hash,
       location: 'navbar',
     });
@@ -152,8 +153,6 @@ export default function Navbar() {
               trackEvent('Lead', {
                 content_name: 'Instagram Link',
                 content_category: 'Social Media',
-              });
-              trackCustomEvent('ExternalLinkClick', {
                 link_type: 'instagram',
                 location: 'navbar_desktop',
               });
@@ -169,7 +168,9 @@ export default function Navbar() {
           <Link
             href="/award"
             onClick={() => {
-              trackCustomEvent('NavClick', {
+              trackEvent('Lead', {
+                content_name: 'Award',
+                content_category: 'Navigation',
                 section: 'award',
                 location: 'navbar_desktop',
               });
@@ -201,8 +202,6 @@ export default function Navbar() {
               trackEvent('Lead', {
                 content_name: 'Instagram Link',
                 content_category: 'Social Media',
-              });
-              trackCustomEvent('ExternalLinkClick', {
                 link_type: 'instagram',
                 location: 'navbar_mobile',
               });

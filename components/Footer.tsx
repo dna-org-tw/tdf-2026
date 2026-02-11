@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 import Link from 'next/link';
 
 export default function Footer() {
@@ -30,8 +30,8 @@ export default function Footer() {
                   trackEvent('Lead', {
                     content_name: 'Call for Speakers',
                     content_category: 'CTA',
+                    location: 'footer',
                   });
-                  trackCustomEvent('CallForSpeakersClick', { location: 'footer' });
                 }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
@@ -45,8 +45,8 @@ export default function Footer() {
                   trackEvent('Lead', {
                     content_name: 'Call for Sponsors',
                     content_category: 'CTA',
+                    location: 'footer',
                   });
-                  trackCustomEvent('CallForSponsorsClick', { location: 'footer' });
                 }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
@@ -60,8 +60,8 @@ export default function Footer() {
                   trackEvent('Lead', {
                     content_name: 'Call for Partners',
                     content_category: 'CTA',
+                    location: 'footer',
                   });
-                  trackCustomEvent('CallForPartnersClick', { location: 'footer' });
                 }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
@@ -75,8 +75,8 @@ export default function Footer() {
                   trackEvent('Lead', {
                     content_name: 'Call for Volunteers',
                     content_category: 'CTA',
+                    location: 'footer',
                   });
-                  trackCustomEvent('CallForVolunteersClick', { location: 'footer' });
                 }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
@@ -90,8 +90,8 @@ export default function Footer() {
                   trackEvent('Lead', {
                     content_name: 'Call for Side Events',
                     content_category: 'CTA',
+                    location: 'footer',
                   });
-                  trackCustomEvent('CallForSideEventsClick', { location: 'footer' });
                 }}
                 className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
               >
@@ -104,7 +104,7 @@ export default function Footer() {
           <div className="flex flex-col gap-1 text-xs">
             <Link 
               href="/order/query"
-              onClick={() => trackCustomEvent('OrderQueryClick', { location: 'footer' })}
+              onClick={() => trackEvent('Lead', { content_name: 'Order Query', content_category: 'CTA', location: 'footer' })}
               className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
             >
               {t.footer.orderQuery}
@@ -112,8 +112,7 @@ export default function Footer() {
             <a 
               href="mailto:fest@dna.org.tw"
               onClick={() => {
-                trackEvent('Contact', { content_category: 'Email Contact' });
-                trackCustomEvent('EmailClick', { location: 'footer' });
+                trackEvent('Contact', { content_category: 'Email Contact', location: 'footer' });
               }}
               className="hover:text-[#10B8D9] transition-colors"
             >
@@ -128,8 +127,6 @@ export default function Footer() {
                 trackEvent('Lead', {
                   content_name: 'Taiwan Digital Fest Instagram',
                   content_category: 'Social Media',
-                });
-                trackCustomEvent('ExternalLinkClick', {
                   link_type: 'instagram',
                   location: 'footer',
                   account: 'taiwandigitalfest',
@@ -148,8 +145,6 @@ export default function Footer() {
                 trackEvent('Lead', {
                   content_name: 'TDNA Instagram',
                   content_category: 'Social Media',
-                });
-                trackCustomEvent('ExternalLinkClick', {
                   link_type: 'instagram',
                   location: 'footer',
                   account: 'dna.org.tw',

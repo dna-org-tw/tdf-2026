@@ -71,14 +71,15 @@ export default function TicketFollowSection() {
           setModalMessage(result.error || t.followUs?.duplicateMessage || t.hero.followForm.duplicateMessage);
           setEmail('');
           setModalOpen(true);
-          trackCustomEvent('TicketsFollowDuplicate', { location: 'tickets_section' });
+          trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'tickets_section' });
           return;
         }
 
         setModalType('error');
         setModalMessage(result.error || t.followUs?.errorMessage || t.hero.followForm.errorMessage);
         setModalOpen(true);
-        trackCustomEvent('TicketsFollowError', {
+        trackCustomEvent('NewsletterSubmitResult', {
+          result: 'error',
           location: 'tickets_section',
           reason: 'api_error',
           status: response.status,
@@ -91,18 +92,17 @@ export default function TicketFollowSection() {
       setModalMessage(result.message || t.followUs?.successMessage || t.hero.followForm.successMessage);
       setEmail('');
       setModalOpen(true);
-      // Track CompleteRegistration event for free newsletter subscription (Meta standard event)
       trackEvent('CompleteRegistration', {
         content_name: 'Tickets Free Follow Form',
         content_category: 'Newsletter Subscription',
       });
-      trackCustomEvent('TicketsFollowSuccess', { location: 'tickets_section' });
     } catch (err) {
       console.error('Tickets follow submit error:', err);
       setModalType('error');
       setModalMessage(t.followUs?.errorMessage || t.hero.followForm.errorMessage);
       setModalOpen(true);
-      trackCustomEvent('TicketsFollowError', {
+      trackCustomEvent('NewsletterSubmitResult', {
+        result: 'error',
         location: 'tickets_section',
         reason: 'network_error',
       });

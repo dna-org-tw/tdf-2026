@@ -109,7 +109,6 @@ export default function FollowUsSection() {
     }
 
     setIsSubmitting(true);
-    trackCustomEvent('FollowUsSubmit', { location: 'follow_us_section' });
 
     try {
       // 执行 reCAPTCHA 验证
@@ -154,26 +153,24 @@ export default function FollowUsSection() {
         setEmail('');
         // 更新关注者数量
         setFollowerCount((prev) => prev + 1);
-        // Track CompleteRegistration event for free newsletter subscription (Meta standard event)
         trackEvent('CompleteRegistration', {
           content_name: 'Follow Us Form',
           content_category: 'Newsletter Subscription',
         });
-        trackCustomEvent('FollowUsSuccess', { location: 'follow_us_section' });
       } else if (response.status === 409) {
         setModalState({
           isOpen: true,
           type: 'duplicate',
           message: data.error || t.followUs.duplicateMessage,
         });
-        trackCustomEvent('FollowUsDuplicate', { location: 'follow_us_section' });
+        trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'follow_us_section' });
       } else {
         setModalState({
           isOpen: true,
           type: 'error',
           message: data.error || t.followUs.errorMessage,
         });
-        trackCustomEvent('FollowUsError', { location: 'follow_us_section' });
+        trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'follow_us_section' });
       }
     } catch (error) {
       console.error('Follow Us subscription error:', error);
@@ -182,7 +179,7 @@ export default function FollowUsSection() {
         type: 'error',
         message: t.followUs.errorMessage,
       });
-      trackCustomEvent('FollowUsError', { location: 'follow_us_section' });
+      trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'follow_us_section' });
     } finally {
       setIsSubmitting(false);
     }

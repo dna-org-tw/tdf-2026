@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 
 export default function CheckoutCancelledPage() {
   const searchParams = useSearchParams();
@@ -57,16 +57,10 @@ export default function CheckoutCancelledPage() {
     | '';
 
   useEffect(() => {
-    // Track ViewContent for cancelled checkout page
     trackEvent('ViewContent', {
       content_name: 'Checkout Cancelled',
       content_category: 'Checkout',
-    });
-    
-    if (!tier) return;
-
-    trackCustomEvent('TicketPurchaseCancelled', {
-      tier,
+      tier: tier || undefined,
       source: 'stripe_checkout',
     });
   }, [tier]);

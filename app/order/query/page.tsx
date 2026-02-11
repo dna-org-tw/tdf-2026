@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 
 export default function OrderQueryPage() {
   const router = useRouter();
@@ -64,12 +64,9 @@ export default function OrderQueryPage() {
       return;
     }
 
-    // Track search event
     trackEvent('Search', {
       search_string: orderId.trim(),
       content_category: 'Order Query',
-    });
-    trackCustomEvent('OrderQuerySearch', {
       order_id: orderId.trim(),
     });
 

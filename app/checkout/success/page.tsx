@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import { trackEvent } from '@/components/FacebookPixel';
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
@@ -63,16 +63,10 @@ export default function CheckoutSuccessPage() {
     | '';
 
   useEffect(() => {
-    // Track ViewContent for success page
     trackEvent('ViewContent', {
       content_name: 'Checkout Success',
       content_category: 'Checkout',
-    });
-    
-    if (!tier) return;
-
-    trackCustomEvent('TicketPurchaseSuccess', {
-      tier,
+      tier: tier || undefined,
       source: 'stripe_checkout',
     });
   }, [tier]);
