@@ -330,12 +330,12 @@ export default function EventsSection() {
             return (
               <div
                 key={`week-separator-${w.start}-${w.end}`}
-                className="border-b border-[#D4D4CF] bg-stone-50 px-3 py-1.5 text-[11px] font-semibold text-[#1E1F1C] flex items-center justify-center"
+                className="border-b border-[#D4D4CF] bg-stone-50 px-3 py-1 text-xs sm:text-sm font-bold text-[#1E1F1C] flex items-center justify-center leading-tight"
                 style={{ gridRow, gridColumn: '1 / -1' }}
                 title={w.theme}
               >
                 <span className="text-center">
-                  {w.theme} ({`5/${w.start}`}–{`5/${w.end}`})
+                  {w.theme}
                 </span>
               </div>
             );

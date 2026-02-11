@@ -52,7 +52,7 @@ export default function PartnersSection() {
             {t.partners.organizers.title}
           </motion.h2>
           
-          <div className="flex flex-col items-center gap-12 md:gap-16 lg:gap-20 opacity-70 hover:opacity-100 transition-all duration-500">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 opacity-70 hover:opacity-100 transition-all duration-500">
             {/* TDNA 獨立一排 */}
             <motion.a
               href="https://dna.org.tw"
@@ -63,7 +63,7 @@ export default function PartnersSection() {
               viewport={{ once: true }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="relative h-28 md:h-36 lg:h-44 w-auto block"
+              className="relative h-28 md:h-36 lg:h-44 w-auto block flex-shrink-0"
             >
               <Image
                 src="/images/logo/tdna_logo.png"
@@ -74,6 +74,15 @@ export default function PartnersSection() {
                 loading="lazy"
               />
             </motion.a>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left mt-4 md:mt-0"
+            >
+              {t.partners.organizers.description}
+            </motion.p>
           </div>
         </div>
       </div>

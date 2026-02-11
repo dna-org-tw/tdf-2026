@@ -205,7 +205,9 @@ export const content = {
     },
     partners: {
       organizers: {
-        title: "Organizers"
+        title: "Organizers",
+        description:
+          "Taiwan Digital Nomad Association (TDNA) is a non-profit organization dedicated to building Taiwan into one of Asia's leading digital nomad destinations. TDNA connects international nomads, local communities, governments, and businesses to co-create sustainable work–life ecosystems where people can live, work, and thrive between mountains and sea."
       },
       sponsors: {
         title: "Sponsors",
@@ -918,7 +920,9 @@ export const content = {
     },
     partners: {
       organizers: {
-        title: "主辦單位"
+        title: "主辦單位",
+        description:
+          "台灣數位遊牧者協會（TDNA）是一個致力於推動台灣成為亞洲頂尖數位遊牧基地的非營利組織。我們串連國際遊牧者、在地社群、政府與企業，從活動、空間到生活服務，一起打造可以在山海之間安心工作、深度生活與長期停留的友善生態系。"
       },
       sponsors: {
         title: "贊助單位",
