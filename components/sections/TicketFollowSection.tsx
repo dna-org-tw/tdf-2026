@@ -71,7 +71,7 @@ export default function TicketFollowSection() {
           setModalMessage(result.error || t.followUs?.duplicateMessage || t.hero.followForm.duplicateMessage);
           setEmail('');
           setModalOpen(true);
-          trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'tickets_section' });
+          trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'tickets_section', email: trimmedEmail });
           return;
         }
 
@@ -84,6 +84,7 @@ export default function TicketFollowSection() {
           reason: 'api_error',
           status: response.status,
           message: result.error,
+          email: trimmedEmail,
         });
         return;
       }
@@ -95,6 +96,8 @@ export default function TicketFollowSection() {
       trackEvent('CompleteRegistration', {
         content_name: 'Tickets Free Follow Form',
         content_category: 'Newsletter Subscription',
+        email: trimmedEmail,
+        location: 'tickets_section',
       });
     } catch (err) {
       console.error('Tickets follow submit error:', err);
@@ -105,6 +108,7 @@ export default function TicketFollowSection() {
         result: 'error',
         location: 'tickets_section',
         reason: 'network_error',
+        email: trimmedEmail,
       });
     } finally {
       setIsSubmitting(false);

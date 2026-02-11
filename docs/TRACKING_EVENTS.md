@@ -87,7 +87,7 @@
 ### Purchase
 | 觸發時機 | 參數 |
 |----------|------|
-| 結帳成功頁、訂單資料載入後 | `value`, `currency`, `content_name`, `content_category: 'Tickets'`, `content_ids`, `num_items` |
+| 結帳成功頁、訂單資料載入後 | Meta 標準：`value`, `currency`, `content_name`, `content_category: 'Tickets'`, `content_ids`, `num_items`；完整訂單：`order_id`, `customer_email`, `customer_name`, `ticket_tier`, `payment_status`, `payment_intent_id`, `amount_subtotal`, `amount_discount` |
 
 **程式位置**：`app/checkout/success/page.tsx`
 
@@ -96,10 +96,10 @@
 ### CompleteRegistration
 | 觸發時機 | 參數 |
 |----------|------|
-| Hero 訂閱成功 | `content_name: 'Hero Free Follow Form'`, `content_category: 'Newsletter Subscription'` |
-| 票券區訂閱成功（Follower modal） | `content_name: 'Tickets Follower'`, `content_category: 'Newsletter Subscription'` |
-| 票券追蹤區訂閱成功 | `content_name: 'Tickets Free Follow Form'`, `content_category: 'Newsletter Subscription'` |
-| Follow Us 區訂閱成功 | `content_name: 'Follow Us Form'`, `content_category: 'Newsletter Subscription'` |
+| Hero 訂閱成功 | `content_name`, `content_category`, `email`, `location: 'hero_section'` |
+| 票券區訂閱成功（Follower modal） | `content_name`, `content_category`, `email`, `location: 'tickets_section_follower'` |
+| 票券追蹤區訂閱成功 | `content_name`, `content_category`, `email`, `location: 'tickets_section'` |
+| Follow Us 區訂閱成功 | `content_name`, `content_category`, `email`, `location: 'follow_us_section'` |
 
 **程式位置**：`components/sections/HeroSection.tsx`、`components/sections/TicketsSection.tsx`、`components/sections/TicketFollowSection.tsx`、`components/sections/FollowUsSection.tsx`
 
@@ -146,8 +146,8 @@
 ### NewsletterSubmitResult
 | 觸發時機 | 參數 |
 |----------|------|
-| 訂閱表單：重複 email | `result: 'duplicate'`, `location`（`hero_section` / `tickets_section` / `follow_us_section`） |
-| 訂閱表單：API 或網路錯誤 | `result: 'error'`, `location`, 選填 `reason`, `status`, `message` |
+| 訂閱表單：重複 email | `result: 'duplicate'`, `location`, `email` |
+| 訂閱表單：API 或網路錯誤 | `result: 'error'`, `location`, `email`, 選填 `reason`, `status`, `message` |
 
 **程式位置**：`components/sections/HeroSection.tsx`、`components/sections/TicketFollowSection.tsx`、`components/sections/FollowUsSection.tsx`
 

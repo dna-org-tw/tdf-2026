@@ -145,6 +145,7 @@ export default function FollowUsSection() {
       const data = await response.json();
 
       if (response.ok) {
+        const subscribedEmail = email.trim();
         setModalState({
           isOpen: true,
           type: 'success',
@@ -156,6 +157,8 @@ export default function FollowUsSection() {
         trackEvent('CompleteRegistration', {
           content_name: 'Follow Us Form',
           content_category: 'Newsletter Subscription',
+          email: subscribedEmail,
+          location: 'follow_us_section',
         });
       } else if (response.status === 409) {
         setModalState({
@@ -163,14 +166,14 @@ export default function FollowUsSection() {
           type: 'duplicate',
           message: data.error || t.followUs.duplicateMessage,
         });
-        trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'follow_us_section' });
+        trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'follow_us_section', email: email.trim() });
       } else {
         setModalState({
           isOpen: true,
           type: 'error',
           message: data.error || t.followUs.errorMessage,
         });
-        trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'follow_us_section' });
+        trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'follow_us_section', email: email.trim() });
       }
     } catch (error) {
       console.error('Follow Us subscription error:', error);
@@ -179,7 +182,7 @@ export default function FollowUsSection() {
         type: 'error',
         message: t.followUs.errorMessage,
       });
-      trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'follow_us_section' });
+      trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'follow_us_section', email: email.trim() });
     } finally {
       setIsSubmitting(false);
     }

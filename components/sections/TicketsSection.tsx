@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { trackEvent } from '@/components/FacebookPixel';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
@@ -229,6 +229,7 @@ export default function TicketsSection() {
           setFollowerModalOpen(false);
           setResultModalOpen(true);
           setFollowerSubmitting(false);
+          trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'tickets_section_follower', email: trimmedEmail });
           return;
         }
         setResultModalType('error');
@@ -245,6 +246,8 @@ export default function TicketsSection() {
       trackEvent('CompleteRegistration', {
         content_name: 'Tickets Follower',
         content_category: 'Newsletter Subscription',
+        email: trimmedEmail,
+        location: 'tickets_section_follower',
       });
     } catch (err) {
       console.error('Follower subscribe error:', err);

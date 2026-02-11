@@ -75,13 +75,24 @@ export default function CheckoutSuccessPage() {
   useEffect(() => {
     if (!order || !order.amount_total || !order.currency) return;
 
+    const numItems = order.line_items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 1;
     trackEvent('Purchase', {
+      // Meta 標準參數
       value: order.amount_total / 100, // Convert from cents to dollars
       currency: order.currency.toUpperCase(),
       content_name: order.ticket_tier ? `${order.ticket_tier} Ticket` : 'Event Ticket',
       content_category: 'Tickets',
       content_ids: order.id ? [order.id] : undefined,
-      num_items: order.line_items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 1,
+      num_items: numItems,
+      // 完整訂單資訊（webhook 用途）
+      order_id: order.id ?? undefined,
+      customer_email: order.customer_email ?? undefined,
+      customer_name: order.customer_name ?? undefined,
+      ticket_tier: order.ticket_tier ?? undefined,
+      payment_status: order.payment_status ?? undefined,
+      payment_intent_id: order.payment_intent_id ?? undefined,
+      amount_subtotal: order.amount_subtotal != null ? order.amount_subtotal / 100 : undefined,
+      amount_discount: order.amount_discount != null ? order.amount_discount / 100 : undefined,
     });
   }, [order]);
 

@@ -154,7 +154,7 @@ export default function HeroSection() {
           setModalMessage(t.hero.followForm.duplicateMessage);
           setEmail('');
           setModalOpen(true);
-          trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'hero_section' });
+          trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'hero_section', email: trimmedEmail });
           return;
         }
 
@@ -167,6 +167,7 @@ export default function HeroSection() {
           reason: 'api_error',
           status: response.status,
           message: result.error,
+          email: trimmedEmail,
         });
         return;
       }
@@ -180,6 +181,8 @@ export default function HeroSection() {
       trackEvent('CompleteRegistration', {
         content_name: 'Hero Free Follow Form',
         content_category: 'Newsletter Subscription',
+        email: trimmedEmail,
+        location: 'hero_section',
       });
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -191,6 +194,7 @@ export default function HeroSection() {
         result: 'error',
         location: 'hero_section',
         reason: 'network_error',
+        email: trimmedEmail,
       });
     } finally {
       setIsSubmitting(false);
