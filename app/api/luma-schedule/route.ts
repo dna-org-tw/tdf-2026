@@ -16,6 +16,7 @@ interface CalendarEvent {
   startDate: string;
   endDate: string | null;
   startTime?: string | null;
+  endTime?: string | null;
   eligibility?: string[];
   tags?: Array<{ name: string; color?: string }>;
   url?: string;
@@ -135,6 +136,15 @@ export async function GET() {
           formattedStartTime = startDate.toISOString();
         }
 
+        // Format end time for duration calculation
+        let formattedEndTime = null;
+        if (event.end_at && event.end_at.includes('T')) {
+          const endDateObj = new Date(event.end_at);
+          if (!isNaN(endDateObj.getTime())) {
+            formattedEndTime = endDateObj.toISOString();
+          }
+        }
+
         // Get location (prefer localized Chinese address)
         let location = '';
         if (event.geo_address_info) {
@@ -170,6 +180,7 @@ export async function GET() {
               startDate: formattedStartDate,
               endDate: formattedEndDate,
               startTime: formattedStartTime,
+              endTime: formattedEndTime,
               eligibility: eligibilityTags.length > 0 ? eligibilityTags : undefined,
               tags: eventTags.length > 0 ? eventTags : undefined,
               url: eventUrl || undefined,
