@@ -5,6 +5,7 @@ import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
+import GoogleTag from '@/components/GoogleTag';
 import RecaptchaScript from '@/components/RecaptchaScript';
 
 const inter = Inter({
@@ -169,6 +170,8 @@ export default async function RootLayout({
         <StructuredData lang={lang === 'zh-TW' ? 'zh' : 'en'} />
         {/* Facebook Pixel 追踪 */}
         <FacebookPixel />
+        {/* Google Tag (gtag.js) - Google Ads AW-17947994689 */}
+        <GoogleTag />
         {/* reCAPTCHA Enterprise API */}
         <RecaptchaScript />
         {children}
