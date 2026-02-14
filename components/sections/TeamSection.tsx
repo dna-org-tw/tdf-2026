@@ -367,26 +367,6 @@ export default function TeamSection() {
                   loading="lazy"
                 />
               </motion.a>
-              <motion.a
-                href="https://www.hl.gov.tw/"
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative h-28 md:h-36 lg:h-44 w-28 md:w-36 lg:w-44 bg-white p-4 rounded-lg border-4 border-[#e4003d] flex items-center justify-center"
-              >
-                <Image
-                  src="/images/logo/hualien_gov_logo.png"
-                  alt="Hualien Government"
-                  width={200}
-                  height={192}
-                  className="h-full w-full object-contain"
-                  loading="lazy"
-                />
-              </motion.a>
             </div>
           </div>
 
