@@ -67,94 +67,6 @@ export default function TeamSection() {
 
   return (
     <section id="team" className="text-center">
-      {/* Speakers 講者 */}
-      <div id="speakers" className="py-20 md:py-28 lg:py-32 bg-white">
-        <div className="container mx-auto px-4 sm:px-6">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-10 md:mb-12 lg:mb-16"
-          >
-            {t.partners.speakers.title}
-          </motion.h2>
-
-          {speakersLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E1F1C]"></div>
-            </div>
-          ) : speakers.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
-              {speakers.map((speaker, index) => {
-                const visibleEvents = speaker.events.slice(0, MAX_EVENTS_VISIBLE);
-                const restCount = speaker.events.length - MAX_EVENTS_VISIBLE;
-                const profileUrl = speaker.callForSpeakersUrl ?? (speaker.username ? `${LUMA_USER_BASE}/${speaker.username}` : null);
-
-                const CardContent = (
-                  <>
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] flex-shrink-0 mb-3">
-                      {speaker.avatarUrl ? (
-                        <Image
-                          src={speaker.avatarUrl}
-                          alt={speaker.callForSpeakersUrl ? t.partners.speakers.mockLabel : speaker.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 128px"
-                          unoptimized={speaker.avatarUrl.includes('lu.ma') || speaker.avatarUrl.includes('luma')}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#4B4C47]">
-                          <User className="w-10 h-10 sm:w-12 sm:h-12" />
-                        </div>
-                      )}
-                    </div>
-                    <p className="font-semibold text-[#1E1F1C] text-sm sm:text-base line-clamp-2">
-                      {speaker.callForSpeakersUrl ? t.partners.speakers.mockLabel : speaker.name}
-                    </p>
-                    <div className="text-[#4B4C47] text-xs sm:text-sm mt-0.5 space-y-0.5 text-left w-full min-w-0">
-                      {visibleEvents.map((ev, i) => (
-                        <p key={i} className="line-clamp-2">
-                          {ev.eventName}
-                        </p>
-                      ))}
-                      {restCount > 0 && (
-                        <p className="text-[#1E1F1C] font-medium">
-                          {restCount}+
-                        </p>
-                      )}
-                    </div>
-                  </>
-                );
-                return (
-                  <motion.div
-                    key={speaker.callForSpeakersUrl ? `mock-${index}` : `${speaker.username ?? speaker.name}-${index}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: Math.min(index * 0.05, 0.5) }}
-                    whileHover={{ y: -4 }}
-                    className="flex flex-col items-center text-center"
-                  >
-                    {profileUrl ? (
-                      <a
-                        href={profileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="focus:outline-none focus:ring-2 focus:ring-[#1E1F1C] focus:ring-offset-2 rounded-2xl"
-                      >
-                        {CardContent}
-                      </a>
-                    ) : (
-                      CardContent
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          ) : null}
-        </div>
-      </div>
-
       {/* 主辦單位 Organizers */}
       <div id="organizer" className="py-20 md:py-28 lg:py-32 bg-[#F6F6F6]">
         <div className="container mx-auto px-4 sm:px-6">
@@ -231,6 +143,94 @@ export default function TeamSection() {
               </motion.div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Speakers 講者 */}
+      <div id="speakers" className="py-20 md:py-28 lg:py-32 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-10 md:mb-12 lg:mb-16"
+          >
+            {t.partners.speakers.title}
+          </motion.h2>
+
+          {speakersLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E1F1C]"></div>
+            </div>
+          ) : speakers.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
+              {speakers.map((speaker, index) => {
+                const visibleEvents = speaker.events.slice(0, MAX_EVENTS_VISIBLE);
+                const restCount = speaker.events.length - MAX_EVENTS_VISIBLE;
+                const profileUrl = speaker.callForSpeakersUrl ?? (speaker.username ? `${LUMA_USER_BASE}/${speaker.username}` : null);
+
+                const CardContent = (
+                  <>
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] flex-shrink-0 mb-3">
+                      {speaker.avatarUrl ? (
+                        <Image
+                          src={speaker.avatarUrl}
+                          alt={speaker.callForSpeakersUrl ? t.partners.speakers.mockLabel : speaker.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 128px"
+                          unoptimized={speaker.avatarUrl.includes('lu.ma') || speaker.avatarUrl.includes('luma')}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[#4B4C47]">
+                          <User className="w-10 h-10 sm:w-12 sm:h-12" />
+                        </div>
+                      )}
+                    </div>
+                    <p className="font-semibold text-[#1E1F1C] text-sm sm:text-base line-clamp-2">
+                      {speaker.callForSpeakersUrl ? t.partners.speakers.mockLabel : speaker.name}
+                    </p>
+                    <div className="text-[#4B4C47] text-xs sm:text-sm mt-0.5 space-y-0.5 text-center w-full min-w-0">
+                      {visibleEvents.map((ev, i) => (
+                        <p key={i} className="line-clamp-2">
+                          {ev.eventName}
+                        </p>
+                      ))}
+                      {restCount > 0 && (
+                        <p className="text-[#1E1F1C] font-medium">
+                          {restCount}+
+                        </p>
+                      )}
+                    </div>
+                  </>
+                );
+                return (
+                  <motion.div
+                    key={speaker.callForSpeakersUrl ? `mock-${index}` : `${speaker.username ?? speaker.name}-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: Math.min(index * 0.05, 0.5) }}
+                    whileHover={{ y: -4 }}
+                    className="flex flex-col items-center text-center"
+                  >
+                    {profileUrl ? (
+                      <a
+                        href={profileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex flex-col items-center text-center focus:outline-none focus:ring-2 focus:ring-[#1E1F1C] focus:ring-offset-2 rounded-2xl"
+                      >
+                        {CardContent}
+                      </a>
+                    ) : (
+                      CardContent
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
       </div>
 
