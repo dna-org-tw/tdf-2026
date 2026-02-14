@@ -1,17 +1,17 @@
 // 订单状态类型
 export type OrderStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded';
 
-// 订单数据库记录类型
+// 訂單資料庫記錄類型
 export interface Order {
   id: string; // UUID
   stripe_session_id: string; // Stripe checkout session ID
   stripe_payment_intent_id: string | null; // Stripe payment intent ID
   ticket_tier: 'explore' | 'contribute' | 'backer';
   status: OrderStatus;
-  amount_subtotal: number; // 以分为单位
-  amount_total: number; // 以分为单位
-  amount_tax: number; // 以分为单位
-  amount_discount: number; // 以分为单位
+  amount_subtotal: number; // 以分為單位
+  amount_total: number; // 以分為單位
+  amount_tax: number; // 以分為單位
+  amount_discount: number; // 以分為單位
   currency: string;
   customer_email: string | null;
   customer_name: string | null;

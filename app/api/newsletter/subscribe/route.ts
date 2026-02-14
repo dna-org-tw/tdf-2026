@@ -32,7 +32,7 @@ function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
 
 // Helper function to get client IP address
 function getClientIP(req: NextRequest): string | null {
-  // 尝试从各种请求头获取真实IP
+  // 嘗試從各種請求頭獲取真實 IP
   const forwardedFor = req.headers.get('x-forwarded-for');
   if (forwardedFor) {
     // x-forwarded-for 可能包含多个IP，取第一个
@@ -49,7 +49,7 @@ function getClientIP(req: NextRequest): string | null {
     return cfConnectingIP;
   }
   
-  // 如果都没有，尝试从请求URL获取（开发环境）
+  // 如果都沒有，嘗試從請求 URL 獲取（開發環境）
   try {
     const url = new URL(req.url);
     return url.hostname;
@@ -65,7 +65,7 @@ async function getCountryFromIP(ip: string | null): Promise<string | null> {
   }
 
   try {
-    // 使用 ipapi.co 免费API（无需API key，限制：1000次/天）
+    // 使用 ipapi.co 免費 API（無需 API key，限制：1000 次/天）
     const response = await fetch(`https://ipapi.co/${ip}/country/`, {
       headers: {
         'User-Agent': 'Taiwan-Digital-Fest-2026',
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
         if (recaptchaData.riskAnalysis?.score !== undefined) {
           const score = recaptchaData.riskAnalysis.score;
           // 分数范围 0.0-1.0，越低表示越可疑
-          // 可以根据需要设置阈值，例如低于 0.5 拒绝
+          // 可以根據需要設定閾值，例如低於 0.5 拒絕
           if (score < 0.5) {
             return NextResponse.json(
               { error: t.recaptchaFailed },
@@ -186,11 +186,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 获取IP地址和国家信息
+    // 獲取 IP 地址和國家資訊
     const clientIP = getClientIP(req);
     const country = clientIP ? await getCountryFromIP(clientIP) : null;
     
-    // 获取时区和语言区域（从前端发送）
+    // 獲取時區和語言區域（從前端發送）
     const timezone = body.timezone || null;
     const locale = body.locale || null;
 

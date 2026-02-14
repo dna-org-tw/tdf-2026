@@ -32,7 +32,7 @@ export default function VoteEmailModal({
   const [canVote, setCanVote] = useState(false);
   const [isFollowingNow, setIsFollowingNow] = useState(false);
 
-  // 当 modal 关闭时重置状态
+  // 當 modal 關閉時重置狀態
   useEffect(() => {
     if (!isOpen) {
       setEmail('');
@@ -63,17 +63,17 @@ export default function VoteEmailModal({
         throw new Error(data.error || 'Failed to check follow status');
       }
 
-      // API 调用成功，设置 follow 状态
+      // API 呼叫成功，設定 follow 狀態
       setIsFollowing(data.isFollowing);
       setCanVote(data.isFollowing);
       
-      // 如果用户没有 follow，不设置错误信息，只显示友好的提示（在 Follow Status 部分显示）
-      // 只有当 API 调用真正失败时才显示错误信息
+      // 如果用戶沒有 follow，不設定錯誤資訊，只顯示友善的提示（在 Follow Status 部分顯示）
+      // 只有當 API 呼叫真正失敗時才顯示錯誤資訊
     } catch (err) {
       console.error('Failed to check follow status:', err);
-      // 只有真正的 API 错误才显示错误信息
+      // 只有真正的 API 錯誤才顯示錯誤資訊
       setError(err instanceof Error ? err.message : 'Failed to check follow status');
-      setIsFollowing(null); // 设置为 null，表示检查失败，不显示 follow 状态
+      setIsFollowing(null); // 設為 null，表示檢查失敗，不顯示 follow 狀態
       setCanVote(false);
     } finally {
       setIsChecking(false);
@@ -89,7 +89,7 @@ export default function VoteEmailModal({
       return;
     }
 
-    // 验证 Email 格式
+    // 驗證 Email 格式
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmedEmail)) {
       setError(lang === 'en' ? 'Invalid email format' : '無效的電子郵件格式');
@@ -104,7 +104,7 @@ export default function VoteEmailModal({
     if (!canVote || !email.trim()) return;
 
     // 调用父组件的 onEmailSubmit，传递邮箱
-    // recaptcha 验证会在 page.tsx 的 handleVote 中执行
+    // recaptcha 驗證會在 page.tsx 的 handleVote 中執行
     onEmailSubmit(email.trim());
     onClose();
   };
@@ -119,7 +119,7 @@ export default function VoteEmailModal({
     setError(null);
 
     try {
-      // 执行 reCAPTCHA 验证
+      // 執行 reCAPTCHA 驗證
       let recaptchaToken: string | null = null;
       try {
         recaptchaToken = await executeRecaptcha();
@@ -129,7 +129,7 @@ export default function VoteEmailModal({
         return;
       }
 
-      // 获取用户信息
+      // 獲取用戶資訊
       const userInfo = getUserInfo();
 
       // 调用订阅 API
@@ -151,9 +151,9 @@ export default function VoteEmailModal({
       const result = await response.json();
 
       if (!response.ok) {
-        // 处理重复订阅的情况（视为成功）
+        // 處理重複訂閱的情況（視為成功）
         if (response.status === 409) {
-          // 即使重复订阅，也视为成功，重新检查 follow 状态
+          // 即使重複訂閱，也視為成功，重新檢查 follow 狀態
           await checkFollowStatus(email.trim());
           setIsFollowingNow(false);
           return;

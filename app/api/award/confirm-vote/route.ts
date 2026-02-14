@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import crypto from 'crypto';
 
-// 投票截止时间：2026年4月30日 12:00 (台湾时间)
+// 投票截止時間：2026年4月30日 12:00（台灣時間）
 const VOTING_DEADLINE = new Date('2026-04-30T12:00:00+08:00');
 
 /**
- * 验证并解析投票 token
+ * 驗證並解析投票 token
  */
 function verifyVoteToken(token: string): { postId: string; email: string } | null {
   const voteSecret = process.env.VOTE_SECRET || 'default-vote-secret-change-in-production';
@@ -21,7 +21,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
     
     const [postId, email, timestamp, hash] = parts;
     
-    // 验证 hash
+    // 驗證 hash
     const expectedHash = crypto
       .createHmac('sha256', voteSecret)
       .update(`${postId}:${email}:${timestamp}`)
@@ -31,7 +31,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
       return null;
     }
     
-    // 检查 token 是否过期（24小时）
+    // 檢查 token 是否過期（24 小時）
     const tokenTime = parseInt(timestamp, 10);
     const now = Date.now();
     if (now - tokenTime > 24 * 60 * 60 * 1000) {
@@ -46,7 +46,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
 
 export async function GET(req: NextRequest) {
   try {
-    // 检查投票是否已截止
+    // 檢查投票是否已截止
     if (new Date() > VOTING_DEADLINE) {
       return NextResponse.redirect(
         new URL(`/award/confirm?error=voting_ended`, req.url)
@@ -68,10 +68,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 验证 token
+    // 驗證 token
     const tokenData = verifyVoteToken(token);
     if (!tokenData) {
-      // 重定向到错误页面
+      // 重定向到錯誤頁面
       return NextResponse.redirect(
         new URL(`/award/confirm?error=invalid_token`, req.url)
       );
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
 
     const { postId, email } = tokenData;
 
-    // 查找未确认的投票
+    // 查找未確認的投票
     const { data: vote, error: findError } = await supabaseServer
       .from('award_votes')
       .select('*')
@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
       .single();
 
     if (findError || !vote) {
-      // 检查是否已经确认过
+      // 檢查是否已經確認過
       const { data: confirmedVote } = await supabaseServer
         .from('award_votes')
         .select('id')
@@ -101,19 +101,19 @@ export async function GET(req: NextRequest) {
         .limit(1);
 
       if (confirmedVote && confirmedVote.length > 0) {
-        // 重定向到已确认页面
+        // 重定向到已確認頁面
         return NextResponse.redirect(
           new URL(`/award/confirm?error=already_confirmed`, req.url)
         );
       }
 
-      // 重定向到未找到页面
+      // 重定向到未找到頁面
       return NextResponse.redirect(
         new URL(`/award/confirm?error=not_found`, req.url)
       );
     }
 
-    // 检查今天是否已经确认过其他投票
+    // 檢查今天是否已經確認過其他投票
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -129,13 +129,13 @@ export async function GET(req: NextRequest) {
       .limit(1);
 
     if (todayVotes && todayVotes.length > 0) {
-      // 删除这个未确认的投票（因为今天已经投过票了）
+      // 刪除這個未確認的投票（因為今天已經投過票了）
       await supabaseServer
         .from('award_votes')
         .delete()
         .eq('id', vote.id);
 
-      // 重定向到已投票页面
+      // 重定向到已投票頁面
       return NextResponse.redirect(
         new URL(`/award/confirm?error=already_voted_today`, req.url)
       );

@@ -16,7 +16,7 @@ const mailgunClient = mailgunApiKey && mailgunDomain
   : null;
 
 /**
- * 生成取消订阅的 token
+ * 產生取消訂閱的 token
  */
 export function generateUnsubscribeToken(email: string): string {
   const hash = crypto
@@ -30,7 +30,7 @@ export function generateUnsubscribeToken(email: string): string {
 }
 
 /**
- * 验证并解析取消订阅的 token
+ * 驗證並解析取消訂閱的 token
  */
 export function verifyUnsubscribeToken(token: string): string | null {
   try {
@@ -41,7 +41,7 @@ export function verifyUnsubscribeToken(token: string): string | null {
       return null;
     }
     
-    // 验证 hash
+    // 驗證 hash
     const expectedHash = crypto
       .createHmac('sha256', unsubscribeSecret)
       .update(email)
@@ -58,7 +58,7 @@ export function verifyUnsubscribeToken(token: string): string | null {
 }
 
 /**
- * 发送订阅感谢邮件
+ * 發送訂閱感謝郵件
  */
 export async function sendSubscriptionThankYouEmail(email: string): Promise<boolean> {
   if (!mailgunClient || !mailgunDomain) {
@@ -184,7 +184,7 @@ Unsubscribe: ${unsubscribeUrl}
 }
 
 /**
- * 发送投票确认邮件
+ * 發送投票確認郵件
  */
 export async function sendVoteConfirmationEmail(
   email: string,

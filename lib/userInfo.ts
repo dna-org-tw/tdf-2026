@@ -1,10 +1,10 @@
 /**
- * 获取用户浏览器信息
- * 包括时区、语言区域等
+ * 獲取用戶瀏覽器資訊
+ * 包括時區、語言區域等
  */
 
 /**
- * 获取用户时区
+ * 獲取用戶時區
  */
 export function getUserTimeZone(): string {
   if (typeof window === 'undefined') {
@@ -20,7 +20,7 @@ export function getUserTimeZone(): string {
 }
 
 /**
- * 获取用户语言区域（可能包含国家信息）
+ * 獲取用戶語言區域（可能包含國家資訊）
  */
 export function getUserLocale(): string {
   if (typeof window === 'undefined') {
@@ -36,7 +36,7 @@ export function getUserLocale(): string {
 }
 
 /**
- * 获取所有用户信息
+ * 獲取所有用戶資訊
  */
 export function getUserInfo() {
   return {

@@ -15,7 +15,7 @@ function parseCSV(csvText: string): Partner[] {
     return [];
   }
 
-  // 解析表头
+  // 解析表頭
   const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
   const nameIndex = headers.indexOf('name');
   const logoIndex = headers.indexOf('logo');
@@ -27,12 +27,12 @@ function parseCSV(csvText: string): Partner[] {
 
   const partners: Partner[] = [];
 
-  // 解析数据行
+  // 解析數據行
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
 
-    // 处理 CSV 中可能包含逗号的字段（用引号包裹）
+    // 處理 CSV 中可能包含逗號的欄位（用引號包裹）
     const values: string[] = [];
     let currentValue = '';
     let inQuotes = false;

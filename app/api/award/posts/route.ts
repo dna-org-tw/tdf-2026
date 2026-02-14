@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
 // Instagram API 配置
-// 注意：需要配置 Instagram Graph API 或使用其他方式获取贴文
-// 这里提供一个基础结构，可以后续集成真实的 Instagram API
+// 注意：需要配置 Instagram Graph API 或使用其他方式獲取貼文
+// 這裡提供一個基礎結構，可以後續整合真實的 Instagram API
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 const INSTAGRAM_USER_ID = process.env.INSTAGRAM_USER_ID;
 
@@ -22,12 +22,12 @@ interface InstagramPost {
   type?: string | null;
   short_code?: string | null;
   url?: string | null;
-  // 媒体信息
+  // 媒體資訊
   display_url?: string | null;
   video_url?: string | null;
   dimensions_height?: number | null;
   dimensions_width?: number | null;
-  // 互动数据
+  // 互動數據
   likes_count?: number | null;
   comments_count?: number | null;
   video_play_count?: number | null;
@@ -35,7 +35,7 @@ interface InstagramPost {
   fb_like_count?: number | null;
   fb_play_count?: number | null;
   video_duration?: number | null;
-  // 用户信息
+  // 用戶資訊
   owner_full_name?: string | null;
   owner_username?: string | null;
   owner_id?: string | null;
@@ -43,7 +43,7 @@ interface InstagramPost {
   first_comment?: string | null;
   location_name?: string | null;
   product_type?: string | null;
-  // 数组和复杂对象
+  // 陣列和複雜物件
   hashtags?: string[] | null;
   mentions?: string[] | null;
   images?: string[] | null;
@@ -55,18 +55,18 @@ interface InstagramPost {
 }
 
 /**
- * 从 Instagram Graph API 获取带有特定标签的贴文
- * 注意：Instagram Graph API 需要通过 Hashtag Search 来获取贴文
- * 这需要 Instagram Business Account 和相应的权限
+ * 從 Instagram Graph API 獲取帶有特定標籤的貼文
+ * 注意：Instagram Graph API 需要透過 Hashtag Search 來獲取貼文
+ * 這需要 Instagram Business Account 和相應的權限
  */
 async function fetchInstagramPosts(): Promise<InstagramPost[]> {
-  // TODO: 集成真实的 Instagram API
-  // 这里提供一个示例结构，实际需要：
+  // TODO: 整合真實的 Instagram API
+  // 這裡提供一個範例結構，實際需要：
   // 1. 使用 Instagram Graph API 的 Hashtag Search
   // 2. 搜索标签 #taiwandigitalfest 和 #taiwandigitalfest
-  // 3. 获取贴文数据
+  // 3. 獲取貼文數據
   
-  // 临时返回空数组，实际应该从 Instagram API 获取
+  // 暫時回傳空陣列，實際應該從 Instagram API 獲取
   // 或者使用第三方服务如 RapidAPI 的 Instagram scraper
   
   if (!INSTAGRAM_ACCESS_TOKEN || !INSTAGRAM_USER_ID) {
@@ -75,14 +75,14 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
   }
 
   try {
-    // 示例：使用 Instagram Graph API 获取贴文
-    // 注意：实际实现需要根据 Instagram API 的最新文档
+    // 範例：使用 Instagram Graph API 獲取貼文
+    // 注意：實際實現需要根據 Instagram API 的最新文件
     // const response = await fetch(
     //   `https://graph.instagram.com/${INSTAGRAM_USER_ID}/media?fields=id,caption,media_type,media_url,permalink,timestamp,username&access_token=${INSTAGRAM_ACCESS_TOKEN}`
     // );
     // const data = await response.json();
     
-    // 从数据库获取投票数
+    // 從資料庫獲取投票數
     const { data: votes } = supabaseServer
       ? await supabaseServer
           .from('award_votes')
@@ -97,7 +97,7 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
       });
     }
 
-    // 这里应该处理从 Instagram API 获取的数据
+    // 這裡應該處理從 Instagram API 獲取的數據
     // 并合并投票数
     return [];
   } catch (error) {
@@ -107,7 +107,7 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
 }
 
 /**
- * 从数据库获取已存储的贴文（如果使用数据库存储贴文数据）
+ * 從資料庫獲取已儲存的貼文（如果使用資料庫儲存貼文數據）
  */
 async function getStoredPosts(): Promise<InstagramPost[]> {
   if (!supabaseServer) {
@@ -125,7 +125,7 @@ async function getStoredPosts(): Promise<InstagramPost[]> {
       return [];
     }
 
-    // 获取每个贴文的投票数
+    // 獲取每個貼文的投票數
     const { data: votes } = supabaseServer
       ? await supabaseServer
           .from('award_votes')
@@ -222,7 +222,7 @@ async function getStoredPosts(): Promise<InstagramPost[]> {
 }
 
 /**
- * 从 ig_posts 表获取数据（优先使用）
+ * 從 ig_posts 表獲取數據（優先使用）
  */
 async function getIgPosts(): Promise<InstagramPost[]> {
   if (!supabaseServer) {
@@ -231,7 +231,7 @@ async function getIgPosts(): Promise<InstagramPost[]> {
   }
 
   try {
-    // 获取所有数据，然后按 data.timestamp 排序
+    // 獲取所有數據，然後按 data.timestamp 排序
     let { data: igPosts, error: igError } = await supabaseServer
       .from('ig_posts')
       .select('*');
@@ -286,10 +286,10 @@ async function getIgPosts(): Promise<InstagramPost[]> {
 }
 
 /**
- * 处理 ig_posts 数据并转换为 InstagramPost 格式
+ * 處理 ig_posts 數據並轉換為 InstagramPost 格式
  */
 async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
-  // 获取每个贴文的投票数
+  // 獲取每個貼文的投票數
   const voteCounts: Record<string, number> = {};
   
   if (supabaseServer) {
@@ -309,9 +309,9 @@ async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
     }
   }
 
-  // 处理 ig_posts 数据格式
+  // 處理 ig_posts 數據格式
   return igPosts.map((post: any): InstagramPost => {
-    // 处理 JSONB 数据
+    // 處理 JSONB 數據
     let postData = post;
     if (post.data && typeof post.data === 'object') {
       postData = { ...post, ...post.data };
@@ -337,12 +337,12 @@ async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
             timestamp = parsedData.timestamp;
           }
         } catch {
-          // 解析失败，继续使用其他备选方案
+          // 解析失敗，繼續使用其他備選方案
         }
       }
     }
     
-    // 如果 data.timestamp 不存在，使用其他备选方案（确保始终返回字符串）
+    // 如果 data.timestamp 不存在，使用其他備選方案（確保始終回傳字串）
     const finalTimestamp: string = timestamp || postData.timestamp || postData.created_at || post.created_at || new Date().toISOString();
     
     return {
@@ -389,15 +389,15 @@ async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
 
 export async function GET(_req: NextRequest) {
   try {
-    // 优先从 ig_posts 表获取所有数据
+    // 優先從 ig_posts 表獲取所有數據
     let posts = await getIgPosts();
 
-    // 如果 ig_posts 表中没有数据，尝试从 award_posts 表获取
+    // 如果 ig_posts 表中沒有數據，嘗試從 award_posts 表獲取
     if (posts.length === 0) {
       posts = await getStoredPosts();
     }
 
-    // 如果数据库中没有贴文，尝试从 Instagram API 获取
+    // 如果資料庫中沒有貼文，嘗試從 Instagram API 獲取
     if (posts.length === 0) {
       posts = await fetchInstagramPosts();
     }

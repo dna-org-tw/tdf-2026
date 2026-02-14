@@ -70,7 +70,7 @@ export default function OrderQueryPage() {
       order_id: orderId.trim(),
     });
 
-    // 如果有 reCAPTCHA，使用 grecaptcha.enterprise.execute() 获取 token
+    // 如果有 reCAPTCHA，使用 grecaptcha.enterprise.execute() 獲取 token
     if (recaptchaSiteKey) {
       try {
         // 检查 grecaptcha 是否已加载
@@ -85,7 +85,7 @@ export default function OrderQueryPage() {
         setError(t.orderQuery?.recaptchaError ?? 'reCAPTCHA verification failed. Please try again.');
       }
     } else {
-      // 如果没有配置 reCAPTCHA，直接提交
+      // 如果沒有配置 reCAPTCHA，直接提交
       submitOrderQuery('');
     }
   };

@@ -8,11 +8,11 @@ const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6Lcu81gs
 const recaptchaProjectId = process.env.RECAPTCHA_PROJECT_ID || 'tdna-1769599168858';
 const voteSecret = process.env.VOTE_SECRET || 'default-vote-secret-change-in-production';
 
-// 投票截止时间：2026年4月30日 12:00 (台湾时间)
+// 投票截止時間：2026年4月30日 12:00（台灣時間）
 const VOTING_DEADLINE = new Date('2026-04-30T12:00:00+08:00');
 
 /**
- * 生成投票确认 token
+ * 產生投票確認 token
  */
 function generateVoteToken(postId: string, email: string): string {
   const hash = crypto
@@ -25,7 +25,7 @@ function generateVoteToken(postId: string, email: string): string {
 }
 
 /**
- * 验证并解析投票 token
+ * 驗證並解析投票 token
  */
 function verifyVoteToken(token: string): { postId: string; email: string } | null {
   try {
@@ -38,7 +38,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
     
     const [postId, email, timestamp, hash] = parts;
     
-    // 验证 hash
+    // 驗證 hash
     const expectedHash = crypto
       .createHmac('sha256', voteSecret)
       .update(`${postId}:${email}:${timestamp}`)
@@ -48,7 +48,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
       return null;
     }
     
-    // 检查 token 是否过期（24小时）
+    // 檢查 token 是否過期（24 小時）
     const tokenTime = parseInt(timestamp, 10);
     const now = Date.now();
     if (now - tokenTime > 24 * 60 * 60 * 1000) {
@@ -62,7 +62,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
 }
 
 /**
- * 检查用户今天是否已经投票
+ * 檢查用戶今天是否已經投票
  */
 async function hasVotedToday(email: string): Promise<boolean> {
   if (!supabaseServer) {
@@ -97,19 +97,19 @@ async function hasVotedToday(email: string): Promise<boolean> {
 }
 
 /**
- * 检查用户是否已关注 Instagram 账号
- * 注意：这需要 Instagram API 来验证，这里提供一个基础结构
+ * 檢查用戶是否已關注 Instagram 帳號
+ * 注意：這需要 Instagram API 來驗證，這裡提供一個基礎結構
  */
 async function checkIfFollowing(email: string, username: string): Promise<boolean> {
-  // TODO: 集成 Instagram API 来检查用户是否已关注
-  // 这里暂时返回 true，实际应该调用 Instagram API
-  // 或者通过其他方式验证（如要求用户提供 Instagram 用户名）
+  // TODO: 整合 Instagram API 來檢查用戶是否已關注
+  // 這裡暫時回傳 true，實際應該呼叫 Instagram API
+  // 或透過其他方式驗證（如要求用戶提供 Instagram 用戶名）
   return true;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    // 检查投票是否已截止
+    // 檢查投票是否已截止
     if (new Date() > VOTING_DEADLINE) {
       return NextResponse.json(
         { error: 'Voting has ended' },
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
     const { postId, email, recaptchaToken } = body;
     const emailLower = email.trim().toLowerCase();
 
-    // 验证 Email 格式
+    // 驗證 Email 格式
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailLower)) {
       return NextResponse.json(
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 验证 reCAPTCHA
+    // 驗證 reCAPTCHA
     if (recaptchaApiKey) {
       if (!recaptchaToken) {
         return NextResponse.json(
@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // 检查风险评分
+        // 檢查風險評分
         if (recaptchaData.riskAnalysis?.score !== undefined) {
           const score = recaptchaData.riskAnalysis.score;
           if (score < 0.5) {
@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 检查今天是否已经投票
+    // 檢查今天是否已經投票
     const alreadyVoted = await hasVotedToday(emailLower);
     if (alreadyVoted) {
       return NextResponse.json(
@@ -220,7 +220,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 检查 post_id 是否存在于 ig_posts 表
+    // 檢查 post_id 是否存在於 ig_posts 表
     const { data: postExists, error: postCheckError } = await supabaseServer
       .from('ig_posts')
       .select('id')
@@ -243,7 +243,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 检查是否已关注（检查 newsletter_subscriptions 表）
+    // 檢查是否已關注（檢查 newsletter_subscriptions 表）
     const { data: subscription, error: subscriptionError } = await supabaseServer
       .from('newsletter_subscriptions')
       .select('email')
@@ -252,9 +252,9 @@ export async function POST(req: NextRequest) {
 
     if (subscriptionError) {
       console.error('[Award Vote API] Error checking subscription:', subscriptionError);
-      // 如果查询出错，继续执行投票流程（不阻止投票）
+      // 如果查詢出錯，繼續執行投票流程（不阻止投票）
     } else if (!subscription || subscription.length === 0) {
-      // 用户未订阅，返回需要关注的错误
+      // 用戶未訂閱，回傳需要關注的錯誤
       return NextResponse.json(
         { 
           error: 'Please follow us first to vote. Subscribe to our newsletter to continue.',
@@ -264,7 +264,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 检查是否已有未确认的投票
+    // 檢查是否已有未確認的投票
     const { data: existingVote, error: existingVoteError } = await supabaseServer
       .from('award_votes')
       .select('id')
@@ -284,15 +284,15 @@ export async function POST(req: NextRequest) {
     let voteId: string;
 
     if (existingVote && existingVote.length > 0) {
-      // 更新现有未确认的投票
+      // 更新現有未確認的投票
       voteId = existingVote[0].id;
     } else {
-      // 创建新的投票记录（不设置 created_at，让数据库使用默认值）
+      // 建立新的投票記錄（不設定 created_at，讓資料庫使用預設值）
       const voteData = {
         post_id: postId,
         email: emailLower,
         confirmed: false,
-        // created_at 由数据库自动设置（DEFAULT NOW()）
+        // created_at 由資料庫自動設定（DEFAULT NOW()）
       };
       
       const { data: newVote, error: insertError } = await supabaseServer
@@ -313,7 +313,7 @@ export async function POST(req: NextRequest) {
           email: emailLower,
         });
         
-        // 提供更友好的错误信息
+        // 提供更友善的錯誤資訊
         let errorMessage = 'Failed to create vote';
         if (insertError.code === '23503') {
           errorMessage = 'Invalid post ID. The post may not exist.';
@@ -344,15 +344,15 @@ export async function POST(req: NextRequest) {
       voteId = newVote.id;
     }
 
-    // 生成确认 token
+    // 產生確認 token
     const confirmToken = generateVoteToken(postId, emailLower);
 
-    // 发送确认邮件
+    // 發送確認郵件
     try {
       await sendVoteConfirmationEmail(emailLower, postId, confirmToken);
     } catch (emailError) {
       console.error('[Award Vote API] Failed to send confirmation email:', emailError);
-      // 邮件发送失败不影响投票记录的创建
+      // 郵件發送失敗不影響投票記錄的建立
     }
 
     return NextResponse.json(

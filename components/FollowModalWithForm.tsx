@@ -43,7 +43,7 @@ export default function FollowModalWithForm({
     setIsSubmitting(true);
 
     try {
-      // 执行 reCAPTCHA 验证
+      // 執行 reCAPTCHA 驗證
       let recaptchaToken: string | null = null;
       try {
         recaptchaToken = await executeRecaptcha();
@@ -54,7 +54,7 @@ export default function FollowModalWithForm({
         return;
       }
 
-      // 获取用户信息
+      // 獲取用戶資訊
       const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {
@@ -79,7 +79,7 @@ export default function FollowModalWithForm({
         if (response.status === 409) {
           setModalType('duplicate');
           setModalMessage(result.error || t.hero.followForm.duplicateMessage);
-          // 即使重复订阅，也视为成功（用户已经订阅了）
+          // 即使重複訂閱，也視為成功（用戶已經訂閱了）
           setTimeout(() => {
             onSuccess(trimmedEmail);
             onClose();

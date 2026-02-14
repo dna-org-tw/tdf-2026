@@ -9,7 +9,7 @@ export default function NotFound() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    // 从当前 URL 获取查询参数（特别是 lang 参数）
+    // 從目前 URL 獲取查詢參數（特別是 lang 參數）
     if (typeof window !== 'undefined') {
       const searchParams = window.location.search;
       const redirectUrl = searchParams ? `/${searchParams}` : '/';
@@ -19,7 +19,7 @@ export default function NotFound() {
     }
   }, [router]);
 
-  // 显示加载状态，因为重定向会很快发生
+  // 顯示載入狀態，因為重定向會很快發生
   return (
     <div className="h-screen w-full flex items-center justify-center bg-stone-50">
       <div className="text-center">

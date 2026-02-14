@@ -18,7 +18,7 @@
   --color-white: #FFFFFF;
   --color-black: #000000;
 
-  /* 兼容性映射 - 保持现有语义化变量名 */
+  /* 相容性對應 - 保持現有語義化變數名 */
   --color-ocean: #004E9D;
   --color-ocean-light: #10B8D9;
   --color-forest: #00993E;
@@ -32,28 +32,28 @@
 body {
   background-color: var(--color-light-gray);
   color: var(--color-dark-gray);
-  /* 平滑滚动和过渡 */
+  /* 平滑捲動和過渡 */
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Section 过渡优化 */
+/* Section 過渡優化 */
 section {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 统一的容器最大宽度 */
+/* 統一的容器最大寬度 */
 .container {
   max-width: 1280px;
 }
 
-/* 优化按钮和链接的过渡 */
+/* 優化按鈕和連結的過渡 */
 a, button {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 优化卡片阴影 */
+/* 優化卡片陰影 */
 .shadow-lg {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }

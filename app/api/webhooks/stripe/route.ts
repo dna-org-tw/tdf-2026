@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     let event: Stripe.Event;
 
-    // 验证 webhook 签名
+    // 驗證 webhook 簽章
     if (webhookSecret) {
       try {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         );
       }
     } else {
-      // 如果没有设置 webhook secret，直接解析（仅用于开发环境）
+      // 如果沒有設定 webhook secret，直接解析（僅用於開發環境）
       try {
         event = JSON.parse(body) as Stripe.Event;
       } catch (err) {
@@ -81,13 +81,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 处理 checkout.session.completed 事件
+    // 處理 checkout.session.completed 事件
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
 
       console.log('[Webhook] Processing checkout.session.completed:', session.id);
 
-      // 获取支付详情
+      // 獲取支付詳情
       let paymentIntent: Stripe.PaymentIntent | null = null;
       let charge: Stripe.Charge | null = null;
 
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 提取客户信息
+      // 擷取客戶資訊
       const customerDetails = session.customer_details;
       const customerAddress = customerDetails?.address
         ? {
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
           }
         : null;
 
-      // 提取支付方式信息
+      // 擷取支付方式資訊
       const paymentMethodBrand =
         charge?.payment_method_details?.card?.brand || null;
       const paymentMethodLast4 =
@@ -171,7 +171,7 @@ export async function POST(req: NextRequest) {
         console.warn('[Webhook] Failed to update order for session:', session.id);
       }
     }
-    // 处理 payment_intent.succeeded 事件（备用）
+    // 處理 payment_intent.succeeded 事件（備用）
     else if (event.type === 'payment_intent.succeeded') {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       const checkoutSessionId = paymentIntent.metadata?.checkout_session_id;
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
         }
       }
     }
-    // 处理 checkout.session.async_payment_succeeded 事件
+    // 處理 checkout.session.async_payment_succeeded 事件
     else if (event.type === 'checkout.session.async_payment_succeeded') {
       const session = event.data.object as Stripe.Checkout.Session;
 
@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
         console.warn('[Webhook] Failed to update order for session:', session.id);
       }
     }
-    // 处理 checkout.session.async_payment_failed 事件
+    // 處理 checkout.session.async_payment_failed 事件
     else if (event.type === 'checkout.session.async_payment_failed') {
       const session = event.data.object as Stripe.Checkout.Session;
 
@@ -235,7 +235,7 @@ export async function POST(req: NextRequest) {
         console.warn('[Webhook] Failed to update order for session:', session.id);
       }
     }
-    // 处理 checkout.session.expired 事件（session 过期/取消）
+    // 處理 checkout.session.expired 事件（session 過期/取消）
     else if (event.type === 'checkout.session.expired') {
       const session = event.data.object as Stripe.Checkout.Session;
 

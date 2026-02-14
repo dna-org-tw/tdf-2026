@@ -1,6 +1,6 @@
 import { InstagramPost } from './types';
 
-// 获取帖子主图
+// 獲取貼文主圖
 export const getPostImage = (post: InstagramPost): string => {
   if (post.media_url) return post.media_url;
   if (post.display_url) return post.display_url;
@@ -9,7 +9,7 @@ export const getPostImage = (post: InstagramPost): string => {
   return '';
 };
 
-// 获取帖子链接
+// 獲取貼文連結
 export const getPostLink = (post: InstagramPost): string => {
   if (post.permalink) return post.permalink;
   if (post.url) return post.url;
@@ -17,7 +17,7 @@ export const getPostLink = (post: InstagramPost): string => {
   return '#';
 };
 
-// 获取帖子用户名
+// 獲取貼文用戶名
 export const getPostUsername = (post: InstagramPost): string => {
   return post.username || post.owner_username || post.ownerUsername || '';
 };

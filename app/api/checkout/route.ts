@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 获取价格信息以获取金额
+    // 獲取價格資訊以獲取金額
     const price = await stripe.prices.retrieve(priceId);
     const amount = price.unit_amount || 0;
 
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     if (!order) {
       console.warn('[Checkout] Failed to create order in Supabase, but Stripe session was created:', session.id);
-      // 不阻止返回，因为 Stripe session 已创建成功
+      // 不阻止返回，因為 Stripe session 已建立成功
     } else {
       console.log('[Checkout] Order created in Supabase:', order.id);
     }

@@ -27,7 +27,7 @@ export const content = {
     },
     nav: {
       about: "About",
-      team: "Team",
+      team: "All of Us",
       why: "Why Taiwan",
       highlights: "Events",
       schedule: "Schedule",
@@ -41,7 +41,7 @@ export const content = {
     },
     navShort: {
       about: "About",
-      team: "Team",
+      team: "All of Us",
       why: "Why",
       highlights: "Events",
       schedule: "Schedule",
@@ -633,16 +633,6 @@ export const content = {
       recaptchaNotLoaded: "reCAPTCHA is not loaded. Please refresh the page.",
       backToHome: "Back to homepage"
     },
-    sideEvents: {
-      title: "Side Events Calendar",
-      subtitle: "Discover community-organized side events happening throughout May 2026",
-      errorMessage: "Please try again later or visit the Luma calendar directly.",
-      loadError: "Failed to load events",
-      visitLuma: "Visit Luma Calendar",
-      noEvents: "No side events found at the moment.",
-      viewEvent: "View Event",
-      viewAllEvents: "View All Events on Luma"
-    },
     errorBoundary: {
       title: "Error loading content",
       description: "We couldn't load this content. Please refresh the page or try again later.",
@@ -812,7 +802,7 @@ export const content = {
     },
     nav: {
       about: "關於",
-      team: "主辦團隊",
+      team: "我們所有人",
       why: "為什麼是這裡",
       highlights: "活動",
       schedule: "重要時程",
@@ -826,7 +816,7 @@ export const content = {
     },
     navShort: {
       about: "關於",
-      team: "團隊",
+      team: "我們所有人",
       why: "為什麼",
       highlights: "活動",
       schedule: "時程",
@@ -1418,16 +1408,6 @@ export const content = {
       recaptchaNotLoaded: "reCAPTCHA 尚未載入，請刷新頁面。",
       backToHome: "返回首頁"
     },
-    sideEvents: {
-      title: "Side Events 行事曆",
-      subtitle: "探索 2026 年 5 月期間由社群組織的 Side Events",
-      errorMessage: "請稍後再試，或直接造訪 Luma 行事曆。",
-      loadError: "無法載入活動",
-      visitLuma: "造訪 Luma 行事曆",
-      noEvents: "目前沒有找到 Side Events。",
-      viewEvent: "查看活動",
-      viewAllEvents: "在 Luma 上查看所有活動"
-    },
     errorBoundary: {
       title: "載入時發生錯誤",
       description: "我們無法載入此內容。請重新整理頁面或稍後再試。",
@@ -1461,8 +1441,8 @@ export const content = {
       supabaseNotConfigured: "Supabase 服務端尚未設定完成。",
       emailRequired: "請提供有效的 Email 地址。",
       invalidEmailFormat: "Email 格式不正確。",
-      recaptchaRequired: "reCAPTCHA 验证是必需的。",
-      recaptchaFailed: "reCAPTCHA 验证失败，请稍后重试。",
+      recaptchaRequired: "reCAPTCHA 驗證是必需的。",
+      recaptchaFailed: "reCAPTCHA 驗證失敗，請稍後重試。",
       subscriptionFailed: "訂閱失敗，請稍後再試。",
       alreadySubscribed: "此 Email 已經訂閱過了。",
       subscriptionSuccess: "已成功訂閱！感謝你的關注 🙌",

@@ -1,16 +1,16 @@
-# Nomad Award 数据库设置
+# Nomad Award 資料庫設定
 
-本文档说明 Nomad Award 功能所需的数据库表结构。
+本文件說明 Nomad Award 功能所需的資料庫表結構。
 
-## 需要的数据库表
+## 需要的資料庫表
 
 ### 1. `award_posts` 表
 
-存储 Instagram 贴文信息，包含从 API 获取的所有字段。
+儲存 Instagram 貼文資訊，包含從 API 獲取的所有欄位。
 
 ```sql
 CREATE TABLE award_posts (
-  -- 基础字段（向后兼容）
+  -- 基礎欄位（向後相容）
   id TEXT PRIMARY KEY,
   permalink TEXT,
   media_url TEXT,
@@ -18,19 +18,19 @@ CREATE TABLE award_posts (
   username TEXT,
   timestamp TIMESTAMPTZ,
   
-  -- API 返回的主要字段
+  -- API 回傳的主要欄位
   input_url TEXT,
   post_type TEXT,  -- 'Sidecar', 'Video', 'Image', 'Clips' 等
   short_code TEXT,
   url TEXT,
   
-  -- 媒体信息
+  -- 媒體資訊
   display_url TEXT,
   video_url TEXT,
   dimensions_height INTEGER,
   dimensions_width INTEGER,
   
-  -- 互动数据
+  -- 互動數據
   likes_count INTEGER DEFAULT 0,
   comments_count INTEGER DEFAULT 0,
   video_play_count INTEGER DEFAULT 0,
@@ -39,27 +39,27 @@ CREATE TABLE award_posts (
   fb_play_count INTEGER DEFAULT 0,
   video_duration NUMERIC,
   
-  -- 用户信息
+  -- 用戶資訊
   owner_full_name TEXT,
   owner_username TEXT,
   owner_id TEXT,
   
-  -- 其他信息
+  -- 其他資訊
   first_comment TEXT,
   location_name TEXT,
   product_type TEXT,  -- 'carousel_container', 'carousel_item', 'clips' 等
   
-  -- 数组和复杂对象存储在 JSONB 中
-  hashtags JSONB,  -- 字符串数组
-  mentions JSONB,  -- 字符串数组
-  images JSONB,  -- 字符串数组
-  latest_comments JSONB,  -- 对象数组
-  child_posts JSONB,  -- 复杂对象数组
-  tagged_users JSONB,  -- 对象数组
-  music_info JSONB,  -- 复杂对象
-  coauthor_producers JSONB,  -- 对象数组
+  -- 陣列和複雜物件儲存在 JSONB 中
+  hashtags JSONB,  -- 字串陣列
+  mentions JSONB,  -- 字串陣列
+  images JSONB,  -- 字串陣列
+  latest_comments JSONB,  -- 物件陣列
+  child_posts JSONB,  -- 複雜物件陣列
+  tagged_users JSONB,  -- 物件陣列
+  music_info JSONB,  -- 複雜物件
+  coauthor_producers JSONB,  -- 物件陣列
   
-  -- 元数据
+  -- 元數據
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -73,10 +73,10 @@ CREATE INDEX idx_award_posts_hashtags ON award_posts USING GIN (hashtags);
 CREATE INDEX idx_award_posts_tagged_users ON award_posts USING GIN (tagged_users);
 ```
 
-**注意**：如果表已存在，需要执行以下迁移脚本：
+**注意**：如果表已存在，需要執行以下遷移腳本：
 
 ```sql
--- 添加新字段
+-- 添加新欄位
 ALTER TABLE award_posts 
   ADD COLUMN IF NOT EXISTS input_url TEXT,
   ADD COLUMN IF NOT EXISTS post_type TEXT,
@@ -108,7 +108,7 @@ ALTER TABLE award_posts
   ADD COLUMN IF NOT EXISTS music_info JSONB,
   ADD COLUMN IF NOT EXISTS coauthor_producers JSONB;
 
--- 创建索引
+-- 建立索引
 CREATE INDEX IF NOT EXISTS idx_award_posts_timestamp ON award_posts(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_award_posts_type ON award_posts(post_type);
 CREATE INDEX IF NOT EXISTS idx_award_posts_owner_username ON award_posts(owner_username);
@@ -118,7 +118,7 @@ CREATE INDEX IF NOT EXISTS idx_award_posts_tagged_users ON award_posts USING GIN
 
 ### 2. `award_votes` 表
 
-存储投票记录。
+儲存投票記錄。
 
 ```sql
 CREATE TABLE award_votes (
@@ -141,7 +141,7 @@ CREATE UNIQUE INDEX idx_award_votes_unique_unconfirmed ON award_votes(post_id, e
 
 ### 3. `award_fetch_log` 表
 
-存储 Instagram Reels 抓取日志和最后抓取时间。
+儲存 Instagram Reels 抓取日誌和最後抓取時間。
 
 ```sql
 CREATE TABLE award_fetch_log (
@@ -154,42 +154,42 @@ CREATE TABLE award_fetch_log (
 CREATE INDEX idx_award_fetch_log_last_fetch_at ON award_fetch_log(last_fetch_at DESC);
 ```
 
-## 环境变量
+## 環境變數
 
-需要在 `.env` 或环境配置中添加以下变量：
+需要在 `.env` 或環境配置中添加以下變數：
 
 ```env
-# 投票确认 token 密钥（用于生成和验证投票确认链接）
+# 投票確認 token 金鑰（用於產生和驗證投票確認連結）
 VOTE_SECRET=your-secret-key-here-change-in-production
 
-# Instagram API 配置（可选，如果需要自动获取 Instagram 贴文和 Reels）
+# Instagram API 配置（可選，如果需要自動獲取 Instagram 貼文和 Reels）
 INSTAGRAM_ACCESS_TOKEN=your-instagram-access-token
 INSTAGRAM_USER_ID=your-instagram-user-id
-INSTAGRAM_HASHTAG_ID=your-instagram-hashtag-id  # 可选的 hashtag ID（用于直接通过 hashtag 获取 Reels）
+INSTAGRAM_HASHTAG_ID=your-instagram-hashtag-id  # 可選的 hashtag ID（用於直接透過 hashtag 獲取 Reels）
 ```
 
-## Instagram 贴文和 Reels 获取
+## Instagram 貼文和 Reels 獲取
 
-目前代码提供了两种方式获取 Instagram 贴文和 Reels：
+目前程式碼提供了兩種方式獲取 Instagram 貼文和 Reels：
 
-1. **从数据库获取**：手动或通过脚本将贴文数据插入到 `award_posts` 表中
-2. **从 Instagram API 获取**：配置 Instagram Graph API 后，系统会自动获取带有特定标签的贴文和 Reels
+1. **從資料庫獲取**：手動或透過腳本將貼文數據插入到 `award_posts` 表中
+2. **從 Instagram API 獲取**：配置 Instagram Graph API 後，系統會自動獲取帶有特定標籤的貼文和 Reels
 
-### 自动抓取 Reels
+### 自動抓取 Reels
 
-当用户访问 award 页面时，系统会自动调用 `/api/award/fetch-reels` API 来：
-- 从 Instagram Graph API 抓取带有 `#taiwandigitalfest` 或 `#taiwandigitalfest` 标签的 Reels
-- 将抓取到的 Reels 保存到 `award_posts` 表中
-- 更新 `award_fetch_log` 表中的最后抓取时间
+當用戶存取 award 頁面時，系統會自動呼叫 `/api/award/fetch-reels` API 來：
+- 從 Instagram Graph API 抓取帶有 `#taiwandigitalfest` 或 `#taiwandigitalfest` 標籤的 Reels
+- 將抓取到的 Reels 儲存到 `award_posts` 表中
+- 更新 `award_fetch_log` 表中的最後抓取時間
 
-抓取逻辑会：
-- 优先使用 Hashtag API（如果配置了 `INSTAGRAM_HASHTAG_ID`）
-- 如果没有配置 Hashtag ID，则从用户媒体中过滤出包含相关标签的 Reels
-- 自动去重，避免重复保存相同的 Reel
+抓取邏輯會：
+- 優先使用 Hashtag API（如果配置了 `INSTAGRAM_HASHTAG_ID`）
+- 如果沒有配置 Hashtag ID，則從用戶媒體中過濾出包含相關標籤的 Reels
+- 自動去重，避免重複儲存相同的 Reel
 
-### 手动添加贴文示例
+### 手動添加貼文範例
 
-**基础字段插入**（向后兼容）：
+**基礎欄位插入**（向後相容）：
 ```sql
 INSERT INTO award_posts (id, permalink, media_url, caption, username, timestamp)
 VALUES (
@@ -202,7 +202,7 @@ VALUES (
 );
 ```
 
-**完整字段插入**（包含所有 API 数据）：
+**完整欄位插入**（包含所有 API 數據）：
 ```sql
 INSERT INTO award_posts (
   id, permalink, media_url, caption, username, timestamp,
@@ -244,22 +244,22 @@ VALUES (
 );
 ```
 
-**字段说明**：
-- **基础字段**：id, permalink, media_url, caption, username, timestamp（向后兼容）
-- **API 主要字段**：input_url, post_type, short_code, url
-- **媒体信息**：display_url, video_url, dimensions_height, dimensions_width
-- **互动数据**：likes_count, comments_count, video_play_count, ig_play_count, fb_like_count, fb_play_count, video_duration
-- **用户信息**：owner_full_name, owner_username, owner_id
-- **其他信息**：first_comment, location_name, product_type
-- **数组字段（JSONB）**：hashtags, mentions, images, latest_comments, child_posts, tagged_users, coauthor_producers
-- **复杂对象（JSONB）**：music_info
+**欄位說明**：
+- **基礎欄位**：id, permalink, media_url, caption, username, timestamp（向後相容）
+- **API 主要欄位**：input_url, post_type, short_code, url
+- **媒體資訊**：display_url, video_url, dimensions_height, dimensions_width
+- **互動數據**：likes_count, comments_count, video_play_count, ig_play_count, fb_like_count, fb_play_count, video_duration
+- **用戶資訊**：owner_full_name, owner_username, owner_id
+- **其他資訊**：first_comment, location_name, product_type
+- **陣列欄位（JSONB）**：hashtags, mentions, images, latest_comments, child_posts, tagged_users, coauthor_producers
+- **複雜物件（JSONB）**：music_info
 
-## 注意事项
+## 注意事項
 
-1. **投票截止时间**：代码中硬编码为 2026年4月30日 12:00 (台湾时间)，如需修改请更新 `app/api/award/vote/route.ts` 和 `app/api/award/confirm-vote/route.ts` 中的 `VOTING_DEADLINE` 常量。
+1. **投票截止時間**：程式碼中硬編碼為 2026年4月30日 12:00（台灣時間），如需修改請更新 `app/api/award/vote/route.ts` 和 `app/api/award/confirm-vote/route.ts` 中的 `VOTING_DEADLINE` 常數。
 
-2. **投票限制**：每个邮箱每天只能投票一次，通过 `confirmed_at` 字段的时间戳来判断。
+2. **投票限制**：每個郵箱每天只能投票一次，透過 `confirmed_at` 欄位的時間戳來判斷。
 
-3. **reCAPTCHA 保护**：所有投票请求都需要通过 reCAPTCHA Enterprise 验证。
+3. **reCAPTCHA 保護**：所有投票請求都需要透過 reCAPTCHA Enterprise 驗證。
 
-4. **邮件确认**：投票后需要点击邮件中的确认链接才能完成投票。
+4. **郵件確認**：投票後需要點擊郵件中的確認連結才能完成投票。

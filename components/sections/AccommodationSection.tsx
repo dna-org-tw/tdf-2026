@@ -34,7 +34,7 @@ const NomadMap = dynamic(
   }
 );
 
-// 将地址对象或字符串转换为字符串格式
+// 將地址物件或字串轉換為字串格式
 function formatAddressToString(address: string | StructuredAddress): string {
   if (typeof address === 'string') {
     return address;
@@ -71,11 +71,11 @@ export default function AccommodationSection() {
   const items = t.accommodation.items;
   useSectionTracking({ sectionId: 'accommodation', sectionName: 'Accommodation Section', category: 'Event Information' });
   
-  // 直接从数据中获取经纬度，而不是通过 geocoding API
+  // 直接從數據中獲取經緯度，而不是透過 geocoding API
   const coordinatesMap = useMemo(() => {
     const coords = new Map<string, Coordinates>();
     items.forEach((item) => {
-      // 检查数据中是否有经纬度字段
+      // 檢查數據中是否有經緯度欄位
       if ('latitude' in item && 'longitude' in item && 
           typeof item.latitude === 'number' && typeof item.longitude === 'number') {
         const addressString = formatAddressToString(item.address);

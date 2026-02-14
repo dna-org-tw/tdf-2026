@@ -12,7 +12,7 @@ const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 export function useRecaptcha(action: string = 'subscribe') {
   const executeRecaptcha = useCallback(async (): Promise<string | null> => {
     if (!recaptchaSiteKey) {
-      // 如果没有配置 reCAPTCHA，返回 null（允许继续提交）
+      // 如果沒有配置 reCAPTCHA，回傳 null（允許繼續提交）
       return null;
     }
 
@@ -22,7 +22,7 @@ export function useRecaptcha(action: string = 'subscribe') {
         throw new Error('reCAPTCHA is not loaded. Please refresh the page.');
       }
 
-      // 执行 reCAPTCHA 验证
+      // 執行 reCAPTCHA 驗證
       const token = await window.grecaptcha.enterprise.execute(recaptchaSiteKey, {
         action,
       });

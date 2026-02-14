@@ -101,7 +101,7 @@
 | 票券追蹤區訂閱成功 | `content_name`, `content_category`, `email`, `location: 'tickets_section'` |
 | Follow Us 區訂閱成功 | `content_name`, `content_category`, `email`, `location: 'follow_us_section'` |
 
-**程式位置**：`components/sections/HeroSection.tsx`、`components/sections/TicketsSection.tsx`、`components/sections/TicketFollowSection.tsx`、`components/sections/FollowUsSection.tsx`
+**程式位置**：`components/sections/HeroSection.tsx`、`components/sections/TicketsSection.tsx`、`components/sections/FollowUsSection.tsx`
 
 ---
 
@@ -149,7 +149,7 @@
 | 訂閱表單：重複 email | `result: 'duplicate'`, `location`, `email` |
 | 訂閱表單：API 或網路錯誤 | `result: 'error'`, `location`, `email`, 選填 `reason`, `status`, `message` |
 
-**程式位置**：`components/sections/HeroSection.tsx`、`components/sections/TicketFollowSection.tsx`、`components/sections/FollowUsSection.tsx`
+**程式位置**：`components/sections/HeroSection.tsx`、`components/sections/FollowUsSection.tsx`
 
 ---
 

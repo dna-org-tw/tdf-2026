@@ -16,7 +16,7 @@ const Footer = dynamic(() => import('@/components/Footer'), {
 });
 
 // AEO优化：启用SSR以确保AI爬虫可以访问内容
-// 关键内容区域使用SSR，提升AI可访问性和SEO表现
+// 關鍵內容區域使用 SSR，提升 AI 可存取性和 SEO 表現
 const AboutSection = dynamic(() => import('@/components/sections/AboutSection'), {
   ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-white animate-pulse" />,

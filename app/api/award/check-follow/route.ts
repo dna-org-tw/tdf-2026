@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
 /**
- * 检查用户是否已关注（订阅 newsletter）
+ * 檢查用戶是否已關注（訂閱 newsletter）
  */
 export async function POST(req: NextRequest) {
   try {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const email = body.email.trim().toLowerCase();
 
-    // 验证 Email 格式
+    // 驗證 Email 格式
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 检查是否已订阅 newsletter
+    // 檢查是否已訂閱 newsletter
     const { data: subscription, error: subscriptionError } = await supabaseServer
       .from('newsletter_subscriptions')
       .select('email')

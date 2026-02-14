@@ -21,7 +21,7 @@ function mapPaymentStatusToOrderStatus(
   if (sessionStatus === 'complete' && paymentStatus === 'paid') {
     return 'paid';
   }
-  // session 过期或未完成且未支付，视为取消
+  // session 過期或未完成且未支付，視為取消
   if (sessionStatus === 'expired' || (sessionStatus !== 'complete' && paymentStatus === 'unpaid')) {
     return 'cancelled';
   }
@@ -52,12 +52,12 @@ export async function POST(req: NextRequest) {
     const sessionId = body.session_id as string;
     const forceStatus = body.force_status as OrderStatus | undefined;
 
-    // 从 Stripe 获取最新的 session 信息
+    // 從 Stripe 獲取最新的 session 資訊
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['payment_intent', 'payment_intent.latest_charge', 'line_items'],
     });
 
-    // 获取支付详情
+    // 獲取支付詳情
     let charge: Stripe.Charge | null = null;
     const paymentIntent = session.payment_intent as Stripe.PaymentIntent | null;
 
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 提取客户信息
+    // 擷取客戶資訊
     const customerDetails = session.customer_details;
     const customerAddress = customerDetails?.address
       ? {
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
         }
       : null;
 
-    // 提取支付方式信息
+    // 擷取支付方式資訊
     const paymentMethodBrand = charge?.payment_method_details?.card?.brand || null;
     const paymentMethodLast4 = charge?.payment_method_details?.card?.last4 || null;
     const paymentMethodType = charge?.payment_method_details?.type || null;

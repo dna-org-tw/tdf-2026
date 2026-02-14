@@ -26,11 +26,11 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
       'https://www.facebook.com/taiwandigitalfest',
       'https://www.instagram.com/taiwandigitalfest',
       'https://dna.org.tw',
-      // AEO优化：实体链接到外部知识库，提升实体权威性
+      // AEO 優化：實體連結到外部知識庫，提升實體權威性
       // 如果TDNA有Wikipedia或Wikidata条目，可以添加：
       // 'https://en.wikipedia.org/wiki/Taiwan_Digital_Nomad_Association',
       // 'https://www.wikidata.org/wiki/Q...',
-      // 也可以添加LinkedIn、Twitter等社交媒体链接
+      // 也可以添加 LinkedIn、Twitter 等社群媒體連結
     ],
     contactPoint: {
       '@type': 'ContactPoint',
@@ -236,7 +236,7 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
     ],
   };
 
-  // AEO优化：结构化数据脚本，Next.js会自动将其放在head中
+  // AEO 優化：結構化數據腳本，Next.js 會自動將其放在 head 中
   return (
     <>
       <script

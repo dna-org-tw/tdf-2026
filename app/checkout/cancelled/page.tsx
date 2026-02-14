@@ -97,7 +97,7 @@ export default function CheckoutCancelledPage() {
         };
         setOrder(orderData);
 
-        // 同步更新 Supabase 订单状态为 cancelled
+        // 同步更新 Supabase 訂單狀態為 cancelled
         try {
           await fetch('/api/order/sync', {
             method: 'POST',
@@ -106,7 +106,7 @@ export default function CheckoutCancelledPage() {
             },
             body: JSON.stringify({
               session_id: sessionId,
-              force_status: 'cancelled', // 强制设置为取消状态
+              force_status: 'cancelled', // 強制設為取消狀態
             }),
           });
         } catch (syncErr) {

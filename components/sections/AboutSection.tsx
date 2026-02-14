@@ -152,7 +152,7 @@ export default function AboutSection() {
               {t.about.title}
             </h2>
 
-            {/* SEO优化：答案块格式 - 整合关键信息，包含核心關鍵字 */}
+            {/* SEO 優化：答案塊格式 - 整合關鍵資訊，包含核心關鍵字 */}
             <div className="mb-8 p-6 bg-teal-50 rounded-xl border-l-4 border-teal-500">
               <p className="text-lg md:text-xl font-semibold text-[#1E1F1C] leading-relaxed">
                 {lang === 'en'

@@ -79,7 +79,7 @@ export interface InstagramPost {
   location_name?: string | null;
   product_type?: string | null;
   productType?: string | null;
-  // 数组和复杂对象
+  // 陣列和複雜物件
   hashtags?: string[] | null;
   mentions?: string[] | null;
   latest_comments?: unknown[] | null;

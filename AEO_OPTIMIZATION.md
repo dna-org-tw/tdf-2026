@@ -1,171 +1,170 @@
-# AEO (Answer Engine Optimization) 优化总结
+# AEO (Answer Engine Optimization) 優化總結
 
-本文档记录了根据《答案引擎優化 (AEO) 2026 戰略白皮書》实施的优化措施。
+本文件記錄了根據《答案引擎優化 (AEO) 2026 戰略白皮書》實施的優化措施。
 
-## 已实施的优化
+## 已實施的優化
 
-### 1. 结构化数据（Schema Markup）✅
+### 1. 結構化數據（Schema Markup）✅
 
 #### Organization Schema
 - ✅ 添加了完整的 Organization Schema
-- ✅ 包含 `sameAs` 属性，链接到社交媒体和官方网站
-- ✅ 包含联系信息和组织描述
+- ✅ 包含 `sameAs` 屬性，連結到社群媒體和官方網站
+- ✅ 包含聯絡資訊和組織描述
 
 #### Event Schema
-- ✅ 添加了 Festival 类型的 Event Schema
-- ✅ 包含完整的事件信息：日期、地点、组织者
-- ✅ 包含票种信息（Explorer, Contributor, Backer）
-- ✅ 包含关键词和受众信息
+- ✅ 添加了 Festival 類型的 Event Schema
+- ✅ 包含完整的事件資訊：日期、地點、組織者
+- ✅ 包含票種資訊（Explorer, Contributor, Backer）
+- ✅ 包含關鍵詞和受眾資訊
 
 #### FAQPage Schema
 - ✅ 添加了 FAQPage Schema
-- ✅ 包含所有常见问题的结构化数据
+- ✅ 包含所有常見問題的結構化數據
 - ✅ 使用 Question/Answer 格式
 
 #### 其他 Schema
 - ✅ BreadcrumbList Schema
 - ✅ WebSite Schema with SearchAction
 
-**文件位置：** `components/StructuredData.tsx`
+**檔案位置：** `components/StructuredData.tsx`
 
-### 2. 元数据优化 ✅
+### 2. 元數據優化 ✅
 
-#### 丰富的 Metadata
-- ✅ 优化的 title 和 description
-- ✅ 添加了 keywords 数组
+#### 豐富的 Metadata
+- ✅ 優化的 title 和 description
+- ✅ 添加了 keywords 陣列
 - ✅ 添加了 authors, creator, publisher
 - ✅ 配置了 OpenGraph 和 Twitter Card
-- ✅ 设置了 robots 和 googleBot 规则
-- ✅ 配置了多语言 alternate links
+- ✅ 設定了 robots 和 googleBot 規則
+- ✅ 配置了多語言 alternate links
 
-**文件位置：** `app/layout.tsx`
+**檔案位置：** `app/layout.tsx`
 
-### 3. 内容结构优化（BLUF原则）✅
+### 3. 內容結構優化（BLUF 原則）✅
 
 #### BLUF (Bottom Line Up Front)
-- ✅ 在 AboutSection 中添加了答案块格式
-- ✅ 前30-50字直接回答问题
-- ✅ 使用问题导向的 H2/H3 标题
-- ✅ 使用 `<dl>`, `<dt>`, `<dd>` 语义化标签
+- ✅ 在 AboutSection 中添加了答案塊格式
+- ✅ 前 30-50 字直接回答問題
+- ✅ 使用問題導向的 H2/H3 標題
+- ✅ 使用 `<dl>`, `<dt>`, `<dd>` 語義化標籤
 
-**文件位置：** `components/sections/AboutSection.tsx`
+**檔案位置：** `components/sections/AboutSection.tsx`
 
-### 4. SSR 优化 ✅
+### 4. SSR 優化 ✅
 
-#### 服务器端渲染
-- ✅ 将关键内容组件的 SSR 设置为 `true`
-- ✅ 确保 AI 爬虫可以访问完整内容
-- ✅ 提升 First Contentful Paint (FCP) 性能
+#### 伺服器端渲染
+- ✅ 將關鍵內容組件的 SSR 設為 `true`
+- ✅ 確保 AI 爬蟲可以存取完整內容
+- ✅ 提升 First Contentful Paint (FCP) 效能
 
-**优化的组件：**
+**優化的組件：**
 - AboutSection
 - WhySection
 - EventsSection
 - TicketsSection
-- TicketFollowSection
 - AccommodationSection
 - TeamSection
 - FollowUsSection
 
-**文件位置：** `components/HomeContent.tsx`
+**檔案位置：** `components/HomeContent.tsx`
 
-### 5. Robots.txt 优化 ✅
+### 5. Robots.txt 優化 ✅
 
-#### AI 爬虫访问权限
-- ✅ 明确允许 GPTBot (OpenAI)
-- ✅ 明确允许 Google-Extended (Bard/Gemini)
-- ✅ 明确允许 CCBot (Common Crawl)
-- ✅ 明确允许 anthropic-ai (Claude)
-- ✅ 明确允许 PerplexityBot
+#### AI 爬蟲存取權限
+- ✅ 明確允許 GPTBot (OpenAI)
+- ✅ 明確允許 Google-Extended (Bard/Gemini)
+- ✅ 明確允許 CCBot (Common Crawl)
+- ✅ 明確允許 anthropic-ai (Claude)
+- ✅ 明確允許 PerplexityBot
 
-**文件位置：** `app/robots.ts`
+**檔案位置：** `app/robots.ts`
 
-### 6. 实体链接（sameAs）✅
+### 6. 實體連結（sameAs）✅
 
-#### 外部知识库链接
-- ✅ 在 Organization Schema 中添加了 `sameAs` 属性
-- ✅ 链接到 Facebook、Instagram、官方网站
-- ✅ 预留了 Wikipedia、Wikidata 链接位置
+#### 外部知識庫連結
+- ✅ 在 Organization Schema 中添加了 `sameAs` 屬性
+- ✅ 連結到 Facebook、Instagram、官方網站
+- ✅ 預留了 Wikipedia、Wikidata 連結位置
 
-**文件位置：** `components/StructuredData.tsx`
+**檔案位置：** `components/StructuredData.tsx`
 
-## AEO 最佳实践实施
+## AEO 最佳實踐實施
 
-### ✅ 已实施的最佳实践
+### ✅ 已實施的最佳實踐
 
-1. **结构化数据优先**
-   - 所有关键实体都有对应的 Schema 标记
-   - 使用标准的 Schema.org 词汇表
+1. **結構化數據優先**
+   - 所有關鍵實體都有對應的 Schema 標記
+   - 使用標準的 Schema.org 詞彙表
 
-2. **结论先行（BLUF）**
-   - 关键信息在前30-50字内呈现
-   - 使用答案块格式
+2. **結論先行（BLUF）**
+   - 關鍵資訊在前 30-50 字內呈現
+   - 使用答案塊格式
 
-3. **问题导向标题**
-   - H2/H3 标题直接回答用户可能的问题
-   - 提升 AI 提取答案的准确性
+3. **問題導向標題**
+   - H2/H3 標題直接回答用戶可能的問題
+   - 提升 AI 擷取答案的準確性
 
-4. **SSR 优先**
-   - 关键内容使用服务器端渲染
-   - 确保 AI 爬虫可以完整访问内容
+4. **SSR 優先**
+   - 關鍵內容使用伺服器端渲染
+   - 確保 AI 爬蟲可以完整存取內容
 
-5. **明确的爬虫权限**
-   - robots.txt 明确允许 AI 爬虫
-   - 避免内容被误判为不可访问
+5. **明確的爬蟲權限**
+   - robots.txt 明確允許 AI 爬蟲
+   - 避免內容被誤判為不可存取
 
-### 📋 未来优化建议
+### 📋 未來優化建議
 
-1. **实体链接扩展**
-   - 创建 Wikipedia 条目（如果适用）
-   - 创建 Wikidata 条目
-   - 添加 LinkedIn 公司页面链接
+1. **實體連結擴展**
+   - 建立 Wikipedia 條目（如適用）
+   - 建立 Wikidata 條目
+   - 添加 LinkedIn 公司頁面連結
 
-2. **内容新鲜度**
+2. **內容新鮮度**
    - 定期更新 `dateModified` Schema
-   - 确保内容在3个月内更新过
+   - 確保內容在 3 個月內更新過
 
-3. **数据密度提升**
-   - 添加更多统计数据和原创研究
-   - 使用表格和列表展示对比数据
+3. **數據密度提升**
+   - 添加更多統計數據和原創研究
+   - 使用表格和列表展示對比數據
 
-4. **多模态优化**
-   - 为图片添加详细的 Alt Text
-   - 为视频添加字幕和文字脚本
-   - 添加带时间戳的章节划分
+4. **多模態優化**
+   - 為圖片添加詳細的 Alt Text
+   - 為影片添加字幕和文字腳本
+   - 添加帶時間戳的章節劃分
 
-5. **场外 AEO**
+5. **場外 AEO**
    - 在 Reddit、Quora 等平台建立存在
-   - 获取权威媒体的品牌提及
-   - 管理第三方评论平台的情感分数
+   - 獲取權威媒體的品牌提及
+   - 管理第三方評論平台的情感分數
 
-6. **AEO 监控**
-   - 建立 AEO 追踪试算表
-   - 监控 Share of Model (SoM)
-   - 追踪被引用率 (Citation Rate)
-   - 分析情感分数
+6. **AEO 監控**
+   - 建立 AEO 追蹤試算表
+   - 監控 Share of Model (SoM)
+   - 追蹤被引用率 (Citation Rate)
+   - 分析情感分數
 
-## 技术细节
+## 技術細節
 
-### 结构化数据位置
-结构化数据通过 `StructuredData` 组件注入到页面中，Next.js 会自动将其放在 `<head>` 部分。
+### 結構化數據位置
+結構化數據透過 `StructuredData` 組件注入到頁面中，Next.js 會自動將其放在 `<head>` 部分。
 
 ### SSR 配置
-关键组件通过 `dynamic()` 导入，并设置 `ssr: true` 以确保服务器端渲染。
+關鍵組件透過 `dynamic()` 導入，並設定 `ssr: true` 以確保伺服器端渲染。
 
-### 语言支持
-所有优化都支持中英文双语，根据用户语言偏好动态调整。
+### 語言支援
+所有優化都支援中英文雙語，根據用戶語言偏好動態調整。
 
-## 参考文档
+## 參考文件
 
 - [Schema.org](https://schema.org/)
 - [Google Search Central - Structured Data](https://developers.google.com/search/docs/appearance/structured-data)
 - [Next.js Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)
 
-## 更新日志
+## 更新日誌
 
-- 2026-01-XX: 初始 AEO 优化实施
-  - 添加结构化数据组件
-  - 优化元数据
-  - 实施 BLUF 原则
-  - 启用 SSR
-  - 优化 robots.txt
+- 2026-01-XX: 初始 AEO 優化實施
+  - 添加結構化數據組件
+  - 優化元數據
+  - 實施 BLUF 原則
+  - 啟用 SSR
+  - 優化 robots.txt

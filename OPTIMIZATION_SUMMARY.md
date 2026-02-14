@@ -18,7 +18,6 @@
 - `WhySection`
 - `EventsSection`
 - `TicketsSection`
-- `TicketFollowSection`
 - `AccommodationSection`
 - `TeamSection`
 - `FollowUsSection`
@@ -113,7 +112,7 @@
 
 ### 視頻格式轉換（如需要）
 
-**注意**：目前項目中沒有本地視頻文件，所有視頻都是通過 YouTube 嵌入。如果未來需要添加本地視頻文件，可以參考 `VIDEO_OPTIMIZATION.md` 中的優化建議。
+**注意**：目前專案中沒有本地影片檔案，所有影片都是透過 YouTube 嵌入。如果未來需要添加本地影片檔案，可以參考 `VIDEO_OPTIMIZATION.md` 中的優化建議。
 
 ## 🧪 測試建議
 
@@ -136,7 +135,7 @@
 
 ## 📝 注意事項
 
-1. **視頻優化**：目前使用 YouTube 嵌入，無需本地視頻優化
+1. **影片優化**：目前使用 YouTube 嵌入，無需本地影片優化
 2. **CDN 配置**：建議使用台灣節點的 CDN 進一步優化
 3. **測試**：所有優化都應在實際環境中測試驗證
 4. **監控**：部署後持續監控效能指標
@@ -144,4 +143,4 @@
 ## 🔗 相關文檔
 
 - `PERFORMANCE_OPTIMIZATIONS.md` - 詳細優化記錄
-- `VIDEO_OPTIMIZATION.md` - 視頻優化指南
+- `VIDEO_OPTIMIZATION.md` - 影片優化指南

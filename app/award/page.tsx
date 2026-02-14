@@ -85,9 +85,9 @@ export default function AwardPage() {
         console.warn('[Award Page] No posts in response data:', data);
       }
 
-      // 处理所有帖子数据，统一格式并计算投票数（不进行任何过滤）
+      // 處理所有貼文數據，統一格式並計算投票數（不進行任何過濾）
       const processedPosts = (data.posts || []).map((post: InstagramPost) => {
-        // 统一字段名称（处理不同的命名风格）
+        // 統一欄位名稱（處理不同的命名風格）
         const processedPost: InstagramPost = {
           ...post,
           // 统一 permalink/url
@@ -102,11 +102,11 @@ export default function AwardPage() {
           timestamp: post.timestamp || new Date().toISOString(),
           // 统一类型
           type: post.type || post.post_type || 'Image',
-          // 统一互动数据
+          // 統一互動數據
           likes_count: post.likes_count ?? post.likesCount ?? 0,
           comments_count: post.comments_count ?? post.commentsCount ?? 0,
           video_play_count: post.video_play_count ?? post.videoPlayCount ?? 0,
-          // 统一用户信息
+          // 統一用戶資訊
           owner_username: post.owner_username || post.ownerUsername || post.username || '',
           owner_full_name: post.owner_full_name || post.ownerFullName || '',
           // 统一 childPosts
@@ -115,13 +115,13 @@ export default function AwardPage() {
           tagged_users: post.tagged_users || post.taggedUsers || [],
           // 统一 coauthorProducers
           coauthor_producers: post.coauthor_producers || post.coauthorProducers || [],
-          // 投票数（从 vote_count 获取，如果没有则默认为 0）
+          // 投票數（從 vote_count 獲取，如果沒有則預設為 0）
           vote_count: post.vote_count || 0,
         };
         return processedPost;
       });
 
-      // 确保显示所有贴文，不做任何过滤
+      // 確保顯示所有貼文，不做任何過濾
       if (processedPosts.length === 0) {
         console.warn('[Award Page] No posts to display. Check if ig_posts table has data.');
       }
@@ -166,7 +166,7 @@ export default function AwardPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // 检查是否需要先关注
+        // 檢查是否需要先關注
         if (data.requiresFollow) {
           setPendingVote({ postId, email: email.trim() });
           setShowFollowModal(true);
@@ -174,7 +174,7 @@ export default function AwardPage() {
           return;
         }
         
-        // 显示详细的错误信息
+        // 顯示詳細的錯誤資訊
         const errorMessage = data.details 
           ? `${data.error || 'Failed to submit vote'}: ${data.details}`
           : data.error || t.award?.posts?.voteError || 'Failed to submit vote';
@@ -208,17 +208,17 @@ export default function AwardPage() {
     }
   };
 
-  // 处理关注成功后的回调
+  // 處理關注成功後的回調
   const handleFollowSuccess = async (email: string) => {
     if (!pendingVote) return;
 
-    // 关闭 modal
+    // 關閉 modal
     setShowFollowModal(false);
 
-    // 自动重新发送投票请求
+    // 自動重新發送投票請求
     await handleVote(pendingVote.postId, email);
     
-    // 清除待处理的投票
+    // 清除待處理的投票
     setPendingVote(null);
   };
 

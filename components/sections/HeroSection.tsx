@@ -83,7 +83,7 @@ export default function HeroSection() {
   const [modalType, setModalType] = useState<'success' | 'error' | 'duplicate' | null>(null);
   const [modalMessage, setModalMessage] = useState('');
 
-  // 获取关注者数量
+  // 獲取關注者數量
   useEffect(() => {
     const fetchFollowerCount = async () => {
       try {
@@ -117,7 +117,7 @@ export default function HeroSection() {
     try {
       setIsSubmitting(true);
 
-      // 执行 reCAPTCHA 验证
+      // 執行 reCAPTCHA 驗證
       let recaptchaToken: string | null = null;
       try {
         recaptchaToken = await executeRecaptcha();
@@ -129,7 +129,7 @@ export default function HeroSection() {
         return;
       }
 
-      // 获取用户信息
+      // 獲取用戶資訊
       const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {
