@@ -8,7 +8,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# 複製依賴文件
+# 複製依賴檔案
 COPY package.json package-lock.json* ./
 RUN npm ci
 
@@ -34,7 +34,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# 複製必要的文件
+# 複製必要檔案
 COPY --from=builder /app/public ./public
 
 # 設置正確的權限

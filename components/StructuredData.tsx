@@ -11,7 +11,7 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
   const eventStartDate = '2026-05-01T00:00:00+08:00';
   const eventEndDate = '2026-05-31T23:59:59+08:00';
 
-  // Organization Schema with sameAs (AEO关键优化)
+  // Organization Schema with sameAs (AEO 關鍵優化)
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -27,7 +27,7 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
       'https://www.instagram.com/taiwandigitalfest',
       'https://dna.org.tw',
       // AEO 優化：實體連結到外部知識庫，提升實體權威性
-      // 如果TDNA有Wikipedia或Wikidata条目，可以添加：
+      // 若 TDNA 有 Wikipedia 或 Wikidata 條目，可添加：
       // 'https://en.wikipedia.org/wiki/Taiwan_Digital_Nomad_Association',
       // 'https://www.wikidata.org/wiki/Q...',
       // 也可以添加 LinkedIn、Twitter 等社群媒體連結
@@ -43,7 +43,7 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
     },
   };
 
-  // Event Schema (SEO核心：事件结构化数据 - 優化關鍵字)
+  // Event Schema (SEO 核心：事件結構化資料 - 優化關鍵字)
   const eventSchema = {
     '@context': 'https://schema.org',
     '@type': 'Festival',
@@ -147,7 +147,7 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
     },
   };
 
-  // FAQPage Schema (AEO优化：问答结构化数据)
+  // FAQPage Schema (AEO 優化：問答結構化資料)
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',

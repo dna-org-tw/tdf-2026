@@ -27,7 +27,7 @@ export interface RecordVisitorResult {
 
 /**
  * 記錄或更新訪客資訊，以 fingerprint 作為唯一識別
- * 若已存在則更新 IP、時區、語系等，返回 visitor 記錄
+ * 若已存在則更新 IP、時區、語系等，回傳 visitor 記錄
  */
 export async function recordVisitor(
   input: RecordVisitorInput

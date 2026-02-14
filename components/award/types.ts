@@ -32,7 +32,7 @@ export interface CoauthorProducer {
 
 export interface InstagramPost {
   id: string;
-  // 基础字段（向后兼容）
+  // 基礎欄位（向後相容）
   permalink?: string;
   media_url?: string;
   caption?: string;
@@ -40,14 +40,14 @@ export interface InstagramPost {
   timestamp: string;
   vote_count?: number;
   has_voted?: boolean;
-  // API 返回的主要字段
+  // API 回傳的主要欄位
   input_url?: string | null;
   post_type?: string | null;
   type?: string | null;
   short_code?: string | null;
   url?: string | null;
   error?: string | null;
-  // 媒体信息
+  // 媒體資訊
   display_url?: string | null;
   displayUrl?: string | null;
   video_url?: string | null;
@@ -56,7 +56,7 @@ export interface InstagramPost {
   dimensionsWidth?: number | null;
   dimensions_width?: number | null;
   dimensionsHeight?: number | null;
-  // 互动数据
+  // 互動資料
   likes_count?: number | null;
   likesCount?: number | null;
   comments_count?: number | null;
@@ -67,14 +67,14 @@ export interface InstagramPost {
   fb_like_count?: number | null;
   fb_play_count?: number | null;
   video_duration?: number | null;
-  // 用户信息
+  // 使用者資訊
   owner_full_name?: string | null;
   ownerFullName?: string | null;
   owner_username?: string | null;
   ownerUsername?: string | null;
   owner_id?: string | null;
   ownerId?: string | null;
-  // 其他信息
+  // 其他資訊
   first_comment?: string | null;
   location_name?: string | null;
   product_type?: string | null;

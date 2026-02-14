@@ -96,14 +96,14 @@ export default function VoteEmailModal({
       return;
     }
 
-    // 检查 follow 状态
+    // 檢查 follow 狀態
     await checkFollowStatus(trimmedEmail);
   };
 
   const handleVote = () => {
     if (!canVote || !email.trim()) return;
 
-    // 调用父组件的 onEmailSubmit，传递邮箱
+    // 呼叫父元件的 onEmailSubmit，傳遞信箱
     // recaptcha 驗證會在 page.tsx 的 handleVote 中執行
     onEmailSubmit(email.trim());
     onClose();
@@ -132,7 +132,7 @@ export default function VoteEmailModal({
       // 獲取用戶資訊
       const userInfo = getUserInfo();
 
-      // 调用订阅 API
+      // 呼叫訂閱 API
       const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: {
@@ -164,7 +164,7 @@ export default function VoteEmailModal({
         return;
       }
 
-      // 订阅成功，重新检查 follow 状态
+      // 訂閱成功，重新檢查 follow 狀態
       await checkFollowStatus(email.trim());
       setIsFollowingNow(false);
     } catch (err) {

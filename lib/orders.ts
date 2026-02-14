@@ -6,7 +6,7 @@ if (!supabaseServer) {
 }
 
 /**
- * 在 Supabase 中创建订单
+ * 在 Supabase 中建立訂單
  */
 export async function createOrder(input: CreateOrderInput): Promise<Order | null> {
   if (!supabaseServer) {

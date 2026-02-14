@@ -15,30 +15,30 @@ const Footer = dynamic(() => import('@/components/Footer'), {
   loading: () => null, // Footer 不需要 loading 狀態
 });
 
-// AEO优化：启用SSR以确保AI爬虫可以访问内容
+// AEO 優化：啟用 SSR 以確保 AI 爬蟲可以存取內容
 // 關鍵內容區域使用 SSR，提升 AI 可存取性和 SEO 表現
 const AboutSection = dynamic(() => import('@/components/sections/AboutSection'), {
-  ssr: true, // AEO优化：启用SSR
+  ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
 const EventsSection = dynamic(() => import('@/components/sections/EventsSection'), {
-  ssr: true, // AEO优化：启用SSR
+  ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-stone-100 animate-pulse" />,
 });
 
 const TicketsSection = dynamic(() => import('@/components/sections/TicketsSection'), {
-  ssr: true, // AEO优化：启用SSR
+  ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
 });
 
 const AccommodationSection = dynamic(() => import('@/components/sections/AccommodationSection'), {
-  ssr: true, // AEO优化：启用SSR
+  ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
 const FollowUsSection = dynamic(() => import('@/components/sections/FollowUsSection'), {
-  ssr: true, // AEO优化：启用SSR
+  ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
 });
 

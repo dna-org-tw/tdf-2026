@@ -73,7 +73,7 @@ export default function OrderQueryPage() {
     // 如果有 reCAPTCHA，使用 grecaptcha.enterprise.execute() 獲取 token
     if (recaptchaSiteKey) {
       try {
-        // 检查 grecaptcha 是否已加载
+        // 檢查 grecaptcha 是否已載入
         if (typeof window !== 'undefined' && window.grecaptcha?.enterprise) {
           const token = await window.grecaptcha.enterprise.execute(recaptchaSiteKey, { action: 'submit' });
           submitOrderQuery(token);

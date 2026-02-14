@@ -24,7 +24,7 @@ export function generateUnsubscribeToken(email: string): string {
     .update(email)
     .digest('hex');
   
-  // 将 email 和 hash 组合成 token（使用 base64 编码）
+  // 將 email 與 hash 組合為 token（使用 base64 編碼）
   const token = Buffer.from(`${email}:${hash}`).toString('base64url');
   return token;
 }

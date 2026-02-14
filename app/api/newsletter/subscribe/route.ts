@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
 
         const recaptchaData = await recaptchaResponse.json();
 
-        // Enterprise API 返回的格式不同，检查 tokenProperties
+        // Enterprise API 回傳的格式不同，檢查 tokenProperties
         if (!recaptchaData.tokenProperties?.valid || recaptchaData.tokenProperties?.action !== 'subscribe') {
           return NextResponse.json(
             { error: t.recaptchaFailed },
@@ -165,10 +165,10 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // 检查风险评分（如果可用）
+        // 檢查風險評分（如可用）
         if (recaptchaData.riskAnalysis?.score !== undefined) {
           const score = recaptchaData.riskAnalysis.score;
-          // 分数范围 0.0-1.0，越低表示越可疑
+          // 分數範圍 0.0-1.0，越低表示越可疑
           // 可以根據需要設定閾值，例如低於 0.5 拒絕
           if (score < 0.5) {
             return NextResponse.json(
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 獲取 IP 地址和國家資訊
+    // 取得 IP 位址與國家資訊
     const clientIP = getClientIP(req);
     const country = clientIP ? await getCountryFromIP(clientIP) : null;
     
@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     };
 
-    // 添加可选字段
+    // 新增可選欄位
     if (timezone) insertData.timezone = timezone;
     if (clientIP) insertData.ip_address = clientIP;
     if (country) insertData.country = country;

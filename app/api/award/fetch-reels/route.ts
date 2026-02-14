@@ -77,7 +77,7 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
           postData = post;
         }
 
-        // 不跳過任何數據，全部添加
+        // 不跳過任何資料，全部新增
         processedPosts.push(postData);
       } catch (parseError) {
         // 即使解析錯誤，也保留原始數據

@@ -31,7 +31,7 @@ export interface Order {
   updated_at: string; // ISO timestamp
 }
 
-// 创建订单的输入类型
+// 建立訂單的輸入類型
 export interface CreateOrderInput {
   stripe_session_id: string;
   ticket_tier: 'explore' | 'contribute' | 'backer';

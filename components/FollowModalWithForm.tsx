@@ -96,7 +96,7 @@ export default function FollowModalWithForm({
       setModalType('success');
       setModalMessage(result.message || t.hero.followForm.successMessage);
       
-      // 成功后调用回调并关闭 modal
+      // 成功後呼叫回呼並關閉 modal
       setTimeout(() => {
         onSuccess(trimmedEmail);
         onClose();
@@ -188,7 +188,7 @@ export default function FollowModalWithForm({
               {/* Content */}
               <div className="p-6">
                 {modalType ? (
-                  // 显示结果消息
+                  // 顯示結果訊息
                   <div className="text-center">
                     <div className="flex justify-center mb-4">
                       {getIcon()}
@@ -211,7 +211,7 @@ export default function FollowModalWithForm({
                     )}
                   </div>
                 ) : (
-                  // 显示表单
+                  // 顯示表單
                   <>
                     <p className="text-base text-white/90 leading-relaxed mb-6 text-center">
                       {getMessage()}

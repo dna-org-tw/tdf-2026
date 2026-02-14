@@ -11,7 +11,7 @@ import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
-// 计数器动画组件
+// 計數器動畫元件
 function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
   const [displayValue, setDisplayValue] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -49,7 +49,7 @@ function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?:
     }
   }, [value, duration]);
 
-  // 格式化数字，添加千位分隔符
+  // 格式化數字，新增千位分隔符
   const formatNumber = (num: number) => {
     return num.toLocaleString('en-US');
   };

@@ -15,7 +15,7 @@ interface Coordinates {
 }
 
 // 動態導入地圖組件（避免 SSR 問題）
-// 添加 loading 狀態與延遲載入優化
+// 新增 loading 狀態與延遲載入優化
 const NomadMap = dynamic(
   () => import('@/components/NomadMap'),
   { 
@@ -40,7 +40,7 @@ function formatAddressToString(address: string | StructuredAddress): string {
     return address;
   }
   
-  // 构建完整地址字符串
+  // 建構完整地址字串
   const parts: string[] = [];
   
   if (address['addr:postcode']) {

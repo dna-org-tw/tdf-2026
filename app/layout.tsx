@@ -146,7 +146,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // 可以添加 Google Search Console 驗證
+    // 可新增 Google Search Console 驗證
     // google: 'your-google-verification-code',
   },
 };
@@ -167,7 +167,7 @@ export default async function RootLayout({
       >
         {/* Performance optimization: Preconnect to external domains - Next.js will move these to head */}
         <PreconnectLinks />
-        {/* AEO 優化：添加結構化數據 - Next.js 會自動將其移到 head */}
+        {/* AEO 優化：新增結構化資料 - Next.js 會自動將其移到 head */}
         <StructuredData lang={lang === 'zh-TW' ? 'zh' : 'en'} />
         {/* Facebook Pixel 追踪 */}
         <FacebookPixel />

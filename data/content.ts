@@ -1435,13 +1435,13 @@ export const content = {
       submitUnsubscribe: "取消訂閱"
     },
     notFound: {
-      redirecting: "正在跳转到首页..."
+      redirecting: "正在導向至首頁..."
     },
     api: {
       supabaseNotConfigured: "Supabase 服務端尚未設定完成。",
-      emailRequired: "請提供有效的 Email 地址。",
+      emailRequired: "請提供有效的 Email 信箱。",
       invalidEmailFormat: "Email 格式不正確。",
-      recaptchaRequired: "reCAPTCHA 驗證是必需的。",
+      recaptchaRequired: "reCAPTCHA 驗證是必須的。",
       recaptchaFailed: "reCAPTCHA 驗證失敗，請稍後重試。",
       subscriptionFailed: "訂閱失敗，請稍後再試。",
       alreadySubscribed: "此 Email 已經訂閱過了。",

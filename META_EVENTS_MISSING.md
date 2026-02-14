@@ -65,7 +65,7 @@ trackEvent('SubmitApplication', {
 trackEvent('FindLocation', {
   content_name: 'Accommodation Map',
   content_category: 'Location Search',
-  // 如果用戶點擊了特定住宿，可以添加：
+  // 若使用者點擊了特定住宿，可新增：
   // content_ids: [accommodationId],
 });
 ```
@@ -74,16 +74,16 @@ trackEvent('FindLocation', {
 
 ### 3. Schedule（安排/查看日程）
 
-**狀態**: ⚠️ **部分實現**
+**狀態**: ⚠️ **部分實作**
 
-**說明**: 網站有日程表功能，用戶可能會查看或安排活動。雖然目前使用了 `ViewContent` 和 `Search`，但如果用戶實際安排/註冊活動，應該使用 `Schedule` 事件。
+**說明**: 網站有日程表功能，使用者可能會查看或安排活動。雖然目前使用了 `ViewContent` 和 `Search`，但若使用者實際安排/註冊活動，應使用 `Schedule` 事件。
 
 **適用場景**:
-- 用戶開啟日程表模態框
-- 用戶點擊活動連結進行註冊
-- 用戶篩選日程表（已有 `Search` 事件）
+- 使用者開啟日程表模態框
+- 使用者點擊活動連結進行註冊
+- 使用者篩選日程表（已有 `Search` 事件）
 
-**當前實現位置**:
+**當前實作位置**:
 - `components/sections/EventsSection.tsx` - 日程表展示
 - `components/ScheduleModal.tsx` - 日程表模態框
 
@@ -92,8 +92,8 @@ trackEvent('FindLocation', {
 - `Search` 事件（日程篩選）
 
 **建議改進**:
-- 在用戶開啟日程表模態框時，追蹤 `Schedule` 事件
-- 在用戶點擊活動連結進行註冊時，追蹤 `Schedule` 事件
+- 在使用者開啟日程表模態框時，追蹤 `Schedule` 事件
+- 在使用者點擊活動連結進行註冊時，追蹤 `Schedule` 事件
 
 **推薦參數**:
 ```javascript
@@ -114,7 +114,7 @@ trackEvent('Schedule', {
 ✅ **ViewContent** - 內容查看
 ✅ **CompleteRegistration** - 完成註冊（訂閱）
 ✅ **InitiateCheckout** - 開始結帳
-✅ **AddPaymentInfo** - 添加支付資訊
+✅ **AddPaymentInfo** - 新增支付資訊
 ✅ **Purchase** - 購買完成
 ✅ **Lead** - 潛在客戶線索
 ✅ **Search** - 搜尋/篩選
@@ -129,7 +129,7 @@ trackEvent('Schedule', {
 **原因**: 申請表單是重要的轉化目標，使用標準事件可以更好地在 Meta 廣告平台中建立轉化目標。
 
 **實施步驟**:
-1. 在所有「Call for」連結的 `onClick` 事件中添加 `SubmitApplication` 追蹤
+1. 在所有「Call for」連結的 `onClick` 事件中新增 `SubmitApplication` 追蹤
 2. 保留現有的 `Lead` 事件作為補充
 3. 更新 `META_EVENTS_TRACKING.md` 文件
 
@@ -173,7 +173,7 @@ trackEvent('Schedule', {
 
 3. **外部連結**: 申請表單連結指向外部 Google Forms，我們只能追蹤用戶點擊連結的行為，無法追蹤用戶實際提交表單的行為（除非使用 Google Forms API）。
 
-4. **向後相容**: 添加新事件時，應保留現有的自訂事件追蹤，以確保數據連續性。
+4. **向後相容**：新增事件時，應保留現有的自訂事件追蹤，以確保資料連續性。
 
 ---
 

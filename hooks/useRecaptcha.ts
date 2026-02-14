@@ -17,7 +17,7 @@ export function useRecaptcha(action: string = 'subscribe') {
     }
 
     try {
-      // 检查 grecaptcha 是否已加载
+      // 檢查 grecaptcha 是否已載入
       if (typeof window === 'undefined' || !window.grecaptcha?.enterprise) {
         throw new Error('reCAPTCHA is not loaded. Please refresh the page.');
       }

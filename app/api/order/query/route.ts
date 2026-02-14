@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
         const recaptchaData = await recaptchaResponse.json();
 
-        // Enterprise API 返回的格式不同，检查 tokenProperties
+        // Enterprise API 回傳的格式不同，檢查 tokenProperties
         if (!recaptchaData.tokenProperties?.valid || recaptchaData.tokenProperties?.action !== 'submit') {
           return NextResponse.json(
             { error: 'reCAPTCHA verification failed. Please try again.' },
@@ -78,10 +78,10 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // 检查风险评分（如果可用）
+        // 檢查風險評分（如可用）
         if (recaptchaData.riskAnalysis?.score !== undefined) {
           const score = recaptchaData.riskAnalysis.score;
-          // 分数范围 0.0-1.0，越低表示越可疑
+          // 分數範圍 0.0-1.0，越低表示越可疑
           // 可以根據需要設定閾值，例如低於 0.5 拒絕
           if (score < 0.5) {
             return NextResponse.json(

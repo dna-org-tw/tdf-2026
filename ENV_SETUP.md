@@ -38,7 +38,7 @@ MAILGUN_API_KEY=your_mailgun_api_key
 # Mailgun 網域（必須是在 Mailgun 中驗證的網域）
 MAILGUN_DOMAIN=yourdomain.com
 
-# 發件人郵箱地址（必須使用驗證過的網域）
+# 寄件人電子郵件位址（必須使用驗證過的網域）
 EMAIL_FROM=noreply@yourdomain.com
 
 # 網站基礎 URL（用於產生訂單詳情連結和取消訂閱連結）

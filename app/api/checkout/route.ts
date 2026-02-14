@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     const visitorFingerprint = body?.visitor_fingerprint ?? null;
 
-    // 在 Supabase 中创建订单记录
+    // 在 Supabase 中建立訂單記錄
     const order = await createOrder({
       stripe_session_id: session.id,
       ticket_tier: tier,

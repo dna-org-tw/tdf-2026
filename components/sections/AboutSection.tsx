@@ -147,7 +147,7 @@ export default function AboutSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="w-full md:w-1/2"
           >
-            {/* AEO优化：BLUF原则 - 结论先行，问题导向标题 */}
+            {/* AEO 優化：BLUF 原則 - 結論先行，問題導向標題 */}
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-8 leading-tight">
               {t.about.title}
             </h2>

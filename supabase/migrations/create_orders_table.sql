@@ -1,4 +1,4 @@
--- 创建 orders 表
+-- 建立 orders 表
 -- 用於儲存 Stripe 支付訂單資訊
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS orders (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 创建索引以提高查询性能
+-- 建立索引以提高查詢效能
 CREATE INDEX IF NOT EXISTS idx_orders_stripe_session_id ON orders(stripe_session_id);
 CREATE INDEX IF NOT EXISTS idx_orders_stripe_payment_intent_id ON orders(stripe_payment_intent_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
@@ -45,7 +45,7 @@ CREATE TRIGGER update_orders_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- 添加注释
+-- 新增註解
 COMMENT ON TABLE orders IS '儲存 Stripe 支付訂單資訊';
 COMMENT ON COLUMN orders.stripe_session_id IS 'Stripe checkout session ID';
 COMMENT ON COLUMN orders.stripe_payment_intent_id IS 'Stripe payment intent ID';

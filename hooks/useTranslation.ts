@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { content, Language, Content } from '@/data/content';
 
-// 檢測瀏覽器語系並返回對應的語言代碼（僅在客戶端使用）
+// 偵測瀏覽器語系並回傳對應的語言代碼（僅在客戶端使用）
 function getBrowserLanguage(): Language {
   if (typeof window === 'undefined') {
     return 'zh'; // 服務端渲染時使用預設值
@@ -21,7 +21,7 @@ function getBrowserLanguage(): Language {
   return 'en';
 }
 
-// 從 URL 參數獲取語言，如果沒有則返回預設值（服務端和客戶端都可用）
+// 從 URL 參數取得語言，若沒有則回傳預設值（伺服端和客戶端皆可用）
 function getInitialLanguage(searchParams: URLSearchParams | null): Language {
   if (!searchParams) {
     return 'zh'; // 如果 searchParams 不可用，使用預設值

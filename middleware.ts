@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // 處理 /zh 和 /en 路徑，重定向到根路徑並添加查詢參數
+  // 處理 /zh 和 /en 路徑，重新導向至根路徑並新增查詢參數
   if (pathname === '/zh' || pathname.startsWith('/zh/')) {
     const redirectUrl = new URL(request.url);
     // 移除 /zh 前綴，如果結果為空，則設為根路徑

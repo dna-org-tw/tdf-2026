@@ -2,21 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
 // Instagram API 配置
-// 注意：需要配置 Instagram Graph API 或使用其他方式獲取貼文
+// 注意：需設定 Instagram Graph API 或使用其他方式取得貼文
 // 這裡提供一個基礎結構，可以後續整合真實的 Instagram API
 const INSTAGRAM_ACCESS_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 const INSTAGRAM_USER_ID = process.env.INSTAGRAM_USER_ID;
 
 interface InstagramPost {
   id: string;
-  // 基础字段（向后兼容）
+  // 基礎欄位（向後相容）
   permalink: string;
   media_url: string;
   caption?: string;
   username: string;
   timestamp: string;
   vote_count: number;
-  // API 返回的主要字段
+  // API 回傳的主要欄位
   input_url?: string | null;
   post_type?: string | null;
   type?: string | null;
@@ -39,7 +39,7 @@ interface InstagramPost {
   owner_full_name?: string | null;
   owner_username?: string | null;
   owner_id?: string | null;
-  // 其他信息
+  // 其他資訊
   first_comment?: string | null;
   location_name?: string | null;
   product_type?: string | null;
@@ -63,11 +63,11 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
   // TODO: 整合真實的 Instagram API
   // 這裡提供一個範例結構，實際需要：
   // 1. 使用 Instagram Graph API 的 Hashtag Search
-  // 2. 搜索标签 #taiwandigitalfest 和 #taiwandigitalfest
+  // 2. 搜尋標籤 #taiwandigitalfest 和 #taiwandigitalfest
   // 3. 獲取貼文數據
   
   // 暫時回傳空陣列，實際應該從 Instagram API 獲取
-  // 或者使用第三方服务如 RapidAPI 的 Instagram scraper
+  // 或使用第三方服務如 RapidAPI 的 Instagram scraper
   
   if (!INSTAGRAM_ACCESS_TOKEN || !INSTAGRAM_USER_ID) {
     console.warn('[Award API] Instagram credentials not configured. Returning empty posts.');
@@ -76,7 +76,7 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
 
   try {
     // 範例：使用 Instagram Graph API 獲取貼文
-    // 注意：實際實現需要根據 Instagram API 的最新文件
+    // 注意：實際實作需根據 Instagram API 的最新文件
     // const response = await fetch(
     //   `https://graph.instagram.com/${INSTAGRAM_USER_ID}/media?fields=id,caption,media_type,media_url,permalink,timestamp,username&access_token=${INSTAGRAM_ACCESS_TOKEN}`
     // );
@@ -241,7 +241,7 @@ async function getIgPosts(): Promise<InstagramPost[]> {
       return [];
     }
 
-    // 在内存中按 data.timestamp 排序
+    // 在記憶體中按 data.timestamp 排序
     if (igPosts && igPosts.length > 0) {
       igPosts.sort((a: any, b: any) => {
         const getTimestamp = (post: any): string => {
@@ -325,7 +325,7 @@ async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
 
     const postId = postData.id || post.id;
     
-    // 优先使用 data.timestamp，然后才是其他字段
+    // 優先使用 data.timestamp，其次才是其他欄位
     let timestamp: string | undefined;
     if (post.data) {
       if (typeof post.data === 'object' && post.data.timestamp) {
