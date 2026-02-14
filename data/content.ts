@@ -212,6 +212,10 @@ export const content = {
       viewFull: "Click to view full image"
     },
     partners: {
+      speakers: {
+        title: "Speakers",
+        mockLabel: "Call for Speakers",
+      },
       organizers: {
         title: "Organizers",
         description:
@@ -520,11 +524,57 @@ export const content = {
       callForVolunteers: "Call for Volunteers",
       callForSideEvents: "Host Your Side Event",
       orderQuery: "Order Query",
+      codeOfConduct: "Code of Conduct",
       recaptcha: "This site is protected by reCAPTCHA and the Google",
       privacyPolicy: "Privacy Policy",
       termsOfService: "Terms of Service",
       and: "and",
       apply: "apply."
+    },
+    codeOfConduct: {
+      title: "Code of Conduct",
+      lastUpdated: "Last updated: February 2026",
+      intro: "All attendees, speakers, sponsors, volunteers, and participants at Taiwan Digital Fest 2026 are required to agree with the following code of conduct. Organisers will enforce this code throughout the event. We expect cooperation from all participants to help ensure a safe, welcoming, and inclusive environment for everybody.",
+      quickVersion: {
+        title: "The Quick Version",
+        content: "Taiwan Digital Fest 2026 is dedicated to providing a harassment-free experience for everyone, regardless of gender, gender identity and expression, age, sexual orientation, disability, physical appearance, body size, race, ethnicity, religion (or lack thereof), nationality, or technology choices. We do not tolerate harassment of participants in any form. Sexual language and imagery are not appropriate for any venue, including talks, workshops, side events, parties, and online media. Participants violating these rules may be sanctioned or expelled from the event without a refund at the discretion of the organisers."
+      },
+      fullVersion: {
+        title: "The Full Version",
+        harassment: {
+          title: "Harassment includes:",
+          items: [
+            "Offensive verbal comments related to gender, gender identity and expression, age, sexual orientation, disability, physical appearance, body size, race, ethnicity, religion, nationality, or technology choices",
+            "Sexual images in public spaces",
+            "Deliberate intimidation, stalking, or following",
+            "Harassing photography or recording",
+            "Sustained disruption of talks or other events",
+            "Inappropriate physical contact",
+            "Unwelcome sexual attention"
+          ]
+        },
+        expected: {
+          title: "Expected Behavior",
+          items: [
+            "Treat everyone with respect and acknowledge that all participants deserve to be present",
+            "Use welcoming and inclusive language",
+            "Be considerate of differing viewpoints and experiences",
+            "Accept constructive criticism gracefully",
+            "Focus on what is best for the community",
+            "Show empathy towards other participants"
+          ]
+        },
+        sponsors: "Sponsors are also subject to the anti-harassment policy. In particular, sponsors should not use sexualised images, activities, or other material. Booth staff (including volunteers) should not use sexualised clothing, uniforms, or costumes, or otherwise create a sexualised environment.",
+        enforcement: "If a participant engages in harassing behavior, the organisers may take any action they deem appropriate, including warning the offender or expulsion from the event with no refund.",
+        reporting: {
+          title: "Reporting",
+          content: "If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact a member of event staff immediately. Staff can be identified by branded clothing or badges. Staff will be happy to help participants contact venue security or local law enforcement, provide escorts, or otherwise assist those experiencing harassment to feel safe for the duration of the event.",
+          email: "You can also report concerns by email:"
+        },
+        scope: "We expect participants to follow these rules at all event venues, workshops, side events, and event-related social activities, both in person and online.",
+        contact: "For any questions or concerns regarding this Code of Conduct, please contact us at fest@dna.org.tw."
+      },
+      backToHome: "Back to homepage"
     },
     checkout: {
       orderError: "Unable to load order details.",
@@ -947,6 +997,10 @@ export const content = {
       viewFull: "點擊查看大圖"
     },
     partners: {
+      speakers: {
+        title: "講者",
+        mockLabel: "徵求講者",
+      },
       organizers: {
         title: "主辦單位",
         description:
@@ -1255,11 +1309,57 @@ export const content = {
       callForVolunteers: "徵求志工",
       callForSideEvents: "立即舉辦 Side Event",
       orderQuery: "查詢訂單",
+      codeOfConduct: "活動行為準則",
       recaptcha: "此網站受 reCAPTCHA 保護，並適用 Google",
       privacyPolicy: "隱私權政策",
       termsOfService: "服務條款",
       and: "和",
       apply: "適用。"
+    },
+    codeOfConduct: {
+      title: "活動行為準則",
+      lastUpdated: "最後更新：2026 年 2 月",
+      intro: "Taiwan Digital Fest 2026 的所有與會者、講者、贊助商、志工與參與者均須同意下列行為準則。主辦單位將於活動期間全程執行本準則。我們期待所有參與者共同合作，為每個人營造安全、友善且包容的環境。",
+      quickVersion: {
+        title: "簡要說明",
+        content: "Taiwan Digital Fest 2026 致力於為每個人提供免於騷擾的體驗，不論性別、性別認同與表現、年齡、性取向、身心障礙、外表、體型、種族、民族、宗教信仰（或無宗教信仰）、國籍或技術選擇。我們不容忍任何形式的騷擾。任何場合（包括演講、工作坊、Side Events、派對與線上媒體）皆不適合出現性相關的語言或圖像。違反本準則的參與者，主辦單位得依其裁量予以警告或驅離會場，且不予退款。"
+      },
+      fullVersion: {
+        title: "完整條文",
+        harassment: {
+          title: "騷擾包括但不限於：",
+          items: [
+            "與性別、性別認同與表現、年齡、性取向、身心障礙、外表、體型、種族、民族、宗教、國籍或技術選擇相關的冒犯性言語",
+            "公開場合的性暗示圖像",
+            "故意恐嚇、跟蹤或尾隨",
+            "騷擾性攝影或錄影",
+            "持續干擾演講或其他活動進行",
+            "不當肢體接觸",
+            "不受歡迎的性暗示"
+          ]
+        },
+        expected: {
+          title: "期望行為",
+          items: [
+            "以尊重對待每個人，並認知所有參與者都有權在場",
+            "使用友善且包容的語言",
+            "體諒不同觀點與經驗",
+            "虛心接受建設性批評",
+            "以社群最佳利益為考量",
+            "對其他參與者展現同理心"
+          ]
+        },
+        sponsors: "贊助商亦須遵守反騷擾政策。特別是，贊助商不得使用具性暗示的圖像、活動或其他素材。攤位工作人員（含志工）不得穿著具性暗示的服裝、制服或服飾，或營造具性暗示的環境。",
+        enforcement: "若參與者出現騷擾行為，主辦單位得依其裁量採取適當措施，包括對違規者予以警告或驅離會場且不予退款。",
+        reporting: {
+          title: "通報方式",
+          content: "若您遭受騷擾、目睹他人遭受騷擾，或有任何其他疑慮，請立即聯繫活動工作人員。工作人員可透過品牌服裝或識別證辨識。我們將樂於協助參與者聯繫場地保全或當地執法單位、提供陪同，或以其他方式協助遭受騷擾者於活動期間感到安全。",
+          email: "您也可以透過以下信箱通報："
+        },
+        scope: "我們期待參與者在所有活動場地、工作坊、Side Events 及活動相關社交場合（含實體與線上）均遵守本準則。",
+        contact: "若對本行為準則有任何疑問或疑慮，請來信 fest@dna.org.tw 與我們聯絡。"
+      },
+      backToHome: "返回首頁"
     },
     checkout: {
       orderError: "無法載入訂單詳情。",

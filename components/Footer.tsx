@@ -160,6 +160,14 @@ export default function Footer() {
         {/* reCAPTCHA branding (required when hiding badge) */}
         <div className="text-center mt-2 pt-2 border-t border-[#F6F6F6]/10">
           <p className="text-xs text-[#F6F6F6]/60">
+            <Link
+              href="/code-of-conduct"
+              onClick={() => trackEvent('Lead', { content_name: 'Code of Conduct', content_category: 'Legal', location: 'footer' })}
+              className="hover:text-[#10B8D9] transition-colors underline"
+            >
+              {t.footer.codeOfConduct}
+            </Link>
+            {' · '}
             {t.footer.recaptcha}{' '}
             <a 
               href="https://policies.google.com/privacy" 
@@ -179,7 +187,7 @@ export default function Footer() {
               {t.footer.termsOfService}
             </a>{' '}
             {t.footer.apply}
-          </p>
+            </p>
         </div>
       </div>
     </footer>
