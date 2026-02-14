@@ -5,12 +5,24 @@ export interface SpeakerEvent {
   eventUrl?: string;
 }
 
+/** Optional social/contact links from Luma host (handles or URLs). */
+export interface SpeakerSocialLinks {
+  website?: string | null;
+  twitter_handle?: string | null;
+  youtube_handle?: string | null;
+  linkedin_handle?: string | null;
+  instagram_handle?: string | null;
+  tiktok_handle?: string | null;
+}
+
 export interface SpeakerGrouped {
   api_id: string;
   name: string;
   avatarUrl: string | null;
   username: string | null;
   events: SpeakerEvent[];
+  /** Social links from Luma host; only set when at least one is present. */
+  social?: SpeakerSocialLinks | null;
 }
 
 interface HostEventRow {
@@ -20,6 +32,7 @@ interface HostEventRow {
   username: string | null;
   eventName: string;
   eventUrl: string;
+  social?: SpeakerSocialLinks | null;
 }
 
 const EXCLUDED_USERNAMES = ['tdna', 'taiwan_nomad'];
@@ -27,7 +40,14 @@ const EXCLUDED_USERNAMES = ['tdna', 'taiwan_nomad'];
 function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
   const byId = new Map<
     string,
-    { api_id: string; name: string; avatarUrl: string | null; username: string | null; events: SpeakerEvent[] }
+    {
+      api_id: string;
+      name: string;
+      avatarUrl: string | null;
+      username: string | null;
+      events: SpeakerEvent[];
+      social?: SpeakerSocialLinks | null;
+    }
   >();
 
   for (const row of rows) {
@@ -41,6 +61,7 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
         (e) => e.eventName === row.eventName && e.eventUrl === row.eventUrl
       );
       if (!alreadyHas) existing.events.push(event);
+      if (row.social && !existing.social) existing.social = row.social;
     } else {
       byId.set(row.api_id, {
         api_id: row.api_id,
@@ -48,6 +69,7 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
         avatarUrl: row.avatarUrl,
         username: row.username,
         events: [event],
+        social: row.social ?? undefined,
       });
     }
   }
@@ -58,6 +80,7 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
     avatarUrl: v.avatarUrl,
     username: v.username,
     events: v.events,
+    social: v.social ?? null,
   }));
 }
 
@@ -83,6 +106,18 @@ export function getSpeakersFromEntries(entries: LumaApiEntry[]): SpeakerGrouped[
       const name = h.name && String(h.name).trim();
       if (!name) continue;
 
+      const website = h.website && String(h.website).trim() ? String(h.website) : null;
+      const twitter_handle = h.twitter_handle && String(h.twitter_handle).trim() ? String(h.twitter_handle) : null;
+      const youtube_handle = h.youtube_handle && String(h.youtube_handle).trim() ? String(h.youtube_handle) : null;
+      const linkedin_handle = h.linkedin_handle && String(h.linkedin_handle).trim() ? String(h.linkedin_handle) : null;
+      const instagram_handle = h.instagram_handle && String(h.instagram_handle).trim() ? String(h.instagram_handle) : null;
+      const tiktok_handle = h.tiktok_handle && String(h.tiktok_handle).trim() ? String(h.tiktok_handle) : null;
+
+      const hasSocial = website || twitter_handle || youtube_handle || linkedin_handle || instagram_handle || tiktok_handle;
+      const social: SpeakerSocialLinks | undefined = hasSocial
+        ? { website, twitter_handle, youtube_handle, linkedin_handle, instagram_handle, tiktok_handle }
+        : undefined;
+
       rows.push({
         api_id: h.api_id,
         name,
@@ -91,6 +126,7 @@ export function getSpeakersFromEntries(entries: LumaApiEntry[]): SpeakerGrouped[
         username: h.username && String(h.username).trim() ? String(h.username) : null,
         eventName,
         eventUrl,
+        social,
       });
     }
   }

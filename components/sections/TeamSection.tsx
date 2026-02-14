@@ -7,8 +7,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { useLumaData } from '@/contexts/LumaDataContext';
-import { ExternalLink, Instagram, Mail, Globe, User } from 'lucide-react';
-import type { SpeakerGrouped } from '@/lib/lumaSpeakers';
+import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter } from 'lucide-react';
+import type { SpeakerGrouped, SpeakerSocialLinks } from '@/lib/lumaSpeakers';
 
 interface Partner {
   name: string;
@@ -25,6 +25,32 @@ const CALL_FOR_SPEAKERS_URL = 'https://forms.gle/pVc6oTEi1XZ1pAR49';
 const DEFAULT_SPEAKER_IMAGE = '/images/default_speaker.jpg';
 const MAX_EVENTS_VISIBLE = 3;
 const TARGET_SPEAKER_COUNT = 10;
+
+/** Build social URL from handle or use website as-is. */
+function getSocialUrl(
+  kind: keyof SpeakerSocialLinks,
+  value: string | null | undefined
+): string | null {
+  if (!value || !String(value).trim()) return null;
+  const raw = String(value).trim();
+  const v = raw.replace(/^@/, '');
+  switch (kind) {
+    case 'website':
+      return raw.startsWith('http') ? raw : `https://${raw}`;
+    case 'twitter_handle':
+      return `https://x.com/${v}`;
+    case 'youtube_handle':
+      return `https://www.youtube.com/@${v}`;
+    case 'linkedin_handle':
+      return `https://www.linkedin.com/in/${v}`;
+    case 'instagram_handle':
+      return `https://www.instagram.com/${v}`;
+    case 'tiktok_handle':
+      return `https://www.tiktok.com/@${v}`;
+    default:
+      return null;
+  }
+}
 
 export default function TeamSection() {
   const { t } = useTranslation();
@@ -169,14 +195,32 @@ export default function TeamSection() {
                 const visibleEvents = speaker.events.slice(0, MAX_EVENTS_VISIBLE);
                 const restCount = speaker.events.length - MAX_EVENTS_VISIBLE;
                 const profileUrl = speaker.callForSpeakersUrl ?? (speaker.api_id ? `${LUMA_USER_BASE}/${speaker.api_id}` : null);
+                const social = speaker.social;
+                const isMock = !!speaker.callForSpeakersUrl;
 
-                const CardContent = (
+                const socialLinks: { kind: keyof SpeakerSocialLinks; href: string; icon: React.ReactNode; label: string }[] = [];
+                if (!isMock && social) {
+                  const w = getSocialUrl('website', social.website);
+                  if (w) socialLinks.push({ kind: 'website', href: w, icon: <Globe className="w-4 h-4" />, label: 'Website' });
+                  const tw = getSocialUrl('twitter_handle', social.twitter_handle);
+                  if (tw) socialLinks.push({ kind: 'twitter_handle', href: tw, icon: <Twitter className="w-4 h-4" />, label: 'X' });
+                  const yt = getSocialUrl('youtube_handle', social.youtube_handle);
+                  if (yt) socialLinks.push({ kind: 'youtube_handle', href: yt, icon: <Youtube className="w-4 h-4" />, label: 'YouTube' });
+                  const li = getSocialUrl('linkedin_handle', social.linkedin_handle);
+                  if (li) socialLinks.push({ kind: 'linkedin_handle', href: li, icon: <Linkedin className="w-4 h-4" />, label: 'LinkedIn' });
+                  const ig = getSocialUrl('instagram_handle', social.instagram_handle);
+                  if (ig) socialLinks.push({ kind: 'instagram_handle', href: ig, icon: <Instagram className="w-4 h-4" />, label: 'Instagram' });
+                  const tt = getSocialUrl('tiktok_handle', social.tiktok_handle);
+                  if (tt) socialLinks.push({ kind: 'tiktok_handle', href: tt, icon: <ExternalLink className="w-4 h-4" />, label: 'TikTok' });
+                }
+
+                const CardMain = (
                   <>
                     <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] flex-shrink-0 mb-3">
                       {speaker.avatarUrl ? (
                         <Image
                           src={speaker.avatarUrl}
-                          alt={speaker.callForSpeakersUrl ? t.partners.speakers.mockLabel : speaker.name}
+                          alt={isMock ? t.partners.speakers.mockLabel : speaker.name}
                           fill
                           className="object-cover"
                           sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 128px"
@@ -189,7 +233,7 @@ export default function TeamSection() {
                       )}
                     </div>
                     <p className="font-semibold text-[#1E1F1C] text-sm sm:text-base line-clamp-2">
-                      {speaker.callForSpeakersUrl ? t.partners.speakers.mockLabel : speaker.name}
+                      {isMock ? t.partners.speakers.mockLabel : speaker.name}
                     </p>
                     <div className="text-[#4B4C47] text-xs sm:text-sm mt-0.5 space-y-0.5 text-center w-full min-w-0">
                       {visibleEvents.map((ev, i) => (
@@ -205,6 +249,7 @@ export default function TeamSection() {
                     </div>
                   </>
                 );
+
                 return (
                   <motion.div
                     key={speaker.callForSpeakersUrl ? `mock-${index}` : `${speaker.api_id || speaker.name}-${index}`}
@@ -222,10 +267,26 @@ export default function TeamSection() {
                         rel="noopener noreferrer"
                         className="flex flex-col items-center text-center focus:outline-none focus:ring-2 focus:ring-[#1E1F1C] focus:ring-offset-2 rounded-2xl"
                       >
-                        {CardContent}
+                        {CardMain}
                       </a>
                     ) : (
-                      CardContent
+                      CardMain
+                    )}
+                    {socialLinks.length > 0 && (
+                      <div className="flex items-center justify-center gap-1.5 mt-2 flex-wrap" role="group" aria-label="Social links">
+                        {socialLinks.map(({ href, icon, label }) => (
+                          <a
+                            key={label}
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                            aria-label={label}
+                          >
+                            {icon}
+                          </a>
+                        ))}
+                      </div>
                     )}
                   </motion.div>
                 );

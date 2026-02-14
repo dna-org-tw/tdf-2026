@@ -27,6 +27,11 @@ export interface LumaApiHost {
   username?: string | null;
   avatar_url?: string | null;
   website?: string | null;
+  twitter_handle?: string | null;
+  youtube_handle?: string | null;
+  linkedin_handle?: string | null;
+  instagram_handle?: string | null;
+  tiktok_handle?: string | null;
   [key: string]: unknown;
 }
 
