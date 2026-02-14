@@ -20,6 +20,16 @@ export interface CalendarEvent {
   imageUrl?: string;
 }
 
+/** Host from Luma calendar API (event host / speaker). */
+export interface LumaApiHost {
+  api_id: string;
+  name: string | null;
+  username?: string | null;
+  avatar_url?: string | null;
+  website?: string | null;
+  [key: string]: unknown;
+}
+
 export interface LumaApiEntry {
   api_id: string;
   event: {
@@ -41,6 +51,7 @@ export interface LumaApiEntry {
     url: string;
   };
   start_at: string;
+  hosts?: LumaApiHost[];
   ticket_info?: {
     price?: {
       cents: number;

@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import { buildScheduleFromEntries, type LumaApiEntry } from '@/lib/lumaSchedule';
-import {
-  getSpeakersFromEventList,
-  type SpeakerGrouped,
-  type SpeakerEventInput,
-} from '@/lib/lumaSpeakers';
+import { getSpeakersFromEntries, type SpeakerGrouped } from '@/lib/lumaSpeakers';
 
 const LUMA_API_URL =
   'https://api2.luma.com/calendar/get-items?calendar_api_id=cal-S2KwfjOEzcZl8E8&pagination_limit=100&period=future';
@@ -38,25 +34,7 @@ export async function GET() {
 
     const events = buildScheduleFromEntries(entries);
 
-    const speakerEventList: SpeakerEventInput[] = entries
-      .filter((e) => e.event?.name && e.event?.url)
-      .map((e) => ({
-        slug: e.event.url,
-        name: e.event.name,
-        url: e.event.url.startsWith('http') ? e.event.url : `https://lu.ma/${e.event.url}`,
-      }));
-
-    const seen = new Set<string>();
-    const uniqueSpeakerEvents = speakerEventList.filter((ev) => {
-      const key = `${ev.slug}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-    const speakers = await getSpeakersFromEventList(uniqueSpeakerEvents, {
-      maxEvents: 50,
-    });
+    const speakers = getSpeakersFromEntries(entries);
 
     return NextResponse.json({ events, speakers });
   } catch (error) {
