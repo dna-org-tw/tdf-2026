@@ -613,7 +613,11 @@ export const content = {
       retry: "Try Again",
       backToHome: "Back to homepage",
       missingToken: "Missing unsubscribe link parameter.",
-      preparing: "Preparing to unsubscribe..."
+      preparing: "Preparing to unsubscribe...",
+      enterEmailTitle: "Enter your email to unsubscribe",
+      enterEmailDescription: "If you arrived without a link parameter, please enter the email address you used to subscribe.",
+      emailPlaceholder: "your@email.com",
+      submitUnsubscribe: "Unsubscribe"
     },
     notFound: {
       redirecting: "Redirecting to homepage..."
@@ -1344,7 +1348,11 @@ export const content = {
       retry: "重新嘗試",
       backToHome: "返回首頁",
       missingToken: "缺少取消訂閱的連結參數。",
-      preparing: "準備取消訂閱..."
+      preparing: "準備取消訂閱...",
+      enterEmailTitle: "輸入信箱以取消訂閱",
+      enterEmailDescription: "若您點擊的連結未帶參數，請輸入您訂閱時使用的 Email 信箱。",
+      emailPlaceholder: "your@email.com",
+      submitUnsubscribe: "取消訂閱"
     },
     notFound: {
       redirecting: "正在跳转到首页..."

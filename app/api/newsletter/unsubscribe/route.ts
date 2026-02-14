@@ -85,6 +85,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// 簡單的 Email 格式驗證
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 export async function POST(req: NextRequest) {
   const lang = getLangFromRequest(req);
   const t = content[lang].api;
@@ -99,21 +105,43 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => null);
 
-    if (!body || !body.token) {
+    if (!body) {
       return NextResponse.json(
         { error: t.unsubscribeTokenRequired },
         { status: 400 }
       );
     }
 
-    const { token } = body;
+    let email: string | null = null;
 
-    // 驗證 token 並獲取 email
-    const email = verifyUnsubscribeToken(token);
-
-    if (!email) {
+    if (body.token) {
+      // 驗證 token 並獲取 email
+      email = verifyUnsubscribeToken(body.token);
+      if (!email) {
+        return NextResponse.json(
+          { error: t.invalidUnsubscribeToken },
+          { status: 400 }
+        );
+      }
+    } else if (body.email) {
+      // 直接以 email 取消訂閱
+      const rawEmail = body.email.trim();
+      if (!rawEmail) {
+        return NextResponse.json(
+          { error: t.emailRequired },
+          { status: 400 }
+        );
+      }
+      if (!isValidEmail(rawEmail)) {
+        return NextResponse.json(
+          { error: t.invalidEmailFormat },
+          { status: 400 }
+        );
+      }
+      email = rawEmail.toLowerCase();
+    } else {
       return NextResponse.json(
-        { error: t.invalidUnsubscribeToken },
+        { error: t.unsubscribeTokenRequired },
         { status: 400 }
       );
     }

@@ -10,14 +10,14 @@ export default function UnsubscribePage() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'form'>('idle');
   const [message, setMessage] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const token = searchParams.get('token');
 
   useEffect(() => {
     if (!token) {
-      setStatus('error');
-      setMessage(t.unsubscribe.missingToken);
+      setStatus('form');
       return;
     }
 
@@ -50,6 +50,38 @@ export default function UnsubscribePage() {
 
     unsubscribe();
   }, [token, t]);
+
+  const handleEmailUnsubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    try {
+      setStatus('loading');
+      setMessage(t.unsubscribe.processing);
+
+      const res = await fetch('/api/newsletter/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || t.unsubscribe.errorTitle);
+      }
+
+      setStatus('success');
+      setMessage(data.message || t.unsubscribe.successMessage);
+
+      trackEvent('Unsubscribe', {
+        content_category: 'Newsletter',
+      });
+    } catch (error) {
+      console.error('Unsubscribe error:', error);
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : t.unsubscribe.errorTitle);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#1E1F1C] text-white flex items-center justify-center px-4">
@@ -108,12 +140,11 @@ export default function UnsubscribePage() {
               </p>
             </div>
             <div className="pt-4 space-y-3">
-              <button
-                onClick={() => {
-                  if (token) {
+              {token ? (
+                <button
+                  onClick={() => {
                     setStatus('idle');
                     setMessage('');
-                    // 重新嘗試取消訂閱
                     const unsubscribe = async () => {
                       try {
                         setStatus('loading');
@@ -128,16 +159,27 @@ export default function UnsubscribePage() {
                         setMessage(data.message || t.unsubscribe.successMessage);
                       } catch (error) {
                         setStatus('error');
-                    setMessage(error instanceof Error ? error.message : t.unsubscribe.errorTitle);
+                        setMessage(error instanceof Error ? error.message : t.unsubscribe.errorTitle);
                       }
                     };
                     unsubscribe();
-                  }
-                }}
-                className="w-full md:w-auto px-6 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#10B8D9] text-white hover:bg-[#10B8D9]/80 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                {t.unsubscribe.retry}
-              </button>
+                  }}
+                  className="w-full md:w-auto px-6 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#10B8D9] text-white hover:bg-[#10B8D9]/80 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  {t.unsubscribe.retry}
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setStatus('form');
+                    setMessage('');
+                    setEmail('');
+                  }}
+                  className="w-full md:w-auto px-6 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#10B8D9] text-white hover:bg-[#10B8D9]/80 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  {t.unsubscribe.retry}
+                </button>
+              )}
               <button
                 onClick={() => router.push('/')}
                 className="w-full md:w-auto px-6 py-3 rounded-lg font-semibold text-sm md:text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all duration-200"
@@ -145,6 +187,41 @@ export default function UnsubscribePage() {
                 {t.unsubscribe.backToHome}
               </button>
             </div>
+          </>
+        )}
+
+        {status === 'form' && (
+          <>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/10 border border-blue-400/40 mb-2">
+              <span className="text-3xl">✉</span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold">{t.unsubscribe.enterEmailTitle}</h1>
+            <p className="text-white/80 text-sm md:text-base leading-relaxed">{t.unsubscribe.enterEmailDescription}</p>
+            <form onSubmit={handleEmailUnsubscribe} className="space-y-4 text-left">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t.unsubscribe.emailPlaceholder}
+                required
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:border-transparent"
+              />
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button
+                  type="submit"
+                  className="w-full md:w-auto px-6 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#10B8D9] text-white hover:bg-[#10B8D9]/80 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  {t.unsubscribe.submitUnsubscribe}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/')}
+                  className="w-full md:w-auto px-6 py-3 rounded-lg font-semibold text-sm md:text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all duration-200"
+                >
+                  {t.unsubscribe.backToHome}
+                </button>
+              </div>
+            </form>
           </>
         )}
 
