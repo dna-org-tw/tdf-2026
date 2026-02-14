@@ -6,6 +6,7 @@ export interface SpeakerEvent {
 }
 
 export interface SpeakerGrouped {
+  api_id: string;
   name: string;
   avatarUrl: string | null;
   username: string | null;
@@ -26,7 +27,7 @@ const EXCLUDED_USERNAMES = ['tdna', 'taiwan_nomad'];
 function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
   const byId = new Map<
     string,
-    { name: string; avatarUrl: string | null; username: string | null; events: SpeakerEvent[] }
+    { api_id: string; name: string; avatarUrl: string | null; username: string | null; events: SpeakerEvent[] }
   >();
 
   for (const row of rows) {
@@ -42,6 +43,7 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
       if (!alreadyHas) existing.events.push(event);
     } else {
       byId.set(row.api_id, {
+        api_id: row.api_id,
         name: row.name,
         avatarUrl: row.avatarUrl,
         username: row.username,
@@ -51,6 +53,7 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
   }
 
   return Array.from(byId.values()).map((v) => ({
+    api_id: v.api_id,
     name: v.name,
     avatarUrl: v.avatarUrl,
     username: v.username,

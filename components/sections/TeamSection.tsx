@@ -20,7 +20,7 @@ interface SpeakerGroupedWithMock extends SpeakerGrouped {
   callForSpeakersUrl?: string;
 }
 
-const LUMA_USER_BASE = 'https://lu.ma/user';
+const LUMA_USER_BASE = 'https://luma.com/user';
 const CALL_FOR_SPEAKERS_URL = 'https://forms.gle/pVc6oTEi1XZ1pAR49';
 const DEFAULT_SPEAKER_IMAGE = '/images/default_speaker.jpg';
 const MAX_EVENTS_VISIBLE = 3;
@@ -36,6 +36,7 @@ export default function TeamSection() {
     const real = contextSpeakers;
     const mockCount = Math.max(0, TARGET_SPEAKER_COUNT - real.length);
     const mockSpeakers: SpeakerGroupedWithMock[] = Array.from({ length: mockCount }, () => ({
+      api_id: '',
       name: '',
       avatarUrl: DEFAULT_SPEAKER_IMAGE,
       username: null,
@@ -167,7 +168,7 @@ export default function TeamSection() {
               {speakers.map((speaker, index) => {
                 const visibleEvents = speaker.events.slice(0, MAX_EVENTS_VISIBLE);
                 const restCount = speaker.events.length - MAX_EVENTS_VISIBLE;
-                const profileUrl = speaker.callForSpeakersUrl ?? (speaker.username ? `${LUMA_USER_BASE}/${speaker.username}` : null);
+                const profileUrl = speaker.callForSpeakersUrl ?? (speaker.api_id ? `${LUMA_USER_BASE}/${speaker.api_id}` : null);
 
                 const CardContent = (
                   <>
@@ -206,7 +207,7 @@ export default function TeamSection() {
                 );
                 return (
                   <motion.div
-                    key={speaker.callForSpeakersUrl ? `mock-${index}` : `${speaker.username ?? speaker.name}-${index}`}
+                    key={speaker.callForSpeakersUrl ? `mock-${index}` : `${speaker.api_id || speaker.name}-${index}`}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
