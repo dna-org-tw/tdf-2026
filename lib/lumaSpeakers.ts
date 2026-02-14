@@ -20,6 +20,8 @@ export interface SpeakerGrouped {
   name: string;
   avatarUrl: string | null;
   username: string | null;
+  /** Short bio from Luma host. */
+  bioShort?: string | null;
   events: SpeakerEvent[];
   /** Social links from Luma host; only set when at least one is present. */
   social?: SpeakerSocialLinks | null;
@@ -30,6 +32,7 @@ interface HostEventRow {
   name: string;
   avatarUrl: string | null;
   username: string | null;
+  bioShort?: string | null;
   eventName: string;
   eventUrl: string;
   social?: SpeakerSocialLinks | null;
@@ -45,6 +48,7 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
       name: string;
       avatarUrl: string | null;
       username: string | null;
+      bioShort?: string | null;
       events: SpeakerEvent[];
       social?: SpeakerSocialLinks | null;
     }
@@ -62,12 +66,14 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
       );
       if (!alreadyHas) existing.events.push(event);
       if (row.social && !existing.social) existing.social = row.social;
+      if (row.bioShort && !existing.bioShort) existing.bioShort = row.bioShort;
     } else {
       byId.set(row.api_id, {
         api_id: row.api_id,
         name: row.name,
         avatarUrl: row.avatarUrl,
         username: row.username,
+        bioShort: row.bioShort ?? undefined,
         events: [event],
         social: row.social ?? undefined,
       });
@@ -79,6 +85,7 @@ function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
     name: v.name,
     avatarUrl: v.avatarUrl,
     username: v.username,
+    bioShort: v.bioShort ?? null,
     events: v.events,
     social: v.social ?? null,
   }));
@@ -118,12 +125,15 @@ export function getSpeakersFromEntries(entries: LumaApiEntry[]): SpeakerGrouped[
         ? { website, twitter_handle, youtube_handle, linkedin_handle, instagram_handle, tiktok_handle }
         : undefined;
 
+      const bioShort = h.bio_short && String(h.bio_short).trim() ? String(h.bio_short).trim() : null;
+
       rows.push({
         api_id: h.api_id,
         name,
         avatarUrl:
           h.avatar_url && String(h.avatar_url).trim() ? String(h.avatar_url) : null,
         username: h.username && String(h.username).trim() ? String(h.username) : null,
+        bioShort,
         eventName,
         eventUrl,
         social,

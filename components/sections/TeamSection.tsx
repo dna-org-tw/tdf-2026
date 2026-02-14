@@ -190,7 +190,7 @@ export default function TeamSection() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E1F1C]"></div>
             </div>
           ) : speakers.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
               {speakers.map((speaker, index) => {
                 const visibleEvents = speaker.events.slice(0, MAX_EVENTS_VISIBLE);
                 const restCount = speaker.events.length - MAX_EVENTS_VISIBLE;
@@ -214,9 +214,9 @@ export default function TeamSection() {
                   if (tt) socialLinks.push({ kind: 'tiktok_handle', href: tt, icon: <ExternalLink className="w-4 h-4" />, label: 'TikTok' });
                 }
 
-                const CardMain = (
+                const CardProfile = (
                   <>
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] flex-shrink-0 mb-3">
+                    <div className="relative w-[clamp(5.5rem,32vw,8rem)] h-[clamp(5.5rem,32vw,8rem)] rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] flex-shrink-0 mb-3 aspect-square">
                       {speaker.avatarUrl ? (
                         <Image
                           src={speaker.avatarUrl}
@@ -235,19 +235,46 @@ export default function TeamSection() {
                     <p className="font-semibold text-[#1E1F1C] text-sm sm:text-base line-clamp-2">
                       {isMock ? t.partners.speakers.mockLabel : speaker.name}
                     </p>
-                    <div className="text-[#4B4C47] text-xs sm:text-sm mt-0.5 space-y-0.5 text-center w-full min-w-0">
-                      {visibleEvents.map((ev, i) => (
-                        <p key={i} className="line-clamp-2">
-                          {ev.eventName}
-                        </p>
-                      ))}
-                      {restCount > 0 && (
-                        <p className="text-[#1E1F1C] font-medium">
-                          {restCount}+
-                        </p>
-                      )}
-                    </div>
+                    {!isMock && speaker.bioShort && (
+                      <p className="text-[#4B4C47] text-xs mt-1 text-center w-full min-w-0">
+                        {speaker.bioShort.length > 200
+                          ? `${speaker.bioShort.slice(0, 200)}…`
+                          : speaker.bioShort}
+                      </p>
+                    )}
                   </>
+                );
+
+                const EventBadges = (
+                  <div className="flex flex-wrap justify-center gap-1.5 mt-2 w-full min-w-0">
+                    {visibleEvents.map((ev, i) =>
+                      ev.eventUrl ? (
+                        <a
+                          key={i}
+                          href={ev.eventUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E0E0E0] text-[#1E1F1C] hover:bg-[#1E1F1C] hover:text-white transition-colors line-clamp-1 max-w-full"
+                          title={ev.eventName}
+                        >
+                          <span className="truncate">{ev.eventName}</span>
+                        </a>
+                      ) : (
+                        <span
+                          key={i}
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E0E0E0] text-[#1E1F1C] line-clamp-1 max-w-full"
+                          title={ev.eventName}
+                        >
+                          <span className="truncate">{ev.eventName}</span>
+                        </span>
+                      )
+                    )}
+                    {restCount > 0 && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#1E1F1C] text-white">
+                        +{restCount}
+                      </span>
+                    )}
+                  </div>
                 );
 
                 return (
@@ -267,11 +294,12 @@ export default function TeamSection() {
                         rel="noopener noreferrer"
                         className="flex flex-col items-center text-center focus:outline-none focus:ring-2 focus:ring-[#1E1F1C] focus:ring-offset-2 rounded-2xl"
                       >
-                        {CardMain}
+                        {CardProfile}
                       </a>
                     ) : (
-                      CardMain
+                      CardProfile
                     )}
+                    {EventBadges}
                     {socialLinks.length > 0 && (
                       <div className="flex items-center justify-center gap-1.5 mt-2 flex-wrap" role="group" aria-label="Social links">
                         {socialLinks.map(({ href, icon, label }) => (

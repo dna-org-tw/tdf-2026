@@ -26,6 +26,7 @@ export interface LumaApiHost {
   name: string | null;
   username?: string | null;
   avatar_url?: string | null;
+  bio_short?: string | null;
   website?: string | null;
   twitter_handle?: string | null;
   youtube_handle?: string | null;
