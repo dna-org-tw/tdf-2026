@@ -5,6 +5,8 @@ import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/sections/HeroSection';
 import HashNavigationHandler from '@/components/HashNavigationHandler';
 import { useScrollDepth } from '@/hooks/useScrollDepth';
+import { LumaDataProvider } from '@/contexts/LumaDataContext';
+import TeamSection from '@/components/sections/TeamSection';
 
 // 動態導入非首屏組件，大幅減少初始 bundle 大小
 // 使用 loading 狀態提升 UX，並設定 ssr: false 避免不必要的 SSR
@@ -35,11 +37,6 @@ const AccommodationSection = dynamic(() => import('@/components/sections/Accommo
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
-const PartnersSection = dynamic(() => import('@/components/sections/PartnersSection'), {
-  ssr: true, // AEO优化：启用SSR
-  loading: () => <div className="h-96 bg-white animate-pulse" />,
-});
-
 const FollowUsSection = dynamic(() => import('@/components/sections/FollowUsSection'), {
   ssr: true, // AEO优化：启用SSR
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
@@ -50,7 +47,7 @@ export default function HomeContent() {
   useScrollDepth();
 
   return (
-    <>
+    <LumaDataProvider>
       <Navbar />
       <HeroSection />
       <HashNavigationHandler />
@@ -58,9 +55,9 @@ export default function HomeContent() {
       <EventsSection />
       <TicketsSection />
       <AccommodationSection />
-      <PartnersSection />
+      <TeamSection />
       <FollowUsSection />
       <Footer />
-    </>
+    </LumaDataProvider>
   );
 }

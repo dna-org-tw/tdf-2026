@@ -6,6 +6,7 @@ import { X, Mail, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
+import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
 interface VoteEmailModalProps {
   isOpen: boolean;
@@ -143,6 +144,7 @@ export default function VoteEmailModal({
           recaptchaToken,
           timezone: userInfo.timezone,
           locale: userInfo.locale,
+          visitor_fingerprint: getVisitorFingerprint(),
         }),
       });
 

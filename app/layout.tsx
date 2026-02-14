@@ -7,6 +7,7 @@ import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
 import GoogleTag from '@/components/GoogleTag';
 import RecaptchaScript from '@/components/RecaptchaScript';
+import VisitorTracker from '@/components/VisitorTracker';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -174,6 +175,8 @@ export default async function RootLayout({
         <GoogleTag />
         {/* reCAPTCHA Enterprise API */}
         <RecaptchaScript />
+        {/* 自動記錄 visitor：fingerprint、IP、時區、語系，供訂閱/購買關聯 */}
+        <VisitorTracker />
         {children}
       </body>
     </html>

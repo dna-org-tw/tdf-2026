@@ -15,18 +15,21 @@ export async function createOrder(input: CreateOrderInput): Promise<Order | null
   }
 
   try {
+    const insertData: Record<string, unknown> = {
+      stripe_session_id: input.stripe_session_id,
+      ticket_tier: input.ticket_tier,
+      status: 'pending',
+      amount_subtotal: input.amount_subtotal,
+      amount_total: input.amount_total,
+      amount_tax: input.amount_tax,
+      amount_discount: input.amount_discount,
+      currency: input.currency,
+    };
+    if (input.visitor_fingerprint) insertData.visitor_fingerprint = input.visitor_fingerprint;
+
     const { data, error } = await supabaseServer
       .from('orders')
-      .insert({
-        stripe_session_id: input.stripe_session_id,
-        ticket_tier: input.ticket_tier,
-        status: 'pending',
-        amount_subtotal: input.amount_subtotal,
-        amount_total: input.amount_total,
-        amount_tax: input.amount_tax,
-        amount_discount: input.amount_discount,
-        currency: input.currency,
-      })
+      .insert(insertData)
       .select()
       .single();
 

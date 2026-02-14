@@ -172,7 +172,7 @@
 - ✅ Tickets Section
 - ✅ Ticket Follow Section
 - ✅ Accommodation Section
-- ✅ Partners Section
+- ✅ Team Section
 - ✅ Follow Us Section
 
 ### 用户交互

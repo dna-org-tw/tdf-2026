@@ -92,7 +92,7 @@ export default function Navbar() {
     { name: t.nav.highlights, href: '#events' },
     { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.accommodation, href: '#accommodation' },
-    { name: t.nav.team, href: '#partners' },
+    { name: t.nav.team, href: '#team' },
     { name: t.nav.followUs, href: '#follow-us' },
   ];
 

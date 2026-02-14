@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { recordVisitor } from '@/lib/visitors';
+
+function getClientIP(req: NextRequest): string | null {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) return forwardedFor.split(',')[0].trim();
+
+  const realIP = req.headers.get('x-real-ip');
+  if (realIP) return realIP;
+
+  const cfConnectingIP = req.headers.get('cf-connecting-ip');
+  if (cfConnectingIP) return cfConnectingIP;
+
+  return null;
+}
+
+async function getCountryFromIP(ip: string | null): Promise<string | null> {
+  if (!ip || ip === 'localhost' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+    return null;
+  }
+  try {
+    const response = await fetch(`https://ipapi.co/${ip}/country/`, {
+      headers: { 'User-Agent': 'Taiwan-Digital-Fest-2026' },
+    });
+    if (response.ok) {
+      const country = await response.text();
+      return country.trim() || null;
+    }
+  } catch (error) {
+    console.error('[Visitors API] Failed to get country from IP:', error);
+  }
+  return null;
+}
+
+/**
+ * POST /api/visitors/record
+ * 記錄訪客資訊：fingerprint、IP、時區、語系等
+ * Body: { fingerprint, timezone?, locale?, user_agent? }
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => null);
+
+    if (!body?.fingerprint || typeof body.fingerprint !== 'string') {
+      return NextResponse.json(
+        { error: 'fingerprint is required' },
+        { status: 400 }
+      );
+    }
+
+    const fingerprint = body.fingerprint.trim();
+    if (!fingerprint) {
+      return NextResponse.json(
+        { error: 'fingerprint is required' },
+        { status: 400 }
+      );
+    }
+
+    const clientIP = getClientIP(req);
+    const country = clientIP ? await getCountryFromIP(clientIP) : null;
+    const userAgent = req.headers.get('user-agent') || null;
+
+    const result = await recordVisitor({
+      fingerprint,
+      timezone: body.timezone ?? null,
+      locale: body.locale ?? null,
+      user_agent: body.user_agent ?? userAgent,
+      ip_address: clientIP,
+      country,
+    });
+
+    if (!result.visitor) {
+      return NextResponse.json(
+        {
+          error: 'Failed to record visitor',
+          detail: result.error ?? 'Unknown error',
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, visitor_fingerprint: result.visitor.fingerprint },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('[Visitors API] Unexpected error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

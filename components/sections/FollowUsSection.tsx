@@ -9,6 +9,7 @@ import { Mail, CheckCircle2, Zap, Users } from 'lucide-react';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { getUserInfo } from '@/lib/userInfo';
+import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
 // 计数器动画组件
 function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
@@ -139,6 +140,7 @@ export default function FollowUsSection() {
           recaptchaToken,
           timezone: userInfo.timezone,
           locale: userInfo.locale,
+          visitor_fingerprint: getVisitorFingerprint(),
         }),
       });
 

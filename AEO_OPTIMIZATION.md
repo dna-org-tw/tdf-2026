@@ -64,7 +64,7 @@
 - TicketsSection
 - TicketFollowSection
 - AccommodationSection
-- PartnersSection
+- TeamSection
 - FollowUsSection
 
 **文件位置：** `components/HomeContent.tsx`

@@ -8,6 +8,7 @@ import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { getUserInfo } from '@/lib/userInfo';
+import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
 export default function TicketFollowSection() {
   const { t } = useTranslation();
@@ -60,6 +61,7 @@ export default function TicketFollowSection() {
           recaptchaToken,
           timezone: userInfo.timezone,
           locale: userInfo.locale,
+          visitor_fingerprint: getVisitorFingerprint(),
         }),
       });
 

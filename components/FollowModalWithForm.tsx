@@ -6,6 +6,7 @@ import { X, CheckCircle2, AlertCircle, Info, Mail } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
+import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
 interface FollowModalWithFormProps {
   isOpen: boolean;
@@ -67,6 +68,7 @@ export default function FollowModalWithForm({
           recaptchaToken,
           timezone: userInfo.timezone,
           locale: userInfo.locale,
+          visitor_fingerprint: getVisitorFingerprint(),
         }),
       });
 

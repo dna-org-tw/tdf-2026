@@ -1,33 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
-
-interface TicketInfo {
-  follower: { free: boolean; price?: number };
-  explorer: { free: boolean; price?: number };
-  contributor: { free: boolean; price?: number };
-  backer: { free: boolean; price?: number };
-}
-
-interface CalendarEvent {
-  title: string;
-  location: string;
-  description: string;
-  startDate: string;
-  endDate: string | null;
-  startTime?: string | null;
-  endTime?: string | null;
-  eligibility?: string[];
-  tags?: Array<{ name: string; color?: string }>;
-  url?: string;
-  tickets?: TicketInfo;
-  imageUrl?: string;
-}
+import { useLumaData } from '@/contexts/LumaDataContext';
+import type { CalendarEvent } from '@/lib/lumaSchedule';
 
 type TicketTier = 'follower' | 'explorer' | 'contributor' | 'backer' | 'other';
 
@@ -47,31 +27,15 @@ const FILTER_BUTTON_CLASS: Record<TicketTier | 'all', { active: string; inactive
 
 export default function EventsSection() {
   const { t } = useTranslation();
-  const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]);
+  const { events: contextEvents } = useLumaData();
   const [selectedTierFilter, setSelectedTierFilter] = useState<TicketTier | 'all'>('all');
-  
+
+  const allEvents = useMemo(
+    () => contextEvents.filter((event) => event.url && event.title),
+    [contextEvents]
+  );
+
   useSectionTracking({ sectionId: 'events', sectionName: 'Events Section', category: 'Event Information' });
-
-  // Fetch Luma calendar data
-  useEffect(() => {
-    const fetchCalendarData = async () => {
-      try {
-        const response = await fetch('/api/luma-schedule');
-        if (response.ok) {
-          const data = await response.json();
-          const events = data.events || [];
-          // Filter events that have URLs (more likely to have images)
-          const filteredEvents = events
-            .filter((event: CalendarEvent) => event.url && event.title);
-          setAllEvents(filteredEvents);
-        }
-      } catch (error) {
-        console.error('Failed to fetch calendar data:', error);
-      }
-    };
-
-    fetchCalendarData();
-  }, []);
 
   // Get the lowest tier ticket type from event tags
   // Ticket tier hierarchy (lowest to highest): follower < explorer < contributor < backer

@@ -9,6 +9,7 @@ import { useSectionTracking } from '@/hooks/useSectionTracking';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
+import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
 interface TicketTier {
   name: string;
@@ -163,7 +164,7 @@ export default function TicketsSection() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tier: tier.key }),
+        body: JSON.stringify({ tier: tier.key, visitor_fingerprint: getVisitorFingerprint() }),
       });
 
       if (!response.ok) {
@@ -218,6 +219,7 @@ export default function TicketsSection() {
           recaptchaToken,
           timezone: userInfo.timezone,
           locale: userInfo.locale,
+          visitor_fingerprint: getVisitorFingerprint(),
         }),
       });
       const result = await response.json();

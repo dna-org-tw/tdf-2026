@@ -70,6 +70,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const visitorFingerprint = body?.visitor_fingerprint ?? null;
+
     // 在 Supabase 中创建订单记录
     const order = await createOrder({
       stripe_session_id: session.id,
@@ -79,6 +81,7 @@ export async function POST(req: NextRequest) {
       amount_tax: 0,
       amount_discount: 0,
       currency: price.currency || 'usd',
+      visitor_fingerprint: visitorFingerprint,
     });
 
     if (!order) {

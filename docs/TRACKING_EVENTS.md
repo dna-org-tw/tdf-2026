@@ -22,7 +22,7 @@
 | 票券區（Tickets Section） | 同上，由 useSectionTracking 觸發 |
 | 票券追蹤區（Ticket Follow Section） | 同上 |
 | 關於區（About Section） | 同上 |
-| 合作夥伴區（Partners Section） | 同上 |
+| 合作夥伴區（Team Section） | 同上 |
 | 住宿區（Accommodation Section） | 同上 |
 | Follow Us 區 | 同上 |
 | YouTube 影片載入／點擊播放 | `content_name`, `content_category: 'Video'`, `content_type: 'video'`, `content_ids`, `video_id` |
@@ -49,11 +49,11 @@
 | Footer：Order Query 連結 | `content_name: 'Order Query'`, `content_category: 'CTA'`, `location: 'footer'` |
 | Footer：Instagram 連結（TDF / TDNA） | `content_name`, `content_category: 'Social Media'`, `link_type`, `location`, `account` |
 | Hero：Call for Speakers / Volunteers / Partners / Side Events / Sponsors | `content_name`, `content_category: 'CTA'`, `location: 'hero_section'` |
-| Partners：Call for Sponsors / Call for Partners | `content_name`, `content_category: 'CTA'`, `location: 'partners_section'` |
+| Partners：Call for Sponsors / Call for Partners | `content_name`, `content_category: 'CTA'`, `location: 'team_section'` |
 | Partners：夥伴連結點擊 | `content_name`, `content_category: 'External Link'`, `link_type: 'partner_link'`, `location`, `partner_name` |
 | 獎項頁：投票成功 | `content_name: 'Award Vote'`, `content_category: 'Award'`, `post_id` |
 
-**程式位置**：`components/sections/EventsSection.tsx`、`components/Navbar.tsx`、`components/Footer.tsx`、`components/sections/HeroSection.tsx`、`components/sections/PartnersSection.tsx`、`app/award/page.tsx`
+**程式位置**：`components/sections/EventsSection.tsx`、`components/Navbar.tsx`、`components/Footer.tsx`、`components/sections/HeroSection.tsx`、`components/sections/TeamSection.tsx`、`app/award/page.tsx`
 
 ---
 

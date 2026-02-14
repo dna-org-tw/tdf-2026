@@ -195,25 +195,18 @@ export async function POST(req: NextRequest) {
     const locale = body.locale || null;
 
     // 插入資料到 Supabase
-    const insertData: Record<string, any> = {
+    const insertData: Record<string, unknown> = {
       email,
       source: body.source || 'hero_section',
       created_at: new Date().toISOString(),
     };
 
     // 添加可选字段
-    if (timezone) {
-      insertData.timezone = timezone;
-    }
-    if (clientIP) {
-      insertData.ip_address = clientIP;
-    }
-    if (country) {
-      insertData.country = country;
-    }
-    if (locale) {
-      insertData.locale = locale;
-    }
+    if (timezone) insertData.timezone = timezone;
+    if (clientIP) insertData.ip_address = clientIP;
+    if (country) insertData.country = country;
+    if (locale) insertData.locale = locale;
+    if (body.visitor_fingerprint) insertData.visitor_fingerprint = body.visitor_fingerprint;
 
     const { error, data } = await supabaseServer
       .from('newsletter_subscriptions')

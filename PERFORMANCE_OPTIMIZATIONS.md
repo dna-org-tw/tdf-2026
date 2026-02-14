@@ -31,7 +31,7 @@
   - 添加 `sizes` 屬性以優化響應式載入
   - 使用 `loading="lazy"` 延遲載入非首屏圖片
 
-- ✅ **PartnersSection**：
+- ✅ **TeamSection**：
   - Logo 圖片使用 Next.js `<Image>` 組件
   - 添加明確的寬高屬性以減少 CLS
 

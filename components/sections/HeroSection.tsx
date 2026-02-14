@@ -10,6 +10,7 @@ import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
+import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
 // 计数器动画组件
 function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
@@ -142,6 +143,7 @@ export default function HeroSection() {
           recaptchaToken,
           timezone: userInfo.timezone,
           locale: userInfo.locale,
+          visitor_fingerprint: getVisitorFingerprint(),
         }),
       });
 

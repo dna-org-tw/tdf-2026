@@ -40,6 +40,7 @@ export interface CreateOrderInput {
   amount_tax: number;
   amount_discount: number;
   currency: string;
+  visitor_fingerprint?: string | null;
 }
 
 // 更新订单的输入类型（可选字段传 undefined 表示不更新，传 null 表示清空）

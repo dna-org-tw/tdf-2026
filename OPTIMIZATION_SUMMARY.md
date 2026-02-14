@@ -20,7 +20,7 @@
 - `TicketsSection`
 - `TicketFollowSection`
 - `AccommodationSection`
-- `PartnersSection`
+- `TeamSection`
 - `FollowUsSection`
 - `Footer`
 
