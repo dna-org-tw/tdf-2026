@@ -1,6 +1,6 @@
 # 網站追蹤事件清單
 
-本文件列出所有經由 Facebook Pixel（與 `/api/events/track` webhook）送出的追蹤事件。
+本文件列出所有經由 Facebook Pixel（與 `/api/events/track` webhook、Meta CAPI）送出的追蹤事件。
 
 ---
 
@@ -156,6 +156,7 @@
 ## 三、事件流向
 
 - **Facebook Pixel**：上述標準事件經 `fbq('track', ...)`、自訂事件經 `fbq('trackCustom', ...)` 送出。
+- **Meta CAPI**：前端事件會帶 `eventId`，後端 `POST /api/events/track` 在設定 `META_CAPI_PIXEL_ID` 與 `META_CAPI_ACCESS_TOKEN` 後，會將同事件（含 `event_id`）送至 Meta Conversions API，與 Pixel 去重。
 - **Webhook**：前端同時呼叫 `POST /api/events/track`；若環境變數 `EVENTS_WEBHOOK_URL` 已設定，後端會將相同 payload 轉發至該 URL。
 
 ---

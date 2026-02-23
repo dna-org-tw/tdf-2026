@@ -83,7 +83,37 @@ INSTAGRAM_HASHTAG=#taiwandigitalfest
 
 **注意：** 如果未配置 Instagram API，Award 頁面仍可存取，但無法抓取 Reels。
 
-### 4. 現有 Stripe 配置
+### 4. Meta CAPI 配置（事件伺服器回傳）
+
+為了啟用 Meta Conversions API（CAPI），需要配置以下環境變數：
+
+```bash
+# 前端 Facebook Pixel ID（若不填會用程式內建預設值）
+NEXT_PUBLIC_META_PIXEL_ID=1740357633585300
+
+# 後端 CAPI Pixel ID（通常與前端相同）
+META_CAPI_PIXEL_ID=1740357633585300
+
+# Meta Events Manager 產生的 Access Token
+META_CAPI_ACCESS_TOKEN=your_meta_capi_access_token
+
+# 測試事件碼（可選，僅測試時填）
+META_CAPI_TEST_EVENT_CODE=TEST12345
+
+# Graph API 版本（可選）
+META_CAPI_API_VERSION=v23.0
+```
+
+**設定 Meta CAPI：**
+1. 到 Meta Events Manager 開啟你的 Pixel
+2. 進入 `Settings > Conversions API`
+3. 產生 Access Token 並填入 `META_CAPI_ACCESS_TOKEN`
+4. 將 Pixel ID 填入 `META_CAPI_PIXEL_ID`
+5. 測試階段可在 `Test Events` 取得 `META_CAPI_TEST_EVENT_CODE`
+
+**注意：** 若未設定 `META_CAPI_ACCESS_TOKEN` 或 `META_CAPI_PIXEL_ID`，網站仍會照常送瀏覽器端 Pixel，不會中斷追蹤。
+
+### 5. 現有 Stripe 配置
 
 確保以下 Stripe 環境變數已配置：
 

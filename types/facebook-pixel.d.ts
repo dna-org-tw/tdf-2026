@@ -9,7 +9,8 @@ declare global {
       (
         action: 'track' | 'trackCustom',
         eventName: string,
-        parameters?: Record<string, any>
+        parameters?: Record<string, any>,
+        options?: { eventID?: string }
       ): void;
       callMethod?: (...args: any[]) => void;
       queue?: any[];

@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 
-const FB_PIXEL_ID = '1740357633585300';
+const FB_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1740357633585300';
 
 export default function FacebookPixel() {
   return (
@@ -40,28 +40,42 @@ export default function FacebookPixel() {
   );
 }
 
+function createEventId() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  return `evt_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
 // 轉發事件至 webhook（與 Pixel 並行，不 await）
-function forwardToWebhook(eventType: 'standard' | 'custom', eventName: string, parameters?: Record<string, any>) {
+function forwardToWebhook(
+  eventType: 'standard' | 'custom',
+  eventName: string,
+  parameters: Record<string, any> | undefined,
+  eventId: string
+) {
   if (typeof window === 'undefined') return;
   fetch('/api/events/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ eventType, eventName, parameters: parameters ?? {} }),
+    body: JSON.stringify({ eventType, eventName, parameters: parameters ?? {}, eventId }),
   }).catch(() => {});
 }
 
 // 導出追蹤函數供其他組件使用
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
+  const eventId = createEventId();
   if (typeof window !== 'undefined' && window.fbq) {
-    window.fbq('track', eventName, parameters);
+    window.fbq('track', eventName, parameters, { eventID: eventId });
   }
-  forwardToWebhook('standard', eventName, parameters);
+  forwardToWebhook('standard', eventName, parameters, eventId);
 };
 
 // 導出自定義事件追蹤函數
 export const trackCustomEvent = (eventName: string, parameters?: Record<string, any>) => {
+  const eventId = createEventId();
   if (typeof window !== 'undefined' && window.fbq) {
-    window.fbq('trackCustom', eventName, parameters);
+    window.fbq('trackCustom', eventName, parameters, { eventID: eventId });
   }
-  forwardToWebhook('custom', eventName, parameters);
+  forwardToWebhook('custom', eventName, parameters, eventId);
 };
