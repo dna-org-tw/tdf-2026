@@ -31,7 +31,13 @@ export default function EventsSection() {
   const [selectedTierFilter, setSelectedTierFilter] = useState<TicketTier | 'all'>('all');
 
   const allEvents = useMemo(
-    () => contextEvents.filter((event) => event.url && event.title),
+    () =>
+      contextEvents.filter(
+        (event) =>
+          event.url &&
+          event.title &&
+          (event.visibility ?? '').toLowerCase() !== 'private'
+      ),
     [contextEvents]
   );
 
