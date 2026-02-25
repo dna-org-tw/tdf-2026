@@ -55,7 +55,7 @@ export default function AwardPage() {
         method: 'GET',
         cache: 'no-store', // 確保不使用緩存
       });
-      
+
       if (response.ok) {
         // 抓取完成後重新載入貼文列表以顯示最新內容
         await loadPosts();
@@ -125,7 +125,7 @@ export default function AwardPage() {
       if (processedPosts.length === 0) {
         console.warn('[Award Page] No posts to display. Check if ig_posts table has data.');
       }
-      
+
       setPosts(processedPosts);
     } catch (err) {
       console.error('Failed to load posts:', err);
@@ -173,19 +173,19 @@ export default function AwardPage() {
           setVotingPostId(null);
           return;
         }
-        
+
         // 顯示詳細的錯誤資訊
-        const errorMessage = data.details 
+        const errorMessage = data.details
           ? `${data.error || 'Failed to submit vote'}: ${data.details}`
           : data.error || t.award?.posts?.voteError || 'Failed to submit vote';
-        
+
         console.error('[Award Page] Vote error:', {
           status: response.status,
           error: data.error,
           details: data.details,
           code: data.code,
         });
-        
+
         throw new Error(errorMessage);
       }
 
@@ -217,7 +217,7 @@ export default function AwardPage() {
 
     // 自動重新發送投票請求
     await handleVote(pendingVote.postId, email);
-    
+
     // 清除待處理的投票
     setPendingVote(null);
   };
@@ -250,7 +250,10 @@ export default function AwardPage() {
         </div>
       </main>
       <Footer />
-      
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <h1 className="text-3xl font-semibold tracking-wide text-white sm:text-4xl">Coming Soon</h1>
+      </div>
+
       {/* Follow Modal for voting */}
       <FollowModalWithForm
         isOpen={showFollowModal}
