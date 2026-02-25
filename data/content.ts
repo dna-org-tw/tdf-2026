@@ -119,9 +119,9 @@ export const content = {
           icon: "CalendarCheck" 
         },
         { 
-          title: "⭐ 5-Star Nomad Buffet", 
-          summary: "Indulge in an exclusive five-star dining experience in Hualien. Enjoy carefully curated local and international flavors, captivating performances, and meaningful connections. This premium gathering is your chance to slow down and create unforgettable memories.",
-          desc: "In Hualien, we've prepared a five-star dinner exclusively for digital nomads. The 5-Star Nomad Buffet is not just an all-you-can-eat experience, but a premium gathering that combines fine food, performances, and community connection. Featuring carefully curated high-quality buffet cuisine with both local and international flavors, alongside captivating performances and a relaxed networking atmosphere. This is an evening to slow down, treat yourself, and deepen relationships with partners while creating unforgettable memories. Enjoy great food and great conversations—this is the highlight moment for nomads.", 
+          title: "⭐ Outdoor Nomad Buffet", 
+          summary: "Indulge in an exclusive outdoor dining experience in Hualien. Enjoy carefully curated local and international flavors, captivating performances, and meaningful connections. This premium gathering is your chance to slow down and create unforgettable memories.",
+          desc: "In Hualien, we've prepared an outdoor dinner exclusively for digital nomads. The Outdoor Nomad Buffet is not just an all-you-can-eat experience, but a premium gathering that combines fine food, performances, and community connection. Featuring carefully curated high-quality buffet cuisine with both local and international flavors, alongside captivating performances and a relaxed networking atmosphere. This is an evening to slow down, treat yourself, and deepen relationships with partners while creating unforgettable memories. Enjoy great food and great conversations—this is the highlight moment for nomads.", 
           icon: "Users" 
         },
         { 
@@ -169,7 +169,7 @@ export const content = {
         features: [
           "Exclusive Digital Nomad Community",
           "Opening Marketplace + Unlimited drinks",
-          "Five-Star Nomad Buffet x 1",
+          "Outdoor Nomad Buffet x 1",
           "VIP Dinner x 4",
           "Digital Nomad Activities x 40+"
         ]
@@ -180,7 +180,7 @@ export const content = {
         features: [
           "Exclusive Digital Nomad Community",
           "Opening Marketplace + Unlimited drinks & food",
-          "Five-Star Nomad Buffet x 1",
+          "Outdoor Nomad Buffet x 1",
           "VIP Dinner x 4",
           "VIP Lunch x 4",
           "VVIP Experience x 4",
@@ -737,11 +737,11 @@ export const content = {
         },
         {
           question: "What activities are included in Taiwan Digital Fest 2026?",
-          answer: "The festival includes Opening Party, Digital Nomad Activities (workshops, talks, and networking), 5-Star Nomad Buffet, VIP Lunches and Dinners, 3-Day 2-Night Hualien Digital Nomad Trip, and exclusive VVIP Experiences. Activities range from AI workshops and startup pitches to cultural tours, river tracing, and hot spring visits."
+          answer: "The festival includes Opening Party, Digital Nomad Activities (workshops, talks, and networking), Outdoor Nomad Buffet, VIP Lunches and Dinners, 3-Day 2-Night Hualien Digital Nomad Trip, and exclusive VVIP Experiences. Activities range from AI workshops and startup pitches to cultural tours, river tracing, and hot spring visits."
         },
         {
           question: "What are the ticket types available?",
-          answer: "There are three ticket types: Explorer (basic access with community, opening party, and 30+ activities), Contributor (includes five-star buffet, VIP dinners, and 40+ activities), and Backer (full access including VIP lunches, VVIP experiences, Hualien trip, and 50+ activities)."
+          answer: "There are three ticket types: Explorer (basic access with community, opening party, and 30+ activities), Contributor (includes outdoor buffet, VIP dinners, and 40+ activities), and Backer (full access including VIP lunches, VVIP experiences, Hualien trip, and 50+ activities)."
         },
         {
           question: "How do I register for Taiwan Digital Fest 2026?",
@@ -894,9 +894,9 @@ export const content = {
           icon: "CalendarCheck" 
         },
         { 
-          title: "⭐ 5-Star Nomad Buffet｜花蓮尊榮遊牧饗宴", 
-          summary: "專屬於數位遊牧者的五星級晚宴。精心規劃高品質自助料理，結合在地與國際風味，搭配精彩演出與輕鬆交流氛圍。這是一個放慢腳步、好好犒賞自己的夜晚，也是與夥伴深化關係、留下難忘回憶的重要時刻。",
-          desc: "在花蓮，我們為你準備了一場專屬於數位遊牧者的五星級晚宴。5-Star Nomad Buffet 不只是吃到飽，而是一場結合美食、表演與社群交流的尊榮體驗。現場精心規劃高品質自助料理，讓你盡情享用在地與國際風味，同時搭配精彩演出與輕鬆交流的氛圍。這是一個放慢腳步、好好犒賞自己的夜晚，也是與夥伴深化關係、留下難忘回憶的重要時刻。吃得開心、聊得盡興，這就是屬於遊牧者的高光時刻。", 
+          title: "⭐ Outdoor Nomad Buffet｜戶外遊牧饗宴", 
+          summary: "專屬於數位遊牧者的戶外晚宴。精心規劃高品質自助料理，結合在地與國際風味，搭配精彩演出與輕鬆交流氛圍。這是一個放慢腳步、好好犒賞自己的夜晚，也是與夥伴深化關係、留下難忘回憶的重要時刻。",
+          desc: "在花蓮，我們為你準備了一場專屬於數位遊牧者的戶外晚宴。Outdoor Nomad Buffet 不只是吃到飽，而是一場結合美食、表演與社群交流的尊榮體驗。現場精心規劃高品質自助料理，讓你盡情享用在地與國際風味，同時搭配精彩演出與輕鬆交流的氛圍。這是一個放慢腳步、好好犒賞自己的夜晚，也是與夥伴深化關係、留下難忘回憶的重要時刻。吃得開心、聊得盡興，這就是屬於遊牧者的高光時刻。", 
           icon: "Users" 
         },
         { 
@@ -944,7 +944,7 @@ export const content = {
         features: [
           "專屬數位遊牧社群",
           "開幕市集＋無限酒水",
-          "五星級 Nomad Buffet x 1",
+          "戶外 Nomad Buffet x 1",
           "VIP 晚餐 x 4",
           "數位遊牧活動 x 40+"
         ]
@@ -955,7 +955,7 @@ export const content = {
         features: [
           "專屬數位遊牧社群",
           "開幕市集＋無限酒水餐食",
-          "五星級 Nomad Buffet x 1",
+          "戶外 Nomad Buffet x 1",
           "VIP 晚餐 x 4",
           "VIP 午餐 x 4",
           "VVIP 體驗活動 x 4",

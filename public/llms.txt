@@ -12,7 +12,7 @@ Locations: Taitung & Hualien, Taiwan
 # Key Pages & Content
 Main Page: /
 About: About Taiwan Digital Fest 2026 - A curated festival for digital nomads in Taiwan
-Event Highlights: Opening Party, Digital Nomad Activities, 5-Star Nomad Buffet, VIP Lunch/Dinner, 3-Day 2-Night Hualien Trip, VVIP Experiences
+Event Highlights: Opening Party, Digital Nomad Activities, Outdoor Nomad Buffet, VIP Lunch/Dinner, 3-Day 2-Night Hualien Trip, VVIP Experiences
 Tickets: Explorer, Contributor, Backer
 Accommodation: Certified Taiwan Digital Nomad Friendly accommodations in Taitung and Hualien
 
@@ -27,13 +27,13 @@ Who: Digital nomads, remote workers, creators, entrepreneurs, and anyone interes
 
 # Ticket Types
 Explorer: Basic access - Exclusive community, Opening Party, 30+ Digital Nomad Activities
-Contributor: Includes Explorer benefits + Five-Star Nomad Buffet, 4 VIP Dinners, 40+ activities
+Contributor: Includes Explorer benefits + Outdoor Nomad Buffet, 4 VIP Dinners, 40+ activities
 Backer: Full access - All Contributor benefits + 4 VIP Lunches, 4 VVIP Experiences, 3-Day 2-Night Hualien Trip, 50+ activities
 
 # Key Activities
 - Opening Party: Networking event to kick off the festival
 - Digital Nomad Activities: Workshops, talks, and networking in bookstores, cafes, bars, and co-working spaces
-- 5-Star Nomad Buffet: Premium dining experience in Hualien
+- Outdoor Nomad Buffet: Premium outdoor dining experience in Hualien
 - VIP Lunch/Dinner: Curated local culinary experiences in Taitung
 - 3-Day 2-Night Hualien Trip: Immersive journey through local tribes, river tracing, and nature
 - VVIP Experiences: Exclusive slow-living itineraries including SPA coffee moon-viewing, hot springs, and Chishang day trips
