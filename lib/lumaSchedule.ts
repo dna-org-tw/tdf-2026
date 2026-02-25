@@ -18,6 +18,7 @@ export interface CalendarEvent {
   url?: string;
   tickets?: TicketInfo;
   imageUrl?: string;
+  visibility?: string;
 }
 
 /** Host from Luma calendar API (event host / speaker). */
@@ -43,6 +44,7 @@ export interface LumaApiEntry {
     name: string;
     start_at: string;
     end_at: string;
+    visibility?: string;
     cover_url?: string;
     geo_address_info?: {
       full_address?: string;
@@ -180,6 +182,7 @@ export function buildScheduleFromEntries(entries: LumaApiEntry[]): CalendarEvent
         url: eventUrl || undefined,
         imageUrl: event.cover_url,
         tickets: ticketInfo,
+        visibility: event.visibility,
       });
     } catch {
       // Skip invalid event
