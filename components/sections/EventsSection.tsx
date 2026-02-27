@@ -379,14 +379,17 @@ export default function EventsSection() {
         </div>
       </div>
 
-      {/* CTA Buttons */}
+      {/* Venue disclaimer + CTA Buttons */}
       <div className="container mx-auto px-4 sm:px-6">
+        <p className="mt-6 text-center text-sm text-[#1E1F1C]/60">
+          {t.schedule?.venueDisclaimer}
+        </p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
+          className="mt-4 text-center flex flex-wrap justify-center gap-3 sm:gap-4"
         >
           <a
             href="https://forms.gle/EofTp9Qso27jEeeY7"

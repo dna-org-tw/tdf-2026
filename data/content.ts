@@ -479,7 +479,8 @@ export const content = {
       follower: "Follower",
       clearFilter: "Clear Filter",
       clickDate: "Click on a date to view event details",
-      clickEvent: "Click on events to view details on Luma"
+      clickEvent: "Click on events to view details on Luma",
+      venueDisclaimer: "Event venues are tentative and subject to change at the organizer's discretion."
     },
     eventModal: {
       day: "May",
@@ -1254,7 +1255,8 @@ export const content = {
       follower: "Follower",
       clearFilter: "清除篩選",
       clickDate: "點擊日期查看活動詳情",
-      clickEvent: "點擊活動查看 Luma 詳情"
+      clickEvent: "點擊活動查看 Luma 詳情",
+      venueDisclaimer: "活動場地僅為暫定場所，主辦單位保有調整之權利。"
     },
     eventModal: {
       day: "年 5 月",
