@@ -65,6 +65,9 @@ export async function POST(req: NextRequest) {
       success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
       cancel_url: `${baseUrl}/checkout/cancelled?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
       allow_promotion_codes: true,
+      tax_id_collection: {
+        enabled: true,
+      },
       metadata: {
         ticket_tier: tier,
       },
