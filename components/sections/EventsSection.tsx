@@ -248,6 +248,46 @@ export default function EventsSection() {
   };
 
 
+  const renderTicketFilter = () => (
+    <div className="flex flex-wrap justify-center gap-3">
+      {TICKET_FILTER_OPTIONS.map((tier) => {
+        const isActive = selectedTierFilter === tier;
+        const labelMap: Record<TicketTier | 'all', string> = {
+          all: 'All',
+          follower: 'Follower',
+          explorer: 'Explorer',
+          contributor: 'Contributor',
+          backer: 'Backer',
+          other: 'Side Event',
+        };
+
+        return (
+          <button
+            key={tier}
+            type="button"
+            onClick={() => {
+              setSelectedTierFilter(tier);
+              trackEvent('SelectContent', {
+                content_type: 'product_filter',
+                content_name: 'Events Ticket Tier',
+                content_category: 'Event Information',
+                tier,
+                location: 'events_section',
+              });
+            }}
+            className={`
+              px-4 py-2 rounded-full text-sm md:text-base font-semibold border
+              transition-all duration-200 shadow-sm
+              ${isActive ? FILTER_BUTTON_CLASS[tier].active : FILTER_BUTTON_CLASS[tier].inactive}
+            `}
+          >
+            {labelMap[tier]}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   const handleEventClick = (event: CalendarEvent) => {
     if (event.url) {
       trackEvent('Lead', {
@@ -283,43 +323,9 @@ export default function EventsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-10 flex flex-wrap justify-center gap-3"
+          className="mb-10"
         >
-          {TICKET_FILTER_OPTIONS.map((tier) => {
-            const isActive = selectedTierFilter === tier;
-            const labelMap: Record<TicketTier | 'all', string> = {
-              all: 'All',
-              follower: 'Follower',
-              explorer: 'Explorer',
-              contributor: 'Contributor',
-              backer: 'Backer',
-              other: 'Side Event',
-            };
-
-            return (
-              <button
-                key={tier}
-                type="button"
-                onClick={() => {
-                  setSelectedTierFilter(tier);
-                  trackEvent('SelectContent', {
-                    content_type: 'product_filter',
-                    content_name: 'Events Ticket Tier',
-                    content_category: 'Event Information',
-                    tier,
-                    location: 'events_section',
-                  });
-                }}
-                className={`
-                  px-4 py-2 rounded-full text-sm md:text-base font-semibold border
-                  transition-all duration-200 shadow-sm
-                  ${isActive ? FILTER_BUTTON_CLASS[tier].active : FILTER_BUTTON_CLASS[tier].inactive}
-                `}
-              >
-                {labelMap[tier]}
-              </button>
-            );
-          })}
+          {renderTicketFilter()}
         </motion.div>
       </div>
 
@@ -437,6 +443,11 @@ export default function EventsSection() {
             ));
           })}
         </div>
+      </div>
+
+      {/* 日曆下方票種篩選器 */}
+      <div className="container mx-auto px-4 sm:px-6 mt-8">
+        {renderTicketFilter()}
       </div>
 
       {/* Venue disclaimer + CTA Buttons */}
