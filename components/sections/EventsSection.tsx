@@ -120,27 +120,73 @@ export default function EventsSection() {
     };
   });
 
-  // 解析活動的開始／結束時段（小時），用於網格放置
-  const getEventHours = (event: CalendarEvent): { dayIndex: number; startH: number; endH: number } | null => {
-    const date = parseEventDate(event);
-    if (!date || date.getMonth() !== 4) return null;
-    const dayIndex = date.getDate() - 1;
-
-    let startH = 8;
-    let endH = 9;
-    if (event.startTime) {
-      const start = new Date(event.startTime);
-      startH = start.getHours();
-      if (event.endTime) {
-        const end = new Date(event.endTime);
-        endH = Math.min(24, end.getHours() + (end.getMinutes() > 0 ? 1 : 0));
-      } else {
-        endH = Math.min(24, startH + 1);
-      }
+  // 展開跨日活動為每天一段（首日 startH–24:00、中間日 08:00–24:00、末日 08:00–endH）
+  const getEventSegments = (event: CalendarEvent): { dayIndex: number; startH: number; endH: number }[] => {
+    if (!event.startTime) {
+      const date = parseEventDate(event);
+      if (!date || date.getFullYear() !== 2026 || date.getMonth() !== 4) return [];
+      return [{ dayIndex: date.getDate() - 1, startH: 8, endH: 9 }];
     }
-    startH = Math.max(8, Math.min(23, startH));
-    endH = Math.max(startH + 1, Math.min(24, endH));
-    return { dayIndex, startH, endH };
+
+    const start = new Date(event.startTime);
+    const end = event.endTime ? new Date(event.endTime) : new Date(start.getTime() + 3600000);
+    const isMay = (d: Date) => d.getFullYear() === 2026 && d.getMonth() === 4;
+
+    const mayFirst = new Date(2026, 4, 1, 0, 0, 0);
+    const juneFirst = new Date(2026, 5, 1, 0, 0, 0);
+    if (end <= mayFirst || start >= juneFirst) return [];
+
+    const effEnd = end > juneFirst ? juneFirst : end;
+
+    let firstDay = isMay(start) ? start.getDate() : 1;
+    let lastDay: number;
+
+    if (effEnd.getHours() === 0 && effEnd.getMinutes() === 0 && effEnd.getSeconds() === 0) {
+      lastDay = isMay(effEnd) ? effEnd.getDate() - 1 : 31;
+    } else {
+      lastDay = isMay(effEnd) ? effEnd.getDate() : 31;
+    }
+
+    if (lastDay < 1) return [];
+    firstDay = Math.max(1, Math.min(31, firstDay));
+    lastDay = Math.max(1, Math.min(31, lastDay));
+
+    const clamp = (sH: number, eH: number) => {
+      sH = Math.max(8, Math.min(23, sH));
+      eH = Math.max(sH + 1, Math.min(24, eH));
+      return { startH: sH, endH: eH };
+    };
+
+    if (firstDay === lastDay) {
+      const sH = isMay(start) && start.getDate() === firstDay ? start.getHours() : 8;
+      let eH: number;
+      if (isMay(end) && end.getDate() === firstDay) {
+        eH = end.getHours() + (end.getMinutes() > 0 ? 1 : 0);
+        if (eH === 0) eH = 24;
+      } else {
+        eH = 24;
+      }
+      const c = clamp(sH, eH);
+      return [{ dayIndex: firstDay - 1, ...c }];
+    }
+
+    const segments: { dayIndex: number; startH: number; endH: number }[] = [];
+    for (let day = firstDay; day <= lastDay; day++) {
+      let sH: number, eH: number;
+      if (day === firstDay && isMay(start) && start.getDate() === firstDay) {
+        sH = start.getHours();
+        eH = 24;
+      } else if (day === lastDay && isMay(end) && end.getDate() === lastDay) {
+        sH = 8;
+        eH = end.getHours() + (end.getMinutes() > 0 ? 1 : 0);
+      } else {
+        sH = 8;
+        eH = 24;
+      }
+      const c = clamp(sH, eH);
+      segments.push({ dayIndex: day - 1, ...c });
+    }
+    return segments;
   };
 
   // 活動區塊背景色（依票種或輪替）
@@ -158,22 +204,26 @@ export default function EventsSection() {
     return TIER_BG_CLASS[tier];
   };
 
-  // 依「日」分組已篩選的活動，並附上網格位置
-  const eventsByDay = mayDays.map((day) => {
-    const dayEventList = filteredByTicketTier.filter(
-      (e) => parseEventDate(e) && parseEventDate(e)!.getMonth() === 4 && parseEventDate(e)!.getDate() === day.dayIndex + 1
-    );
-    const events = dayEventList
-      .map((event) => {
-        const hours = getEventHours(event);
-        if (!hours) return null;
-        const startCol = hours.startH - 8;
-        const span = hours.endH - hours.startH;
-        return { event, startCol, span, color: getEventBlockColor(event) };
-      })
-      .filter((x): x is NonNullable<typeof x> => x !== null);
-    return { ...day, events };
-  });
+  // 依「日」分組已篩選的活動（含跨日展開），並附上網格位置
+  const eventsByDay = (() => {
+    const allSegments: { dayIndex: number; startH: number; endH: number; event: CalendarEvent }[] = [];
+    for (const event of filteredByTicketTier) {
+      for (const seg of getEventSegments(event)) {
+        allSegments.push({ ...seg, event });
+      }
+    }
+    return mayDays.map((day) => {
+      const events = allSegments
+        .filter((s) => s.dayIndex === day.dayIndex)
+        .map(({ event, startH, endH }) => ({
+          event,
+          startCol: startH - 8,
+          span: endH - startH,
+          color: getEventBlockColor(event),
+        }));
+      return { ...day, events };
+    });
+  })();
 
   // 日曆網格：本體列數 = 31 天 + 每週（分隔列 + 時間標籤列）
   const BODY_ROW_COUNT = 31 + WEEK_THEMES.length * 2;
