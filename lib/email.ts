@@ -1,6 +1,7 @@
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import crypto from 'crypto';
+import { logEmail } from './emailLog';
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
@@ -66,11 +67,11 @@ export async function sendSubscriptionThankYouEmail(email: string): Promise<bool
     return false;
   }
 
+  const subject = 'Thank You for Joining Taiwan Digital Nomad Community!';
+
   try {
     const unsubscribeToken = generateUnsubscribeToken(email);
     const unsubscribeUrl = `${baseUrl}/newsletter/unsubscribe?token=${unsubscribeToken}`;
-
-    const subject = 'Thank You for Joining Taiwan Digital Nomad Community!';
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -173,12 +174,37 @@ Unsubscribe: ${unsubscribeUrl}
 
     if (!response || !response.id) {
       console.error('[Email] Failed to send subscription thank you email', response);
+      logEmail({
+        to_email: email,
+        from_email: fromEmail,
+        subject,
+        email_type: 'subscription_thank_you',
+        status: 'failed',
+        error_message: 'Mailgun returned no message ID',
+      }).catch(() => {});
       return false;
     }
+
+    logEmail({
+      to_email: email,
+      from_email: fromEmail,
+      subject,
+      email_type: 'subscription_thank_you',
+      status: 'sent',
+      mailgun_message_id: response.id,
+    }).catch(() => {});
 
     return true;
   } catch (error) {
     console.error('[Email] Error sending subscription thank you email', error);
+    logEmail({
+      to_email: email,
+      from_email: fromEmail,
+      subject,
+      email_type: 'subscription_thank_you',
+      status: 'failed',
+      error_message: error instanceof Error ? error.message : String(error),
+    }).catch(() => {});
     return false;
   }
 }
@@ -196,10 +222,10 @@ export async function sendVoteConfirmationEmail(
     return false;
   }
 
+  const subject = 'Confirm Your Nomad Award Vote - Taiwan Digital Fest 2026';
+
   try {
     const confirmUrl = `${baseUrl}/api/award/confirm-vote?token=${encodeURIComponent(confirmToken)}`;
-
-    const subject = 'Confirm Your Nomad Award Vote - Taiwan Digital Fest 2026';
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -293,12 +319,40 @@ This is an automated email. Please do not reply directly to this message.
 
     if (!response || !response.id) {
       console.error('[Email] Failed to send vote confirmation email', response);
+      logEmail({
+        to_email: email,
+        from_email: fromEmail,
+        subject,
+        email_type: 'vote_confirmation',
+        status: 'failed',
+        error_message: 'Mailgun returned no message ID',
+        metadata: { post_id: postId },
+      }).catch(() => {});
       return false;
     }
+
+    logEmail({
+      to_email: email,
+      from_email: fromEmail,
+      subject,
+      email_type: 'vote_confirmation',
+      status: 'sent',
+      mailgun_message_id: response.id,
+      metadata: { post_id: postId },
+    }).catch(() => {});
 
     return true;
   } catch (error) {
     console.error('[Email] Error sending vote confirmation email', error);
+    logEmail({
+      to_email: email,
+      from_email: fromEmail,
+      subject,
+      email_type: 'vote_confirmation',
+      status: 'failed',
+      error_message: error instanceof Error ? error.message : String(error),
+      metadata: { post_id: postId },
+    }).catch(() => {});
     return false;
   }
 }

@@ -156,7 +156,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 從 middleware 設置的請求頭讀取語言
+  // 從 proxy 設置的請求頭讀取語言
   const headersList = await headers();
   const lang = headersList.get('x-lang') || 'zh-TW';
   

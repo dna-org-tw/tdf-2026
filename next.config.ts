@@ -58,7 +58,9 @@ const nextConfig: NextConfig = {
   
   // Turbopack 配置（用於開發模式）
   // 注意：webpack 配置仍會在生產建置中使用
-  turbopack: {},
+  turbopack: {
+    root: __dirname,
+  },
   
   // Webpack 優化配置（用於生產建置）
   webpack: (config, { isServer }) => {

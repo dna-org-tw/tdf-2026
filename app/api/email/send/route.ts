@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
+import { logEmail, type EmailType } from '@/lib/emailLog';
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
@@ -26,6 +27,9 @@ interface OrderData {
 }
 
 export async function POST(req: NextRequest) {
+  let order: OrderData | undefined;
+  let emailType: EmailType = 'order_cancelled';
+
   try {
     if (!mailgunClient || !mailgunDomain) {
       console.warn('[Email] Mailgun is not configured. Email sending is disabled.');
@@ -41,7 +45,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
     }
 
-    const { order, type } = body as { order: OrderData; type: 'success' | 'cancelled' };
+    let type: 'success' | 'cancelled';
+    ({ order, type } = body as { order: OrderData; type: 'success' | 'cancelled' });
 
     if (!order || !order.customer_email) {
       return NextResponse.json(
@@ -52,6 +57,7 @@ export async function POST(req: NextRequest) {
 
     const orderDetailUrl = `${baseUrl}/order/${order.id}`;
     const isSuccess = type === 'success' && order.payment_status === 'paid';
+    emailType = isSuccess ? 'order_success' : 'order_cancelled';
 
     // Format amount
     const amountFormatted =
@@ -198,19 +204,53 @@ Taiwan Digital Fest 2026 Team
       text: textContent,
     };
 
+    const logMeta = {
+      order_id: order.id,
+      ticket_tier: order.ticket_tier,
+      amount_total: order.amount_total,
+      currency: order.currency,
+    };
+
     const response = await mailgunClient.messages.create(mailgunDomain, messageData);
 
     if (!response || !response.id) {
       console.error('[Email] Failed to send email', response);
+      logEmail({
+        to_email: order.customer_email,
+        from_email: fromEmail,
+        subject,
+        email_type: emailType,
+        status: 'failed',
+        error_message: 'Mailgun returned no message ID',
+        metadata: logMeta,
+      }).catch(() => {});
       return NextResponse.json(
         { error: 'Failed to send email.' },
         { status: 500 }
       );
     }
 
+    logEmail({
+      to_email: order.customer_email,
+      from_email: fromEmail,
+      subject,
+      email_type: emailType,
+      status: 'sent',
+      mailgun_message_id: response.id,
+      metadata: logMeta,
+    }).catch(() => {});
+
     return NextResponse.json({ success: true, messageId: response.id });
   } catch (error) {
     console.error('[Email] Error sending email', error);
+    logEmail({
+      to_email: order?.customer_email ?? 'unknown',
+      from_email: fromEmail,
+      email_type: emailType,
+      status: 'failed',
+      error_message: error instanceof Error ? error.message : String(error),
+      metadata: { order_id: order?.id },
+    }).catch(() => {});
     return NextResponse.json(
       { error: 'Failed to send email.' },
       { status: 500 }
