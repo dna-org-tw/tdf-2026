@@ -27,10 +27,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
     }
 
-    const { orderId, recaptchaToken } = body;
+    const { orderId, email, recaptchaToken } = body;
 
-    if (!orderId) {
-      return NextResponse.json({ error: 'Order ID is required.' }, { status: 400 });
+    if (!orderId && !email) {
+      return NextResponse.json({ error: 'Order ID or email is required.' }, { status: 400 });
     }
 
     // Verify reCAPTCHA Enterprise
@@ -70,7 +70,6 @@ export async function POST(req: NextRequest) {
 
         const recaptchaData = await recaptchaResponse.json();
 
-        // Enterprise API 回傳的格式不同，檢查 tokenProperties
         if (!recaptchaData.tokenProperties?.valid || recaptchaData.tokenProperties?.action !== 'submit') {
           return NextResponse.json(
             { error: 'reCAPTCHA verification failed. Please try again.' },
@@ -78,11 +77,8 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // 檢查風險評分（如可用）
         if (recaptchaData.riskAnalysis?.score !== undefined) {
           const score = recaptchaData.riskAnalysis.score;
-          // 分數範圍 0.0-1.0，越低表示越可疑
-          // 可以根據需要設定閾值，例如低於 0.5 拒絕
           if (score < 0.5) {
             return NextResponse.json(
               { error: 'reCAPTCHA verification failed. Please try again.' },
@@ -99,17 +95,48 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Retrieve session from Stripe
-    // Order ID could be either a checkout session ID or payment intent ID
+    // Query by email - return list of orders
+    if (email) {
+      const sessions = await stripe.checkout.sessions.list({
+        customer_details: { email: email.trim().toLowerCase() },
+        limit: 100,
+        expand: ['data.line_items'],
+      });
+
+      if (!sessions.data.length) {
+        return NextResponse.json(
+          { error: 'No orders found for this email address.' },
+          { status: 404 }
+        );
+      }
+
+      const orders = sessions.data.map((s) => {
+        const firstItem = s.line_items?.data?.[0];
+        const product = firstItem?.price?.product as Stripe.Product | string | null;
+        return {
+          id: s.id,
+          status: s.status,
+          payment_status: s.payment_status,
+          amount_total: s.amount_total,
+          currency: s.currency,
+          created: s.created,
+          customer_name: s.customer_details?.name,
+          ticket_tier: s.metadata?.ticket_tier,
+          product_name: typeof product === 'object' && product ? product.name : (firstItem?.description || null),
+        };
+      });
+
+      return NextResponse.json({ orders });
+    }
+
+    // Query by order ID - return single order detail
     let session;
     
     try {
-      // Try as checkout session ID first
       session = await stripe.checkout.sessions.retrieve(orderId, {
         expand: ['payment_intent', 'payment_intent.latest_charge', 'line_items', 'line_items.data.price.product'],
       });
     } catch (error) {
-      // If not found, try to find by payment intent
       try {
         const paymentIntent = await stripe.paymentIntents.retrieve(orderId);
         if (paymentIntent.metadata?.checkout_session_id) {
@@ -135,7 +162,6 @@ export async function POST(req: NextRequest) {
 
     const paymentIntent = session.payment_intent as Stripe.PaymentIntent | null;
 
-    // Retrieve charge if latest_charge exists
     let charge: Stripe.Charge | null = null;
     if (paymentIntent?.latest_charge && stripe) {
       const chargeId = typeof paymentIntent.latest_charge === 'string' 
@@ -148,7 +174,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Extract line items details
     const lineItems = session.line_items?.data || [];
     const lineItemsDetails = lineItems.map((item) => {
       const price = item.price;
@@ -165,7 +190,6 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // Extract discount information
     const totalDetails = session.total_details;
     const discount = session.total_details?.amount_discount
       ? {
@@ -174,7 +198,6 @@ export async function POST(req: NextRequest) {
         }
       : null;
 
-    // Extract customer details
     const customerDetails = session.customer_details
       ? {
           email: session.customer_details.email,

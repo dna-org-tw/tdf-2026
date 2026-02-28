@@ -1,9 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent } from '@/components/FacebookPixel';
+import Navbar from '@/components/Navbar';
+
+const Footer = dynamic(() => import('@/components/Footer'), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -124,7 +131,9 @@ export default function OrderDetailPage() {
   const isPaid = order?.payment_status === 'paid';
 
   return (
-    <main className="min-h-screen bg-[#1E1F1C] text-white flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen flex flex-col bg-[#1E1F1C] text-white">
+      <Navbar />
+      <div className="flex-1 flex items-center justify-center px-4 py-12 pt-24">
       <div className="max-w-2xl w-full">
         <div className="text-center mb-8">
           <div
@@ -370,6 +379,8 @@ export default function OrderDetailPage() {
           </button>
         </div>
       </div>
+      </div>
+      <Footer />
     </main>
   );
 }
