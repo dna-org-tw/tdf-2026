@@ -38,7 +38,7 @@ interface HostEventRow {
   social?: SpeakerSocialLinks | null;
 }
 
-const EXCLUDED_USERNAMES = ['tdna', 'taiwan_nomad'];
+const EXCLUDED_USERNAMES = ['tdna', 'taiwan_nomad', 'fest_dna_org_tw'];
 
 function groupSpeakers(rows: HostEventRow[]): SpeakerGrouped[] {
   const byId = new Map<
