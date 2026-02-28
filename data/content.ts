@@ -214,6 +214,7 @@ export const content = {
     partners: {
       speakers: {
         title: "Speakers",
+        subtitle: "Listed in alphabetical order",
         mockLabel: "Call for Speakers",
       },
       organizers: {
@@ -1007,6 +1008,7 @@ export const content = {
     partners: {
       speakers: {
         title: "講者",
+        subtitle: "依照名字字典順序呈現",
         mockLabel: "徵求講者",
       },
       organizers: {

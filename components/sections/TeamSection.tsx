@@ -59,7 +59,9 @@ export default function TeamSection() {
   const [loading, setLoading] = useState(true);
 
   const speakers = useMemo((): SpeakerGroupedWithMock[] => {
-    const real = contextSpeakers;
+    const real = [...contextSpeakers].sort((a, b) =>
+      (a.name || '').localeCompare(b.name || '')
+    );
     const mockCount = Math.max(0, TARGET_SPEAKER_COUNT - real.length);
     const mockSpeakers: SpeakerGroupedWithMock[] = Array.from({ length: mockCount }, () => ({
       api_id: '',
@@ -180,10 +182,19 @@ export default function TeamSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-10 md:mb-12 lg:mb-16"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-4 md:mb-6"
           >
             {t.partners.speakers.title}
           </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-[#4B4C47] text-base md:text-lg mb-10 md:mb-12 lg:mb-16"
+          >
+            {t.partners.speakers.subtitle}
+          </motion.p>
 
           {speakersLoading ? (
             <div className="flex justify-center items-center py-12">
@@ -236,10 +247,8 @@ export default function TeamSection() {
                       {isMock ? t.partners.speakers.mockLabel : speaker.name}
                     </p>
                     {!isMock && speaker.bioShort && (
-                      <p className="text-[#4B4C47] text-xs mt-1 text-center w-full min-w-0">
-                        {speaker.bioShort.length > 200
-                          ? `${speaker.bioShort.slice(0, 200)}…`
-                          : speaker.bioShort}
+                      <p className="text-[#4B4C47] text-xs mt-1 text-center w-full min-w-0 line-clamp-3">
+                        {speaker.bioShort}
                       </p>
                     )}
                   </>
