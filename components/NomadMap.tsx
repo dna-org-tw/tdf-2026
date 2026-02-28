@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 export interface StructuredAddress {
   "addr:city": string;
   "addr:district": string;
@@ -26,12 +30,16 @@ interface NomadMapProps {
 }
 
 export default function NomadMap(_props: NomadMapProps = {}) {
+  const [mapActive, setMapActive] = useState(false);
   const taitungCenter = { lat: 22.7554, lng: 121.1467 };
   const mapZoom = 13;
   const mapUrl = `https://www.google.com/maps/d/u/0/embed?mid=1jiU-gH4iF7e913fadDFio1Cg6OPjoEw&ehbc=2E312F&noprof=1&ll=${taitungCenter.lat}%2C${taitungCenter.lng}&z=${mapZoom}`;
 
   return (
-    <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px]">
+    <div
+      className="relative w-full h-[400px] sm:h-[500px] md:h-[600px]"
+      onMouseLeave={() => setMapActive(false)}
+    >
       <iframe
         src={mapUrl}
         width="100%"
@@ -41,6 +49,12 @@ export default function NomadMap(_props: NomadMapProps = {}) {
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
       />
+      {!mapActive && (
+        <div
+          className="absolute inset-0 cursor-pointer"
+          onClick={() => setMapActive(true)}
+        />
+      )}
     </div>
   );
 }
