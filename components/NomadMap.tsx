@@ -26,14 +26,12 @@ interface NomadMapProps {
 }
 
 export default function NomadMap(_props: NomadMapProps = {}) {
-  // 台東市區座標 (22.7554, 121.1467)
-  // 使用 ll 參數設定地圖中心點為台東市區，z=13 為適合的縮放級別
   const taitungCenter = { lat: 22.7554, lng: 121.1467 };
   const mapZoom = 13;
   const mapUrl = `https://www.google.com/maps/d/u/0/embed?mid=1jiU-gH4iF7e913fadDFio1Cg6OPjoEw&ehbc=2E312F&noprof=1&ll=${taitungCenter.lat}%2C${taitungCenter.lng}&z=${mapZoom}`;
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px]">
       <iframe
         src={mapUrl}
         width="100%"

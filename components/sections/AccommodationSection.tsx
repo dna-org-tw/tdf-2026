@@ -1,13 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
-import { MapPin } from 'lucide-react';
+import { MapPin, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { StructuredAddress } from '@/components/NomadMap';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
+import type { TaitungAccommodation } from '@/lib/parseNomadStores';
 
 interface Coordinates {
   lat: number;
@@ -66,7 +67,95 @@ function formatAddressToString(address: string | StructuredAddress): string {
   return parts.join('');
 }
 
-export default function AccommodationSection() {
+function StoreCard({ store, isEn }: { store: TaitungAccommodation; isEn: boolean }) {
+  return (
+    <a
+      href={store.website}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex-shrink-0 w-[260px] sm:w-[280px] group rounded-xl border border-slate-200 bg-white p-4 hover:border-[#10B8D9]/50 hover:shadow-md transition-all duration-200"
+    >
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <h4 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#10B8D9] transition-colors">
+          {isEn ? store.nameEn : store.nameZh}
+        </h4>
+        <ExternalLink className="w-3.5 h-3.5 flex-shrink-0 text-slate-400 group-hover:text-[#10B8D9] mt-0.5 transition-colors" />
+      </div>
+      <p className="text-xs text-slate-500 leading-relaxed mb-2">
+        {isEn ? store.addressEn : store.addressZh}
+      </p>
+      {store.description && (
+        <p className="text-xs text-slate-400 leading-relaxed line-clamp-5">
+          {store.description}
+        </p>
+      )}
+    </a>
+  );
+}
+
+function AccommodationCarousel({ stores }: { stores: TaitungAccommodation[] }) {
+  const { lang } = useTranslation();
+  const isEn = lang === 'en';
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < maxScroll - 4);
+  }, []);
+
+  const scroll = useCallback((direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const step = 296 * 2;
+    el.scrollBy({ left: direction === 'left' ? -step : step, behavior: 'smooth' });
+  }, []);
+
+  return (
+    <div>
+      <h3 className="text-xl sm:text-2xl font-display font-bold text-[#1E1F1C] text-center mb-4 flex items-center justify-center gap-2">
+        <MapPin className="w-5 h-5 text-[#10B8D9]" />
+        {isEn ? 'Recommended Accommodations' : '推薦住宿'}
+      </h3>
+      <div className="flex items-center justify-end mb-3 px-4 sm:px-6">
+        <div className="flex gap-1.5">
+          <button
+            onClick={() => scroll('left')}
+            disabled={!canScrollLeft}
+            className="p-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => scroll('right')}
+            disabled={!canScrollRight}
+            className="p-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+      <div
+        ref={scrollRef}
+        onScroll={checkScroll}
+        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 px-4 sm:px-6 [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: 'none' }}
+      >
+        {stores.map((store, i) => (
+          <StoreCard key={i} store={store} isEn={isEn} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function AccommodationSection({ taitungStores }: { taitungStores: TaitungAccommodation[] }) {
   const { t } = useTranslation();
   const items = t.accommodation.items;
   useSectionTracking({ sectionId: 'accommodation', sectionName: 'Accommodation Section', category: 'Event Information' });
@@ -174,7 +263,7 @@ export default function AccommodationSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="rounded-lg overflow-hidden shadow-lg border border-[#F6F6F6]"
-              style={{ height: '600px', width: '100%' }}
+              style={{ width: '100%' }}
             >
               <ErrorBoundary
                 fallback={
@@ -214,9 +303,18 @@ export default function AccommodationSection() {
             </div>
           )}
         </div>
+      </div>
 
-        {/* CTA Buttons */}
-        {t.accommodation.ctas && t.accommodation.ctas.length > 0 && (
+      {/* Accommodation Carousel — full-width */}
+      {taitungStores.length > 0 && (
+        <div className="mb-12">
+          <AccommodationCarousel stores={taitungStores} />
+        </div>
+      )}
+
+      {/* CTA Buttons */}
+      {t.accommodation.ctas && t.accommodation.ctas.length > 0 && (
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -245,8 +343,8 @@ export default function AccommodationSection() {
               );
             })}
           </motion.div>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 }
