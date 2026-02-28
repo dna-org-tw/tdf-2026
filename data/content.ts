@@ -149,10 +149,10 @@ export const content = {
       subtitle: "Be part of the journey. Be part of the global nomad tribe."
     },
     tickets: {
-      title: "Event Pass & Early Bird Tickets",
+      title: "Event Pass & Special Offer Tickets",
       subtitle: "Choose the event pass that suits you and participate in different levels of networking opportunities and activities",
-      saleBanner: "🎉 Early Bird Tickets - Limited Time",
-      saleEnd: "Early bird pricing ends on",
+      saleBanner: "🎉 Special Offer - Limited Time",
+      saleEnd: "Special offer ends on",
       save: "Save",
       explore: {
         name: "Explorer",
@@ -945,8 +945,8 @@ export const content = {
     tickets: {
       title: "票券資訊",
       subtitle: "選擇適合您的票種，參與不同層級的活動體驗",
-      saleBanner: "🎉 限時特價中",
-      saleEnd: "特價優惠至",
+      saleBanner: "🎉 優惠票價 - 限時優惠",
+      saleEnd: "優惠票價至",
       save: "省",
       explore: {
         name: "Explorer",

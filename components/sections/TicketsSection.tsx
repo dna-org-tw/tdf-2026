@@ -37,7 +37,7 @@ const ticketTiers: TicketTier[] = [
     name: 'Explorer',
     key: 'explore',
     originalPrice: 30,
-    salePrice: 20,
+    salePrice: 25,
     color: {
       bg: 'bg-[#10B8D9]/10',
       text: 'text-[#10B8D9]',
@@ -49,7 +49,7 @@ const ticketTiers: TicketTier[] = [
     name: 'Contributor',
     key: 'contribute',
     originalPrice: 300,
-    salePrice: 200,
+    salePrice: 250,
     color: {
       bg: 'bg-[#00993E]/10',
       text: 'text-[#00993E]',
@@ -61,7 +61,7 @@ const ticketTiers: TicketTier[] = [
     name: 'Backer',
     key: 'backer',
     originalPrice: 600,
-    salePrice: 400,
+    salePrice: 500,
     color: {
       bg: 'bg-[#FFD028]/10',
       text: 'text-[#FFD028]',
@@ -84,14 +84,14 @@ export default function TicketsSection() {
   const [resultModalMessage, setResultModalMessage] = useState('');
   useSectionTracking({ sectionId: 'tickets', sectionName: 'Tickets Section', category: 'Tickets' });
 
-  const saleEndDate = '2/28';
+  const saleEndDate = '3/31';
   
   // Calculate countdown to February 28, 2026 (end of day UTC)
   useEffect(() => {
     const calculateCountdown = () => {
       const now = new Date();
-      // February 28, 2026 23:59:59 UTC
-      const endDate = new Date('2026-02-28T23:59:59Z');
+      // March 31, 2026 23:59:59 UTC
+      const endDate = new Date('2026-03-31T23:59:59Z');
       const difference = endDate.getTime() - now.getTime();
       
       if (difference > 0) {
@@ -579,7 +579,7 @@ export default function TicketsSection() {
             className={`
               relative rounded-2xl p-8 border-2 transition-all duration-300
               bg-gradient-to-br from-[#1E1F1C] to-[#1E1F1C]/90 backdrop-blur-sm
-              border-white/30 hover:shadow-2xl hover:shadow-[#10B8D9]/15 hover:scale-[1.02]
+              border-[#A855F7]/40 hover:shadow-2xl hover:shadow-[#A855F7]/15 hover:scale-[1.02]
               flex flex-col
             `}
           >
@@ -593,14 +593,14 @@ export default function TicketsSection() {
                 </p>
               )}
               <div className="mb-6">
-                <span className="text-2xl font-bold text-[#10B8D9]">
+                <span className="text-2xl font-bold text-[#A855F7]">
                   {t.tickets.follower?.price ?? 'Free'}
                 </span>
               </div>
               <div className="space-y-3 mb-6 flex-1">
                 {(t.tickets.follower?.features ?? ['Exclusive Digital Nomad Community', 'Digital Nomad Activities x 10+']).map((feature: string, i: number) => (
                   <div key={i} className="flex items-start gap-2">
-                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#10B8D9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-sm text-white/90">{feature}</span>
@@ -610,7 +610,7 @@ export default function TicketsSection() {
               <button
                 type="button"
                 onClick={() => setFollowerModalOpen(true)}
-                className="w-full mt-auto px-4 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#10B8D9] text-white hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg"
+                className="w-full mt-auto px-4 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#A855F7] text-white hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 {t.tickets.follower?.cta ?? 'Become our follower'}
               </button>
