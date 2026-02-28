@@ -42,6 +42,11 @@ const nextConfig: NextConfig = {
         hostname: '*.cdninstagram.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'newsbuffet.aottercdn.com',
+        pathname: '/media/**',
+      },
     ],
     // 對於外部圖片，使用 unoptimized 以減少處理時間
     unoptimized: false,

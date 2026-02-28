@@ -27,6 +27,7 @@ export const content = {
     },
     nav: {
       about: "About",
+      news: "News",
       team: "All of Us",
       why: "Why Taiwan",
       highlights: "Events",
@@ -491,6 +492,11 @@ export const content = {
       close: "Close",
       viewOnLuma: "View on Luma"
     },
+    news: {
+      title: "News",
+      subtitle: "The latest news and media coverage about Taiwan Digital Fest 2026.",
+      readMore: "Read more",
+    },
     followUs: {
       title: "Follow Us",
       subtitle: "Stay updated with the latest news, exclusive updates, and join our digital nomad community!",
@@ -821,6 +827,7 @@ export const content = {
     },
     nav: {
       about: "關於",
+      news: "最新消息",
       team: "我們所有人",
       why: "為什麼是這裡",
       highlights: "活動",
@@ -1030,7 +1037,7 @@ export const content = {
       }
     },
     accommodation: {
-      title: "Nomad Map",
+      title: "遊牧地圖",
       subtitle: "這些是我們為數位遊牧者精選推薦的場地以及活動場地。",
       badge: "台灣數位遊牧友善標章認證商家",
       viewWebsite: "查看網站",
@@ -1284,6 +1291,11 @@ export const content = {
       event: "個活動",
       close: "關閉",
       viewOnLuma: "在 Luma 查看"
+    },
+    news: {
+      title: "最新消息",
+      subtitle: "2026 台灣數位嘉年華的最新新聞與媒體報導。",
+      readMore: "閱讀更多",
     },
     followUs: {
       title: "關注我們",

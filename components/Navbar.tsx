@@ -88,7 +88,7 @@ export default function Navbar() {
   }, [isHomePage, pathname]);
 
   const navLinks = [
-    { name: t.nav.about, href: '#about' },
+    { name: t.nav.news, href: '#news' },
     { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.highlights, href: '#events' },
     { name: t.nav.accommodation, href: '#accommodation' },
