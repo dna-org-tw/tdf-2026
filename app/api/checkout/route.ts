@@ -54,6 +54,27 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
+    // 從 cookie 讀取折扣碼，自動帶入 Stripe promotion code
+    const discountCode = req.cookies.get('discount_code')?.value;
+    let stripePromotionCodeId: string | undefined;
+
+    if (discountCode) {
+      try {
+        const promoCodes = await stripe.promotionCodes.list({
+          code: discountCode,
+          active: true,
+          limit: 1,
+        });
+        if (promoCodes.data.length > 0) {
+          stripePromotionCodeId = promoCodes.data[0].id;
+        } else {
+          console.warn(`[Checkout] Promotion code not found or inactive: ${discountCode}`);
+        }
+      } catch (err) {
+        console.error('[Checkout] Error looking up promotion code:', err);
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [
@@ -64,7 +85,9 @@ export async function POST(req: NextRequest) {
       ],
       success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
       cancel_url: `${baseUrl}/checkout/cancelled?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
-      allow_promotion_codes: true,
+      ...(stripePromotionCodeId
+        ? { discounts: [{ promotion_code: stripePromotionCodeId }] }
+        : { allow_promotion_codes: true }),
       tax_id_collection: {
         enabled: true,
       },
