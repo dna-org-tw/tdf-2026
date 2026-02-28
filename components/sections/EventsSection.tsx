@@ -26,7 +26,7 @@ const FILTER_BUTTON_CLASS: Record<TicketTier | 'all', { active: string; inactive
 };
 
 export default function EventsSection() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { events: contextEvents } = useLumaData();
   const [selectedTierFilter, setSelectedTierFilter] = useState<TicketTier | 'all'>('all');
 
@@ -175,24 +175,26 @@ export default function EventsSection() {
     return { ...day, events };
   });
 
-  // 日曆網格：本體列數 = 31 天 + 每週分隔列數
-  const BODY_ROW_COUNT = 31 + WEEK_THEMES.length;
+  // 日曆網格：本體列數 = 31 天 + 每週（分隔列 + 時間標籤列）
+  const BODY_ROW_COUNT = 31 + WEEK_THEMES.length * 2;
 
-  // 每週分隔列所在的 grid row（含表頭，因此 +2）
+  // 每週分隔列所在的 grid row（無表頭，+1 轉為 1-based）
+  // 每週佔 2 列（主題 + 時間標籤），所以之前的週數 × 2
   const getWeekSeparatorGridRow = (weekIndex: number) => {
     const week = WEEK_THEMES[weekIndex];
-    const daysBefore = week.start - 1; // 在本週開始前的天數
-    const separatorsBefore = weekIndex; // 在本週之前已經插入的分隔列數
-    const bodyRowIndex = daysBefore + separatorsBefore; // 0-based，本體列索引
-    return bodyRowIndex + 2; // +1 表頭列，+1 轉成 1-based grid row
+    const daysBefore = week.start - 1;
+    const extraRowsBefore = weekIndex * 2;
+    const bodyRowIndex = daysBefore + extraRowsBefore;
+    return bodyRowIndex + 1;
   };
 
-  // 某一天所在的 grid row（含所有在它之前的分隔列）
+  // 某一天所在的 grid row（含所有在它之前的分隔列 + 時間標籤列）
   const getDayGridRow = (dayIndex: number) => {
-    const dayNumber = dayIndex + 1; // 1–31
-    const separatorsBefore = WEEK_THEMES.filter((w) => w.start <= dayNumber).length;
-    const bodyRowIndex = dayIndex + separatorsBefore;
-    return bodyRowIndex + 2;
+    const dayNumber = dayIndex + 1;
+    const weeksBeforeCount = WEEK_THEMES.filter((w) => w.start <= dayNumber).length;
+    const extraRows = weeksBeforeCount * 2;
+    const bodyRowIndex = dayIndex + extraRows;
+    return bodyRowIndex + 1;
   };
 
 
@@ -274,42 +276,50 @@ export default function EventsSection() {
       {/* 日曆網格：固定高度，縱向可捲動；日期、頂部 8:00–21:00，活動方塊依時段放置 */}
       <div className="container mx-auto px-4 sm:px-6 overflow-x-auto mt-2">
         <div
-          className="inline-block min-w-[800px] border border-[#D4D4CF] rounded-xl bg-white shadow-sm max-h-[480px] overflow-y-auto"
+          className="inline-block min-w-[800px] border border-[#D4D4CF] rounded-xl bg-white shadow-sm"
           style={{
             display: 'grid',
             gridTemplateColumns: `min-content repeat(${HOURS.length}, 1fr)`,
-            gridTemplateRows: `auto repeat(${BODY_ROW_COUNT}, minmax(52px, 64px))`,
+            gridTemplateRows: `repeat(${BODY_ROW_COUNT}, auto)`,
           }}
         >
-          {/* 表頭：Date | 8:00 … 21:00（固定在頂端） */}
-          <div className="sticky top-0 z-20 border-b border-r border-[#D4D4CF] bg-stone-50 px-2 py-2 text-xs font-semibold text-[#1E1F1C]" style={{ gridColumn: 1, gridRow: 1 }}>
-            Date
-          </div>
-          {HOURS.map((h, i) => (
-            <div
-              key={h}
-              className="sticky top-0 z-20 border-b border-r border-[#D4D4CF] bg-stone-50 px-1 py-2 text-center text-xs font-medium text-[#1E1F1C]/70"
-              style={{ gridColumn: i + 2, gridRow: 1 }}
-            >
-              {h}:00
-            </div>
-          ))}
-
-          {/* 每週分隔列：合併整列儲存格，主題週置中顯示（淡灰底） */}
+          {/* 每週分隔列：主題 + 時間標籤（淡灰底） */}
           {WEEK_THEMES.map((w, weekIndex) => {
             const gridRow = getWeekSeparatorGridRow(weekIndex);
-            const themeLabel = t.schedule?.weekThemes?.[weekIndex] ?? w.theme;
+            const weekNumbers = lang === 'zh'
+              ? ['第一週', '第二週', '第三週', '第四週', '第五週']
+              : ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
+            const rawTheme = t.schedule?.weekThemes?.[weekIndex] ?? w.theme;
+            const themeLabel = `${weekNumbers[weekIndex]}：${rawTheme}`;
+            const timeLabelRow = gridRow + 1;
             return (
-              <div
-                key={`week-separator-${w.start}-${w.end}`}
-                className="border-b border-[#D4D4CF] bg-stone-50 px-3 py-1 text-xs sm:text-sm font-bold text-[#1E1F1C] flex items-center justify-center leading-tight"
-                style={{ gridRow, gridColumn: '1 / -1' }}
-                title={themeLabel}
-              >
-                <span className="text-center">
-                  {themeLabel}
-                </span>
-              </div>
+              <React.Fragment key={`week-separator-${w.start}-${w.end}`}>
+                <div
+                  className="border-b border-[#D4D4CF] bg-[#1E1F1C] px-3 py-4 text-xs sm:text-sm font-bold text-white flex items-center justify-center leading-tight"
+                  style={{ gridRow, gridColumn: '1 / -1' }}
+                  title={themeLabel}
+                >
+                  <span className="text-center">
+                    {themeLabel}
+                  </span>
+                </div>
+                {/* 時間標籤列 */}
+                <div
+                  className="border-b border-r border-[#3A3B38] bg-[#2D2F2C] px-2 py-0 text-[10px] font-semibold text-white/60 flex items-center"
+                  style={{ gridRow: timeLabelRow, gridColumn: 1 }}
+                >
+                  Date
+                </div>
+                {HOURS.map((h, i) => (
+                  <div
+                    key={`week-time-${weekIndex}-${h}`}
+                    className="border-b border-r border-[#3A3B38] bg-[#2D2F2C] px-1 py-0 text-center text-[10px] font-medium text-white/60 flex items-center justify-center"
+                    style={{ gridRow: timeLabelRow, gridColumn: i + 2 }}
+                  >
+                    {h}:00
+                  </div>
+                ))}
+              </React.Fragment>
             );
           })}
 

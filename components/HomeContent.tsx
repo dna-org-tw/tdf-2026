@@ -53,8 +53,8 @@ export default function HomeContent({ taitungStores }: { taitungStores: TaitungA
       <HeroSection />
       <HashNavigationHandler />
       <AboutSection />
-      <EventsSection />
       <TicketsSection />
+      <EventsSection />
       <AccommodationSection taitungStores={taitungStores} />
       <TeamSection />
       <FollowUsSection />
