@@ -305,7 +305,7 @@ export default function EventsSection() {
                 </div>
                 {/* 時間標籤列 */}
                 <div
-                  className="border-b border-r border-[#3A3B38] bg-[#2D2F2C] px-2 py-0 text-[10px] font-semibold text-white/60 flex items-center"
+                  className="border-b border-r border-[#D4D4CF] bg-stone-200 px-2 py-0 text-[10px] font-semibold text-[#1E1F1C]/50 flex items-center"
                   style={{ gridRow: timeLabelRow, gridColumn: 1 }}
                 >
                   Date
@@ -313,7 +313,7 @@ export default function EventsSection() {
                 {HOURS.map((h, i) => (
                   <div
                     key={`week-time-${weekIndex}-${h}`}
-                    className="border-b border-r border-[#3A3B38] bg-[#2D2F2C] px-1 py-0 text-center text-[10px] font-medium text-white/60 flex items-center justify-center"
+                    className="border-b border-r border-[#D4D4CF] bg-stone-200 px-1 py-0 text-center text-[10px] font-medium text-[#1E1F1C]/50 flex items-center justify-center"
                     style={{ gridRow: timeLabelRow, gridColumn: i + 2 }}
                   >
                     {h}:00
