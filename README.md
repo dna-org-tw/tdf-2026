@@ -61,8 +61,9 @@ npm install
 
 主要環境變數：
 - `NEXT_PUBLIC_SITE_URL`: 網站 URL
-- `SUPABASE_URL`: Supabase 專案 URL
-- `SUPABASE_ANON_KEY`: Supabase 匿名金鑰
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase 專案 URL
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Supabase Publishable Key（前端用）
+- `SUPABASE_SECRET_KEY`: Supabase Secret Key（後端用）
 - `STRIPE_SECRET_KEY`: Stripe 私鑰
 - `STRIPE_PRICE_EXPLORE`, `STRIPE_PRICE_CONTRIBUTE`, `STRIPE_PRICE_BACKER`: Stripe 價格 ID
 - `MAILGUN_API_KEY`: Mailgun API 金鑰

@@ -33,7 +33,7 @@ export async function recordVisitor(
   input: RecordVisitorInput
 ): Promise<RecordVisitorResult> {
   if (!supabaseServer) {
-    const msg = 'Supabase client not initialized (check SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SUPABASE_URL)';
+    const msg = 'Supabase client not initialized (check SUPABASE_SECRET_KEY, NEXT_PUBLIC_SUPABASE_URL)';
     console.warn('[Visitors]', msg);
     return { visitor: null, error: msg };
   }

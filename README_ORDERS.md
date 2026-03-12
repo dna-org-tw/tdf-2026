@@ -58,7 +58,7 @@
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_SECRET_KEY=sb_secret_your_secret_key
 
 # Stripe
 STRIPE_SECRET_KEY=your_stripe_secret_key
