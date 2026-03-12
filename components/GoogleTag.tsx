@@ -2,7 +2,8 @@
 
 import Script from 'next/script';
 
-const GA_MEASUREMENT_ID = 'AW-17947994689';
+const GA_MEASUREMENT_ID = 'G-514WNV4FS9';
+const ADS_ID = 'AW-17947994689';
 
 export default function GoogleTag() {
   return (
@@ -17,6 +18,7 @@ export default function GoogleTag() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${GA_MEASUREMENT_ID}');
+          gtag('config', '${ADS_ID}');
         `}
       </Script>
     </>
