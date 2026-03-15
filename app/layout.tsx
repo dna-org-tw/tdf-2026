@@ -10,6 +10,7 @@ import GoogleTag from '@/components/GoogleTag';
 import RecaptchaScript from '@/components/RecaptchaScript';
 import VisitorTracker from '@/components/VisitorTracker';
 import DiscountCodeCapture from '@/components/DiscountCodeCapture';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -183,7 +184,9 @@ export default async function RootLayout({
         <Suspense>
           <DiscountCodeCapture />
         </Suspense>
+        <AuthProvider>
         {children}
+        </AuthProvider>
       </body>
     </html>
   );

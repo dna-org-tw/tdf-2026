@@ -4,7 +4,8 @@ export type EmailType =
   | 'subscription_thank_you'
   | 'vote_confirmation'
   | 'order_success'
-  | 'order_cancelled';
+  | 'order_cancelled'
+  | 'magic_link';
 
 interface EmailLogEntry {
   to_email: string;

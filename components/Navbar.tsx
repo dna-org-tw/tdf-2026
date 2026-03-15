@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Globe, Instagram } from 'lucide-react';
+import { Menu, X, Globe, Instagram, User } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import MobileMenu from './MobileMenu';
 import { trackEvent } from '@/components/FacebookPixel';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -39,7 +41,7 @@ export default function Navbar() {
     // Dynamically get navbar height
     const navbarElement = document.querySelector('nav');
     const navbarHeight = navbarElement ? navbarElement.offsetHeight : 80;
-    
+
     // Scroll offset is simply the navbar height
     return Math.max(0, element.offsetTop - navbarHeight);
   };
@@ -48,14 +50,14 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const hash = href.replace('#', '');
-    
+
     trackEvent('Lead', {
       content_name: 'Navigation',
       content_category: 'Navigation',
       section: hash,
       location: 'navbar',
     });
-    
+
     if (isHomePage) {
       // If on home page, just scroll to the section
       const element = document.getElementById(hash);
@@ -107,10 +109,10 @@ export default function Navbar() {
           <Link href="/" className={`font-display font-bold text-xl tracking-tight flex items-center gap-3 transition-colors ${
             scrolled ? 'text-[#1E1F1C]' : 'text-white'
           }`}>
-          <Image 
-            src="/images/logo/tdf2026_logo.png" 
-            alt="Taiwan Digital Fest 2026 Logo - Taiwan Digital Nomad Association" 
-            width={40} 
+          <Image
+            src="/images/logo/tdf2026_logo.png"
+            alt="Taiwan Digital Fest 2026 Logo - Taiwan Digital Nomad Association"
+            width={40}
             height={40}
             className="object-contain"
           />
@@ -134,8 +136,8 @@ export default function Navbar() {
               {link.name}
             </a>
           ))}
-          
-          <button 
+
+          <button
             onClick={toggleLanguage}
             className={`hover:text-[#10B8D9] transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
@@ -144,7 +146,7 @@ export default function Navbar() {
           >
             <Globe className="w-5 h-5" />
           </button>
-          
+
           <a
             href="http://instagram.com/taiwandigitalfest"
             target="_blank"
@@ -164,7 +166,31 @@ export default function Navbar() {
           >
             <Instagram className="w-5 h-5" />
           </a>
-          
+
+          {/* Auth: Login / Member */}
+          {!authLoading && (
+            user ? (
+              <Link
+                href="/member"
+                className={`hover:text-[#10B8D9] transition-colors ${
+                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
+                }`}
+                aria-label={t.nav.member}
+              >
+                <User className="w-5 h-5" />
+              </Link>
+            ) : (
+              <Link
+                href="/member"
+                className={`text-sm font-medium hover:text-[#10B8D9] transition-colors ${
+                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
+                }`}
+              >
+                {t.nav.login}
+              </Link>
+            )
+          )}
+
           <Link
             href="/award"
             onClick={() => {
@@ -185,7 +211,30 @@ export default function Navbar() {
 
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
-          <button 
+          {/* Auth: Login / Member (mobile) */}
+          {!authLoading && (
+            user ? (
+              <Link
+                href="/member"
+                className={`hover:text-[#10B8D9] transition-colors ${
+                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
+                }`}
+                aria-label={t.nav.member}
+              >
+                <User className="w-5 h-5" />
+              </Link>
+            ) : (
+              <Link
+                href="/member"
+                className={`hover:text-[#10B8D9] transition-colors text-sm font-medium ${
+                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
+                }`}
+              >
+                {t.nav.login}
+              </Link>
+            )
+          )}
+          <button
             onClick={toggleLanguage}
             className={`hover:text-[#10B8D9] transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
@@ -213,7 +262,7 @@ export default function Navbar() {
           >
             <Instagram className="w-5 h-5" />
           </a>
-          <button 
+          <button
             className={`transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}
@@ -226,10 +275,10 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Nav */}
-      <MobileMenu 
-        isOpen={isOpen} 
-        navLinks={navLinks} 
-        handleNavClick={handleNavClick} 
+      <MobileMenu
+        isOpen={isOpen}
+        navLinks={navLinks}
+        handleNavClick={handleNavClick}
       />
     </nav>
   );
