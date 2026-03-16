@@ -7,7 +7,7 @@ import { useSectionTracking } from '@/hooks/useSectionTracking';
 import LazyYouTubeEmbed from '@/components/LazyYouTubeEmbed';
 
 export default function AboutSection() {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const instagramRef = useRef<HTMLDivElement>(null);
   useSectionTracking({ sectionId: 'about', sectionName: 'About Section', category: 'Event Information' });
 
@@ -155,9 +155,7 @@ export default function AboutSection() {
             {/* SEO 優化：答案塊格式 - 整合關鍵資訊，包含核心關鍵字 */}
             <div className="mb-8 p-6 bg-teal-50 rounded-xl border-l-4 border-teal-500">
               <p className="text-lg md:text-xl font-semibold text-[#1E1F1C] leading-relaxed">
-                {lang === 'en'
-                  ? "Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A curated remote work summit combining AI workshops, networking opportunities, and startup pitches with scenic biking, ocean tours, and hot springs. Experience geo-arbitrage while connecting with the global nomad tribe in Asia's hidden gem."
-                  : '前往山海交界的壯麗之地。專為數位遊牧者策劃的節慶，結合 AI 工作坊、社交活動與創業路演，以及稻浪單車、海洋導覽與溫泉體驗，在台灣最美麗的地區。'}
+                {t.about.teaser}
               </p>
             </div>
 

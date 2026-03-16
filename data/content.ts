@@ -64,6 +64,7 @@ export const content = {
         theme: "Theme:",
         themeValue: "Digital Nomad, AI Workshops, Placemaking, Nature Experience"
       },
+      teaser: "Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A curated remote work summit combining AI workshops, networking opportunities, and startup pitches with scenic biking, ocean tours, and hot springs. Experience geo-arbitrage while connecting with the global nomad tribe in Asia's hidden gem.",
       ctas: [
         { type: "Register", text: "Start Your Journey", href: "#tickets" },
         { type: "Gallery", text: "View 2025 Gallery", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
@@ -532,6 +533,7 @@ export const content = {
       callForVolunteers: "Call for Volunteers",
       callForSideEvents: "Host Your Side Event",
       orderQuery: "Order Query",
+      contactLabel: "Contact:",
       codeOfConduct: "Code of Conduct",
       recaptcha: "This site is protected by reCAPTCHA and the Google",
       privacyPolicy: "Privacy Policy",
@@ -864,6 +866,7 @@ export const content = {
         theme: "主題：",
         themeValue: "數位遊牧、AI 工作坊、地方創生、自然體驗"
       },
+      teaser: "前往山海交界的壯麗之地。專為數位遊牧者策劃的節慶，結合 AI 工作坊、社交活動與創業路演，以及稻浪單車、海洋導覽與溫泉體驗，在台灣最美麗的地區。",
       ctas: [
         { type: "Register", text: "開始旅程", href: "#tickets" },
         { type: "Gallery", text: "查看 2025 精彩瞬間", href: "https://photos.app.goo.gl/dR4cJexFwQjbxReC9" }
@@ -1332,6 +1335,7 @@ export const content = {
       callForVolunteers: "徵求志工",
       callForSideEvents: "立即舉辦 Side Event",
       orderQuery: "查詢訂單",
+      contactLabel: "聯絡我們：",
       codeOfConduct: "活動行為準則",
       recaptcha: "此網站受 reCAPTCHA 保護，並適用 Google",
       privacyPolicy: "隱私權政策",
@@ -1583,6 +1587,10 @@ export const content = {
         {
           question: "參加 2026 台灣數位嘉年華需要簽證嗎？",
           answer: "簽證要求取決於您的國籍。大多數訪客可以免簽證進入台灣 14-90 天。我們建議您向您所在國家的台灣代表處查詢具體簽證要求。"
+        },
+        {
+          question: "在台東和花蓮的生活成本是多少？",
+          answer: "台東和花蓮提供了絕佳的地理套利機會，生活成本相較西方國家更為實惠。住宿從平價旅社到中價位共居空間不等，通常每晚 20-50 美元。餐費約 5-15 美元，共享工作空間每天約 10-30 美元。整體生活成本遠低於西方主要城市，非常適合追求高品質生活同時節省開支的遠距工作者和數位遊牧者。"
         },
         {
           question: "活動使用什麼語言進行？",

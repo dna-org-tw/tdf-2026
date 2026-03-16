@@ -116,7 +116,7 @@ export default function Footer() {
               }}
               className="hover:text-[#10B8D9] transition-colors"
             >
-              <span className="font-semibold">Contact: </span>
+              <span className="font-semibold">{t.footer.contactLabel} </span>
               <span className="text-[#F6F6F6]/60">fest@dna.org.tw</span>
             </a>
             <a 
