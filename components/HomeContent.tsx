@@ -43,6 +43,11 @@ const AccommodationSection = dynamic(() => import('@/components/sections/Accommo
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
+const FAQSection = dynamic(() => import('@/components/sections/FAQSection'), {
+  ssr: true,
+  loading: () => <div className="h-96 bg-[#F6F6F6] animate-pulse" />,
+});
+
 const FollowUsSection = dynamic(() => import('@/components/sections/FollowUsSection'), {
   ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
@@ -62,6 +67,7 @@ export default function HomeContent({ taitungStores }: { taitungStores: TaitungA
       <EventsSection />
       <NewsSection />
       <AccommodationSection taitungStores={taitungStores} />
+      <FAQSection />
       <TeamSection />
       <FollowUsSection />
       <Footer />
