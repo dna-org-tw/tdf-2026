@@ -29,8 +29,8 @@ function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?:
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // 自定义缓动函数：前面快后面慢（更明显的 ease-out）
-        // 使用更高次方的 ease-out，让前面更快，后面更慢
+        // 自定義緩動函數：前面快後面慢（更明顯的 ease-out）
+        // 使用更高次方的 ease-out，讓前面更快，後面更慢
         const easeOut = 1 - Math.pow(1 - progress, 5);
         const currentValue = Math.floor(startValue + (endValue - startValue) * easeOut);
         
@@ -154,7 +154,7 @@ export default function FollowUsSection() {
           message: data.message || t.followUs.successMessage,
         });
         setEmail('');
-        // 更新关注者数量
+        // 更新關注者數量
         setFollowerCount((prev) => prev + 1);
         trackEvent('CompleteRegistration', {
           content_name: 'Follow Us Form',

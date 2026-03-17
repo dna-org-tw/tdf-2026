@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 确认投票
+    // 確認投票
     const { error: updateError } = await supabaseServer
       .from('award_votes')
       .update({
@@ -157,7 +157,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 重定向到确认成功页面
+    // 重定向到確認成功頁面
     return NextResponse.redirect(
       new URL(`/award/confirm?success=true&token=${token}`, req.url)
     );
