@@ -11,6 +11,11 @@ import type { TaitungAccommodation } from '@/lib/parseNomadStores';
 
 // 動態導入非首屏組件，大幅減少初始 bundle 大小
 // 使用 loading 狀態提升 UX，並設定 ssr: false 避免不必要的 SSR
+const BriefingSection = dynamic(() => import('@/components/sections/BriefingSection'), {
+  ssr: true,
+  loading: () => <div className="h-48 bg-[#0a1628] animate-pulse" />,
+});
+
 const Footer = dynamic(() => import('@/components/Footer'), {
   ssr: false,
   loading: () => null, // Footer 不需要 loading 狀態
@@ -56,6 +61,7 @@ export default function HomeContent({ taitungStores }: { taitungStores: TaitungA
     <LumaDataProvider>
       <Navbar />
       <HeroSection />
+      <BriefingSection />
       <HashNavigationHandler />
       <AboutSection />
       <TicketsSection />
