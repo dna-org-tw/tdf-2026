@@ -14,7 +14,7 @@ export default function NotFound() {
       const searchParams = window.location.search;
       const redirectUrl = searchParams ? `/${searchParams}` : '/';
       
-      // 重定向到首页，保留查询参数
+      // 重定向到首頁，保留查詢參數
       router.replace(redirectUrl);
     }
   }, [router]);
