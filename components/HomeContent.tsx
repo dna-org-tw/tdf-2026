@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/sections/HeroSection';
@@ -7,7 +8,22 @@ import HashNavigationHandler from '@/components/HashNavigationHandler';
 import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { LumaDataProvider } from '@/contexts/LumaDataContext';
 import TeamSection from '@/components/sections/TeamSection';
+import BriefingModal from '@/components/BriefingModal';
 import type { TaitungAccommodation } from '@/lib/parseNomadStores';
+
+const BRIEFING_MODAL_KEY = 'briefing_modal_last_shown';
+
+function shouldShowBriefingModal(): boolean {
+  try {
+    const lastShown = localStorage.getItem(BRIEFING_MODAL_KEY);
+    if (!lastShown) return true;
+    const lastDate = new Date(lastShown).toDateString();
+    const today = new Date().toDateString();
+    return lastDate !== today;
+  } catch {
+    return true;
+  }
+}
 
 // 動態導入非首屏組件，大幅減少初始 bundle 大小
 // 使用 loading 狀態提升 UX，並設定 ssr: false 避免不必要的 SSR
@@ -57,6 +73,20 @@ export default function HomeContent({ taitungStores }: { taitungStores: TaitungA
   // Track scroll depth
   useScrollDepth();
 
+  const [briefingModalOpen, setBriefingModalOpen] = useState(false);
+
+  // Auto-show briefing modal once per day
+  useEffect(() => {
+    if (shouldShowBriefingModal()) {
+      setBriefingModalOpen(true);
+      try {
+        localStorage.setItem(BRIEFING_MODAL_KEY, new Date().toISOString());
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
   return (
     <LumaDataProvider>
       <Navbar />
@@ -71,6 +101,10 @@ export default function HomeContent({ taitungStores }: { taitungStores: TaitungA
       <TeamSection />
       <FollowUsSection />
       <Footer />
+      <BriefingModal
+        isOpen={briefingModalOpen}
+        onClose={() => setBriefingModalOpen(false)}
+      />
     </LumaDataProvider>
   );
 }

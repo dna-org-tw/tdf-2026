@@ -1,20 +1,15 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, CheckCircle2, Star } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackCustomEvent } from '@/components/FacebookPixel';
-import BriefingModal from '@/components/BriefingModal';
-import Script from 'next/script';
 
 export default function BriefingSection() {
   const { t } = useTranslation();
-  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <>
-      <section className="relative bg-gradient-to-b from-[#0a1628] to-[#1E1F1C] py-12 sm:py-16 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-[#0a1628] to-[#1E1F1C] py-12 sm:py-16 overflow-hidden">
         {/* Accent glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[2px] bg-gradient-to-r from-transparent via-[#10B8D9]/60 to-transparent" />
 
@@ -64,13 +59,13 @@ export default function BriefingSection() {
             <div className="flex flex-col sm:flex-row gap-3">
               <a
                 href="https://luma.com/event/evt-1ZQ0H7LPHB2tovg"
-                className="luma-checkout--button inline-flex items-center justify-center bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-lg shadow-[#10B8D9]/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                data-luma-action="checkout"
-                data-luma-event-id="evt-1ZQ0H7LPHB2tovg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-lg shadow-[#10B8D9]/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 onClick={() => {
                   trackCustomEvent('BriefingRegisterClick', {
                     location: 'briefing_section',
-                    action: 'luma_checkout',
+                    action: 'luma_page',
                   });
                 }}
               >
@@ -94,19 +89,5 @@ export default function BriefingSection() {
           </motion.div>
         </div>
       </section>
-
-      {/* Luma Checkout Script */}
-      <Script
-        id="luma-checkout"
-        src="https://embed.lu.ma/checkout-button.js"
-        strategy="lazyOnload"
-      />
-
-      {/* Briefing Modal */}
-      <BriefingModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
-    </>
   );
 }
