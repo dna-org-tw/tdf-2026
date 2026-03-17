@@ -33,6 +33,12 @@ export default function MobileMenu({ isOpen, navLinks, handleNavClick }: MobileM
               </a>
             ))}
             <a
+              href="/blog"
+              className="text-lg font-medium text-[#1E1F1C] cursor-pointer"
+            >
+              {t.nav.blog || 'Blog'}
+            </a>
+            <a
               href="/award"
               className="bg-[#10B8D9] text-white px-6 py-3 rounded-lg text-center font-semibold cursor-pointer"
             >

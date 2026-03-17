@@ -38,6 +38,7 @@ export const content = {
       followUs: "Follow Us",
       register: "Schedule",
       award: "IG Contest",
+      blog: "Blog",
       languageToggle: "中文"
     },
     navShort: {
@@ -838,6 +839,7 @@ export const content = {
       followUs: "關注我們",
       register: "時程",
       award: "IG 短影音大賽",
+      blog: "Blog",
       languageToggle: "中文"
     },
     navShort: {

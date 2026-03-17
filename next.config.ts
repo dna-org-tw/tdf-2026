@@ -47,6 +47,13 @@ const nextConfig: NextConfig = {
         hostname: 'newsbuffet.aottercdn.com',
         pathname: '/media/**',
       },
+      {
+        // Ghost CMS images (localhost dev)
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '2368',
+        pathname: '/content/images/**',
+      },
     ],
     // 對於外部圖片，使用 unoptimized 以減少處理時間
     unoptimized: false,

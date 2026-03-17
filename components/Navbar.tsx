@@ -166,6 +166,15 @@ export default function Navbar() {
           </a>
           
           <Link
+            href="/blog"
+            className={`text-sm font-medium hover:text-[#10B8D9] transition-colors ${
+              scrolled ? 'text-[#1E1F1C]' : 'text-white'
+            }`}
+          >
+            {t.nav.blog || 'Blog'}
+          </Link>
+
+          <Link
             href="/award"
             onClick={() => {
               trackEvent('Lead', {
