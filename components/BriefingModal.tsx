@@ -11,31 +11,35 @@ interface BriefingModalProps {
 
 export default function BriefingModal({ isOpen, onClose }: BriefingModalProps) {
   const { t } = useTranslation();
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <motion.div
+          key="briefing-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50"
+        >
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
           />
 
           {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="bg-[#1E1F1C] rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-white/10">
+          <div className="relative flex items-center justify-center h-full p-4">
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-[#1E1F1C] rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-white/10"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Header */}
               <div className="flex items-center justify-between p-5 border-b border-white/10">
                 <h3 className="text-xl font-display font-bold text-white">
@@ -63,9 +67,9 @@ export default function BriefingModal({ isOpen, onClose }: BriefingModalProps) {
                   tabIndex={0}
                 />
               </div>
-            </div>
-          </motion.div>
-        </>
+            </motion.div>
+          </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
