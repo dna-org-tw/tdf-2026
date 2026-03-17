@@ -19,8 +19,14 @@ export default function Navbar() {
   const router = useRouter();
   const isHomePage = pathname === '/';
 
+  // Non-home pages always show scrolled (solid) navbar
+  useEffect(() => {
+    if (!isHomePage) setScrolled(true);
+  }, [isHomePage]);
+
   // Handle scroll effect with throttle optimization
   useEffect(() => {
+    if (!isHomePage) return;
     // 使用 requestAnimationFrame 優化 scroll 事件處理
     let ticking = false;
     const handleScroll = () => {
@@ -34,7 +40,7 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isHomePage]);
 
   // Helper function to calculate scroll position
   const calculateScrollPosition = (element: HTMLElement) => {
