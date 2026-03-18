@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, CheckCircle2, Star } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -11,6 +11,20 @@ import Script from 'next/script';
 export default function BriefingSection() {
   const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    const dismissedDate = localStorage.getItem('briefing-modal-dismissed');
+    const today = new Date().toISOString().slice(0, 10);
+    if (dismissedDate !== today) {
+      setModalOpen(true);
+    }
+  }, []);
+
+  const handleClose = () => {
+    setModalOpen(false);
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem('briefing-modal-dismissed', today);
+  };
 
   return (
     <>
@@ -76,20 +90,20 @@ export default function BriefingSection() {
               >
                 {t.briefing.registerButton}
               </a>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <a
+                href="https://luma.com/event/evt-1ZQ0H7LPHB2tovg"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => {
-                  setModalOpen(true);
                   trackCustomEvent('BriefingDetailsClick', {
                     location: 'briefing_section',
-                    action: 'open_modal',
+                    action: 'view_details',
                   });
                 }}
-                className="inline-flex items-center justify-center bg-white/10 hover:bg-white/15 text-white border border-white/20 font-semibold text-base px-8 py-3.5 rounded-xl transition-all"
+                className="inline-flex items-center justify-center bg-white/10 hover:bg-white/15 text-white border border-white/20 font-semibold text-base px-8 py-3.5 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 {t.briefing.detailsButton}
-              </motion.button>
+              </a>
             </div>
           </motion.div>
         </div>
@@ -105,7 +119,7 @@ export default function BriefingSection() {
       {/* Briefing Modal */}
       <BriefingModal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={handleClose}
       />
     </>
   );
