@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { recordVisitor } from '@/lib/visitors';
 
+const MD5_REGEX = /^[a-f0-9]{32}$/;
+
 function getClientIP(req: NextRequest): string | null {
   const forwardedFor = req.headers.get('x-forwarded-for');
   if (forwardedFor) return forwardedFor.split(',')[0].trim();
@@ -49,9 +51,9 @@ export async function POST(req: NextRequest) {
     }
 
     const fingerprint = body.fingerprint.trim();
-    if (!fingerprint) {
+    if (!fingerprint || !MD5_REGEX.test(fingerprint)) {
       return NextResponse.json(
-        { error: 'fingerprint is required' },
+        { error: 'Invalid fingerprint format' },
         { status: 400 }
       );
     }

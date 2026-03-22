@@ -629,16 +629,6 @@ export default function TicketsSection() {
                   </div>
                 )}
               </div>
-              <div className="space-y-3 mb-6 flex-1">
-                {(t.tickets.little_backer?.features ?? []).map((feature: string, i: number) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#FFD028]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-sm text-white/90">{feature}</span>
-                  </div>
-                ))}
-              </div>
               <button
                 type="button"
                 onClick={() => {
