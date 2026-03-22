@@ -16,7 +16,8 @@ export default function BriefingSection() {
     const dismissedDate = localStorage.getItem('briefing-modal-dismissed');
     const today = new Date().toISOString().slice(0, 10);
     if (dismissedDate !== today) {
-      setModalOpen(true);
+      const timer = setTimeout(() => setModalOpen(true), 5000);
+      return () => clearTimeout(timer);
     }
   }, []);
 
