@@ -98,10 +98,7 @@ export async function POST(req: NextRequest) {
       tax_id_collection: {
         enabled: true,
       },
-      metadata: {
-        ticket_tier: tier,
-        ...(week ? { week } : {}),
-      },
+      ...(week ? { metadata: { week } } : {}),
     });
 
     const visitorFingerprint = body?.visitor_fingerprint ?? null;
