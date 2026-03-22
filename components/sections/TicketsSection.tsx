@@ -11,11 +11,14 @@ import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
+type TicketKey = 'explore' | 'contribute' | 'little_backer' | 'backer';
+
 interface TicketTier {
   name: string;
-  key: 'explore' | 'contribute' | 'backer';
+  key: TicketKey;
   originalPrice: number;
   salePrice: number;
+  requiresWeekSelection?: boolean;
   color: {
     bg: string;
     text: string;
@@ -75,7 +78,10 @@ export default function TicketsSection() {
   const { t } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
   const [countdown, setCountdown] = useState<CountdownTime | null>(null);
-  const [loadingTier, setLoadingTier] = useState<'explore' | 'contribute' | 'backer' | null>(null);
+  const [loadingTier, setLoadingTier] = useState<TicketKey | null>(null);
+  const [weekModalOpen, setWeekModalOpen] = useState(false);
+  const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
+  const [pendingWeekTier, setPendingWeekTier] = useState<TicketTier | null>(null);
   const [followerModalOpen, setFollowerModalOpen] = useState(false);
   const [followerEmail, setFollowerEmail] = useState('');
   const [followerSubmitting, setFollowerSubmitting] = useState(false);
@@ -129,7 +135,15 @@ export default function TicketsSection() {
   
   const isOnSale = countdown !== null && countdown.total > 0;
 
-  const handleCheckout = async (tier: TicketTier) => {
+  const handleCheckout = async (tier: TicketTier, week?: string) => {
+    // If this tier requires week selection and no week is provided, show modal
+    if (tier.requiresWeekSelection && !week) {
+      setPendingWeekTier(tier);
+      setSelectedWeek(null);
+      setWeekModalOpen(true);
+      return;
+    }
+
     try {
       setLoadingTier(tier.key);
 
@@ -146,6 +160,7 @@ export default function TicketsSection() {
         checkout_provider: 'stripe',
         tier: tier.key,
         on_sale: isOnSale,
+        ...(week ? { week } : {}),
       });
 
       trackEvent('AddPaymentInfo', {
@@ -164,7 +179,11 @@ export default function TicketsSection() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tier: tier.key, visitor_fingerprint: getVisitorFingerprint() }),
+        body: JSON.stringify({
+          tier: tier.key,
+          visitor_fingerprint: getVisitorFingerprint(),
+          ...(week ? { week } : {}),
+        }),
       });
 
       if (!response.ok) {
@@ -186,6 +205,13 @@ export default function TicketsSection() {
     } finally {
       setLoadingTier(null);
     }
+  };
+
+  const handleWeekConfirm = () => {
+    if (!selectedWeek || !pendingWeekTier) return;
+    setWeekModalOpen(false);
+    handleCheckout(pendingWeekTier, selectedWeek);
+    setPendingWeekTier(null);
   };
 
   const handleFollowerSubscribe = async (e: React.FormEvent) => {
@@ -404,7 +430,7 @@ export default function TicketsSection() {
                 
                 {/* Pricing */}
                 <div className="mb-6">
-                  {isOnSale ? (
+                  {isOnSale && tier.originalPrice !== tier.salePrice ? (
                     <div>
                       <div className="flex items-baseline gap-2 mb-1">
                         <span className="text-3xl font-bold text-white">
@@ -451,13 +477,16 @@ export default function TicketsSection() {
                     let isPreviousTierFeature = false;
                     if (!isDigitalNomadActivities) {
                       if (tier.key === 'contribute') {
-                        // Check if feature exists in explore
                         isPreviousTierFeature = t.tickets.explore.features.some(prevFeature => {
                           const prevCore = getCoreFeatureName(prevFeature);
                           return currentCore === prevCore;
                         });
+                      } else if (tier.key === 'little_backer') {
+                        isPreviousTierFeature = t.tickets.contribute.features.some(prevFeature => {
+                          const prevCore = getCoreFeatureName(prevFeature);
+                          return currentCore === prevCore;
+                        });
                       } else if (tier.key === 'backer') {
-                        // Check if feature exists in contribute
                         isPreviousTierFeature = t.tickets.contribute.features.some(prevFeature => {
                           const prevCore = getCoreFeatureName(prevFeature);
                           return currentCore === prevCore;
@@ -485,6 +514,7 @@ export default function TicketsSection() {
                       switch (tier.key) {
                         case 'contribute':
                           return { icon: 'text-[#00993E]', text: 'text-[#00993E] font-semibold' };
+                        case 'little_backer':
                         case 'backer':
                           return { icon: 'text-[#FFD028]', text: 'text-[#FFD028] font-semibold' };
                         default:
@@ -494,20 +524,13 @@ export default function TicketsSection() {
                     
                     const colors = getTierColor();
                     // 開幕市集那行：icon 用票券等級色
-                    const openingMarketplaceIcon =
-                      isOpeningMarketplaceFeature &&
-                      (tier.key === 'explore'
-                        ? 'text-[#10B8D9]'
-                        : tier.key === 'contribute'
-                          ? 'text-[#00993E]'
-                          : 'text-[#FFD028]');
-                    const openingMarketplaceRestClass =
-                      isOpeningMarketplaceFeature &&
-                      (tier.key === 'explore'
-                        ? 'text-[#10B8D9] font-semibold'
-                        : tier.key === 'contribute'
-                          ? 'text-[#00993E] font-semibold'
-                          : 'text-[#FFD028] font-semibold');
+                    const getMarketplaceColor = () => {
+                      if (tier.key === 'explore') return 'text-[#10B8D9]';
+                      if (tier.key === 'contribute') return 'text-[#00993E]';
+                      return 'text-[#FFD028]';
+                    };
+                    const openingMarketplaceIcon = isOpeningMarketplaceFeature && getMarketplaceColor();
+                    const openingMarketplaceRestClass = isOpeningMarketplaceFeature && `${getMarketplaceColor()} font-semibold`;
                     
                     const openingMarketplaceParts = isOpeningMarketplaceFeature && (() => {
                       const sep = feature.includes('＋') ? '＋' : ' + ';
@@ -566,6 +589,85 @@ export default function TicketsSection() {
             </motion.div>
           ))}
         </div>
+
+        {/* Weekly Backer 獨立票券 - 選擇週次 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.25 }}
+          className="w-full mb-4 md:mb-6"
+        >
+          <div
+            className={`
+              relative rounded-2xl p-8 border-2 transition-all duration-300
+              bg-gradient-to-br from-[#1E1F1C] to-[#1E1F1C]/90 backdrop-blur-sm
+              border-[#FFD028]/40 hover:shadow-2xl hover:shadow-[#FFD028]/15 hover:scale-[1.02]
+              flex flex-col
+            `}
+          >
+            <div className="flex-1 flex flex-col">
+              <h3 className="text-2xl font-display font-bold mb-2 text-white">
+                {t.tickets.little_backer?.label ?? 'Weekly Backer'}
+              </h3>
+              <div className="mb-6">
+                {isOnSale ? (
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="text-3xl font-bold text-white">$200</span>
+                      <span className="text-white/70 text-sm">USD</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white/50 line-through text-sm">$250 USD</span>
+                      <span className="text-[#FFD028] text-xs font-medium">{t.tickets.save} $50</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-white">$250</span>
+                    <span className="text-[#F6F6F6]/60 text-sm">USD</span>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-3 mb-6 flex-1">
+                {(t.tickets.little_backer?.features ?? []).map((feature: string, i: number) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5 text-[#FFD028]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm text-white/90">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPendingWeekTier({
+                    name: 'Weekly Backer',
+                    key: 'little_backer',
+                    originalPrice: 250,
+                    salePrice: 200,
+                    requiresWeekSelection: true,
+                    color: {
+                      bg: 'bg-[#FFD028]/10',
+                      text: 'text-[#FFD028]',
+                      border: 'border-[#FFD028]/40',
+                      badge: 'bg-[#FFD028]',
+                    },
+                  });
+                  setSelectedWeek(null);
+                  setWeekModalOpen(true);
+                }}
+                disabled={loadingTier === 'little_backer'}
+                className="w-full mt-auto px-4 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#FFD028] text-[#1E1F1C] hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                {loadingTier === 'little_backer'
+                  ? (t.tickets?.processing ?? 'Processing...')
+                  : (t.tickets?.payWithCard ?? 'Start Your Journey')}
+              </button>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Follower 獨立票券 - 免費訂閱 */}
         <motion.div
@@ -674,6 +776,81 @@ export default function TicketsSection() {
                     {followerSubmitting ? t.hero.followForm.submitting : t.hero.followForm.submitButton}
                   </button>
                 </form>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Week Selection Modal for Weekly Backer */}
+      <AnimatePresence>
+        {weekModalOpen && pendingWeekTier && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={() => setWeekModalOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            >
+              <div
+                className="bg-[#1E1F1C] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-[#FFD028]/30 pointer-events-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between p-6 border-b border-white/10">
+                  <h3 className="text-xl font-display font-bold text-white">
+                    {t.tickets.little_backer?.weekLabel ?? 'Select Your Week'}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setWeekModalOpen(false)}
+                    className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white"
+                    aria-label="Close"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="p-6 space-y-3">
+                  {(t.tickets.little_backer?.weeks ?? [
+                    'Week 1: May 1 – May 7',
+                    'Week 2: May 8 – May 14',
+                    'Week 3: May 15 – May 21',
+                    'Week 4: May 22 – May 28',
+                  ]).map((weekLabel: string, i: number) => {
+                    const weekValue = `week${i + 1}`;
+                    return (
+                      <button
+                        key={weekValue}
+                        type="button"
+                        onClick={() => setSelectedWeek(weekValue)}
+                        className={`
+                          w-full px-4 py-3 rounded-xl border-2 text-left font-medium transition-all duration-200
+                          ${selectedWeek === weekValue
+                            ? 'border-[#FFD028] bg-[#FFD028]/15 text-[#FFD028]'
+                            : 'border-white/20 bg-white/5 text-white/80 hover:border-[#FFD028]/50 hover:bg-[#FFD028]/5'}
+                        `}
+                      >
+                        {weekLabel}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={handleWeekConfirm}
+                    disabled={!selectedWeek || loadingTier === 'little_backer'}
+                    className="w-full mt-4 px-4 py-3 rounded-xl font-semibold bg-[#FFD028] text-[#1E1F1C] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
+                  >
+                    {loadingTier === 'little_backer'
+                      ? (t.tickets?.processing ?? 'Processing...')
+                      : (t.tickets?.payWithCard ?? 'Start Your Journey')}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </>

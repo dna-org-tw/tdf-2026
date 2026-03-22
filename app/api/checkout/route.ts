@@ -16,9 +16,10 @@ const stripe = stripeSecretKey
     })
   : null;
 
-const PRICE_IDS: Record<'explore' | 'contribute' | 'backer', string | undefined> = {
+const PRICE_IDS: Record<'explore' | 'contribute' | 'little_backer' | 'backer', string | undefined> = {
   explore: process.env.STRIPE_PRICE_EXPLORE,
   contribute: process.env.STRIPE_PRICE_CONTRIBUTE,
+  little_backer: process.env.STRIPE_PRICE_WEEKLY_BACKER,
   backer: process.env.STRIPE_PRICE_BACKER,
 };
 
@@ -33,10 +34,16 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => null);
 
-    const tier: 'explore' | 'contribute' | 'backer' | undefined = body?.tier;
+    const tier: 'explore' | 'contribute' | 'little_backer' | 'backer' | undefined = body?.tier;
+    const week: string | undefined = body?.week;
 
-    if (!tier || !['explore', 'contribute', 'backer'].includes(tier)) {
+    if (!tier || !['explore', 'contribute', 'little_backer', 'backer'].includes(tier)) {
       return NextResponse.json({ error: 'Invalid ticket tier.' }, { status: 400 });
+    }
+
+    // Weekly Backer requires week selection
+    if (tier === 'little_backer' && (!week || !['week1', 'week2', 'week3', 'week4'].includes(week))) {
+      return NextResponse.json({ error: 'Week selection is required for Weekly Backer.' }, { status: 400 });
     }
 
     const priceId = PRICE_IDS[tier];
@@ -93,6 +100,7 @@ export async function POST(req: NextRequest) {
       },
       metadata: {
         ticket_tier: tier,
+        ...(week ? { week } : {}),
       },
     });
 

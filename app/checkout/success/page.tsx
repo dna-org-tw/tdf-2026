@@ -181,7 +181,7 @@ export default function CheckoutSuccessPage() {
   }, [sessionId, t.checkout]);
 
   const tierLabel =
-    (tier && t.tickets?.[tier as 'explore' | 'contribute' | 'backer']?.label) || '';
+    (tier && t.tickets?.[tier as 'explore' | 'contribute' | 'little_backer' | 'backer']?.label) || '';
 
   return (
     <main className="min-h-screen bg-[#1E1F1C] text-white flex items-center justify-center px-4">

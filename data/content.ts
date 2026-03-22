@@ -201,6 +201,26 @@ export const content = {
           "Digital Nomad Activities x 40+"
         ]
       },
+      little_backer: {
+        name: "Weekly Backer",
+        label: "Weekly Backer",
+        features: [
+          "Exclusive Digital Nomad Community",
+          "Opening Marketplace + Unlimited drinks & food",
+          "Outdoor Nomad Buffet x 1",
+          "VIP Dinner x 1",
+          "VIP Lunch x 1",
+          "Digital Nomad Activities x 40+"
+        ],
+        weekLabel: "Select Your Week",
+        weekRequired: "Please select a week to continue",
+        weeks: [
+          "Week 1: May 1 – May 7",
+          "Week 2: May 8 – May 14",
+          "Week 3: May 15 – May 21",
+          "Week 4: May 22 – May 28"
+        ]
+      },
       backer: {
         name: "Backer",
         label: "Backer",
@@ -1041,6 +1061,26 @@ export const content = {
           "戶外 Nomad Buffet x 1",
           "VIP 晚餐 x 4",
           "數位遊牧活動 x 40+"
+        ]
+      },
+      little_backer: {
+        name: "Weekly Backer",
+        label: "Weekly Backer",
+        features: [
+          "專屬數位遊牧社群",
+          "開幕市集＋無限酒水餐食",
+          "戶外 Nomad Buffet x 1",
+          "VIP 晚餐 x 1",
+          "VIP 午餐 x 1",
+          "數位遊牧活動 x 40+"
+        ],
+        weekLabel: "選擇你的週次",
+        weekRequired: "請選擇參加週次以繼續",
+        weeks: [
+          "第一週：5/1 – 5/7",
+          "第二週：5/8 – 5/14",
+          "第三週：5/15 – 5/21",
+          "第四週：5/22 – 5/28"
         ]
       },
       backer: {
