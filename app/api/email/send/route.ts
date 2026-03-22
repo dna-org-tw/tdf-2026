@@ -73,6 +73,8 @@ export async function POST(req: NextRequest) {
           day: 'numeric',
           hour: '2-digit',
           minute: '2-digit',
+          timeZone: 'Asia/Taipei',
+          timeZoneName: 'short',
         })
       : 'N/A';
 

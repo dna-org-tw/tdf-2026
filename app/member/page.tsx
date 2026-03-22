@@ -91,19 +91,17 @@ function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTr
 }
 
 function MemberDashboard() {
-  const { user, session, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.email || !session?.access_token) return;
+    if (!user?.email) return;
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch(`/api/auth/orders?email=${encodeURIComponent(user.email!)}`, {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
+        const res = await fetch(`/api/auth/orders?email=${encodeURIComponent(user.email!)}`);
 
         if (res.ok) {
           const data = await res.json();
@@ -117,7 +115,7 @@ function MemberDashboard() {
     };
 
     fetchOrders();
-  }, [user?.email, session?.access_token]);
+  }, [user?.email]);
 
   const formatAmount = (amount: number, currency: string) => {
     return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;

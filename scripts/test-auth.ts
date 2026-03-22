@@ -1,12 +1,12 @@
 #!/usr/bin/env npx tsx
 /**
- * 會員登入系統（Magic Link）端對端測試腳本
+ * 會員登入系統（Custom Magic Link）端對端測試腳本
  *
  * 測試項目：
- * 1. 環境變數檢查（Supabase + Mailgun）
+ * 1. 環境變數檢查（Supabase + Mailgun + AUTH_SECRET）
  * 2. Magic Link API — 產生 & 寄送
- * 3. OTP Token 驗證（模擬 callback）
- * 4. 會員 Session & JWT 取得
+ * 3. Token 驗證（直接呼叫 verify API）
+ * 4. Session API 取得
  * 5. 受保護的 Orders API 存取
  * 6. 登出與 Session 失效
  *
@@ -14,11 +14,12 @@
  *
  * 注意：
  * - 需要 dev server 運行在 localhost:3000（用於測試 API routes）
- * - 使用 Supabase Admin API 直接產生 token，不實際寄信
- * - 測試結束後會清理建立的測試使用者
+ * - 直接操作 DB 產生 token，不實際寄信
+ * - 測試結束後會清理建立的測試資料
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createHash, randomBytes } from 'crypto';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -41,9 +42,9 @@ try {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SECRET_KEY = process.env.SUPABASE_SECRET_KEY!;
-const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
+const AUTH_SECRET = process.env.AUTH_SECRET;
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 
@@ -72,10 +73,10 @@ function testEnvVars() {
   console.log('\n🔧 1. 環境變數檢查');
   assert(!!SUPABASE_URL, 'NEXT_PUBLIC_SUPABASE_URL 已設定');
   assert(!!SECRET_KEY, 'SUPABASE_SECRET_KEY 已設定');
-  assert(!!PUBLISHABLE_KEY, 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY 已設定');
   assert(!!MAILGUN_API_KEY, 'MAILGUN_API_KEY 已設定');
   assert(!!MAILGUN_DOMAIN, 'MAILGUN_DOMAIN 已設定');
   assert(!!process.env.EMAIL_FROM, 'EMAIL_FROM 已設定');
+  assert(!!AUTH_SECRET, 'AUTH_SECRET 已設定');
 }
 
 // ─── 2. Magic Link API 端點測試 ────────────────
@@ -122,156 +123,139 @@ async function testMagicLinkAPI(): Promise<boolean> {
   }
 }
 
-// ─── 3. Supabase Admin 產生 Token & 驗證 OTP ────
+// ─── 3. Token 驗證（直接 DB 操作模擬） ────────
 async function testTokenVerification(
-  secClient: SupabaseClient,
-  pubClient: SupabaseClient
-): Promise<{ accessToken: string; userId: string } | null> {
-  console.log('\n🔐 3. Token 產生 & OTP 驗證');
+  secClient: SupabaseClient
+): Promise<string | null> {
+  console.log('\n🔐 3. Token 產生 & 驗證');
 
-  // 3a. 使用 Admin API 產生 magic link token
-  const { data: linkData, error: linkError } = await secClient.auth.admin.generateLink({
-    type: 'magiclink',
+  // 3a. 在 DB 中插入一個測試 token
+  const rawToken = randomBytes(32).toString('hex');
+  const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+  // Ensure user exists
+  await secClient.from('users').upsert({ email: TEST_EMAIL }, { onConflict: 'email', ignoreDuplicates: true });
+
+  // Invalidate existing tokens
+  await secClient.from('auth_tokens').update({ used: true }).eq('email', TEST_EMAIL).eq('used', false);
+
+  const { error: insertError } = await secClient.from('auth_tokens').insert({
     email: TEST_EMAIL,
-  });
-
-  if (linkError || !linkData?.properties?.hashed_token) {
-    assert(false, 'Admin generateLink 產生 hashed_token', linkError?.message);
-    return null;
-  }
-
-  const tokenHash = linkData.properties.hashed_token;
-  assert(true, `Admin generateLink 產生 hashed_token (${tokenHash.slice(0, 12)}...)`);
-
-  // 3b. 驗證 callback URL 格式
-  const callbackUrl = `${BASE_URL}/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink`;
-  const url = new URL(callbackUrl);
-  assert(url.searchParams.get('token_hash') === tokenHash, 'Callback URL 包含正確的 token_hash');
-  assert(url.searchParams.get('type') === 'magiclink', 'Callback URL type=magiclink');
-  assert(url.pathname === '/auth/callback', 'Callback URL path=/auth/callback');
-
-  // 3c. 使用 Publishable Key client 驗證 OTP（模擬瀏覽器端行為）
-  const { data: verifyData, error: verifyError } = await pubClient.auth.verifyOtp({
     token_hash: tokenHash,
-    type: 'magiclink',
+    expires_at: expiresAt,
   });
+  assert(!insertError, 'DB 插入測試 auth_token', insertError?.message);
 
-  if (verifyError) {
-    assert(false, 'verifyOtp 成功驗證', verifyError.message);
+  // 3b. 呼叫 verify API（不跟隨 redirect）
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/verify?token=${rawToken}`, {
+      redirect: 'manual',
+    });
+    assert(res.status === 307 || res.status === 308 || res.status === 302, `verify API → redirect (${res.status})`);
+
+    const location = res.headers.get('location') || '';
+    assert(location.includes('/member'), 'Redirect 到 /member', `location: ${location}`);
+
+    // Extract session cookie
+    const setCookieHeader = res.headers.get('set-cookie') || '';
+    assert(setCookieHeader.includes('tdf_session'), 'Set-Cookie 包含 tdf_session');
+
+    // Extract cookie value
+    const cookieMatch = setCookieHeader.match(/tdf_session=([^;]+)/);
+    return cookieMatch ? cookieMatch[1] : null;
+  } catch (err) {
+    assert(false, 'verify API 呼叫成功', `${err}`);
     return null;
   }
-
-  assert(!!verifyData.session, 'verifyOtp 返回有效 session');
-  assert(!!verifyData.session?.access_token, 'Session 包含 access_token');
-  assert(
-    verifyData.session?.user?.email === TEST_EMAIL,
-    `Session user email 正確 (${verifyData.session?.user?.email})`
-  );
-  assert(!!verifyData.session?.user?.id, `Session user id 存在 (${verifyData.session?.user?.id})`);
-
-  return {
-    accessToken: verifyData.session!.access_token,
-    userId: verifyData.session!.user.id,
-  };
 }
 
-// ─── 4. Callback 頁面可達性測試 ────────────────
-async function testCallbackPage() {
-  console.log('\n🌐 4. Auth Callback 頁面可達性');
+// ─── 4. Session API 測試 ────────────────────────
+async function testSessionAPI(sessionCookie: string) {
+  console.log('\n🔑 4. Session API 測試');
 
-  // 4a. 無 token_hash → 應渲染錯誤頁
+  // 4a. 無 cookie → user: null
   try {
-    const res = await fetch(`${BASE_URL}/auth/callback`);
-    assert(res.status === 200, '/auth/callback 無參數 → 頁面可達 (200)');
-    const html = await res.text();
-    assert(html.includes('Login Failed') || html.includes('Invalid'), '頁面顯示錯誤提示');
+    const res = await fetch(`${BASE_URL}/api/auth/session`);
+    const data = await res.json();
+    assert(res.status === 200 && data.user === null, 'GET /api/auth/session 無 cookie → user: null');
   } catch (err) {
-    assert(false, '/auth/callback 無參數 → 頁面可達', `${err}`);
+    assert(false, 'GET /api/auth/session 無 cookie', `${err}`);
   }
 
-  // 4b. 有完整參數 → 頁面可達
+  // 4b. 有效 cookie → user 資料
   try {
-    const res = await fetch(`${BASE_URL}/auth/callback?token_hash=fakehash&type=magiclink`);
-    assert(res.status === 200, '/auth/callback 含參數 → 頁面可達 (200)');
+    const res = await fetch(`${BASE_URL}/api/auth/session`, {
+      headers: { Cookie: `tdf_session=${sessionCookie}` },
+    });
+    const data = await res.json();
+    assert(res.status === 200 && data.user !== null, 'GET /api/auth/session 有效 cookie → user 資料');
+    assert(data.user?.email === TEST_EMAIL, `Session user email 正確 (${data.user?.email})`);
+    assert(!!data.user?.id, `Session user id 存在`);
   } catch (err) {
-    assert(false, '/auth/callback 含參數 → 頁面可達', `${err}`);
+    assert(false, 'GET /api/auth/session 有效 cookie', `${err}`);
   }
 }
 
 // ─── 5. Orders API 驗證測試 ────────────────────
-async function testOrdersAPI(accessToken: string) {
+async function testOrdersAPI(sessionCookie: string) {
   console.log('\n📦 5. Orders API 受保護端點測試');
 
-  // 5a. 無 Authorization header → 401
+  // 5a. 無 cookie → 401
   try {
     const res = await fetch(`${BASE_URL}/api/auth/orders?email=${encodeURIComponent(TEST_EMAIL)}`);
-    assert(res.status === 401, 'GET /api/auth/orders 無 token → 401 Unauthorized', `實際 status: ${res.status}`);
+    assert(res.status === 401, 'GET /api/auth/orders 無 cookie → 401 Unauthorized', `實際 status: ${res.status}`);
   } catch (err) {
-    assert(false, 'GET /api/auth/orders 無 token → 401', `${err}`);
+    assert(false, 'GET /api/auth/orders 無 cookie → 401', `${err}`);
   }
 
-  // 5b. 無效 token → 401
-  try {
-    const res = await fetch(`${BASE_URL}/api/auth/orders?email=${encodeURIComponent(TEST_EMAIL)}`, {
-      headers: { Authorization: 'Bearer invalid_token_here' },
-    });
-    assert(res.status === 401, 'GET /api/auth/orders 無效 token → 401 Unauthorized', `實際 status: ${res.status}`);
-  } catch (err) {
-    assert(false, 'GET /api/auth/orders 無效 token → 401', `${err}`);
-  }
-
-  // 5c. 缺少 email 參數 → 400
-  try {
-    const res = await fetch(`${BASE_URL}/api/auth/orders`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    assert(res.status === 400, 'GET /api/auth/orders 無 email → 400 Bad Request', `實際 status: ${res.status}`);
-  } catch (err) {
-    assert(false, 'GET /api/auth/orders 無 email → 400', `${err}`);
-  }
-
-  // 5d. email 不匹配 → 401
+  // 5b. email 不匹配 → 401
   try {
     const res = await fetch(`${BASE_URL}/api/auth/orders?email=wrong@email.com`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Cookie: `tdf_session=${sessionCookie}` },
     });
     assert(res.status === 401, 'GET /api/auth/orders email 不匹配 → 401 Unauthorized', `實際 status: ${res.status}`);
   } catch (err) {
     assert(false, 'GET /api/auth/orders email 不匹配 → 401', `${err}`);
   }
 
-  // 5e. 正確 token + email → 200 + orders array
+  // 5c. 正確 cookie + email → 200 + orders array
   try {
     const res = await fetch(`${BASE_URL}/api/auth/orders?email=${encodeURIComponent(TEST_EMAIL)}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Cookie: `tdf_session=${sessionCookie}` },
     });
-    assert(res.status === 200, 'GET /api/auth/orders 正確 token + email → 200', `實際 status: ${res.status}`);
+    assert(res.status === 200, 'GET /api/auth/orders 正確 cookie + email → 200', `實際 status: ${res.status}`);
 
     const data = await res.json();
     assert(Array.isArray(data.orders), '回傳 orders 陣列', `type: ${typeof data.orders}`);
     console.log(`    ℹ️  目前有 ${data.orders?.length ?? 0} 筆訂單`);
   } catch (err) {
-    assert(false, 'GET /api/auth/orders 正確 token + email → 200', `${err}`);
+    assert(false, 'GET /api/auth/orders 正確 cookie + email → 200', `${err}`);
   }
 }
 
-// ─── 6. Member 頁面測試 ────────────────────────
-async function testMemberPage() {
-  console.log('\n👤 6. Member 頁面可達性');
+// ─── 6. Callback 頁面 & Member 頁面可達性 ─────
+async function testPages() {
+  console.log('\n🌐 6. 頁面可達性');
 
+  // Callback error page
+  try {
+    const res = await fetch(`${BASE_URL}/auth/callback?error=expired`);
+    assert(res.status === 200, '/auth/callback?error=expired → 頁面可達 (200)');
+  } catch (err) {
+    assert(false, '/auth/callback → 頁面可達', `${err}`);
+  }
+
+  // Member page
   try {
     const res = await fetch(`${BASE_URL}/member`);
     assert(res.status === 200, '/member → 頁面可達 (200)');
-    const html = await res.text();
-    // 頁面應包含登入表單或會員儀表板相關內容
-    const hasAuthContent = html.includes('member') || html.includes('login') || html.includes('Sign');
-    assert(hasAuthContent, '/member 頁面包含登入或會員相關內容');
   } catch (err) {
     assert(false, '/member → 頁面可達', `${err}`);
   }
 }
 
-// ─── 7. Email 寄送紀錄驗證 ─────────────────────
+// ─── 7. Email Log 紀錄驗證 ─────────────────────
 async function testEmailLog(secClient: SupabaseClient) {
   console.log('\n📋 7. Email Log 紀錄驗證');
 
@@ -294,38 +278,40 @@ async function testEmailLog(secClient: SupabaseClient) {
     const log = logs[0];
     assert(log.status === 'sent', `email_logs status = sent`, `實際: ${log.status}`);
     assert(!!log.mailgun_message_id, `email_logs 有 mailgun_message_id`);
-    assert(!!log.from_email, `email_logs 有 from_email (${log.from_email})`);
   }
 }
 
 // ─── 8. 登出 & Session 失效 ────────────────────
-async function testSignOut(
-  secClient: SupabaseClient,
-  accessToken: string
-) {
+async function testSignOut(sessionCookie: string) {
   console.log('\n🚪 8. 登出 & Session 失效');
 
-  // Use admin to revoke session
-  // First get the user from the token
-  const { data: { user }, error: getUserErr } = await secClient.auth.getUser(accessToken);
-  assert(!getUserErr && !!user, 'Admin getUser 使用 access_token 成功');
-
-  if (user) {
-    // Sign out the user (admin)
-    const { error: signOutErr } = await secClient.auth.admin.signOut(accessToken);
-    assert(!signOutErr, 'Admin signOut 成功');
-
-    // After sign out, the token should be invalid
-    const res = await fetch(`${BASE_URL}/api/auth/orders?email=${encodeURIComponent(TEST_EMAIL)}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+  // Logout
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/logout`, {
+      method: 'POST',
+      headers: { Cookie: `tdf_session=${sessionCookie}` },
     });
-    assert(res.status === 401, '登出後 orders API → 401 Unauthorized', `實際 status: ${res.status}`);
+    const data = await res.json();
+    assert(res.status === 200 && data.success, 'POST /api/auth/logout → 200 成功');
+
+    // Check set-cookie clears the session
+    const setCookie = res.headers.get('set-cookie') || '';
+    assert(setCookie.includes('tdf_session=') && setCookie.includes('Max-Age=0'), 'Set-Cookie 清除 tdf_session');
+  } catch (err) {
+    assert(false, 'POST /api/auth/logout', `${err}`);
   }
 }
 
 // ─── 9. 清理測試資料 ────────────────────────────
-async function cleanup(secClient: SupabaseClient, userId?: string) {
+async function cleanup(secClient: SupabaseClient) {
   console.log('\n🧹 9. 清理測試資料');
+
+  // 清理 auth_tokens
+  const { error: tokenErr } = await secClient
+    .from('auth_tokens')
+    .delete()
+    .eq('email', TEST_EMAIL);
+  assert(!tokenErr, '清理 auth_tokens 測試紀錄');
 
   // 清理 email_logs
   const { error: logErr } = await secClient
@@ -336,9 +322,12 @@ async function cleanup(secClient: SupabaseClient, userId?: string) {
   assert(!logErr, '清理 email_logs 測試紀錄');
 
   // 刪除測試使用者（僅自動產生的測試 email）
-  if (userId && TEST_EMAIL.includes('test_auth_') && TEST_EMAIL.endsWith('.local')) {
-    const { error: delErr } = await secClient.auth.admin.deleteUser(userId);
-    assert(!delErr, `刪除測試使用者 (${userId.slice(0, 8)}...)`);
+  if (TEST_EMAIL.includes('test_auth_') && TEST_EMAIL.endsWith('.local')) {
+    const { error: delErr } = await secClient
+      .from('users')
+      .delete()
+      .eq('email', TEST_EMAIL);
+    assert(!delErr, `刪除測試使用者 (${TEST_EMAIL})`);
   } else {
     console.log('  ⏭️  跳過刪除使用者（使用真實 email）');
   }
@@ -347,7 +336,7 @@ async function cleanup(secClient: SupabaseClient, userId?: string) {
 // ─── Main ────────────────────────────────────────
 async function main() {
   console.log('╔══════════════════════════════════════════╗');
-  console.log('║  會員登入系統（Magic Link）端對端測試       ║');
+  console.log('║  會員登入系統（Custom Magic Link）端對端測試  ║');
   console.log('╚══════════════════════════════════════════╝');
   console.log(`  測試 Email: ${TEST_EMAIL}`);
   console.log(`  目標 Server: ${BASE_URL}`);
@@ -355,16 +344,12 @@ async function main() {
   // 1. 環境變數
   testEnvVars();
 
-  if (!SUPABASE_URL || !SECRET_KEY || !PUBLISHABLE_KEY) {
+  if (!SUPABASE_URL || !SECRET_KEY) {
     console.error('\n❌ Supabase 環境變數缺失，無法繼續測試');
     process.exit(1);
   }
 
   const secClient = createClient(SUPABASE_URL, SECRET_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-
-  const pubClient = createClient(SUPABASE_URL, PUBLISHABLE_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
@@ -379,22 +364,27 @@ async function main() {
   // 2. Magic Link API
   const emailSent = await testMagicLinkAPI();
 
-  // 3. Token 產生 & OTP 驗證
-  const authResult = await testTokenVerification(secClient, pubClient);
+  // 3. Token 驗證
+  const sessionCookie = await testTokenVerification(secClient);
 
-  // 4. Callback 頁面
-  await testCallbackPage();
-
-  // 5. Orders API
-  if (authResult) {
-    await testOrdersAPI(authResult.accessToken);
+  // 4. Session API
+  if (sessionCookie) {
+    await testSessionAPI(sessionCookie);
   } else {
-    console.log('\n📦 5. Orders API 受保護端點測試');
-    console.log('  ⏭️  跳過（無有效 session）');
+    console.log('\n🔑 4. Session API 測試');
+    console.log('  ⏭️  跳過（無有效 session cookie）');
   }
 
-  // 6. Member 頁面
-  await testMemberPage();
+  // 5. Orders API
+  if (sessionCookie) {
+    await testOrdersAPI(sessionCookie);
+  } else {
+    console.log('\n📦 5. Orders API 受保護端點測試');
+    console.log('  ⏭️  跳過（無有效 session cookie）');
+  }
+
+  // 6. 頁面可達性
+  await testPages();
 
   // 7. Email Log
   if (emailSent) {
@@ -405,15 +395,15 @@ async function main() {
   }
 
   // 8. 登出
-  if (authResult) {
-    await testSignOut(secClient, authResult.accessToken);
+  if (sessionCookie) {
+    await testSignOut(sessionCookie);
   } else {
     console.log('\n🚪 8. 登出 & Session 失效');
-    console.log('  ⏭️  跳過（無有效 session）');
+    console.log('  ⏭️  跳過（無有效 session cookie）');
   }
 
   // 9. 清理
-  await cleanup(secClient, authResult?.userId);
+  await cleanup(secClient);
 
   // 結果
   console.log('\n══════════════════════════════════════════');

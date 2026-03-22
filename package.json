@@ -15,6 +15,7 @@
     "clsx": "^2.1.1",
     "form-data": "^4.0.0",
     "framer-motion": "^12.26.2",
+    "jose": "^6.2.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
     "mailgun.js": "^11.0.0",

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { sendVoteConfirmationEmail } from '@/lib/email';
+import { getTaipeiDayBounds } from '@/lib/taipeiTime';
 import crypto from 'crypto';
 
 const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
@@ -70,18 +71,16 @@ async function hasVotedToday(email: string): Promise<boolean> {
   }
 
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Use Taipei time (UTC+8) for "today" boundary since this is a Taiwan event
+    const { todayStart, tomorrowStart } = getTaipeiDayBounds();
 
     const { data, error } = await supabaseServer
       .from('award_votes')
       .select('id')
       .eq('email', email.toLowerCase())
       .eq('confirmed', true)
-      .gte('created_at', today.toISOString())
-      .lt('created_at', tomorrow.toISOString())
+      .gte('created_at', todayStart.toISOString())
+      .lt('created_at', tomorrowStart.toISOString())
       .limit(1);
 
     if (error) {

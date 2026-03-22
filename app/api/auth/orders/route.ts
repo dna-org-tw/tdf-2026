@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { getSessionFromRequest } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
@@ -7,21 +8,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
     }
 
-    const email = req.nextUrl.searchParams.get('email');
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
-
-    // Verify the request comes from an authenticated user by checking the Authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
+    const session = await getSessionFromRequest(req);
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const token = authHeader.slice(7);
-    const { data: { user }, error: authError } = await supabaseServer.auth.getUser(token);
-
-    if (authError || !user || user.email !== email) {
+    const email = req.nextUrl.searchParams.get('email');
+    if (!email || email !== session.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

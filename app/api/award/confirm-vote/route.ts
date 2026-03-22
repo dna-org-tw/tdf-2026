@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { getTaipeiDayBounds } from '@/lib/taipeiTime';
 import crypto from 'crypto';
 
 // 投票截止時間：2026年4月30日 12:00（台灣時間）
@@ -113,19 +114,16 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 檢查今天是否已經確認過其他投票
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // 檢查今天是否已經確認過其他投票（使用台北時間 UTC+8）
+    const { todayStart, tomorrowStart } = getTaipeiDayBounds();
 
     const { data: todayVotes } = await supabaseServer
       .from('award_votes')
       .select('id')
       .eq('email', email)
       .eq('confirmed', true)
-      .gte('confirmed_at', today.toISOString())
-      .lt('confirmed_at', tomorrow.toISOString())
+      .gte('confirmed_at', todayStart.toISOString())
+      .lt('confirmed_at', tomorrowStart.toISOString())
       .limit(1);
 
     if (todayVotes && todayVotes.length > 0) {
