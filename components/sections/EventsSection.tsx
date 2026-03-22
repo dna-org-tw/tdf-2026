@@ -98,8 +98,8 @@ export default function EventsSection() {
     }
   };
 
-  // 日曆網格：8:00–23:00，每小時一欄
-  const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+  // 日曆網格：7:00–23:00，每小時一欄
+  const HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
   const WEEK_THEMES = [
     { start: 1, end: 7, theme: 'Regional Revitalization & Startups' },
     { start: 8, end: 14, theme: 'Art, Humanities & Design' },
@@ -130,7 +130,7 @@ export default function EventsSection() {
       if (!date) return [];
       const tp = toTaipeiParts(date);
       if (tp.year !== 2026 || tp.month !== 5) return [];
-      return [{ dayIndex: tp.day - 1, startH: 8, endH: 9 }];
+      return [{ dayIndex: tp.day - 1, startH: 7, endH: 8 }];
     }
 
     const start = new Date(event.startTime);
@@ -163,13 +163,13 @@ export default function EventsSection() {
     lastDay = Math.max(1, Math.min(31, lastDay));
 
     const clamp = (sH: number, eH: number) => {
-      sH = Math.max(8, Math.min(23, sH));
+      sH = Math.max(7, Math.min(23, sH));
       eH = Math.max(sH + 1, Math.min(24, eH));
       return { startH: sH, endH: eH };
     };
 
     if (firstDay === lastDay) {
-      const sH = isMayTp(startTp) && startTp.day === firstDay ? startTp.hour : 8;
+      const sH = isMayTp(startTp) && startTp.day === firstDay ? startTp.hour : 7;
       let eH: number;
       if (isMayTp(endTp) && endTp.day === firstDay) {
         eH = endTp.hour + (endTp.minute > 0 ? 1 : 0);
@@ -188,10 +188,10 @@ export default function EventsSection() {
         sH = startTp.hour;
         eH = 24;
       } else if (day === lastDay && isMayTp(endTp) && endTp.day === lastDay) {
-        sH = 8;
+        sH = 7;
         eH = endTp.hour + (endTp.minute > 0 ? 1 : 0);
       } else {
-        sH = 8;
+        sH = 7;
         eH = 24;
       }
       const c = clamp(sH, eH);
@@ -228,7 +228,7 @@ export default function EventsSection() {
         .filter((s) => s.dayIndex === day.dayIndex)
         .map(({ event, startH, endH }) => ({
           event,
-          startCol: startH - 8,
+          startCol: startH - 7,
           span: endH - startH,
           color: getEventBlockColor(event),
         }));
