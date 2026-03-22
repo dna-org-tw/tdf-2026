@@ -7,7 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { useLumaData } from '@/contexts/LumaDataContext';
-import type { CalendarEvent } from '@/lib/lumaSchedule';
+import { toTaipeiParts, type CalendarEvent } from '@/lib/lumaSchedule';
 
 type TicketTier = 'follower' | 'explorer' | 'contributor' | 'backer' | 'other';
 
@@ -110,41 +110,52 @@ export default function EventsSection() {
 
   const DAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const mayDays = Array.from({ length: 31 }, (_, i) => {
-    const d = new Date(2026, 4, i + 1);
+    // Use noon UTC to avoid date boundary issues when converting to Taipei
+    const d = new Date(Date.UTC(2026, 4, i + 1, 4)); // 4:00 UTC = 12:00 Taipei
+    const { dayOfWeek } = toTaipeiParts(d);
     const weekInfo = WEEK_THEMES.find((w) => i + 1 >= w.start && i + 1 <= w.end);
     return {
       dayIndex: i,
-      label: `5/${i + 1} ${DAY_NAMES[d.getDay()]}`,
+      label: `5/${i + 1} ${DAY_NAMES[dayOfWeek]}`,
       dateKey: `2026-05-${String(i + 1).padStart(2, '0')}`,
       theme: weekInfo?.theme ?? '',
     };
   });
 
   // 展開跨日活動為每天一段（首日 startH–24:00、中間日 08:00–24:00、末日 08:00–endH）
+  // 所有時間以 Asia/Taipei 時區計算
   const getEventSegments = (event: CalendarEvent): { dayIndex: number; startH: number; endH: number }[] => {
     if (!event.startTime) {
       const date = parseEventDate(event);
-      if (!date || date.getFullYear() !== 2026 || date.getMonth() !== 4) return [];
-      return [{ dayIndex: date.getDate() - 1, startH: 8, endH: 9 }];
+      if (!date) return [];
+      const tp = toTaipeiParts(date);
+      if (tp.year !== 2026 || tp.month !== 5) return [];
+      return [{ dayIndex: tp.day - 1, startH: 8, endH: 9 }];
     }
 
     const start = new Date(event.startTime);
     const end = event.endTime ? new Date(event.endTime) : new Date(start.getTime() + 3600000);
-    const isMay = (d: Date) => d.getFullYear() === 2026 && d.getMonth() === 4;
 
-    const mayFirst = new Date(2026, 4, 1, 0, 0, 0);
-    const juneFirst = new Date(2026, 5, 1, 0, 0, 0);
-    if (end <= mayFirst || start >= juneFirst) return [];
+    const startTp = toTaipeiParts(start);
+    const endTp = toTaipeiParts(end);
 
-    const effEnd = end > juneFirst ? juneFirst : end;
+    const isMayTp = (tp: { year: number; month: number }) => tp.year === 2026 && tp.month === 5;
 
-    let firstDay = isMay(start) ? start.getDate() : 1;
+    // May 1 00:00 and June 1 00:00 in Taipei (UTC+8)
+    const mayFirstMs = Date.UTC(2026, 3, 30, 16, 0, 0); // 2026-05-01T00:00:00+08:00
+    const juneFirstMs = Date.UTC(2026, 4, 31, 16, 0, 0); // 2026-06-01T00:00:00+08:00
+    if (end.getTime() <= mayFirstMs || start.getTime() >= juneFirstMs) return [];
+
+    const effEndMs = end.getTime() > juneFirstMs ? juneFirstMs : end.getTime();
+    const effEndTp = toTaipeiParts(new Date(effEndMs));
+
+    let firstDay = isMayTp(startTp) ? startTp.day : 1;
     let lastDay: number;
 
-    if (effEnd.getHours() === 0 && effEnd.getMinutes() === 0 && effEnd.getSeconds() === 0) {
-      lastDay = isMay(effEnd) ? effEnd.getDate() - 1 : 31;
+    if (effEndTp.hour === 0 && effEndTp.minute === 0) {
+      lastDay = isMayTp(effEndTp) ? effEndTp.day - 1 : 31;
     } else {
-      lastDay = isMay(effEnd) ? effEnd.getDate() : 31;
+      lastDay = isMayTp(effEndTp) ? effEndTp.day : 31;
     }
 
     if (lastDay < 1) return [];
@@ -158,10 +169,10 @@ export default function EventsSection() {
     };
 
     if (firstDay === lastDay) {
-      const sH = isMay(start) && start.getDate() === firstDay ? start.getHours() : 8;
+      const sH = isMayTp(startTp) && startTp.day === firstDay ? startTp.hour : 8;
       let eH: number;
-      if (isMay(end) && end.getDate() === firstDay) {
-        eH = end.getHours() + (end.getMinutes() > 0 ? 1 : 0);
+      if (isMayTp(endTp) && endTp.day === firstDay) {
+        eH = endTp.hour + (endTp.minute > 0 ? 1 : 0);
         if (eH === 0) eH = 24;
       } else {
         eH = 24;
@@ -173,12 +184,12 @@ export default function EventsSection() {
     const segments: { dayIndex: number; startH: number; endH: number }[] = [];
     for (let day = firstDay; day <= lastDay; day++) {
       let sH: number, eH: number;
-      if (day === firstDay && isMay(start) && start.getDate() === firstDay) {
-        sH = start.getHours();
+      if (day === firstDay && isMayTp(startTp) && startTp.day === firstDay) {
+        sH = startTp.hour;
         eH = 24;
-      } else if (day === lastDay && isMay(end) && end.getDate() === lastDay) {
+      } else if (day === lastDay && isMayTp(endTp) && endTp.day === lastDay) {
         sH = 8;
-        eH = end.getHours() + (end.getMinutes() > 0 ? 1 : 0);
+        eH = endTp.hour + (endTp.minute > 0 ? 1 : 0);
       } else {
         sH = 8;
         eH = 24;

@@ -74,11 +74,44 @@ export interface LumaApiEntry {
   }>;
 }
 
+const TAIPEI_TZ = 'Asia/Taipei';
+
+/** Extract year/month/day/hour/minute in Asia/Taipei timezone. */
+export function toTaipeiParts(date: Date): { year: number; month: number; day: number; hour: number; minute: number; dayOfWeek: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TAIPEI_TZ,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+    weekday: 'short',
+  }).formatToParts(date);
+
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parseInt(parts.find((p) => p.type === type)?.value || '0', 10);
+
+  const weekdayStr = parts.find((p) => p.type === 'weekday')?.value || '';
+  const dayOfWeekMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+  let hour = get('hour');
+  // Intl hour12:false returns 24 for midnight in some engines
+  if (hour === 24) hour = 0;
+
+  return {
+    year: get('year'),
+    month: get('month'),
+    day: get('day'),
+    hour,
+    minute: get('minute'),
+    dayOfWeek: dayOfWeekMap[weekdayStr] ?? 0,
+  };
+}
+
 function formatDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  const { year, month, day } = toTaipeiParts(date);
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
 /**
