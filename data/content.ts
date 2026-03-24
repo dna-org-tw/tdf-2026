@@ -844,22 +844,6 @@ export const content = {
         }
       ]
     },
-    briefing: {
-      badge: "Upcoming Event",
-      title: "Online Briefing",
-      description: "Not sure if TDF 2026 is right for you? Join our online briefing to learn about the event structure, ticket options, and how to make the most of your experience.",
-      highlights: [
-        "Event vision, structure & weekly highlights",
-        "Best participation options for your schedule",
-        "Ticket types & how to choose",
-        "Q&A with organizers"
-      ],
-      guest: "Special Guest: Dimitris Tselios, co-organizer of Da Nang Nomad Fest",
-      registerButton: "Register for Briefing",
-      detailsButton: "View Details",
-      modalTitle: "Online Briefing Registration",
-      closeModal: "Close"
-    }
   },
   zh: {
     hero: {
@@ -1702,22 +1686,6 @@ export const content = {
         }
       ]
     },
-    briefing: {
-      badge: "即將舉辦",
-      title: "線上說明會",
-      description: "還不確定 TDF 2026 是否適合你？加入線上說明會，了解活動架構、票券選擇，以及如何規劃最佳參與方式。",
-      highlights: [
-        "活動願景、架構與每週亮點",
-        "最適合你的參與方式",
-        "票券種類與選擇建議",
-        "與主辦團隊即時問答"
-      ],
-      guest: "特別嘉賓：Dimitris Tselios，Da Nang Nomad Fest 共同主辦人",
-      registerButton: "報名說明會",
-      detailsButton: "查看詳情",
-      modalTitle: "線上說明會報名",
-      closeModal: "關閉"
-    }
   }
 };
 
