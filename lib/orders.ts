@@ -78,6 +78,34 @@ export async function getOrderBySessionId(sessionId: string): Promise<Order | nu
 }
 
 /**
+ * 根據 email 查詢訂單列表
+ */
+export async function getOrdersByEmail(email: string): Promise<Order[]> {
+  if (!supabaseServer) {
+    console.error('[Orders] Cannot get orders: Supabase client not initialized');
+    return [];
+  }
+
+  try {
+    const { data, error } = await supabaseServer
+      .from('orders')
+      .select('*')
+      .eq('customer_email', email.trim().toLowerCase())
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('[Orders] Error getting orders by email:', error);
+      return [];
+    }
+
+    return (data as Order[]) || [];
+  } catch (error) {
+    console.error('[Orders] Exception getting orders by email:', error);
+    return [];
+  }
+}
+
+/**
  * 更新订单
  */
 export async function updateOrder(

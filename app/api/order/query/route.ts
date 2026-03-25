@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { getOrdersByEmail } from '@/lib/orders';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
@@ -95,36 +96,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Query by email - return list of orders
+    // Query by email - return list of orders from Supabase
     if (email) {
-      const sessions = await stripe.checkout.sessions.list({
-        customer_details: { email: email.trim().toLowerCase() },
-        limit: 100,
-        expand: ['data.line_items'],
-      });
+      const dbOrders = await getOrdersByEmail(email);
 
-      if (!sessions.data.length) {
+      if (!dbOrders.length) {
         return NextResponse.json(
           { error: 'No orders found for this email address.' },
           { status: 404 }
         );
       }
 
-      const orders = sessions.data.map((s) => {
-        const firstItem = s.line_items?.data?.[0];
-        const product = firstItem?.price?.product as Stripe.Product | string | null;
-        return {
-          id: s.id,
-          status: s.status,
-          payment_status: s.payment_status,
-          amount_total: s.amount_total,
-          currency: s.currency,
-          created: s.created,
-          customer_name: s.customer_details?.name,
-          ticket_tier: s.metadata?.ticket_tier,
-          product_name: typeof product === 'object' && product ? product.name : (firstItem?.description || null),
-        };
-      });
+      const orders = dbOrders.map((o) => ({
+        id: o.stripe_session_id,
+        status: o.status,
+        payment_status: o.status === 'paid' ? 'paid' : 'unpaid',
+        amount_total: o.amount_total,
+        currency: o.currency,
+        created: Math.floor(new Date(o.created_at).getTime() / 1000),
+        customer_name: o.customer_name,
+        ticket_tier: o.ticket_tier,
+        product_name: null,
+      }));
 
       return NextResponse.json({ orders });
     }
