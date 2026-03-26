@@ -102,13 +102,27 @@ export default function Footer() {
           
           {/* Contact Section */}
           <div className="flex flex-col gap-1 text-xs">
-            <Link 
-              href="/order/query"
-              onClick={() => trackEvent('Lead', { content_name: 'Order Query', content_category: 'CTA', location: 'footer' })}
-              className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
-            >
-              {t.footer.orderQuery}
-            </Link>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mb-1">
+              <Link
+                href="/award"
+                className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
+              >
+                {t.nav.award}
+              </Link>
+              <Link
+                href="/order/query"
+                onClick={() => trackEvent('Lead', { content_name: 'Order Query', content_category: 'CTA', location: 'footer' })}
+                className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
+              >
+                {t.footer.orderQuery}
+              </Link>
+              <Link
+                href="/code-of-conduct"
+                className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
+              >
+                {t.footer.codeOfConduct}
+              </Link>
+            </div>
             <a 
               href="mailto:fest@dna.org.tw"
               onClick={() => {

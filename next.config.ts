@@ -54,6 +54,9 @@ const nextConfig: NextConfig = {
   
   // 壓縮配置（Next.js 16 預設啟用）
   compress: true,
+
+  // SEO: 移除 X-Powered-By header
+  poweredByHeader: false,
   
   // 實驗性功能：啟用 React Server Components 優化
   experimental: {

@@ -42,10 +42,10 @@ const notoSansTC = Noto_Sans_TC({
 // SEO Optimization: Rich metadata with core keyword strategy for Western digital nomads
 export const metadata: Metadata = {
   title: {
-    default: 'Taiwan Digital Fest 2026 | Digital Nomad Event & Remote Work Summit',
+    default: 'Taiwan Digital Fest 2026 | Nomad Festival',
     template: '%s | Taiwan Digital Fest 2026',
   },
-  description: 'Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A month-long remote work summit combining AI workshops, networking events, and authentic cultural experiences in Taitung and Hualien. Connect with the global nomad tribe, learn from industry leaders, and experience geo-arbitrage in Asia\'s hidden gem.',
+  description: 'Taiwan Digital Fest 2026: a month-long nomad festival in Taitung & Hualien, May 2026. Workshops, networking, and cultural experiences for remote workers.',
   keywords: [
     // Primary Keywords (Brand & Event Type)
     'Digital Nomad Event 2026',
@@ -98,7 +98,7 @@ export const metadata: Metadata = {
     'Taiwan Digital Fest 2026',
     'TDF 2026',
   ],
-  authors: [{ name: 'Taiwan Digital Nomad Association' }],
+  authors: [{ name: 'Taiwan Digital Nomad Association', url: 'https://dna.org.tw' }],
   creator: 'Taiwan Digital Nomad Association (TDNA)',
   publisher: 'Taiwan Digital Nomad Association',
   formatDetection: {
@@ -108,10 +108,11 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://fest.dna.org.tw'),
   alternates: {
-    canonical: '/',
+    canonical: 'https://fest.dna.org.tw/',
     languages: {
-      'en': '/?lang=en',
-      'zh-TW': '/?lang=zh',
+      'en': 'https://fest.dna.org.tw/?lang=en',
+      'zh-TW': 'https://fest.dna.org.tw/?lang=zh',
+      'x-default': 'https://fest.dna.org.tw/',
     },
   },
   openGraph: {
@@ -120,21 +121,23 @@ export const metadata: Metadata = {
     alternateLocale: ['zh_TW'],
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://fest.dna.org.tw',
     siteName: 'Taiwan Digital Fest 2026',
-    title: 'Taiwan Digital Fest 2026 | Digital Nomad Event & Remote Work Summit',
-    description: 'Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. Connect with the global nomad tribe, learn from industry leaders, and experience geo-arbitrage in Asia\'s hidden gem. May 1-31, 2026.',
+    title: 'Taiwan Digital Fest 2026',
+    description: 'Nomad festival in Taitung & Hualien, Taiwan. May 2026.',
     images: [
       {
         url: '/images/tdf2026_cover.webp',
         width: 1200,
         height: 630,
-        alt: 'Digital Nomad Event 2026 Taiwan - Remote Work Summit',
+        alt: 'Taiwan Digital Fest 2026 — Nomad Festival in Taitung & Hualien',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Taiwan Digital Fest 2026 | Digital Nomad Event & Remote Work Summit',
-    description: 'Connect with the global nomad tribe. AI workshops, networking, and authentic experiences in Taitung & Hualien.',
+    site: '@taiwandigitalfest',
+    creator: '@taiwandigitalfest',
+    title: 'Taiwan Digital Fest 2026',
+    description: 'Taiwan Digital Fest 2026 is a month-long digital nomad festival in Taitung & Hualien, Taiwan. Join workshops, networking events, cultural experiences, and a remote work summit. May 1–31, 2026.',
     images: ['/images/tdf2026_cover.webp'],
   },
   robots: {
@@ -161,7 +164,7 @@ export default async function RootLayout({
 }>) {
   // 從 proxy 設置的請求頭讀取語言
   const headersList = await headers();
-  const lang = headersList.get('x-lang') || 'zh-TW';
+  const lang = headersList.get('x-lang') || 'en';
   
   return (
     <html lang={lang} className="scroll-smooth">
@@ -187,6 +190,25 @@ export default async function RootLayout({
         <AuthProvider>
         {children}
         </AuthProvider>
+        {/* SEO: 為無 JavaScript 的爬蟲提供基本內容 */}
+        <noscript>
+          <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+            <h1>Taiwan Digital Fest 2026</h1>
+            <p>Join Taiwan Digital Fest 2026 — a month-long digital nomad event in Taitung and Hualien, Taiwan. May 1–31, 2026.</p>
+            <p>AI workshops, networking events, cultural experiences, and a remote work summit for digital nomads, freelancers, and location-independent professionals.</p>
+            <h2>About the Event</h2>
+            <p>Taiwan Digital Fest brings together the global nomad community for a month of learning, connecting, and exploring Taiwan&apos;s east coast. Experience world-class coworking, stunning landscapes, and a vibrant digital nomad community.</p>
+            <h2>What to Expect</h2>
+            <ul>
+              <li>AI and remote work workshops</li>
+              <li>Networking events and meetups</li>
+              <li>Cultural immersion experiences</li>
+              <li>Accommodation in Taitung and Hualien</li>
+              <li>Nomad Award — Instagram Reels contest</li>
+            </ul>
+            <p>Visit <a href="https://fest.dna.org.tw">fest.dna.org.tw</a> with JavaScript enabled for the full experience.</p>
+          </div>
+        </noscript>
       </body>
     </html>
   );

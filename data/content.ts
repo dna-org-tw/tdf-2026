@@ -1,7 +1,7 @@
 export const content = {
   en: {
     hero: {
-      title: "Taiwan Digital Fest 2026",
+      title: "Taiwan Digital Fest 2026 — Digital Nomad Event in Taiwan",
       subtitle: "Where the Global Nomad Tribe Meets Nature & Innovation",
       dateLocation: "May 1 – May 31, 2026 | Taitung & Hualien, Taiwan",
       cta: "Follow for Free",
@@ -11,7 +11,7 @@ export const content = {
       ctaSideEvents: "Call for Side Events",
       ctaSponsors: "Call for Sponsors",
       followForm: {
-        title: "Follow Us",
+        title: "Stay Connected",
         followerCountPrefix: "Follow us like",
         followerCountSuffix: "nomads",
         description: "Stay updated with the latest news, exclusive updates, and join our digital nomad community!",
@@ -847,7 +847,7 @@ export const content = {
   },
   zh: {
     hero: {
-      title: "2026 台灣數位嘉年華",
+      title: "2026 台灣數位嘉年華 — 數位遊牧者的台灣盛會",
       subtitle: "在山海之間，遇見世界的數位遊牧者",
       dateLocation: "2026/05/01 – 2026/05/31 | 台灣 台東 & 花蓮",
       cta: "免費關注",
@@ -857,7 +857,7 @@ export const content = {
       ctaSideEvents: "徵求 Side Event",
       ctaSponsors: "徵求贊助商",
       followForm: {
-        title: "關注我們",
+        title: "保持聯繫",
         followerCountPrefix: "像",
         followerCountSuffix: "位數位遊牧者一樣關注我們",
         description: "填寫 Email 關注我們，免費獲得即時資訊，並加入數位遊牧專屬社群！",
@@ -925,7 +925,7 @@ export const content = {
     },
     about: {
       title: "關於本活動",
-      description: "2026 年 5 月，我們邀您前往壯麗的山海交界處，開啟一場工作與生活完美共融的旅程 。在這片遠離塵囂的土地上，Taiwan Digital Fest 將前瞻科技與自然療癒深度結合 。\n\n行程涵蓋全方位的身心體驗：您將在 AI 工作坊與創業路演中掌握最新趨勢，與全球遊牧者激盪火花 。午後，轉身投入大自然的懷抱，享受稻浪間的單車漫遊、海洋導覽與療癒溫泉 。夜晚，則在星空下的 VIP 晚宴與社交派對中，與志同道合的夥伴建立真實連結 。這不僅是工作，更是在絕美日落與微風中找回生活節奏的契機 。",
+      description: "2026 年 5 月，我們邀您前往壯麗的山海交界處，開啟一場工作與生活完美共融的旅程。在這片遠離塵囂的土地上，Taiwan Digital Fest 將前瞻科技與自然療癒深度結合。\n\n行程涵蓋全方位的身心體驗：您將在 AI 工作坊與創業路演中掌握最新趨勢，與全球遊牧者激盪火花。午後，轉身投入大自然的懷抱，享受稻浪間的單車漫遊、海洋導覽與療癒溫泉。夜晚，則在星空下的 VIP 晚宴與社交派對中，與志同道合的夥伴建立真實連結。這不僅是工作，更是在絕美日落與微風中找回生活節奏的契機。",
       tags: ["數位遊牧", "地方創生", "國際交流", "自然體驗", "文化探索"],
       info: {
         title: "活動資訊",
@@ -1032,7 +1032,7 @@ export const content = {
         label: "Explorer",
         features: [
           "專屬數位遊牧社群",
-          "開幕市集＋有限酒水",
+          "開幕市集＋限量酒水",
           "數位遊牧活動 x 30+"
         ]
       },
@@ -1140,7 +1140,7 @@ export const content = {
       mapErrorSearchLink: "Google Maps",
       mapErrorSearchSuffix: "搜尋位置。",
       ctas: [
-        { type: "Register", text: "成為場地伙伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
+        { type: "Register", text: "成為場地夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ],
       items: [
         {
@@ -1485,7 +1485,7 @@ export const content = {
       cancelledTicketInfoPrefix: "已選擇的票種：",
       cancelledEmailLabel: "確認信將發送至",
       cancelledTimeLabel: "嘗試時間",
-      cancelledOrderIdLabel: "會話 ID",
+      cancelledOrderIdLabel: "Session ID",
       successTitle: "付款成功",
       successDescription: "感謝您的購買！您的訂單已確認。",
       ticketInfoPrefix: "您的票種：",
@@ -1506,7 +1506,7 @@ export const content = {
       orderAddressLabel: "帳單地址",
       orderTimeLabel: "訂單時間",
       orderIdLabel: "訂單 ID",
-      orderPaymentIntentLabel: "付款意圖 ID",
+      orderPaymentIntentLabel: "付款識別碼",
       orderInvoiceLabel: "發票",
       orderCardLabel: "付款卡號末四碼",
       tryAgain: "返回重試",

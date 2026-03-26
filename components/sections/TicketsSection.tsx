@@ -370,6 +370,11 @@ export default function TicketsSection() {
           </motion.div>
         )}
 
+        {/* Section Heading */}
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white text-center mb-10 md:mb-14">
+          {t.tickets.title}
+        </h2>
+
         {/* Ticket Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10 mb-4 md:mb-6 md:items-stretch">
           {ticketTiers.map((tier, index) => (
