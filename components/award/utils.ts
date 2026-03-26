@@ -17,7 +17,7 @@ export const getPostLink = (post: InstagramPost): string => {
   return '#';
 };
 
-// 獲取貼文用戶名
+// 取得貼文使用者名稱
 export const getPostUsername = (post: InstagramPost): string => {
   return post.username || post.owner_username || post.ownerUsername || '';
 };

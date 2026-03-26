@@ -4,15 +4,15 @@
 
 ## 功能說明
 
-1. **自動記錄**：用戶進入網站時，`VisitorTracker` 元件會：
+1. **自動記錄**：使用者進入網站時，`VisitorTracker` 元件會：
    - 使用 FingerprintJS 取得瀏覽器 fingerprint
    - 取得時區與語系
    - 呼叫 `/api/visitors/record` 將資料存入 Supabase
    - 將 `visitor_fingerprint` 存至 `sessionStorage` 供後續關聯使用
 
-2. **訂閱關聯**：用戶訂閱 newsletter 時，會將 `visitor_fingerprint` 傳給 subscribe API，寫入 `newsletter_subscriptions.visitor_fingerprint`，可識別是哪個裝置進行訂閱
+2. **訂閱關聯**：使用者訂閱 newsletter 時，會將 `visitor_fingerprint` 傳給 subscribe API，寫入 `newsletter_subscriptions.visitor_fingerprint`，可識別是哪個裝置進行訂閱
 
-3. **購買關聯**：用戶發起 checkout 時，會將 `visitor_fingerprint` 傳給 checkout API，寫入 `orders.visitor_fingerprint`，可識別是哪個裝置進行購買
+3. **購買關聯**：使用者發起 checkout 時，會將 `visitor_fingerprint` 傳給 checkout API，寫入 `orders.visitor_fingerprint`，可識別是哪個裝置進行購買
 
 ## 資料庫設定
 

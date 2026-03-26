@@ -58,7 +58,7 @@ const nextConfig: NextConfig = {
   // 實驗性功能：啟用 React Server Components 優化
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react'],
-    // 注意：PPR 已合併到 cacheComponents，但我們通過動態導入已實現代碼分割優化
+    // 注意：PPR 已合併到 cacheComponents，但我們透過動態導入已實現程式碼分割最佳化
   },
   
   // Turbopack 配置（用於開發模式）
@@ -92,7 +92,7 @@ const nextConfig: NextConfig = {
               priority: 20,
               reuseExistingChunk: true,
             },
-            // 共享代碼
+            // 共用程式碼
             common: {
               name: 'common',
               minChunks: 2,

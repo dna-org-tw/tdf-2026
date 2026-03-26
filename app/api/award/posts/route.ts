@@ -27,7 +27,7 @@ interface InstagramPost {
   video_url?: string | null;
   dimensions_height?: number | null;
   dimensions_width?: number | null;
-  // 互動數據
+  // 互動資料
   likes_count?: number | null;
   comments_count?: number | null;
   video_play_count?: number | null;
@@ -35,7 +35,7 @@ interface InstagramPost {
   fb_like_count?: number | null;
   fb_play_count?: number | null;
   video_duration?: number | null;
-  // 用戶資訊
+  // 使用者資訊
   owner_full_name?: string | null;
   owner_username?: string | null;
   owner_id?: string | null;
@@ -64,7 +64,7 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
   // 這裡提供一個範例結構，實際需要：
   // 1. 使用 Instagram Graph API 的 Hashtag Search
   // 2. 搜尋標籤 #taiwandigitalfest 和 #taiwandigitalfest
-  // 3. 獲取貼文數據
+  // 3. 獲取貼文資料
   
   // 暫時回傳空陣列，實際應該從 Instagram API 獲取
   // 或使用第三方服務如 RapidAPI 的 Instagram scraper
@@ -97,7 +97,7 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
       });
     }
 
-    // 這裡應該處理從 Instagram API 獲取的數據
+    // 這裡應該處理從 Instagram API 獲取的資料
     // 并合并投票数
     return [];
   } catch (error) {
@@ -107,7 +107,7 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
 }
 
 /**
- * 從資料庫獲取已儲存的貼文（如果使用資料庫儲存貼文數據）
+ * 從資料庫獲取已儲存的貼文（如果使用資料庫儲存貼文資料）
  */
 async function getStoredPosts(): Promise<InstagramPost[]> {
   if (!supabaseServer) {
@@ -222,7 +222,7 @@ async function getStoredPosts(): Promise<InstagramPost[]> {
 }
 
 /**
- * 從 ig_posts 表獲取數據（優先使用）
+ * 從 ig_posts 表獲取資料（優先使用）
  */
 async function getIgPosts(): Promise<InstagramPost[]> {
   if (!supabaseServer) {
@@ -231,7 +231,7 @@ async function getIgPosts(): Promise<InstagramPost[]> {
   }
 
   try {
-    // 獲取所有數據，然後按 data.timestamp 排序
+    // 獲取所有資料，然後按 data.timestamp 排序
     let { data: igPosts, error: igError } = await supabaseServer
       .from('ig_posts')
       .select('*');
@@ -286,7 +286,7 @@ async function getIgPosts(): Promise<InstagramPost[]> {
 }
 
 /**
- * 處理 ig_posts 數據並轉換為 InstagramPost 格式
+ * 處理 ig_posts 資料並轉換為 InstagramPost 格式
  */
 async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
   // 獲取每個貼文的投票數
@@ -309,9 +309,9 @@ async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
     }
   }
 
-  // 處理 ig_posts 數據格式
+  // 處理 ig_posts 資料格式
   return igPosts.map((post: any): InstagramPost => {
-    // 處理 JSONB 數據
+    // 處理 JSONB 資料
     let postData = post;
     if (post.data && typeof post.data === 'object') {
       postData = { ...post, ...post.data };
@@ -389,10 +389,10 @@ async function processIgPosts(igPosts: any[]): Promise<InstagramPost[]> {
 
 export async function GET(_req: NextRequest) {
   try {
-    // 優先從 ig_posts 表獲取所有數據
+    // 優先從 ig_posts 表獲取所有資料
     let posts = await getIgPosts();
 
-    // 如果 ig_posts 表中沒有數據，嘗試從 award_posts 表獲取
+    // 如果 ig_posts 表中沒有資料，嘗試從 award_posts 表獲取
     if (posts.length === 0) {
       posts = await getStoredPosts();
     }

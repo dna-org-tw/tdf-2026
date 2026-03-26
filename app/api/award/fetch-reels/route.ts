@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
 /**
- * 從 Supabase 的 ig_posts 表獲取所有數據
- * 不做任何過濾，直接回傳所有原始數據
+ * 從 Supabase 的 ig_posts 表獲取所有資料
+ * 不做任何過濾，直接回傳所有原始資料
  */
 async function fetchAllIgPosts(): Promise<unknown[]> {
   if (!supabaseServer) {
@@ -12,7 +12,7 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
   }
 
   try {
-    // 從 ig_posts 表查詢所有數據，不做任何過濾
+    // 從 ig_posts 表查詢所有資料，不做任何過濾
     const { data: posts, error } = await supabaseServer
       .from('ig_posts')
       .select('*');
@@ -47,12 +47,12 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
       return [];
     }
 
-    // 處理數據格式，但保留所有數據
+    // 處理資料格式，但保留所有資料
     const processedPosts: unknown[] = [];
 
     for (const post of posts) {
       try {
-        // 處理不同的數據儲存格式
+        // 處理不同的資料儲存格式
         let postData: unknown;
         
         if (typeof post === 'string') {
@@ -69,18 +69,18 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
               postData = post.data;
             }
           } else {
-            // 如果沒有 data 欄位，假設整個物件就是數據
+            // 如果沒有 data 欄位，假設整個物件就是資料
             postData = post;
           }
         } else {
-          // 即使格式不同，也保留原始數據
+          // 即使格式不同，也保留原始資料
           postData = post;
         }
 
         // 不跳過任何資料，全部新增
         processedPosts.push(postData);
       } catch (parseError) {
-        // 即使解析錯誤，也保留原始數據
+        // 即使解析錯誤，也保留原始資料
         console.warn('[Award API] Error parsing post data, keeping raw data:', parseError);
         processedPosts.push(post);
       }
@@ -99,7 +99,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    // 從 ig_posts 表獲取所有數據，不做任何過濾
+    // 從 ig_posts 表獲取所有資料，不做任何過濾
     const posts = await fetchAllIgPosts();
     
     return NextResponse.json(
@@ -142,7 +142,7 @@ export async function POST() {
       );
     }
     
-    // 從 ig_posts 表獲取所有數據，不做任何過濾
+    // 從 ig_posts 表獲取所有資料，不做任何過濾
     const posts = await fetchAllIgPosts();
     
     return NextResponse.json(

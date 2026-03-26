@@ -236,7 +236,7 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
     ],
   };
 
-  // AEO 優化：結構化數據腳本，Next.js 會自動將其放在 head 中
+  // AEO 優化：結構化資料腳本，Next.js 會自動將其放在 head 中
   return (
     <>
       <script

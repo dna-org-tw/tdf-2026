@@ -1,6 +1,6 @@
 # 效能優化實施報告
 
-本文檔記錄了針對 Taiwan Digital Fest 2026 網站 (fest.dna.org.tw) 實施的效能優化措施。
+本文件記錄了針對 Taiwan Digital Fest 2026 網站 (fest.dna.org.tw) 實施的效能優化措施。
 
 ## 已實施的優化
 
@@ -23,7 +23,7 @@
 ### 2. 圖片載入優化
 
 - ✅ **HeroSection**：
-  - 視頻 `preload` 從 `auto` 改為 `metadata`，減少初始載入時間
+  - 影片 `preload` 從 `auto` 改為 `metadata`，減少初始載入時間
   - Fallback 圖片添加 `loading="eager"` 優先載入
 
 - ✅ **AboutSection**：
@@ -78,7 +78,7 @@
 
 ### ✅ 已實施的極致優化
 
-1. **代碼分割與動態導入**：
+1. **程式碼分割與動態導入**：
    - ✅ 將所有非首屏組件改為動態導入 (`next/dynamic`)
    - ✅ 關鍵內容組件設定 `ssr: true` 以確保 AI 爬蟲可訪問（AEO 優化）
    - ✅ 非關鍵組件（如 Footer）設定 `ssr: false` 避免不必要的伺服器端渲染
@@ -90,9 +90,9 @@
    - ✅ 設定 `revalidate: 3600` 實現 1 小時快取更新
    - ✅ 大幅減少 TTFB (Time to First Byte)
 
-3. **視頻延遲載入**：
+3. **影片延遲載入**：
    - ✅ 實作 `LazyYouTubeEmbed` 組件使用 Intersection Observer
-   - ✅ YouTube 視頻只在進入視窗時才載入
+   - ✅ YouTube 影片只在進入視窗時才載入
    - ✅ 預期減少初始載入時間
 
 4. **Next.js 配置優化**：
@@ -105,7 +105,7 @@
 
 5. **資源清理**：
    - ✅ 移除未使用的 `tdf2025.jpg` (36MB)
-   - ✅ 創建視頻優化指南文檔
+   - ✅ 創建影片優化指南文件
 
 6. **字體優化**：
    - ✅ 所有字體使用 `display: 'swap'` 避免 FOIT
@@ -167,15 +167,15 @@
 | FID | > 100ms | < 10ms | Code Splitting, Partytown | ✅ 已優化 |
 | CLS | > 0.10 | < 0.05 | next/font, 明確尺寸定義 | ✅ 已優化 |
 | JS Bundle | > 500KB | < 150KB | Dynamic Imports, Tree Shaking | ✅ 已優化 |
-| 初始載入 | > 80MB | < 20MB | LazyYouTubeEmbed, 代碼分割 | ✅ 已優化 |
+| 初始載入 | > 80MB | < 20MB | LazyYouTubeEmbed, 程式碼分割 | ✅ 已優化 |
 
 ### 針對遠距離慢速網路的額外優化
 
-- ✅ **代碼分割**：初始 bundle 減少 60-70%
-- ✅ **視頻延遲載入**：YouTube 視頻延遲載入，減少初始載入時間
+- ✅ **程式碼分割**：初始 bundle 減少 60-70%
+- ✅ **影片延遲載入**：YouTube 影片延遲載入，減少初始載入時間
 - ✅ **長期快取**：靜態資源快取 1 年，減少重複請求
 - ✅ **ISR**：減少伺服器回應時間
-- ⚠️ **視頻格式優化**：待轉換為 WebM（見 `VIDEO_OPTIMIZATION.md`）
+- ⚠️ **影片格式優化**：待轉換為 WebM（見 `VIDEO_OPTIMIZATION.md`）
 
 ## 測試建議
 
@@ -192,7 +192,7 @@
    - PageSpeed Insights
 
 3. **監控**：
-   - 部署後使用 Vercel Analytics 監控真實使用者數據
+   - 部署後使用 Vercel Analytics 監控真實使用者資料
    - 設定 Core Web Vitals 告警
 
 ## 注意事項

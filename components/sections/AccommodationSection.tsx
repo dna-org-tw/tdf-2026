@@ -160,11 +160,11 @@ export default function AccommodationSection({ taitungStores }: { taitungStores:
   const items = t.accommodation.items;
   useSectionTracking({ sectionId: 'accommodation', sectionName: 'Accommodation Section', category: 'Event Information' });
   
-  // 直接從數據中獲取經緯度，而不是透過 geocoding API
+  // 直接從資料中獲取經緯度，而不是透過 geocoding API
   const coordinatesMap = useMemo(() => {
     const coords = new Map<string, Coordinates>();
     items.forEach((item) => {
-      // 檢查數據中是否有經緯度欄位
+      // 檢查資料中是否有經緯度欄位
       if ('latitude' in item && 'longitude' in item && 
           typeof item.latitude === 'number' && typeof item.longitude === 'number') {
         const addressString = formatAddressToString(item.address);

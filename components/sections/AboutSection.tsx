@@ -161,7 +161,7 @@ export default function AboutSection() {
               </p>
             </div>
 
-            {/* 關鍵活動資訊摘要 - AEO 優化：結構化數據 */}
+            {/* 關鍵活動資訊摘要 - AEO 優化：結構化資料 */}
             <div className="mb-6 p-6 bg-[#F6F6F6] rounded-xl border border-[#1E1F1C]/10">
               <h3 className="text-xl font-semibold text-[#1E1F1C] mb-4">
                 {t.about.info.title}

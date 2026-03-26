@@ -85,7 +85,7 @@ export default function AwardPage() {
         console.warn('[Award Page] No posts in response data:', data);
       }
 
-      // 處理所有貼文數據，統一格式並計算投票數（不進行任何過濾）
+      // 處理所有貼文資料，統一格式並計算投票數（不進行任何過濾）
       const processedPosts = (data.posts || []).map((post: InstagramPost) => {
         // 統一欄位名稱（處理不同的命名風格）
         const processedPost: InstagramPost = {
@@ -102,11 +102,11 @@ export default function AwardPage() {
           timestamp: post.timestamp || new Date().toISOString(),
           // 统一类型
           type: post.type || post.post_type || 'Image',
-          // 統一互動數據
+          // 統一互動資料
           likes_count: post.likes_count ?? post.likesCount ?? 0,
           comments_count: post.comments_count ?? post.commentsCount ?? 0,
           video_play_count: post.video_play_count ?? post.videoPlayCount ?? 0,
-          // 統一用戶資訊
+          // 統一使用者資訊
           owner_username: post.owner_username || post.ownerUsername || post.username || '',
           owner_full_name: post.owner_full_name || post.ownerFullName || '',
           // 统一 childPosts

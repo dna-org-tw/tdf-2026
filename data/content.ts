@@ -952,7 +952,7 @@ export const content = {
         { icon: "🍜", text: "美食文化豐富" },
         { icon: "🏥", text: "優質醫療體系" },
         { icon: "⚡", text: "免簽入境便利" },
-        { icon: "🤝", text: "活躍社群網絡" }
+        { icon: "🤝", text: "活躍社群網路" }
       ],
       taitung: {
         title: "台東：山海與文化的交響",

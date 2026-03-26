@@ -63,7 +63,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
 }
 
 /**
- * 檢查用戶今天是否已經投票
+ * 檢查使用者今天是否已經投票
  */
 async function hasVotedToday(email: string): Promise<boolean> {
   if (!supabaseServer) {
@@ -96,13 +96,13 @@ async function hasVotedToday(email: string): Promise<boolean> {
 }
 
 /**
- * 檢查用戶是否已關注 Instagram 帳號
+ * 檢查使用者是否已關注 Instagram 帳號
  * 注意：這需要 Instagram API 來驗證，這裡提供一個基礎結構
  */
 async function checkIfFollowing(email: string, username: string): Promise<boolean> {
-  // TODO: 整合 Instagram API 來檢查用戶是否已關注
+  // TODO: 整合 Instagram API 來檢查使用者是否已關注
   // 這裡暫時回傳 true，實際應該呼叫 Instagram API
-  // 或透過其他方式驗證（如要求用戶提供 Instagram 用戶名）
+  // 或透過其他方式驗證（如要求使用者提供 Instagram 使用者名）
   return true;
 }
 
@@ -253,7 +253,7 @@ export async function POST(req: NextRequest) {
       console.error('[Award Vote API] Error checking subscription:', subscriptionError);
       // 如果查詢出錯，繼續執行投票流程（不阻止投票）
     } else if (!subscription || subscription.length === 0) {
-      // 用戶未訂閱，回傳需要關注的錯誤
+      // 使用者未訂閱，回傳需要關注的錯誤
       return NextResponse.json(
         { 
           error: 'Please follow us first to vote. Subscribe to our newsletter to continue.',

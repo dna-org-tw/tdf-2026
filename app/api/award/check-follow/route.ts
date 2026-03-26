@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
 /**
- * 檢查用戶是否已關注（訂閱 newsletter）
+ * 檢查使用者是否已關注（訂閱 newsletter）
  */
 export async function POST(req: NextRequest) {
   try {

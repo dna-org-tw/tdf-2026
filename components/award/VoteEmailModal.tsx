@@ -67,7 +67,7 @@ export default function VoteEmailModal({
       setIsFollowing(data.isFollowing);
       setCanVote(data.isFollowing);
       
-      // 如果用戶沒有 follow，不設定錯誤資訊，只顯示友善的提示（在 Follow Status 部分顯示）
+      // 如果使用者沒有 follow，不設定錯誤資訊，只顯示友善的提示（在 Follow Status 部分顯示）
       // 只有當 API 呼叫真正失敗時才顯示錯誤資訊
     } catch (err) {
       console.error('Failed to check follow status:', err);
@@ -129,7 +129,7 @@ export default function VoteEmailModal({
         return;
       }
 
-      // 獲取用戶資訊
+      // 獲取使用者資訊
       const userInfo = getUserInfo();
 
       // 呼叫訂閱 API

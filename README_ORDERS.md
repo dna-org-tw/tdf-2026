@@ -4,7 +4,7 @@
 
 ## 功能概述
 
-1. **建立訂單**：在用戶發起購買時，建立 Stripe checkout session 的同時在 Supabase 中建立訂單記錄
+1. **建立訂單**：在使用者發起購買時，建立 Stripe checkout session 的同時在 Supabase 中建立訂單記錄
 2. **更新訂單狀態**：透過 Stripe webhook 和 success 頁面同步更新訂單狀態
 
 ## 資料庫設定
@@ -84,7 +84,7 @@ STRIPE_WEBHOOK_SECRET=your_webhook_secret  # 用於驗證 webhook 請求
 1. **pending**: 訂單已建立，等待支付
 2. **paid**: 支付成功
 3. **failed**: 支付失敗
-4. **cancelled**: 訂單已取消（用戶取消付款或 session 過期）
+4. **cancelled**: 訂單已取消（使用者取消付款或 session 過期）
 5. **refunded**: 已退款
 
 ### 取消訂單處理
@@ -92,7 +92,7 @@ STRIPE_WEBHOOK_SECRET=your_webhook_secret  # 用於驗證 webhook 請求
 當客戶取消付款時，系統會透過以下方式更新訂單狀態：
 
 1. **取消頁面同步** (`app/checkout/cancelled/page.tsx`)
-   - 用戶存取取消頁面時，自動呼叫 `/api/order/sync` API
+   - 使用者存取取消頁面時，自動呼叫 `/api/order/sync` API
    - 強制將訂單狀態設為 `cancelled`
 
 2. **Webhook 事件** (`app/api/webhooks/stripe/route.ts`)
@@ -141,6 +141,6 @@ const updatedOrder = await updateOrder(sessionId, {
 ## 注意事項
 
 1. 金額欄位以分為單位儲存（Stripe 的標準格式）
-2. 訂單狀態透過 webhook 和 success 頁面雙重更新，確保數據一致性
+2. 訂單狀態透過 webhook 和 success 頁面雙重更新，確保資料一致性
 3. 如果 webhook 失敗，success 頁面會嘗試同步訂單狀態
 4. 所有資料庫操作都有錯誤處理，不會影響 Stripe checkout 流程

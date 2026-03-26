@@ -126,7 +126,7 @@ export default function FollowUsSection() {
         return;
       }
 
-      // 獲取用戶資訊
+      // 獲取使用者資訊
       const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {

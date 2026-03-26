@@ -27,7 +27,7 @@ function parseCSV(csvText: string): Partner[] {
 
   const partners: Partner[] = [];
 
-  // 解析數據行
+  // 解析資料行
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;

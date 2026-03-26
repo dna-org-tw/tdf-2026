@@ -1,10 +1,10 @@
 /**
- * 獲取用戶瀏覽器資訊
+ * 獲取使用者瀏覽器資訊
  * 包括時區、語言區域等
  */
 
 /**
- * 獲取用戶時區
+ * 獲取使用者時區
  */
 export function getUserTimeZone(): string {
   if (typeof window === 'undefined') {
@@ -20,7 +20,7 @@ export function getUserTimeZone(): string {
 }
 
 /**
- * 獲取用戶語言區域（可能包含國家資訊）
+ * 獲取使用者語言區域（可能包含國家資訊）
  */
 export function getUserLocale(): string {
   if (typeof window === 'undefined') {
@@ -36,7 +36,7 @@ export function getUserLocale(): string {
 }
 
 /**
- * 獲取所有用戶資訊
+ * 獲取所有使用者資訊
  */
 export function getUserInfo() {
   return {
