@@ -1,18 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Globe, Instagram, User } from 'lucide-react';
+import { Menu, X, Globe, Instagram } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import MobileMenu from './MobileMenu';
 import { trackEvent } from '@/components/FacebookPixel';
-import { useAuth } from '@/contexts/AuthContext';
+// import { useAuth } from '@/contexts/AuthContext'; // temporarily hidden
 
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
-  const { user, loading: authLoading } = useAuth();
+  // const { user, loading: authLoading } = useAuth(); // temporarily hidden
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -173,29 +173,7 @@ export default function Navbar() {
             <Instagram className="w-5 h-5" />
           </a>
 
-          {/* Auth: Login / Member */}
-          {!authLoading && (
-            user ? (
-              <Link
-                href="/member"
-                className={`hover:text-[#10B8D9] transition-colors ${
-                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
-                }`}
-                aria-label={t.nav.member}
-              >
-                <User className="w-5 h-5" />
-              </Link>
-            ) : (
-              <Link
-                href="/member"
-                className={`text-sm font-medium hover:text-[#10B8D9] transition-colors ${
-                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
-                }`}
-              >
-                {t.nav.login}
-              </Link>
-            )
-          )}
+          {/* Auth: Login / Member — temporarily hidden */}
 
           <Link
             href="/award"
@@ -217,29 +195,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
-          {/* Auth: Login / Member (mobile) */}
-          {!authLoading && (
-            user ? (
-              <Link
-                href="/member"
-                className={`hover:text-[#10B8D9] transition-colors ${
-                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
-                }`}
-                aria-label={t.nav.member}
-              >
-                <User className="w-5 h-5" />
-              </Link>
-            ) : (
-              <Link
-                href="/member"
-                className={`hover:text-[#10B8D9] transition-colors text-sm font-medium ${
-                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
-                }`}
-              >
-                {t.nav.login}
-              </Link>
-            )
-          )}
+          {/* Auth: Login / Member (mobile) — temporarily hidden */}
           <button
             onClick={toggleLanguage}
             className={`hover:text-[#10B8D9] transition-colors ${
