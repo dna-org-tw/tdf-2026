@@ -249,7 +249,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-3xl sm:text-5xl md:text-8xl font-bold font-display tracking-tight mb-6 leading-tight drop-shadow-2xl"
+          className="text-2xl sm:text-4xl md:text-6xl font-bold font-display tracking-tight mb-6 leading-tight drop-shadow-2xl"
         >
           {t.hero.title}
         </motion.h1>
@@ -264,22 +264,33 @@ export default function HeroSection() {
         </motion.p>
 
         <div className="flex flex-col items-center gap-4">
-          {/* 第一行：關注我們（Email 訂閱） */}
+          {/* WhatsApp 社群按鈕 — 主要 CTA */}
           <motion.div
-            className="w-full max-w-2xl mx-auto"
+            className="w-full max-w-lg mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
           >
-            <form
-              onSubmit={handleFollowSubmit}
-              className="relative bg-black/50 border-2 border-[#10B8D9]/30 rounded-3xl px-6 sm:px-8 md:px-10 py-6 sm:py-8 backdrop-blur-md shadow-2xl shadow-[#10B8D9]/20"
+            <motion.a
+              href="https://chat.whatsapp.com/KZsFo7oNvZVCPIF86imk0E"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent('Lead', {
+                  content_name: 'Join WhatsApp Community',
+                  content_category: 'CTA',
+                  location: 'hero_section',
+                });
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative inline-flex items-center justify-center gap-2.5 w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-lg sm:text-xl md:text-2xl font-bold tracking-wide transition-all shadow-xl shadow-[#25D366]/30"
             >
               {/* 發光動畫層 */}
               <motion.div
-                className="absolute inset-0 bg-[#10B8D9] rounded-3xl blur-2xl opacity-20"
+                className="absolute inset-0 bg-[#25D366] rounded-2xl blur-2xl opacity-20"
                 animate={{
-                  opacity: [0.15, 0.25, 0.15],
+                  opacity: [0.15, 0.3, 0.15],
                 }}
                 transition={{
                   duration: 3,
@@ -287,45 +298,47 @@ export default function HeroSection() {
                   ease: "easeInOut",
                 }}
               />
-              
+              <Users size={22} className="relative z-10" />
+              <span className="relative z-10">{t.hero.ctaWhatsapp}</span>
+            </motion.a>
+          </motion.div>
+
+          {/* Email 訂閱（次要） */}
+          <motion.div
+            className="w-full max-w-md mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+          >
+            <form
+              onSubmit={handleFollowSubmit}
+              className="relative bg-black/40 border border-white/20 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 backdrop-blur-md"
+            >
               <div className="relative z-10">
                 {/* Title with Follower Count */}
                 {!isLoadingCount ? (
-                  <motion.h3
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.85, duration: 0.5 }}
-                    className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 text-center"
-                  >
-                    <span className="text-white">{t.hero.followForm.followerCountPrefix}</span>{' '}
+                  <h3 className="text-sm sm:text-base font-semibold text-white/80 mb-3 text-center">
+                    <span>{t.hero.followForm.followerCountPrefix}</span>{' '}
                     <span className="text-[#10B8D9]">
                       <AnimatedCounter value={followerCount} />
                     </span>
                     {' '}
-                    <span className="text-white">{t.hero.followForm.followerCountSuffix}</span>
-                  </motion.h3>
+                    <span>{t.hero.followForm.followerCountSuffix}</span>
+                  </h3>
                 ) : (
-                  <motion.h3
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.85, duration: 0.5 }}
-                    className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 text-center"
-                  >
+                  <h3 className="text-sm sm:text-base font-semibold text-white/80 mb-3 text-center">
                     {t.hero.followForm.title}
-                  </motion.h3>
+                  </h3>
                 )}
-                <p className="text-sm sm:text-base text-white/70 mb-6 text-center">
-                  {t.hero.followForm.description}
-                </p>
-                
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <div className="flex-1" suppressHydrationWarning>
                     <input
                       type="email"
                       inputMode="email"
                       autoComplete="email"
                       placeholder={t.hero.followForm.emailPlaceholder}
-                      className="w-full rounded-xl px-4 py-3 sm:py-3.5 bg-black/60 border border-white/20 text-base sm:text-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:border-transparent transition-all"
+                      className="w-full rounded-lg px-3 py-2 sm:py-2.5 bg-black/50 border border-white/15 text-sm sm:text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-[#10B8D9] focus:border-transparent transition-all"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isSubmitting}
@@ -337,34 +350,19 @@ export default function HeroSection() {
                     whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
                     whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
                     disabled={isSubmitting}
-                    className="relative whitespace-nowrap rounded-xl bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-bold text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-3.5 shadow-lg shadow-[#10B8D9]/40 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                    className="relative whitespace-nowrap rounded-lg bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-semibold text-sm sm:text-base px-5 sm:px-6 py-2 sm:py-2.5 shadow-md shadow-[#10B8D9]/30 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                   >
                     {isSubmitting ? (
                       <span>{t.hero.followForm.submitting}</span>
                     ) : (
-                      <motion.span
-                        animate={{
-                          textShadow: [
-                            "0 0 0px rgba(255, 255, 255, 0)",
-                            "0 0 8px rgba(255, 255, 255, 0.3)",
-                            "0 0 0px rgba(255, 255, 255, 0)",
-                          ],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        }}
-                      >
-                        {t.hero.followForm.submitButton}
-                      </motion.span>
+                      <span>{t.hero.followForm.submitButton}</span>
                     )}
                   </motion.button>
                 </div>
               </div>
             </form>
           </motion.div>
-          
+
           {/* 第二行：次要 CTA */}
           <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
             <motion.a

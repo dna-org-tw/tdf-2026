@@ -10,6 +10,7 @@ export const content = {
       ctaPartners: "Call for Partners",
       ctaSideEvents: "Call for Side Events",
       ctaSponsors: "Call for Sponsors",
+      ctaWhatsapp: "Join Nomad Community",
       followForm: {
         title: "Stay Connected",
         followerCountPrefix: "Follow us like",
@@ -856,6 +857,7 @@ export const content = {
       ctaPartners: "徵求合作夥伴",
       ctaSideEvents: "徵求 Side Event",
       ctaSponsors: "徵求贊助商",
+      ctaWhatsapp: "加入專屬數位遊牧社群",
       followForm: {
         title: "保持聯繫",
         followerCountPrefix: "像",
