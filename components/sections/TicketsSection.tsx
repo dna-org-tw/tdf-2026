@@ -11,7 +11,7 @@ import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
-type TicketKey = 'explore' | 'contribute' | 'little_backer' | 'backer';
+type TicketKey = 'explore' | 'contribute' | 'weekly_backer' | 'backer';
 
 interface TicketTier {
   name: string;
@@ -486,7 +486,7 @@ export default function TicketsSection() {
                           const prevCore = getCoreFeatureName(prevFeature);
                           return currentCore === prevCore;
                         });
-                      } else if (tier.key === 'little_backer') {
+                      } else if (tier.key === 'weekly_backer') {
                         isPreviousTierFeature = t.tickets.contribute.features.some(prevFeature => {
                           const prevCore = getCoreFeatureName(prevFeature);
                           return currentCore === prevCore;
@@ -519,7 +519,7 @@ export default function TicketsSection() {
                       switch (tier.key) {
                         case 'contribute':
                           return { icon: 'text-[#00993E]', text: 'text-[#00993E] font-semibold' };
-                        case 'little_backer':
+                        case 'weekly_backer':
                         case 'backer':
                           return { icon: 'text-[#FFD028]', text: 'text-[#FFD028] font-semibold' };
                         default:
@@ -613,7 +613,7 @@ export default function TicketsSection() {
           >
             <div className="flex-1 flex flex-col">
               <h3 className="text-2xl font-display font-bold mb-2 text-white">
-                {t.tickets.little_backer?.label ?? 'Weekly Backer'}
+                {t.tickets.weekly_backer?.label ?? 'Weekly Backer'}
               </h3>
               <div className="mb-6">
                 {isOnSale ? (
@@ -639,7 +639,7 @@ export default function TicketsSection() {
                 onClick={() => {
                   setPendingWeekTier({
                     name: 'Weekly Backer',
-                    key: 'little_backer',
+                    key: 'weekly_backer',
                     originalPrice: 250,
                     salePrice: 200,
                     requiresWeekSelection: true,
@@ -653,10 +653,10 @@ export default function TicketsSection() {
                   setSelectedWeek(null);
                   setWeekModalOpen(true);
                 }}
-                disabled={loadingTier === 'little_backer'}
+                disabled={loadingTier === 'weekly_backer'}
                 className="w-full mt-auto px-4 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#FFD028] text-[#1E1F1C] hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                {loadingTier === 'little_backer'
+                {loadingTier === 'weekly_backer'
                   ? (t.tickets?.processing ?? 'Processing...')
                   : (t.tickets?.payWithCard ?? 'Start Your Journey')}
               </button>
@@ -800,7 +800,7 @@ export default function TicketsSection() {
               >
                 <div className="flex items-center justify-between p-6 border-b border-white/10">
                   <h3 className="text-xl font-display font-bold text-white">
-                    {t.tickets.little_backer?.weekLabel ?? 'Select Your Week'}
+                    {t.tickets.weekly_backer?.weekLabel ?? 'Select Your Week'}
                   </h3>
                   <button
                     type="button"
@@ -812,7 +812,7 @@ export default function TicketsSection() {
                   </button>
                 </div>
                 <div className="p-6 space-y-3">
-                  {(t.tickets.little_backer?.weeks ?? [
+                  {(t.tickets.weekly_backer?.weeks ?? [
                     'Week 1: May 1 – May 7',
                     'Week 2: May 8 – May 14',
                     'Week 3: May 15 – May 21',
@@ -838,10 +838,10 @@ export default function TicketsSection() {
                   <button
                     type="button"
                     onClick={handleWeekConfirm}
-                    disabled={!selectedWeek || loadingTier === 'little_backer'}
+                    disabled={!selectedWeek || loadingTier === 'weekly_backer'}
                     className="w-full mt-4 px-4 py-3 rounded-xl font-semibold bg-[#FFD028] text-[#1E1F1C] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
                   >
-                    {loadingTier === 'little_backer'
+                    {loadingTier === 'weekly_backer'
                       ? (t.tickets?.processing ?? 'Processing...')
                       : (t.tickets?.payWithCard ?? 'Start Your Journey')}
                   </button>

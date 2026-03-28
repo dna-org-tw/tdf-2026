@@ -16,10 +16,10 @@ const stripe = stripeSecretKey
     })
   : null;
 
-const PRICE_IDS: Record<'explore' | 'contribute' | 'little_backer' | 'backer', string | undefined> = {
+const PRICE_IDS: Record<'explore' | 'contribute' | 'weekly_backer' | 'backer', string | undefined> = {
   explore: process.env.STRIPE_PRICE_EXPLORE,
   contribute: process.env.STRIPE_PRICE_CONTRIBUTE,
-  little_backer: process.env.STRIPE_PRICE_WEEKLY_BACKER,
+  weekly_backer: process.env.STRIPE_PRICE_WEEKLY_BACKER,
   backer: process.env.STRIPE_PRICE_BACKER,
 };
 
@@ -34,15 +34,15 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => null);
 
-    const tier: 'explore' | 'contribute' | 'little_backer' | 'backer' | undefined = body?.tier;
+    const tier: 'explore' | 'contribute' | 'weekly_backer' | 'backer' | undefined = body?.tier;
     const week: string | undefined = body?.week;
 
-    if (!tier || !['explore', 'contribute', 'little_backer', 'backer'].includes(tier)) {
+    if (!tier || !['explore', 'contribute', 'weekly_backer', 'backer'].includes(tier)) {
       return NextResponse.json({ error: 'Invalid ticket tier.' }, { status: 400 });
     }
 
     // Weekly Backer requires week selection
-    if (tier === 'little_backer' && (!week || !['week1', 'week2', 'week3', 'week4'].includes(week))) {
+    if (tier === 'weekly_backer' && (!week || !['week1', 'week2', 'week3', 'week4'].includes(week))) {
       return NextResponse.json({ error: 'Week selection is required for Weekly Backer.' }, { status: 400 });
     }
 
@@ -54,10 +54,6 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-
-    // 獲取價格資訊以獲取金額
-    const price = await stripe.prices.retrieve(priceId);
-    const amount = price.unit_amount || 0;
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -103,15 +99,15 @@ export async function POST(req: NextRequest) {
 
     const visitorFingerprint = body?.visitor_fingerprint ?? null;
 
-    // 在 Supabase 中建立訂單記錄
+    // 在 Supabase 中建立訂單記錄（金額先存 0，待 webhook/sync 用 Stripe 實際金額更新）
     const order = await createOrder({
       stripe_session_id: session.id,
       ticket_tier: tier,
-      amount_subtotal: amount,
-      amount_total: amount,
+      amount_subtotal: 0,
+      amount_total: 0,
       amount_tax: 0,
       amount_discount: 0,
-      currency: price.currency || 'usd',
+      currency: 'usd',
       visitor_fingerprint: visitorFingerprint,
     });
 

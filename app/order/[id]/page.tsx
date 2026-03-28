@@ -126,7 +126,7 @@ export default function OrderDetailPage() {
 
   const tierLabel =
     order?.ticket_tier &&
-    t.tickets?.[order.ticket_tier as 'explore' | 'contribute' | 'little_backer' | 'backer']?.label;
+    t.tickets?.[order.ticket_tier as 'explore' | 'contribute' | 'weekly_backer' | 'backer']?.label;
 
   const isPaid = order?.payment_status === 'paid';
 

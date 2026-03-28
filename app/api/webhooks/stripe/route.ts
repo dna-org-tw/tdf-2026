@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { updateOrder } from '@/lib/orders';
+import { updateOrder, createOrder, getOrderBySessionId } from '@/lib/orders';
 import type { OrderStatus } from '@/lib/types/order';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       );
 
       // 更新订单
-      const updatedOrder = await updateOrder(session.id, {
+      const orderData = {
         stripe_payment_intent_id:
           typeof session.payment_intent === 'string'
             ? session.payment_intent
@@ -163,12 +163,39 @@ export async function POST(req: NextRequest) {
         payment_method_brand: paymentMethodBrand,
         payment_method_last4: paymentMethodLast4,
         payment_method_type: paymentMethodType,
-      });
+      };
+
+      const updatedOrder = await updateOrder(session.id, orderData);
 
       if (updatedOrder) {
         console.log('[Webhook] Order updated successfully:', updatedOrder.id);
       } else {
-        console.warn('[Webhook] Failed to update order for session:', session.id);
+        // 訂單不存在（可能建立時失敗），從 success_url 解析 tier 後補建
+        console.warn('[Webhook] Order not found for session:', session.id, '— attempting to create');
+        const tierMatch = session.success_url?.match(/tier=(explore|contribute|weekly_backer|backer)/);
+        const tier = tierMatch?.[1] as 'explore' | 'contribute' | 'weekly_backer' | 'backer' | undefined;
+
+        if (tier) {
+          const createdOrder = await createOrder({
+            stripe_session_id: session.id,
+            ticket_tier: tier,
+            amount_subtotal: session.amount_subtotal || 0,
+            amount_total: session.amount_total || 0,
+            amount_tax: session.total_details?.amount_tax || 0,
+            amount_discount: session.total_details?.amount_discount || 0,
+            currency: session.currency || 'usd',
+          });
+
+          if (createdOrder) {
+            // 建立後立即更新完整資料
+            await updateOrder(session.id, orderData);
+            console.log('[Webhook] Order created and updated:', createdOrder.id);
+          } else {
+            console.error('[Webhook] Failed to create fallback order for session:', session.id);
+          }
+        } else {
+          console.error('[Webhook] Cannot determine tier for session:', session.id);
+        }
       }
     }
     // 處理 payment_intent.succeeded 事件（備用）

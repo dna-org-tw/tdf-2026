@@ -202,7 +202,7 @@ export const content = {
           "Digital Nomad Activities x 40+"
         ]
       },
-      little_backer: {
+      weekly_backer: {
         name: "Weekly Backer",
         label: "Weekly Backer",
         features: [
@@ -1049,7 +1049,7 @@ export const content = {
           "數位遊牧活動 x 40+"
         ]
       },
-      little_backer: {
+      weekly_backer: {
         name: "Weekly Backer",
         label: "Weekly Backer",
         features: [

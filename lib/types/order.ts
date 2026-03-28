@@ -1,12 +1,12 @@
 // 订单状态类型
-export type OrderStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded';
+export type OrderStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded';
 
 // 訂單資料庫記錄類型
 export interface Order {
   id: string; // UUID
   stripe_session_id: string; // Stripe checkout session ID
   stripe_payment_intent_id: string | null; // Stripe payment intent ID
-  ticket_tier: 'explore' | 'contribute' | 'little_backer' | 'backer';
+  ticket_tier: 'explore' | 'contribute' | 'weekly_backer' | 'backer';
   status: OrderStatus;
   amount_subtotal: number; // 以分為單位
   amount_total: number; // 以分為單位
@@ -34,7 +34,7 @@ export interface Order {
 // 建立訂單的輸入類型
 export interface CreateOrderInput {
   stripe_session_id: string;
-  ticket_tier: 'explore' | 'contribute' | 'little_backer' | 'backer';
+  ticket_tier: 'explore' | 'contribute' | 'weekly_backer' | 'backer';
   amount_subtotal: number;
   amount_total: number;
   amount_tax: number;

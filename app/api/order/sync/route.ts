@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { updateOrder } from '@/lib/orders';
+import { updateOrder, createOrder } from '@/lib/orders';
 import type { OrderStatus } from '@/lib/types/order';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     );
 
     // 更新订单
-    const updatedOrder = await updateOrder(sessionId, {
+    const orderUpdateData = {
       stripe_payment_intent_id:
         typeof session.payment_intent === 'string'
           ? session.payment_intent
@@ -116,13 +116,38 @@ export async function POST(req: NextRequest) {
       payment_method_brand: paymentMethodBrand,
       payment_method_last4: paymentMethodLast4,
       payment_method_type: paymentMethodType,
-    });
+    };
 
+    let updatedOrder = await updateOrder(sessionId, orderUpdateData);
+
+    // 訂單不存在時，從 request body 的 tier 或 success_url 解析後補建
     if (!updatedOrder) {
-      return NextResponse.json(
-        { error: 'Failed to update order in database.' },
-        { status: 500 }
-      );
+      console.warn('[Order Sync] Order not found for session:', sessionId, '— attempting to create');
+      const tier = (body.tier as string) || session.success_url?.match(/tier=(explore|contribute|weekly_backer|backer)/)?.[1];
+
+      if (tier && ['explore', 'contribute', 'weekly_backer', 'backer'].includes(tier)) {
+        const createdOrder = await createOrder({
+          stripe_session_id: sessionId,
+          ticket_tier: tier as 'explore' | 'contribute' | 'weekly_backer' | 'backer',
+          amount_subtotal: session.amount_subtotal || 0,
+          amount_total: session.amount_total || 0,
+          amount_tax: session.total_details?.amount_tax || 0,
+          amount_discount: session.total_details?.amount_discount || 0,
+          currency: session.currency || 'usd',
+        });
+
+        if (createdOrder) {
+          updatedOrder = await updateOrder(sessionId, orderUpdateData);
+          console.log('[Order Sync] Order created and updated:', createdOrder.id);
+        }
+      }
+
+      if (!updatedOrder) {
+        return NextResponse.json(
+          { error: 'Failed to update order in database.' },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({
