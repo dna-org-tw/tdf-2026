@@ -1,13 +1,13 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useState, useEffect, useMemo } from 'react';
 import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { useLumaData } from '@/contexts/LumaDataContext';
-import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter } from 'lucide-react';
+import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter, X } from 'lucide-react';
 import type { SpeakerGrouped, SpeakerSocialLinks } from '@/lib/lumaSpeakers';
 import { teamMembers } from '@/data/team';
 import { MessageCircle } from 'lucide-react';
@@ -59,6 +59,7 @@ export default function TeamSection() {
   const { speakers: contextSpeakers, speakersLoading } = useLumaData();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedMember, setSelectedMember] = useState<(typeof teamMembers)[number] | null>(null);
 
   const speakers = useMemo((): SpeakerGroupedWithMock[] => {
     const real = [...contextSpeakers].sort((a, b) =>
@@ -200,16 +201,17 @@ export default function TeamSection() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
             {teamMembers.map((member, index) => (
-              <motion.div
+              <motion.button
                 key={member.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: Math.min(index * 0.05, 0.5) }}
                 whileHover={{ y: -4 }}
-                className="flex flex-col items-center text-center"
+                onClick={() => setSelectedMember(member)}
+                className="flex flex-col items-center text-center cursor-pointer group"
               >
-                <div className="relative w-[clamp(5.5rem,32vw,8rem)] h-[clamp(5.5rem,32vw,8rem)] rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] flex-shrink-0 mb-3 aspect-square">
+                <div className="relative w-[clamp(5.5rem,32vw,8rem)] h-[clamp(5.5rem,32vw,8rem)] rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] group-hover:border-[#C54090] transition-colors flex-shrink-0 mb-3 aspect-square">
                   <Image
                     src={member.photo || '/images/team/placeholder.svg'}
                     alt={member.name}
@@ -230,34 +232,120 @@ export default function TeamSection() {
                   </p>
                 )}
                 {(member.email || member.instagram || member.website || member.whatsapp) && (
-                  <div className="flex items-center justify-center gap-1.5 mt-2 flex-wrap" role="group" aria-label="Contact links">
+                  <div className="flex items-center justify-center gap-1.5 mt-2 flex-wrap">
                     {member.website && (
-                      <a href={member.website} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Website">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47]">
                         <Globe className="w-4 h-4" />
-                      </a>
+                      </span>
                     )}
                     {member.instagram && (
-                      <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Instagram">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47]">
                         <Instagram className="w-4 h-4" />
-                      </a>
+                      </span>
                     )}
                     {member.email && (
-                      <a href={`mailto:${member.email}`} className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Email">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47]">
                         <Mail className="w-4 h-4" />
-                      </a>
+                      </span>
                     )}
                     {member.whatsapp && (
-                      <a href={`https://wa.me/${member.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="WhatsApp">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47]">
                         <MessageCircle className="w-4 h-4" />
-                      </a>
+                      </span>
                     )}
                   </div>
                 )}
-              </motion.div>
+              </motion.button>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Team Member Modal */}
+      <AnimatePresence>
+        {selectedMember && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              onClick={() => setSelectedMember(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+              onClick={() => setSelectedMember(null)}
+            >
+              <div
+                className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="relative p-6 sm:p-8">
+                  <button
+                    onClick={() => setSelectedMember(null)}
+                    className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#F6F6F6] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                    aria-label="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] mb-4">
+                      <Image
+                        src={selectedMember.photo || '/images/team/placeholder.svg'}
+                        alt={selectedMember.name}
+                        fill
+                        className="object-cover"
+                        sizes="128px"
+                      />
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-display font-bold text-[#1E1F1C]">
+                      {selectedMember.name}
+                    </h3>
+                    <p className="text-[#C54090] font-medium mt-1">
+                      {selectedMember.title}
+                    </p>
+                    {selectedMember.bio && (
+                      <p className="text-[#4B4C47] text-sm leading-relaxed mt-4">
+                        {selectedMember.bio}
+                      </p>
+                    )}
+                    {(selectedMember.email || selectedMember.instagram || selectedMember.website || selectedMember.whatsapp) && (
+                      <div className="flex items-center justify-center gap-2 mt-5 flex-wrap">
+                        {selectedMember.website && (
+                          <a href={selectedMember.website} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Website">
+                            <Globe className="w-5 h-5" />
+                          </a>
+                        )}
+                        {selectedMember.instagram && (
+                          <a href={selectedMember.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Instagram">
+                            <Instagram className="w-5 h-5" />
+                          </a>
+                        )}
+                        {selectedMember.email && (
+                          <a href={`mailto:${selectedMember.email}`} className="flex items-center justify-center w-10 h-10 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Email">
+                            <Mail className="w-5 h-5" />
+                          </a>
+                        )}
+                        {selectedMember.whatsapp && (
+                          <a href={`https://wa.me/${selectedMember.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="WhatsApp">
+                            <MessageCircle className="w-5 h-5" />
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Speakers 講者 */}
       <div id="speakers" className="py-20 md:py-28 lg:py-32 bg-[#F6F6F6]">
