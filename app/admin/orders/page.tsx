@@ -126,9 +126,9 @@ export default function OrdersPage() {
     fetch(`/api/admin/orders/daily?days=${chartRange}`)
       .then((res) => res.json())
       .then((data) => {
-        // Compute cumulative revenue
+        // Compute cumulative revenue starting from prior total
         const daily = data.daily || [];
-        let cumulative = 0;
+        let cumulative = data.priorRevenue || 0;
         const withCumulative = daily.map((d: DailyData) => {
           cumulative += d.revenue;
           return { ...d, cumulativeRevenue: cumulative };

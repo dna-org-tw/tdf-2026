@@ -18,6 +18,15 @@ export async function GET(req: NextRequest) {
     const since = new Date();
     since.setDate(since.getDate() - days);
 
+    // Revenue from all paid orders before the range
+    const { data: priorOrders } = await supabaseServer
+      .from('orders')
+      .select('amount_total')
+      .eq('status', 'paid')
+      .lt('created_at', since.toISOString());
+
+    const priorRevenue = (priorOrders || []).reduce((sum, o) => sum + (o.amount_total || 0), 0);
+
     const { data: orders, error } = await supabaseServer
       .from('orders')
       .select('amount_total, status, created_at')
@@ -52,7 +61,7 @@ export async function GET(req: NextRequest) {
 
     const daily = Array.from(dailyMap.values());
 
-    return NextResponse.json({ daily });
+    return NextResponse.json({ daily, priorRevenue });
   } catch (error) {
     console.error('[Admin Daily]', error);
     return NextResponse.json({ error: 'Failed to fetch daily data' }, { status: 500 });
