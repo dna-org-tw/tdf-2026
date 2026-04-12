@@ -35,6 +35,17 @@ const STATUS_LABELS: Record<string, string> = {
   refunded: '已退款',
 };
 
+const STATUS_STYLES: Record<string, string> = {
+  paid: 'bg-green-100 text-green-700',
+  pending: 'bg-yellow-100 text-yellow-700',
+  failed: 'bg-red-100 text-red-700',
+  cancelled: 'bg-slate-100 text-slate-600',
+  expired: 'bg-orange-100 text-orange-700',
+  refunded: 'bg-purple-100 text-purple-700',
+};
+
+const STATUS_ORDER = ['paid', 'pending', 'failed', 'cancelled', 'expired', 'refunded'];
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -127,12 +138,28 @@ export default function AdminDashboard() {
             <p className="text-sm text-slate-400">尚無資料</p>
           ) : (
             <div className="space-y-3">
-              {Object.entries(stats.orders.byStatus).map(([status, count]) => (
-                <div key={status} className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">{STATUS_LABELS[status] || status}</span>
-                  <span className="font-semibold text-slate-900">{count}</span>
-                </div>
-              ))}
+              {STATUS_ORDER
+                .filter((status) => stats.orders.byStatus[status] != null)
+                .map((status) => {
+                  const count = stats.orders.byStatus[status];
+                  const pct = stats.orders.total > 0 ? Math.round((count / stats.orders.total) * 100) : 0;
+                  return (
+                    <div key={status}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[status] || 'bg-slate-100 text-slate-600'}`}>
+                          {STATUS_LABELS[status] || status}
+                        </span>
+                        <span className="text-sm text-slate-900 font-semibold">{count} <span className="text-slate-400 font-normal">({pct}%)</span></span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-1.5">
+                        <div
+                          className="h-1.5 rounded-full bg-slate-300"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           )}
         </div>
