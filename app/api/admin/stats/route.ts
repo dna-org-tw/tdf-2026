@@ -15,10 +15,15 @@ export async function GET(req: NextRequest) {
     // Paid orders count + total revenue
     const { data: orders } = await supabaseServer
       .from('orders')
-      .select('amount_total, currency, ticket_tier, status');
+      .select('amount_total, currency, ticket_tier, status, customer_email');
 
     const paidOrders = (orders || []).filter((o) => o.status === 'paid');
     const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.amount_total || 0), 0);
+
+    // Unique paid members
+    const uniqueMembers = new Set(
+      paidOrders.map((o) => o.customer_email?.toLowerCase()).filter(Boolean)
+    ).size;
 
     // Count by tier
     const tierCounts: Record<string, number> = {};
@@ -41,6 +46,7 @@ export async function GET(req: NextRequest) {
       orders: {
         total: (orders || []).length,
         paid: paidOrders.length,
+        uniqueMembers,
         totalRevenue,
         currency: paidOrders[0]?.currency || 'usd',
         byTier: tierCounts,

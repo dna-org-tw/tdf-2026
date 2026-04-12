@@ -8,6 +8,7 @@ interface Stats {
   orders: {
     total: number;
     paid: number;
+    uniqueMembers: number;
     totalRevenue: number;
     currency: string;
     byTier: Record<string, number>;
@@ -73,14 +74,15 @@ export default function AdminDashboard() {
       <h1 className="text-2xl font-bold text-slate-900">總覽</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <p className="text-sm text-slate-500 mb-1">會員數</p>
+          <p className="text-3xl font-bold text-[#10B8D9]">{stats.orders.uniqueMembers}</p>
+        </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-sm text-slate-500 mb-1">總訂單數</p>
           <p className="text-3xl font-bold text-slate-900">{stats.orders.total}</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <p className="text-sm text-slate-500 mb-1">已付款會員</p>
-          <p className="text-3xl font-bold text-[#10B8D9]">{stats.orders.paid}</p>
+          <p className="text-xs text-slate-400 mt-1">{stats.orders.paid} 筆已付款</p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-sm text-slate-500 mb-1">總收入</p>
@@ -91,6 +93,14 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-sm text-slate-500 mb-1">電子報訂閱者</p>
           <p className="text-3xl font-bold text-[#FFD028]">{stats.subscribers.total}</p>
+        </div>
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <p className="text-sm text-slate-500 mb-1">平均客單價</p>
+          <p className="text-3xl font-bold text-slate-900">
+            {stats.orders.paid > 0
+              ? formatCurrency(Math.round(stats.orders.totalRevenue / stats.orders.paid), stats.orders.currency)
+              : '-'}
+          </p>
         </div>
       </div>
 
@@ -129,10 +139,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Links */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link href="/admin/members" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
           <h3 className="font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors">會員管理 →</h3>
-          <p className="text-sm text-slate-500 mt-1">查看所有訂單與會員資訊</p>
+          <p className="text-sm text-slate-500 mt-1">以人為單位查看會員資訊</p>
+        </Link>
+        <Link href="/admin/orders" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
+          <h3 className="font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors">訂單管理 →</h3>
+          <p className="text-sm text-slate-500 mt-1">查看所有交易訂單明細</p>
         </Link>
         <Link href="/admin/subscribers" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
           <h3 className="font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors">訂閱者管理 →</h3>
