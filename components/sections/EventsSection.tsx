@@ -162,17 +162,18 @@ export default function EventsSection() {
     firstDay = Math.max(1, Math.min(31, firstDay));
     lastDay = Math.max(1, Math.min(31, lastDay));
 
+    const toHalf = (hour: number, minute: number) => hour + (minute >= 30 ? 0.5 : 0);
     const clamp = (sH: number, eH: number) => {
-      sH = Math.max(7, Math.min(23, sH));
-      eH = Math.max(sH + 1, Math.min(24, eH));
+      sH = Math.max(7, Math.min(23.5, sH));
+      eH = Math.max(sH + 0.5, Math.min(24, eH));
       return { startH: sH, endH: eH };
     };
 
     if (firstDay === lastDay) {
-      const sH = isMayTp(startTp) && startTp.day === firstDay ? startTp.hour : 7;
+      const sH = isMayTp(startTp) && startTp.day === firstDay ? toHalf(startTp.hour, startTp.minute) : 7;
       let eH: number;
       if (isMayTp(endTp) && endTp.day === firstDay) {
-        eH = endTp.hour + (endTp.minute > 0 ? 1 : 0);
+        eH = toHalf(endTp.hour, endTp.minute);
         if (eH === 0) eH = 24;
       } else {
         eH = 24;
@@ -185,11 +186,11 @@ export default function EventsSection() {
     for (let day = firstDay; day <= lastDay; day++) {
       let sH: number, eH: number;
       if (day === firstDay && isMayTp(startTp) && startTp.day === firstDay) {
-        sH = startTp.hour;
+        sH = toHalf(startTp.hour, startTp.minute);
         eH = 24;
       } else if (day === lastDay && isMayTp(endTp) && endTp.day === lastDay) {
         sH = 7;
-        eH = endTp.hour + (endTp.minute > 0 ? 1 : 0);
+        eH = toHalf(endTp.hour, endTp.minute);
       } else {
         sH = 7;
         eH = 24;
@@ -228,8 +229,8 @@ export default function EventsSection() {
         .filter((s) => s.dayIndex === day.dayIndex)
         .map(({ event, startH, endH }) => ({
           event,
-          startCol: startH - 7,
-          span: endH - startH,
+          startCol: (startH - 7) * 2,
+          span: (endH - startH) * 2,
           color: getEventBlockColor(event),
         }));
       return { ...day, events };
@@ -346,7 +347,7 @@ export default function EventsSection() {
           className="inline-block min-w-[800px] border border-[#D4D4CF] rounded-xl bg-white shadow-sm"
           style={{
             display: 'grid',
-            gridTemplateColumns: `min-content repeat(${HOURS.length}, 1fr)`,
+            gridTemplateColumns: `min-content repeat(${HOURS.length * 2}, 1fr)`,
             gridTemplateRows: `repeat(${BODY_ROW_COUNT}, auto)`,
           }}
         >
@@ -381,7 +382,7 @@ export default function EventsSection() {
                   <div
                     key={`week-time-${weekIndex}-${h}`}
                     className="border-b border-r border-[#D4D4CF] bg-stone-200 px-1 py-0 text-center text-[10px] font-medium text-[#1E1F1C]/50 flex items-center justify-center"
-                    style={{ gridRow: timeLabelRow, gridColumn: i + 2 }}
+                    style={{ gridRow: timeLabelRow, gridColumn: `${i * 2 + 2} / span 2` }}
                   >
                     {h}:00
                   </div>
@@ -405,7 +406,7 @@ export default function EventsSection() {
                   <div
                     key={`${day.dateKey}-${colIdx}`}
                     className="border-b border-r border-[#E7E5E4] bg-white min-h-[52px]"
-                    style={{ gridRow, gridColumn: colIdx + 2 }}
+                    style={{ gridRow, gridColumn: `${colIdx * 2 + 2} / span 2` }}
                   />
                 ))}
               </React.Fragment>
