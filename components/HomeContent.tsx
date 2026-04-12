@@ -7,7 +7,6 @@ import HashNavigationHandler from '@/components/HashNavigationHandler';
 import { useScrollDepth } from '@/hooks/useScrollDepth';
 import { LumaDataProvider } from '@/contexts/LumaDataContext';
 import TeamSection from '@/components/sections/TeamSection';
-import type { TaitungAccommodation } from '@/lib/parseNomadStores';
 
 // 動態導入非首屏組件，大幅減少初始 bundle 大小
 // 使用 loading 狀態提升 UX，並設定 ssr: false 避免不必要的 SSR
@@ -43,12 +42,17 @@ const AccommodationSection = dynamic(() => import('@/components/sections/Accommo
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
+const FAQSection = dynamic(() => import('@/components/sections/FAQSection'), {
+  ssr: true,
+  loading: () => <div className="h-96 bg-stone-50 animate-pulse" />,
+});
+
 const FollowUsSection = dynamic(() => import('@/components/sections/FollowUsSection'), {
   ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
 });
 
-export default function HomeContent({ taitungStores }: { taitungStores: TaitungAccommodation[] }) {
+export default function HomeContent() {
   // Track scroll depth
   useScrollDepth();
 
@@ -61,7 +65,8 @@ export default function HomeContent({ taitungStores }: { taitungStores: TaitungA
       <TicketsSection />
       <EventsSection />
       <NewsSection />
-      <AccommodationSection taitungStores={taitungStores} />
+      <AccommodationSection />
+      <FAQSection />
       <TeamSection />
       <FollowUsSection />
       <Footer />
