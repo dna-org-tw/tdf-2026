@@ -1,7 +1,6 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface MobileMenuProps {
@@ -23,24 +22,15 @@ export default function MobileMenu({ isOpen, navLinks, handleNavClick }: MobileM
           className="absolute top-full left-0 right-0 bg-white border-b border-[#F6F6F6] p-6 md:hidden shadow-lg"
         >
           <div className="flex flex-col gap-4">
-            {navLinks.map((link) =>
-              link.href.startsWith('#') ? (
+            {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
+                  onClick={link.href.startsWith('#') ? (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, link.href) : undefined}
                   className="text-lg font-medium text-[#1E1F1C] cursor-pointer"
                 >
                   {link.name}
                 </a>
-              ) : (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-lg font-medium text-[#1E1F1C]"
-                >
-                  {link.name}
-                </Link>
               )
             )}
             <a

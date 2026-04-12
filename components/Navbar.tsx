@@ -132,28 +132,17 @@ export default function Navbar() {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) =>
-            link.href.startsWith('#') ? (
+          {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
+                onClick={link.href.startsWith('#') ? (e: React.MouseEvent) => handleNavClick(e, link.href) : undefined}
                 className={`text-sm font-medium hover:text-[#10B8D9] transition-colors cursor-pointer ${
                   scrolled ? 'text-[#1E1F1C]' : 'text-white'
                 }`}
               >
                 {link.name}
               </a>
-            ) : (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium hover:text-[#10B8D9] transition-colors ${
-                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
-                }`}
-              >
-                {link.name}
-              </Link>
             )
           )}
 
