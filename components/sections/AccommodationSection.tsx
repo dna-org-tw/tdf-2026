@@ -313,79 +313,87 @@ export default function AccommodationSection({ taitungStores }: { taitungStores:
         </div>
       )}
 
-      {/* Partner Platforms — Branded Banner */}
+      {/* Partner Platforms — Obi-style full-width banner */}
       {t.accommodation.partnerPlatforms && t.accommodation.partnerPlatforms.items.length > 0 && (
-        <div className="container mx-auto px-4 sm:px-6 mb-12">
-          <h3 className="text-lg sm:text-xl font-display font-bold text-[#1E1F1C] text-center mb-6">
-            {t.accommodation.partnerPlatforms.title}
-          </h3>
+        <div className="mb-12">
           {t.accommodation.partnerPlatforms.items.map((platform) => (
             <motion.a
               key={platform.name}
               href={platform.url}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="group block max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              transition={{ duration: 0.6 }}
+              className="group block w-full overflow-hidden shadow-[0_4px_30px_rgba(0,104,183,0.25)] hover:shadow-[0_4px_40px_rgba(0,104,183,0.4)] transition-shadow duration-300"
             >
-              {/* Blue banner area */}
-              <div className="relative bg-[#0068B7] px-6 sm:px-10 py-8 sm:py-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
-                {/* Decorative house shapes */}
-                <div className="absolute top-0 right-0 w-48 h-48 opacity-[0.08] pointer-events-none">
-                  <svg viewBox="0 0 200 200" fill="white">
+              {/* Full-width obi banner */}
+              <div className="relative bg-gradient-to-r from-[#004F8A] via-[#0068B7] to-[#0080DD] px-6 sm:px-12 lg:px-20 py-8 sm:py-10">
+                {/* Decorative background pattern */}
+                <div className="absolute inset-0 opacity-[0.06] pointer-events-none overflow-hidden">
+                  <svg className="absolute -top-10 -right-10 w-72 h-72" viewBox="0 0 200 200" fill="white">
                     <path d="M100 10L190 90V190H10V90L100 10Z" />
                   </svg>
-                </div>
-                <div className="absolute bottom-0 left-4 w-24 h-24 opacity-[0.06] pointer-events-none">
-                  <svg viewBox="0 0 200 200" fill="white">
+                  <svg className="absolute -bottom-8 left-[20%] w-40 h-40" viewBox="0 0 200 200" fill="white">
+                    <path d="M100 10L190 90V190H10V90L100 10Z" />
+                  </svg>
+                  <svg className="absolute top-2 left-[60%] w-28 h-28" viewBox="0 0 200 200" fill="white">
                     <path d="M100 10L190 90V190H10V90L100 10Z" />
                   </svg>
                 </div>
 
-                {/* Logo */}
-                <div className="flex-shrink-0 relative z-10">
-                  <div className="relative w-[180px] sm:w-[220px] h-[44px] sm:h-[54px]">
-                    <Image
-                      src={platform.logoWhite}
-                      alt={platform.name}
-                      fill
-                      className="object-contain"
-                    />
+                <div className="relative z-10 max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
+                  {/* Logo */}
+                  <div className="flex-shrink-0">
+                    <div className="relative w-[200px] sm:w-[260px] h-[50px] sm:h-[64px]">
+                      <Image
+                        src={platform.logoWhite}
+                        alt={platform.name}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    {platform.tagline && (
+                      <p className="text-white/60 text-xs sm:text-sm mt-2 text-center sm:text-left tracking-wider uppercase">
+                        {platform.tagline}
+                      </p>
+                    )}
                   </div>
-                  {platform.tagline && (
-                    <p className="text-white/70 text-xs sm:text-sm mt-2 text-center sm:text-left tracking-wide">
-                      {platform.tagline}
+
+                  {/* Divider — desktop only */}
+                  <div className="hidden sm:block w-px self-stretch bg-white/20 flex-shrink-0" />
+
+                  {/* Description + features */}
+                  <div className="flex-1 text-center sm:text-left">
+                    <p className="text-white text-sm sm:text-base lg:text-lg leading-relaxed mb-4">
+                      {platform.description}
                     </p>
-                  )}
-                </div>
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                      {platform.features.map((feature) => (
+                        <span
+                          key={feature}
+                          className="inline-block px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full bg-white/20 text-white border border-white/30 backdrop-blur-sm"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
 
-                {/* Divider — desktop only */}
-                <div className="hidden sm:block w-px h-16 bg-white/20 flex-shrink-0" />
-
-                {/* Description + features */}
-                <div className="relative z-10 flex-1 text-center sm:text-left">
-                  <p className="text-white/90 text-sm sm:text-base leading-relaxed mb-4">
-                    {platform.description}
-                  </p>
-                  <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                    {platform.features.map((feature) => (
-                      <span
-                        key={feature}
-                        className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-white/15 text-white border border-white/20"
-                      >
-                        {feature}
-                      </span>
-                    ))}
+                  {/* CTA — inline on desktop */}
+                  <div className="flex-shrink-0 hidden sm:flex items-center gap-2 bg-white/15 hover:bg-white/25 border border-white/30 rounded-full px-6 py-3 transition-colors duration-300">
+                    <span className="text-white text-sm font-bold whitespace-nowrap">
+                      {platform.cta}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-300" />
                   </div>
                 </div>
               </div>
 
-              {/* CTA bar */}
-              <div className="bg-[#004F8A] px-6 sm:px-10 py-3 flex items-center justify-center sm:justify-end gap-2 group-hover:bg-[#003D6B] transition-colors duration-300">
-                <span className="text-white text-sm font-medium">
+              {/* Mobile CTA bar */}
+              <div className="sm:hidden bg-[#003D6B] px-6 py-3 flex items-center justify-center gap-2 group-hover:bg-[#002D50] transition-colors duration-300">
+                <span className="text-white text-sm font-bold">
                   {platform.cta}
                 </span>
                 <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-300" />

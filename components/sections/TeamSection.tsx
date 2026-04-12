@@ -141,7 +141,7 @@ export default function TeamSection() {
                 transition={{ delay: 0.1 }}
                 className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
               >
-                {t.partners.organizers.tdna.description}
+                {t.partners.organizers.tdna?.description}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -206,7 +206,7 @@ export default function TeamSection() {
                 transition={{ delay: 0.1 }}
                 className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
               >
-                {t.partners.organizers.taitungGov.description}
+                {t.partners.organizers.taitungGov?.description}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
