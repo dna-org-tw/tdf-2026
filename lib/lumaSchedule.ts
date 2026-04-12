@@ -19,6 +19,9 @@ export interface CalendarEvent {
   tickets?: TicketInfo;
   imageUrl?: string;
   visibility?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  placeId?: string;
 }
 
 /** Host from Luma calendar API (event host / speaker). */
@@ -49,6 +52,7 @@ export interface LumaApiEntry {
     geo_address_info?: {
       full_address?: string;
       short_address?: string;
+      place_id?: string;
       localized?: {
         'zh-TW'?: {
           full_address?: string;
@@ -56,6 +60,8 @@ export interface LumaApiEntry {
         };
       };
     };
+    geo_latitude?: number | null;
+    geo_longitude?: number | null;
     url: string;
   };
   start_at: string;
@@ -137,11 +143,24 @@ export function buildScheduleFromEntries(entries: LumaApiEntry[]): CalendarEvent
       const validTags = ['#follower', '#explorer', '#contributor', '#backer', '#other'];
       let cleanTitle = event.name;
 
+      // Extract eligibility from title hashtags
       validTags.forEach((tag) => {
         const regex = new RegExp(`\\s*${tag}\\s*`, 'gi');
         if (regex.test(cleanTitle)) {
           eligibilityTags.push(tag.toLowerCase());
           cleanTitle = cleanTitle.replace(regex, ' ').trim();
+        }
+      });
+
+      // Also extract eligibility from entry.tags (Luma calendar tags)
+      const ticketTagNames = ['follower', 'explorer', 'contributor', 'backer', 'other'];
+      entry.tags?.forEach((tag) => {
+        const name = tag.name.toLowerCase();
+        if (ticketTagNames.includes(name)) {
+          const hashTag = `#${name}`;
+          if (!eligibilityTags.includes(hashTag)) {
+            eligibilityTags.push(hashTag);
+          }
         }
       });
 
@@ -216,6 +235,9 @@ export function buildScheduleFromEntries(entries: LumaApiEntry[]): CalendarEvent
         imageUrl: event.cover_url,
         tickets: ticketInfo,
         visibility: event.visibility,
+        latitude: event.geo_latitude ?? null,
+        longitude: event.geo_longitude ?? null,
+        placeId: event.geo_address_info?.place_id,
       });
     } catch {
       // Skip invalid event
