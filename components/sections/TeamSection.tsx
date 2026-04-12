@@ -245,6 +245,57 @@ export default function TeamSection() {
         </div>
       </div>
 
+      {/* 協辦單位 Co-Organizers */}
+      <div id="co-organizer" className="py-20 md:py-28 lg:py-32 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-10 md:mb-12 lg:mb-16"
+          >
+            {t.partners.coOrganizers?.title}
+          </motion.h2>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative h-48 md:h-56 lg:h-64 w-auto flex-shrink-0 rounded-2xl overflow-hidden"
+            >
+              <Image
+                src="/images/partners/nanhuei_alliance.jpg"
+                alt={t.partners.coOrganizers?.nanhueiAlliance?.name || "南迴永續旅行聯盟"}
+                width={400}
+                height={300}
+                className="h-full w-auto object-cover"
+                loading="lazy"
+              />
+            </motion.div>
+            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
+              <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-xl md:text-2xl font-display font-bold text-[#1E1F1C]"
+              >
+                {t.partners.coOrganizers?.nanhueiAlliance?.name}
+              </motion.h3>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
+              >
+                {t.partners.coOrganizers?.nanhueiAlliance?.description}
+              </motion.p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 執行團隊 Organizing Team */}
       <div id="organizing-team" className="py-20 md:py-28 lg:py-32 bg-white">
         <div className="container mx-auto px-4 sm:px-6">
