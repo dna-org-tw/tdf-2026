@@ -304,6 +304,19 @@ export const content = {
       mapErrorDescription: "You can view accommodation information below, or use",
       mapErrorSearchLink: "Google Maps",
       mapErrorSearchSuffix: "to search for locations.",
+      partnerPlatforms: {
+        title: "Partner Accommodation Platforms",
+        subtitle: "We've partnered with trusted platforms to help you find the perfect long-term stay.",
+        items: [
+          {
+            name: "goodroom サブスくらし",
+            description: "A Japanese platform specializing in mid-to-long-term stays (14+ nights). Furnished apartments, hotels, share houses, and co-living — all bookable online with no deposit required. Multilingual support available.",
+            logo: "/images/partners/goodroom.png",
+            url: "https://subscribe.goodrooms.jp/",
+            features: ["No Deposit", "Fully Furnished", "Online Booking", "14+ Night Stays"],
+          }
+        ]
+      },
       ctas: [
         { type: "Register", text: "Become a Venue Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ],
@@ -1161,6 +1174,19 @@ export const content = {
       mapErrorDescription: "您可以在下方查看住宿資訊，或使用",
       mapErrorSearchLink: "Google Maps",
       mapErrorSearchSuffix: "搜尋位置。",
+      partnerPlatforms: {
+        title: "合作住宿平台推薦",
+        subtitle: "我們與值得信賴的平台合作，協助你找到理想的中長期住宿。",
+        items: [
+          {
+            name: "goodroom サブスくらし",
+            description: "日本中長期住宿平台，提供 14 泊以上的月租公寓、飯店、共享住宅及 Co-living。免押金、家具家電齊全、線上即可完成預約，支援多語言服務。",
+            logo: "/images/partners/goodroom.png",
+            url: "https://subscribe.goodrooms.jp/",
+            features: ["免押金", "家具家電齊全", "線上預約", "14泊以上"],
+          }
+        ]
+      },
       ctas: [
         { type: "Register", text: "成為場地夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
       ],
