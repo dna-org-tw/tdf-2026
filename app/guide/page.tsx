@@ -57,8 +57,8 @@ export default function GuidePage() {
         </div>
 
         {/* Tab bar */}
-        <div className="mb-10 overflow-x-auto -mx-4 px-4 scrollbar-hide">
-          <div className="flex gap-2 min-w-max">
+        <div className="max-w-3xl mx-auto mb-10 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 min-w-max pb-1">
             {guide.tabs.map((tab) => (
               <button
                 key={tab.id}

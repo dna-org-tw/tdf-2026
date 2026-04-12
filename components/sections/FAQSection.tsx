@@ -13,7 +13,7 @@ export default function FAQSection() {
   useSectionTracking({ sectionId: 'faq', sectionName: 'FAQ Section', category: 'Information' });
 
   return (
-    <section id="faq" className="bg-stone-50 py-20 md:py-28">
+    <section id="faq" className="bg-stone-50 py-20 md:py-28 lg:py-32">
       <div className="container mx-auto px-4 sm:px-6">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
