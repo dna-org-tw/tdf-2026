@@ -141,7 +141,7 @@ export default function TeamSection() {
                 transition={{ delay: 0.1 }}
                 className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
               >
-                {t.partners.organizers.description}
+                {t.partners.organizers.tdna.description}
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -166,6 +166,73 @@ export default function TeamSection() {
                 </a>
                 <a
                   href="https://dna.org.tw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                >
+                  <Globe className="w-5 h-5" />
+                </a>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* 台東縣政府 Taitung County Government */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500 mt-16 md:mt-20">
+            <motion.a
+              href="https://www.taitung.gov.tw/"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative h-20 md:h-28 lg:h-32 w-auto block flex-shrink-0"
+            >
+              <Image
+                src="/images/logo/taitung_gov_logo.png"
+                alt="Taitung County Government"
+                width={200}
+                height={192}
+                className="h-full w-auto object-contain"
+                loading="lazy"
+              />
+            </motion.a>
+            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
+              >
+                {t.partners.organizers.taitungGov.description}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.15 }}
+                className="flex items-center gap-4 justify-center md:justify-start w-full"
+              >
+                <a
+                  href="https://www.instagram.com/tt.nomads/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.facebook.com/taitung.gov"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a
+                  href="https://www.taitung.gov.tw/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors"
@@ -517,40 +584,6 @@ export default function TeamSection() {
             {t.partners.sponsors.title}
           </motion.h2>
           
-          {/* Platinum Sponsors */}
-          <div className="mb-16">
-            <motion.h3
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-2xl md:text-3xl font-display font-semibold text-[#1E1F1C] mb-8"
-            >
-              {t.partners.sponsors.platinum}
-            </motion.h3>
-            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 lg:gap-20">
-              <motion.a
-                href="https://www.taitung.gov.tw/"
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative h-28 md:h-36 lg:h-44 w-28 md:w-36 lg:w-44 bg-white p-4 rounded-lg border-4 border-[#e4003d] flex items-center justify-center"
-              >
-                <Image
-                  src="/images/logo/taitung_gov_logo.png"
-                  alt="Taitung Government"
-                  width={200}
-                  height={192}
-                  className="h-full w-full object-contain"
-                  loading="lazy"
-                />
-              </motion.a>
-            </div>
-          </div>
-
           {/* Gold Sponsors */}
           <div className="mb-16">
             <motion.h3

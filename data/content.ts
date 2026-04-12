@@ -277,8 +277,14 @@ export const content = {
       },
       organizers: {
         title: "Organizers",
-        description:
-          "Taiwan Digital Nomad Association (TDNA) is a non-profit organization dedicated to building Taiwan into one of Asia's leading digital nomad destinations. TDNA connects international nomads, local communities, governments, and businesses to co-create sustainable work–life ecosystems where people can live, work, and thrive between mountains and sea."
+        tdna: {
+          description:
+            "Taiwan Digital Nomad Association (TDNA) is a non-profit organization dedicated to building Taiwan into one of Asia's leading digital nomad destinations. TDNA connects international nomads, local communities, governments, and businesses to co-create sustainable work–life ecosystems where people can live, work, and thrive between mountains and sea.",
+        },
+        taitungGov: {
+          description:
+            "Taitung County Government is committed to promoting Taitung as a world-class destination for sustainable tourism, digital innovation, and cultural exchange. Through partnerships with international communities and local organizations, Taitung is building a welcoming ecosystem for digital nomads and remote workers to experience its stunning natural landscapes, rich indigenous heritage, and vibrant local life.",
+        },
       },
       sponsors: {
         title: "Sponsors",
@@ -1149,8 +1155,14 @@ export const content = {
       },
       organizers: {
         title: "主辦單位",
-        description:
-          "台灣數位遊牧者協會（TDNA）是一個致力於推動台灣成為亞洲頂尖數位遊牧基地的非營利組織。我們串連國際遊牧者、在地社群、政府與企業，從活動、空間到生活服務，一起打造可以在山海之間安心工作、深度生活與長期停留的友善生態系。"
+        tdna: {
+          description:
+            "台灣數位遊牧者協會（TDNA）是一個致力於推動台灣成為亞洲頂尖數位遊牧基地的非營利組織。我們串連國際遊牧者、在地社群、政府與企業，從活動、空間到生活服務，一起打造可以在山海之間安心工作、深度生活與長期停留的友善生態系。",
+        },
+        taitungGov: {
+          description:
+            "臺東縣政府致力於推動臺東成為永續觀光、數位創新與文化交流的國際目的地。透過與國際社群及在地組織的合作，臺東正打造一個歡迎數位遊牧者與遠端工作者的友善生態系，讓世界看見臺東壯闊的自然地景、豐富的原住民文化，以及充滿活力的在地生活。",
+        },
       },
       sponsors: {
         title: "贊助單位",
