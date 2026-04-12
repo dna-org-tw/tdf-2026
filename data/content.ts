@@ -266,6 +266,10 @@ export const content = {
       viewFull: "Click to view full image"
     },
     partners: {
+      team: {
+        title: "Organizing Team",
+        subtitle: "The people behind Taiwan Digital Fest 2026",
+      },
       speakers: {
         title: "Speakers",
         subtitle: "Listed in alphabetical order",
@@ -1119,6 +1123,10 @@ export const content = {
       viewFull: "點擊查看大圖"
     },
     partners: {
+      team: {
+        title: "執行團隊",
+        subtitle: "Taiwan Digital Fest 2026 的幕後推手",
+      },
       speakers: {
         title: "講者",
         subtitle: "依照名字字典順序呈現",

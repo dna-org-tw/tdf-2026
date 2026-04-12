@@ -9,6 +9,8 @@ import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { useLumaData } from '@/contexts/LumaDataContext';
 import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter } from 'lucide-react';
 import type { SpeakerGrouped, SpeakerSocialLinks } from '@/lib/lumaSpeakers';
+import { teamMembers } from '@/data/team';
+import { MessageCircle } from 'lucide-react';
 
 interface Partner {
   name: string;
@@ -175,8 +177,90 @@ export default function TeamSection() {
         </div>
       </div>
 
+      {/* 執行團隊 Organizing Team */}
+      <div id="organizing-team" className="py-20 md:py-28 lg:py-32 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-4 md:mb-6"
+          >
+            {t.partners.team.title}
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-[#4B4C47] text-base md:text-lg mb-10 md:mb-12 lg:mb-16"
+          >
+            {t.partners.team.subtitle}
+          </motion.p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
+            {teamMembers.map((member, index) => (
+              <motion.div
+                key={member.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: Math.min(index * 0.05, 0.5) }}
+                whileHover={{ y: -4 }}
+                className="flex flex-col items-center text-center"
+              >
+                <div className="relative w-[clamp(5.5rem,32vw,8rem)] h-[clamp(5.5rem,32vw,8rem)] rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] flex-shrink-0 mb-3 aspect-square">
+                  <Image
+                    src={member.photo || '/images/team/placeholder.svg'}
+                    alt={member.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 128px"
+                  />
+                </div>
+                <p className="font-semibold text-[#1E1F1C] text-sm sm:text-base line-clamp-2">
+                  {member.name}
+                </p>
+                <p className="text-[#C54090] text-xs sm:text-sm font-medium mt-0.5">
+                  {member.title}
+                </p>
+                {member.bio && (
+                  <p className="text-[#4B4C47] text-xs mt-1 text-center w-full min-w-0 line-clamp-3">
+                    {member.bio}
+                  </p>
+                )}
+                {(member.email || member.instagram || member.website || member.whatsapp) && (
+                  <div className="flex items-center justify-center gap-1.5 mt-2 flex-wrap" role="group" aria-label="Contact links">
+                    {member.website && (
+                      <a href={member.website} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Website">
+                        <Globe className="w-4 h-4" />
+                      </a>
+                    )}
+                    {member.instagram && (
+                      <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Instagram">
+                        <Instagram className="w-4 h-4" />
+                      </a>
+                    )}
+                    {member.email && (
+                      <a href={`mailto:${member.email}`} className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="Email">
+                        <Mail className="w-4 h-4" />
+                      </a>
+                    )}
+                    {member.whatsapp && (
+                      <a href={`https://wa.me/${member.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full bg-[#F6F6F6] border border-[#E0E0E0] text-[#4B4C47] hover:bg-[#1E1F1C] hover:text-white transition-colors" aria-label="WhatsApp">
+                        <MessageCircle className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Speakers 講者 */}
-      <div id="speakers" className="py-20 md:py-28 lg:py-32 bg-white">
+      <div id="speakers" className="py-20 md:py-28 lg:py-32 bg-[#F6F6F6]">
         <div className="container mx-auto px-4 sm:px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <rect width="200" height="200" rx="100" fill="#F0EDE8"/>
+  <!-- Body/shoulders -->
+  <ellipse cx="100" cy="186" rx="58" ry="38" fill="#D4CFC6"/>
+  <!-- Neck -->
+  <rect x="88" y="130" width="24" height="20" rx="8" fill="#E0DBD2"/>
+  <!-- Head -->
+  <circle cx="100" cy="100" r="42" fill="#E0DBD2"/>
+  <!-- Hair -->
+  <path d="M58 92c0-26 18-46 42-46s42 20 42 46c0 4-1 8-2 11 2-8 3-16 3-24 0-28-19-50-43-50S57 51 57 79c0 8 1 16 3 24-1-3-2-7-2-11z" fill="#C4BEB4"/>
+  <!-- Eyes -->
+  <circle cx="84" cy="98" r="4" fill="#8C8578"/>
+  <circle cx="116" cy="98" r="4" fill="#8C8578"/>
+  <!-- Smile -->
+  <path d="M88 112c4 6 12 8 24 0" stroke="#8C8578" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <!-- Cheeks -->
+  <circle cx="76" cy="108" r="6" fill="#E8C4B8" opacity="0.5"/>
+  <circle cx="124" cy="108" r="6" fill="#E8C4B8" opacity="0.5"/>
+</svg>
