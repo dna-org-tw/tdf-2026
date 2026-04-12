@@ -293,6 +293,16 @@ export const content = {
           description:
             "The Nanhuei Sustainable Travel Alliance connects around 40 local businesses and teams across Taitung's Nanhuei region, spanning food, accommodation, tourism, shopping, and transportation. With \"cultural sustainability, ecological sustainability, and environmental sustainability\" at its core, the alliance promotes locally distinctive sustainable travel practices. Through ocean waste recycling, local tour design, and a reusable cup system, the alliance integrates waste reduction, beach cleanups, and cultural experiences into everyday travel — enabling travelers to take responsibility for the environment while exploring the land.",
         },
+        yuanNatural: {
+          name: "Yuan Natural Co., Ltd.",
+          description:
+            "Yuan Natural is an agricultural brand rooted in Taitung's Chishang and Guanshan regions. The team specializes in rice, functional rice, and rice-based foods, with their proprietary \"Black Fiber Rice®\" winning international acclaim including the 2017 iTQi Superior Taste Award and 2018 Monde Selection Gold Award. Certified under ISO22000, HACCP, and Tse-Xin organic processing standards, Yuan Natural believes that \"healthy land grows healthy crops\" and promotes eco-friendly farming and healthy eating. Over the past decade, their contract farming and natural agriculture practices have helped restore protected species including crested serpent eagles, pangolins, and Reeves's muntjac.",
+        },
+        herflow: {
+          name: "HerFlow Living Lab",
+          description:
+            "HerFlow Living Lab is a multi-functional space nestled in the heart of Dulan, Donghe Township, Taitung — backed by mountains and facing the sea. Run by artistic partners Xiao Guan and A-Xin, the space embodies the philosophy of \"mind-body unity and flowing with nature.\" It offers seasonal light meals, artisanal drinks, and handmade desserts nurtured by Taitung's terroir, alongside curated local creations, sustainability events, exhibitions, and sharing sessions — serving as a creative platform and coworking space that bridges creators with the community.",
+        },
       },
       sponsors: {
         title: "Sponsors",
@@ -1178,6 +1188,16 @@ export const content = {
           name: "南迴永續旅行聯盟",
           description:
             "南迴永續旅行聯盟串聯台東南迴地區約40個在地店家與團隊，涵蓋食、宿、遊、購、行等不同產業，以「文化永續、生態永續、環境永續」為核心，共同推動具在地特色的永續旅行模式。聯盟透過海廢再利用行動、在地遊程設計及永續杯借還系統，將減塑、淨灘與文化體驗融入日常旅行，讓旅人在探索地方的同時，也能實踐對環境與土地的責任。",
+        },
+        yuanNatural: {
+          name: "源天然股份有限公司",
+          description:
+            "源天然是一家深耕於台東池上與關山地區的農業品牌。團隊以稻米、功能米與米製食品為主，獨家研發並註冊商標的「黑纖米®」獲得國際金獎肯定，曾拿下 2017 年 iTQi 絕佳風味獎與 2018 年世界品質金獎。公司通過 ISO22000、HACCP 及慈心有機加工廠等驗證，確保產品安全。源天然認為「土地健康，作物才能健康」，因此推動友善耕作與健康飲食，藉由消費者購買支持永續農法並增加農民收入。十多年來，透過契作與自然農法，復育了大冠鷲、穿山甲與山羌等保育類動物。",
+        },
+        herflow: {
+          name: "合流生活提案所（HerFlow）",
+          description:
+            "合流生活提案所坐落於台東東河鄉都蘭鬧區，是一處背山面海、充滿綠意又具居家感的複合式空間。營運者是在台東漂泊的藝術工作者情侶小關與阿信，他們秉持「身心合一、順勢流動」的理念，希望從山與海學習生活智慧，創造與自然合流的多樣生活樣貌。空間中提供由台東風土滋養的當令輕鮮食、醇飲與手作甜點，販售在地創作選物，並舉辦各種永續活動、展覽與分享會，鼓勵創作者與社區互動。",
         },
       },
       sponsors: {
