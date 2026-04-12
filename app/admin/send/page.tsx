@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-type RecipientGroup = 'orders' | 'subscribers';
+type RecipientGroup = 'orders' | 'subscribers' | 'test';
 type TicketTier = 'explore' | 'contribute' | 'weekly_backer' | 'backer';
 
-const GROUP_OPTIONS: { value: RecipientGroup; label: string }[] = [
+const GROUP_OPTIONS: { value: RecipientGroup; label: string; description?: string }[] = [
+  { value: 'test', label: '寄送測試信', description: '寄送至自己的信箱' },
   { value: 'orders', label: '付費會員' },
   { value: 'subscribers', label: '電子報訂閱者' },
 ];
@@ -55,7 +56,16 @@ export default function SendNotificationPage() {
   const [sending, setSending] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [emailConfig, setEmailConfig] = useState<{ from: string; replyTo: string | null; domain: string | null } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/email-config')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => { if (data) setEmailConfig(data); })
+      .catch(() => {});
+  }, []);
 
   const fetchCount = useCallback(async () => {
     if (groups.length === 0) {
@@ -98,12 +108,14 @@ export default function SendNotificationPage() {
     );
   };
 
+  const isTestOnly = groups.length === 1 && groups[0] === 'test';
   const canSend = groups.length > 0 && subject.trim() && body.trim() && recipientCount && recipientCount > 0;
 
   const handleSend = async () => {
     setShowConfirm(false);
     setSending(true);
     setError('');
+    setSuccessMessage('');
 
     try {
       const res = await fetch('/api/admin/send', {
@@ -123,7 +135,11 @@ export default function SendNotificationPage() {
         throw new Error(data.error || '發送失敗');
       }
 
-      router.push('/admin');
+      if (isTestOnly) {
+        setSuccessMessage(`測試信已寄送（${data.recipientCount} 封）`);
+      } else {
+        router.push('/admin');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '發送失敗');
     } finally {
@@ -134,6 +150,21 @@ export default function SendNotificationPage() {
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">發送通知信</h1>
+
+      {/* Email Config Info */}
+      {emailConfig && (
+        <section className="bg-slate-50 rounded-xl p-4 shadow-sm mb-4 border border-slate-200">
+          <h2 className="font-semibold text-slate-700 mb-2 text-sm">信件設定</h2>
+          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+            <span className="text-slate-500">寄件者 (From)：</span>
+            <span className="text-slate-900 font-mono">{emailConfig.from}</span>
+            <span className="text-slate-500">回覆地址 (Reply-To)：</span>
+            <span className="text-slate-900 font-mono">{emailConfig.replyTo || '未設定（回覆將寄至 From 地址）'}</span>
+            <span className="text-slate-500">Mailgun Domain：</span>
+            <span className="text-slate-900 font-mono">{emailConfig.domain || '未設定'}</span>
+          </div>
+        </section>
+      )}
 
       {/* Recipient Selection */}
       <section className="bg-white rounded-xl p-6 shadow-sm mb-4">
@@ -147,7 +178,10 @@ export default function SendNotificationPage() {
                 onChange={() => toggleGroup(opt.value)}
                 className="w-4 h-4 accent-[#10B8D9]"
               />
-              <span className="text-sm text-slate-700">{opt.label}</span>
+              <span className="text-sm text-slate-700">
+                {opt.label}
+                {opt.description && <span className="text-slate-400 ml-1">({opt.description})</span>}
+              </span>
             </label>
           ))}
         </div>
@@ -235,13 +269,17 @@ export default function SendNotificationPage() {
         <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>
       )}
 
+      {successMessage && (
+        <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">{successMessage}</div>
+      )}
+
       <div className="flex gap-3">
         <button
-          onClick={() => setShowConfirm(true)}
+          onClick={isTestOnly ? handleSend : () => setShowConfirm(true)}
           disabled={!canSend || sending}
           className="bg-[#10B8D9] hover:bg-[#0EA5C4] disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors"
         >
-          {sending ? '發送中...' : '發送通知'}
+          {sending ? '發送中...' : isTestOnly ? '寄送測試信' : '發送通知'}
         </button>
         <button
           onClick={() => router.push('/admin')}

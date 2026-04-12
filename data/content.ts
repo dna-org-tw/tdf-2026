@@ -349,9 +349,6 @@ export const content = {
           }
         ]
       },
-      ctas: [
-        { type: "Register", text: "Become a Venue Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
-      ],
       items: [
         {
           name: "東糖官邸民宿",
@@ -1251,9 +1248,6 @@ export const content = {
           }
         ]
       },
-      ctas: [
-        { type: "Register", text: "成為場地夥伴", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
-      ],
       items: [
         {
           name: "東糖官邸民宿",

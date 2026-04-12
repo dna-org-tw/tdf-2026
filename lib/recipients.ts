@@ -1,6 +1,6 @@
 import { supabaseServer } from '@/lib/supabaseServer';
 
-export type RecipientGroup = 'orders' | 'subscribers';
+export type RecipientGroup = 'orders' | 'subscribers' | 'test';
 export type TicketTier = 'explore' | 'contribute' | 'weekly_backer' | 'backer';
 
 interface RecipientsResult {
@@ -10,13 +10,18 @@ interface RecipientsResult {
 
 export async function getRecipients(
   groups: RecipientGroup[],
-  tiers?: TicketTier[]
+  tiers?: TicketTier[],
+  adminEmail?: string
 ): Promise<RecipientsResult> {
   if (!supabaseServer) {
     throw new Error('Supabase not configured');
   }
 
   const emailSet = new Set<string>();
+
+  if (groups.includes('test') && adminEmail) {
+    emailSet.add(adminEmail.trim().toLowerCase());
+  }
 
   if (groups.includes('orders')) {
     let query = supabaseServer

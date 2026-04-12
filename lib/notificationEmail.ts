@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabaseServer';
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
 const fromEmail = process.env.EMAIL_FROM || `noreply@${mailgunDomain || 'example.com'}`;
+const replyToEmail = process.env.EMAIL_REPLY_TO || 'fest@dna.org.tw';
 
 const mailgunClient = mailgunApiKey && mailgunDomain
   ? new Mailgun(formData).client({ username: 'api', key: mailgunApiKey })
@@ -79,6 +80,7 @@ export async function sendBatchNotification(
         subject,
         html,
         text,
+        'h:Reply-To': replyToEmail,
       });
       totalSent += batch.length;
     } catch (error) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { getRecipients, type RecipientGroup, type TicketTier } from '@/lib/recipients';
 
-const VALID_GROUPS: RecipientGroup[] = ['orders', 'subscribers'];
+const VALID_GROUPS: RecipientGroup[] = ['orders', 'subscribers', 'test'];
 const VALID_TIERS: TicketTier[] = ['explore', 'contribute', 'weekly_backer', 'backer'];
 
 export async function GET(req: NextRequest) {
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     : undefined;
 
   try {
-    const result = await getRecipients(groups, tiers);
+    const result = await getRecipients(groups, tiers, session.email);
     return NextResponse.json(result);
   } catch (error) {
     console.error('[Admin Recipients]', error);
