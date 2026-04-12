@@ -159,7 +159,7 @@ export default function AccommodationSection() {
   useSectionTracking({ sectionId: 'accommodation', sectionName: 'Accommodation Section', category: 'Event Information' });
 
   return (
-    <section id="accommodation" className="bg-white py-20 md:py-28 lg:py-32 transition-colors duration-500">
+    <section id="accommodation" className="bg-white pt-20 md:pt-28 lg:pt-32 transition-colors duration-500">
       <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
