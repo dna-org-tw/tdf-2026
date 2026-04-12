@@ -39,14 +39,6 @@ export const teamMembers: TeamMember[] = [
     whatsapp: '886988927976',
   },
   {
-    name: 'Sophie',
-    title: 'Event Manager',
-    bio: 'Project Manager with 7 years of experience in software development and project management, specializing in digital transformation strategies, system design, and cross-departmental collaboration.',
-    photo: '/images/team/Sophie.jpg',
-    email: 'sophie@dna.org.tw',
-    website: 'https://loudinow.com/',
-  },
-  {
     name: '唐唐',
     title: 'Event Manager',
     bio: 'A student from the Department of Green Energy and Information Technology at NTTU. As President of the Student Association, focusing on strategic coordination, event execution, and cross-team leadership, delivering impactful initiatives through a proactive and solution-driven approach.',
@@ -82,8 +74,12 @@ export const teamMembers: TeamMember[] = [
     whatsapp: '886908966163',
   },
   {
-    name: 'Sophia',
+    name: 'Sophie',
     title: 'Event Manager',
+    bio: 'Project Manager with 7 years of experience in software development and project management, specializing in digital transformation strategies, system design, and cross-departmental collaboration.',
+    photo: '/images/team/Sophie.jpg',
+    email: 'sophie@dna.org.tw',
+    website: 'https://loudinow.com/',
   },
   {
     name: 'Maria',
@@ -92,6 +88,15 @@ export const teamMembers: TeamMember[] = [
   {
     name: 'Nikoleta',
     title: 'Community Manager',
+  },
+  {
+    name: 'Jojo',
+    title: 'Documenter Manager',
+    bio: '7 years being a photographer. Background in economics. Now creating a YT channel for digital nomad event and experience under governmental support. Rock music and physics also fascinate me.',
+    email: 'c1354chen@gmail.com',
+    website: 'https://factual-jade-ebb.notion.site/77Studio-68e81457614e4a8ba9b7ca9e75687968',
+    instagram: 'https://www.instagram.com/asiansquatguy_jojo/',
+    whatsapp: '886911584384',
   },
   {
     name: 'Glacia',
@@ -113,14 +118,5 @@ export const teamMembers: TeamMember[] = [
     bio: 'Crafting stories that connect people and ideas by shaping narratives around the digital nomad lifestyle, remote work, and emerging trends into content that feels relevant and real. With a background in journalism and feature writing.',
     email: 'irene@dna.org.tw',
     instagram: 'https://www.instagram.com/_pinyuuuuuu/',
-  },
-  {
-    name: 'Jojo',
-    title: 'Documenter Manager',
-    bio: '7 years being a photographer. Background in economics. Now creating a YT channel for digital nomad event and experience under governmental support. Rock music and physics also fascinate me.',
-    email: 'c1354chen@gmail.com',
-    website: 'https://factual-jade-ebb.notion.site/77Studio-68e81457614e4a8ba9b7ca9e75687968',
-    instagram: 'https://www.instagram.com/asiansquatguy_jojo/',
-    whatsapp: '886911584384',
   },
 ];
