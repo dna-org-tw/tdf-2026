@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   ResponsiveContainer,
-  LineChart,
+  ComposedChart,
+  Bar,
   Line,
   XAxis,
   YAxis,
@@ -94,9 +95,11 @@ function ChartTooltip({ active, payload, label }: any) {
   return (
     <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-md text-sm">
       <p className="font-medium text-slate-900 mb-1">{label}</p>
-      {payload.map((entry: { name: string; value: number; color: string }) => (
+      {payload.map((entry: { name: string; value: number; color: string; dataKey: string }) => (
         <p key={entry.name} style={{ color: entry.color }}>
-          {entry.name === '收入 (USD)' ? `${entry.name}: $${(entry.value / 100).toFixed(2)}` : `${entry.name}: ${entry.value}`}
+          {entry.dataKey === 'cumulativeRevenue'
+            ? `${entry.name}: $${(entry.value / 100).toFixed(2)}`
+            : `${entry.name}: ${entry.value}`}
         </p>
       ))}
     </div>
@@ -122,7 +125,16 @@ export default function OrdersPage() {
     setChartLoading(true);
     fetch(`/api/admin/orders/daily?days=${chartRange}`)
       .then((res) => res.json())
-      .then((data) => setDailyData(data.daily || []))
+      .then((data) => {
+        // Compute cumulative revenue
+        const daily = data.daily || [];
+        let cumulative = 0;
+        const withCumulative = daily.map((d: DailyData) => {
+          cumulative += d.revenue;
+          return { ...d, cumulativeRevenue: cumulative };
+        });
+        setDailyData(withCumulative);
+      })
       .catch((err) => console.error('[Admin Chart]', err))
       .finally(() => setChartLoading(false));
   }, [chartRange]);
@@ -207,7 +219,7 @@ export default function OrdersPage() {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={dailyData}>
+            <ComposedChart data={dailyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis
                 dataKey="date"
@@ -227,37 +239,35 @@ export default function OrdersPage() {
                 tickFormatter={(v: number) => `$${(v / 100).toFixed(0)}`}
               />
               <Tooltip content={<ChartTooltip />} />
-              <Line
+              <Bar
                 yAxisId="left"
-                type="monotone"
                 dataKey="paid"
                 name="已付款訂單"
-                stroke="#10B8D9"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4 }}
+                fill="#10B8D9"
+                radius={[2, 2, 0, 0]}
+                barSize={chartRange <= 14 ? 16 : chartRange <= 30 ? 8 : 4}
               />
               <Line
                 yAxisId="right"
                 type="monotone"
-                dataKey="revenue"
-                name="收入 (USD)"
+                dataKey="cumulativeRevenue"
+                name="累計收入"
                 stroke="#22c55e"
                 strokeWidth={2}
                 dot={false}
                 activeDot={{ r: 4 }}
               />
-            </LineChart>
+            </ComposedChart>
           </ResponsiveContainer>
         )}
         <div className="flex items-center gap-6 mt-3 text-xs text-slate-500">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-0.5 bg-[#10B8D9] rounded" />
+            <span className="w-3 h-2 bg-[#10B8D9] rounded-sm" />
             已付款訂單
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-0.5 bg-green-500 rounded" />
-            收入
+            累計收入
           </div>
         </div>
       </div>
