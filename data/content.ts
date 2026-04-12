@@ -39,6 +39,7 @@ export const content = {
       followUs: "Follow Us",
       register: "Schedule",
       award: "IG Contest",
+      guide: "Guide",
       login: "Sign In",
       member: "My Account",
       languageToggle: "中文"
@@ -940,6 +941,7 @@ export const content = {
       followUs: "關注我們",
       register: "時程",
       award: "IG 短影音大賽",
+      guide: "指南",
       login: "登入",
       member: "我的帳戶",
       languageToggle: "中文"

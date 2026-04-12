@@ -103,6 +103,7 @@ export default function Navbar() {
     { name: t.nav.accommodation, href: '#accommodation' },
     { name: t.nav.team, href: '#team' },
     { name: t.nav.followUs, href: '#follow-us' },
+    { name: t.nav.guide, href: '/guide' },
   ];
 
   return (
@@ -131,18 +132,30 @@ export default function Navbar() {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href)}
-              className={`text-sm font-medium hover:text-[#10B8D9] transition-colors cursor-pointer ${
-                scrolled ? 'text-[#1E1F1C]' : 'text-white'
-              }`}
-            >
-              {link.name}
-            </a>
-          ))}
+          {navLinks.map((link) =>
+            link.href.startsWith('#') ? (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className={`text-sm font-medium hover:text-[#10B8D9] transition-colors cursor-pointer ${
+                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
+                }`}
+              >
+                {link.name}
+              </a>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium hover:text-[#10B8D9] transition-colors ${
+                  scrolled ? 'text-[#1E1F1C]' : 'text-white'
+                }`}
+              >
+                {link.name}
+              </Link>
+            )
+          )}
 
           <button
             onClick={toggleLanguage}
