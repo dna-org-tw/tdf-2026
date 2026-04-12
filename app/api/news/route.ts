@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const AOTTER_API_URL =
-  'https://nb.aotter.net/api/public/post/publisher?q=697dc6cfb5863795d3e9b5d1';
+  'https://nb.aotter.net/api/public/post/publisher?q=69a6aeacb5863795d3709052';
 
 export const revalidate = 3600; // ISR: revalidate every hour
 
