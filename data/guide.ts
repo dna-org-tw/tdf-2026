@@ -60,7 +60,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q1',
             question: '票券分幾個等級？各自可以參加哪些活動？',
-            answer: 'TDF 2026 票券分為四個等級：PURPLE（免費，官網訂閱 + IG 追蹤可參加紫色活動）、BLUE（$30 USD，藍＋紫色活動）、GREEN（$300 USD，綠＋藍＋紫色活動）、YELLOW（$600 USD，全部活動＋花蓮三天兩夜旅行）。另有 Weekly Backer 票種，適合只能參加單週活動的人。4/20 前有早鳥優惠。',
+            answer: 'TDF 2026 票券分為四個等級：PURPLE（免費，官網訂閱 + IG 追蹤可參加紫色活動）、BLUE（$30 USD，藍＋紫色活動）、GREEN（$300 USD，綠＋藍＋紫色活動）、YELLOW（$600 USD，全部活動＋花蓮三天兩夜旅行）。另有 Weekly Backer 票種，適合只能參加單週活動的人。',
           },
           {
             id: 'q2',
@@ -100,6 +100,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             question: '報名了但沒到會怎樣？（No-Show Policy）',
             answer: '未準時出席者，名額將直接釋放給現場候補人員。無故缺席者，下次活動的預約權限將降為「候補」（再下一次即可恢復正常預約）。',
           },
+          {
+            id: 'q7b',
+            question: '活動是否有限制名額？',
+            answer: '是的，為了提供好的活動品質，活動將會限制參加名額。我們將會依照票券等級以及報名順序來放行。',
+          },
         ],
         guideBlocks: [],
       },
@@ -116,7 +121,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q9',
             question: '主辦方會安排住宿嗎？',
-            answer: '住宿不由主辦方統一安排，參與者需自行預訂。官網會提供台東住宿推薦資訊。',
+            answer: '住宿不由主辦方統一安排，參與者需自行預訂。官網會提供台東住宿推薦資訊。如果需要協助訂房，可以到 WhatsApp 社群群組與我們聯繫，我們有保留住宿給需要協助訂房的會眾。',
           },
         ],
         guideBlocks: [
@@ -130,7 +135,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           },
           {
             title: '住宿區域建議',
-            content: '<ul><li><strong>台東市區（轉運站／鐵花村周邊）</strong>：生活機能最佳，離多數活動場地近</li><li><strong>都蘭</strong>：海岸線氣氛，適合衝浪與慢活，到市區需 30 分鐘車程</li><li><strong>池上／關山</strong>：縱谷稻田風光，適合第二週活動期間入住</li></ul>',
+            content: '<ul><li><strong>台東市區（轉運站／鐵花村周邊）</strong>：生活機能最佳，離多數活動場地近</li><li><strong>都蘭</strong>：海岸線氣氛，適合衝浪與慢活，到市區需 30 分鐘車程</li><li><strong>池上／關山</strong>：縱谷稻田風光，適合第二週活動期間入住</li></ul><p><strong>依參與週數建議：</strong></p><ul><li>參與整個月的會眾：建議住在<strong>市區</strong>，生活機能最佳</li><li>僅參與一週：第一週建議住<strong>南迴（金崙）</strong>、第二週建議住<strong>縱谷（池上、關山）</strong>、第三週建議住<strong>海岸（都蘭）</strong>、第四週建議住<strong>市區</strong></li></ul>',
           },
         ],
       },
@@ -142,7 +147,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q10',
             question: '各場活動之間怎麼移動？',
-            answer: '各場活動需自行前往集合地點。建議參與者善用 WhatsApp 群組進行 Car Share（共乘）。',
+            answer: '各場活動需自行前往集合地點。可以搭乘台鐵、客運前往，也可以租車、租機車或使用 YouBike。建議參與者善用 WhatsApp 群組進行 Car Share（共乘）。',
           },
           {
             id: 'q11',
@@ -153,11 +158,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         guideBlocks: [
           {
             title: '從台灣各地前往台東',
-            content: '<h4>台北 → 台東</h4><table><thead><tr><th>交通方式</th><th>時間</th><th>費用 (TWD)</th><th>備註</th></tr></thead><tbody><tr><td>火車（普悠瑪／太魯閣）</td><td>3.5–4.5 小時</td><td>~783</td><td>最推薦，假日票難搶，建議提前 28 天訂票</td></tr><tr><td>火車（莒光號）</td><td>5–5.5 小時</td><td>~604</td><td>班次較多</td></tr><tr><td>飛機（松山→台東）</td><td>50 分鐘</td><td>~3,500</td><td>每日約 6 班</td></tr></tbody></table><h4>高雄 → 台東</h4><table><thead><tr><th>交通方式</th><th>時間</th><th>費用 (TWD)</th></tr></thead><tbody><tr><td>火車（自強號）</td><td>2–2.5 小時</td><td>~362</td></tr><tr><td>自駕（南迴公路）</td><td>~3 小時</td><td>油資</td></tr></tbody></table>',
+            content: '<h4>台北 → 台東</h4><table><thead><tr><th>交通方式</th><th>時間</th><th>費用 (TWD)</th><th>備註</th></tr></thead><tbody><tr><td>火車（普悠瑪／太魯閣）</td><td>3.5–4.5 小時</td><td>~935</td><td>最推薦，假日票難搶，建議提前 28 天訂票</td></tr><tr><td>火車（莒光號）</td><td>5–5.5 小時</td><td>~603</td><td>班次較多</td></tr><tr><td>飛機（松山→台東）</td><td>50 分鐘</td><td>~3,500</td><td>每日約 6 班</td></tr></tbody></table><h4>高雄 → 台東</h4><table><thead><tr><th>交通方式</th><th>時間</th><th>費用 (TWD)</th></tr></thead><tbody><tr><td>火車（自強號）</td><td>2–2.5 小時</td><td>~486</td></tr><tr><td>自駕（南迴公路）</td><td>~3 小時</td><td>油資</td></tr></tbody></table>',
           },
           {
             title: '台東在地交通',
-            content: '<h4>租機車（最推薦）</h4><p>火車站周邊有多家租車行。125cc 機車 200–500 TWD/日，月租約 180–300 TWD/日。外籍人士需持國際駕照 (IDP) 並攜帶本國駕照。台東科技執法嚴格，務必遵守交通規則、佩戴安全帽。</p><h4>公車系統</h4><ul><li>普悠瑪客運 101 市區循環線：繞行台東市區一圈約 1 小時，每段票 25 元</li><li>台灣好行 東部海岸線：台東轉運站 → 小野柳 → 加路蘭 → 三仙台</li><li>台灣好行 縱谷鹿野線：台東轉運站 → 初鹿牧場 → 鹿野高台</li></ul><h4>共乘</h4><p>TDF 活動期間，WhatsApp 社群群組內會有 Car Share 功能，方便參與者互相搭便車。</p>',
+            content: '<h4>租機車（最推薦）</h4><p>火車站周邊有多家租車行。125cc 機車 200–500 TWD/日，月租約 180–300 TWD/日。外籍人士需持國際駕照 (IDP) 並攜帶本國駕照。台東科技執法嚴格，務必遵守交通規則、佩戴安全帽。</p><h4>YouBike</h4><p>台東市區設有 YouBike 站點，適合短程移動。使用悠遊卡或一卡通即可租借，前 30 分鐘 5 TWD。</p><h4>計程車</h4><p>可使用 LINE Taxi 或 55688 APP 叫車，方便快捷。</p><h4>公車系統</h4><ul><li>普悠瑪客運 101 市區循環線：繞行台東市區一圈約 1 小時，每段票 25 元</li><li>台灣好行 東部海岸線：台東轉運站 → 小野柳 → 加路蘭 → 三仙台</li><li>台灣好行 縱谷鹿野線：台東轉運站 → 初鹿牧場 → 鹿野高台</li></ul><h4>共乘</h4><p>TDF 活動期間，WhatsApp 社群群組內會有 Car Share 功能，方便參與者互相搭便車。</p>',
           },
         ],
       },
@@ -169,7 +174,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q12',
             question: '花蓮旅行費用是多少？包含什麼？',
-            answer: '費用為 $200 USD（Backer 免費）。包含花蓮區域三天交通（30 人座巴士全程包車）、5/29 午晚餐＋住宿、5/30 三餐＋住宿、5/31 早午餐。不包含前往花蓮的交通與個人紀念品。',
+            answer: '費用統一為 $200 USD。包含花蓮區域三天交通（30 人座巴士全程包車）、5/29 午晚餐＋住宿、5/30 三餐＋住宿、5/31 早午餐。不包含前往花蓮的交通與個人紀念品。',
           },
           {
             id: 'q13',
@@ -179,7 +184,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q14',
             question: '非 Backer 可以參加花蓮旅行嗎？',
-            answer: '目前優先保留給 Backer 票持有者。若有空位，預計會以 $150–200 USD 開放加購。',
+            answer: '可以，費用統一為 $200 USD，不分票種。',
           },
         ],
         guideBlocks: [],
@@ -231,11 +236,6 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             id: 'q21',
             question: '可以提供參與證明或邀請函嗎？',
             answer: '可以。購票完成後，請寄信至 fest@dna.org.tw，附上購票證明，主辦方會開立參與證明文件，可作為簽證申請的輔助文件。',
-          },
-          {
-            id: 'q22',
-            question: '怎麼參加短影音大賽？',
-            answer: '只要在 Instagram 發布 Reels 並 tag @taiwandigitalfest，即自動參賽。不需額外報名。第一名可獲得 $600 USD，由公開投票決定，比賽截止日為 4/30。',
           },
           {
             id: 'q25',
@@ -317,7 +317,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q1',
             question: 'What ticket tiers are available?',
-            answer: 'TDF 2026 has four tiers: PURPLE (free — subscribe + follow on IG for purple events), BLUE ($30 — blue + purple events), GREEN ($300 — green + blue + purple events), YELLOW ($600 VIP — all events + Hualien 3-day tour). Weekly Backer tickets are also available for single-week attendance. Early bird pricing available before 4/20.',
+            answer: 'TDF 2026 has four tiers: PURPLE (free — subscribe + follow on IG for purple events), BLUE ($30 — blue + purple events), GREEN ($300 — green + blue + purple events), YELLOW ($600 VIP — all events + Hualien 3-day tour). Weekly Backer tickets are also available for single-week attendance.',
           },
           {
             id: 'q2',
@@ -356,6 +356,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             question: 'What happens if I don\'t show up? (No-Show Policy)',
             answer: 'No-shows will have their spot released to waitlisted attendees on-site. Repeat no-shows will be moved to waitlist status for their next event (normal reservation restored after that).',
           },
+          {
+            id: 'q7b',
+            question: 'Are events limited in capacity?',
+            answer: 'Yes, to ensure quality experiences, events have limited capacity. We will approve registrations based on ticket tier and registration order.',
+          },
         ],
         guideBlocks: [],
       },
@@ -371,7 +376,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q9',
             question: 'Does the organizer arrange accommodation?',
-            answer: 'No, participants arrange their own accommodation. The website provides recommended lodging options in Taitung.',
+            answer: 'Accommodation is not centrally arranged — participants book their own. The website provides recommended lodging options in Taitung. If you need help booking, reach out to us on the WhatsApp community group. We have reserved accommodation for attendees who need booking assistance.',
           },
         ],
         guideBlocks: [
@@ -385,7 +390,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           },
           {
             title: 'Recommended Areas',
-            content: '<ul><li><strong>Taitung City Center</strong>: Best amenities, close to most venues</li><li><strong>Dulan</strong>: Coastal vibe, great for surfing, 30 min to city center</li><li><strong>Chishang / Guanshan</strong>: Rice paddy scenery, ideal for Week 2 events</li></ul>',
+            content: '<ul><li><strong>Taitung City Center</strong>: Best amenities, close to most venues</li><li><strong>Dulan</strong>: Coastal vibe, great for surfing, 30 min to city center</li><li><strong>Chishang / Guanshan</strong>: Rice paddy scenery, ideal for Week 2 events</li></ul><p><strong>Recommendations by attendance duration:</strong></p><ul><li>Full month: Stay in <strong>Taitung City</strong> for best convenience</li><li>Single week: Week 1 — <strong>South Link (Jinlun)</strong>, Week 2 — <strong>East Rift Valley (Chishang, Guanshan)</strong>, Week 3 — <strong>Coast (Dulan)</strong>, Week 4 — <strong>City Center</strong></li></ul>',
           },
         ],
       },
@@ -396,7 +401,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q10',
             question: 'How do I get between event venues?',
-            answer: 'You need to make your own way to each venue. We recommend using the WhatsApp group for Car Share (carpooling).',
+            answer: 'You need to make your own way to each venue. You can take the train (TRA), intercity bus, rent a car, rent a scooter, or use YouBike. We also recommend using the WhatsApp group for Car Share (carpooling).',
           },
           {
             id: 'q11',
@@ -407,11 +412,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         guideBlocks: [
           {
             title: 'Getting to Taitung',
-            content: '<h4>Taipei → Taitung</h4><table><thead><tr><th>Transport</th><th>Duration</th><th>Cost (TWD)</th><th>Notes</th></tr></thead><tbody><tr><td>Train (Puyuma/Taroko)</td><td>3.5–4.5 hrs</td><td>~783</td><td>Best option, book 28 days ahead</td></tr><tr><td>Train (Chu-Kuang)</td><td>5–5.5 hrs</td><td>~604</td><td>More available seats</td></tr><tr><td>Flight (Songshan→Taitung)</td><td>50 min</td><td>~3,500</td><td>~6 flights daily</td></tr></tbody></table><h4>Kaohsiung → Taitung</h4><table><thead><tr><th>Transport</th><th>Duration</th><th>Cost (TWD)</th></tr></thead><tbody><tr><td>Train (Tze-Chiang)</td><td>2–2.5 hrs</td><td>~362</td></tr><tr><td>Drive (South Link Highway)</td><td>~3 hrs</td><td>Gas</td></tr></tbody></table>',
+            content: '<h4>Taipei → Taitung</h4><table><thead><tr><th>Transport</th><th>Duration</th><th>Cost (TWD)</th><th>Notes</th></tr></thead><tbody><tr><td>Train (Puyuma/Taroko)</td><td>3.5–4.5 hrs</td><td>~935</td><td>Best option, book 28 days ahead</td></tr><tr><td>Train (Chu-Kuang)</td><td>5–5.5 hrs</td><td>~603</td><td>More available seats</td></tr><tr><td>Flight (Songshan→Taitung)</td><td>50 min</td><td>~3,500</td><td>~6 flights daily</td></tr></tbody></table><h4>Kaohsiung → Taitung</h4><table><thead><tr><th>Transport</th><th>Duration</th><th>Cost (TWD)</th></tr></thead><tbody><tr><td>Train (Tze-Chiang)</td><td>2–2.5 hrs</td><td>~486</td></tr><tr><td>Drive (South Link Highway)</td><td>~3 hrs</td><td>Gas</td></tr></tbody></table>',
           },
           {
             title: 'Getting Around Taitung',
-            content: '<h4>Scooter Rental (Recommended)</h4><p>Rental shops near the train station. 125cc: 200–500 TWD/day, monthly: ~180–300 TWD/day. International visitors need an International Driving Permit (IDP) plus home license. Traffic enforcement is strict — always wear a helmet.</p><h4>Bus System</h4><ul><li>Puyuma Bus Route 101: City loop, ~1 hour, 25 TWD per section</li><li>Taiwan Tourist Shuttle - East Coast: Taitung → Xiaoyeliu → Jialulan → Sanxiantai</li><li>Taiwan Tourist Shuttle - East Rift Valley: Taitung → Chulu Ranch → Luye Terrace</li></ul><h4>Carpooling</h4><p>Use the TDF WhatsApp group\'s Car Share feature to coordinate rides with other participants.</p>',
+            content: '<h4>Scooter Rental (Recommended)</h4><p>Rental shops near the train station. 125cc: 200–500 TWD/day, monthly: ~180–300 TWD/day. International visitors need an International Driving Permit (IDP) plus home license. Traffic enforcement is strict — always wear a helmet.</p><h4>YouBike</h4><p>YouBike stations are available around Taitung City, great for short trips. Use an EasyCard or iPASS to rent. First 30 minutes: 5 TWD.</p><h4>Taxi</h4><p>Use LINE Taxi or 55688 app for convenient ride-hailing.</p><h4>Bus System</h4><ul><li>Puyuma Bus Route 101: City loop, ~1 hour, 25 TWD per section</li><li>Taiwan Tourist Shuttle - East Coast: Taitung → Xiaoyeliu → Jialulan → Sanxiantai</li><li>Taiwan Tourist Shuttle - East Rift Valley: Taitung → Chulu Ranch → Luye Terrace</li></ul><h4>Carpooling</h4><p>Use the TDF WhatsApp group\'s Car Share feature to coordinate rides with other participants.</p>',
           },
         ],
       },
@@ -422,7 +427,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q12',
             question: 'How much is the Hualien tour and what\'s included?',
-            answer: '$200 USD (free for Backers). Includes: 3-day bus transport in Hualien, 5/29 lunch + dinner + accommodation, 5/30 all meals + accommodation, 5/31 breakfast + lunch. Not included: transport to Hualien, personal souvenirs.',
+            answer: '$200 USD. Includes: 3-day bus transport in Hualien, 5/29 lunch + dinner + accommodation, 5/30 all meals + accommodation, 5/31 breakfast + lunch. Not included: transport to Hualien, personal souvenirs.',
           },
           {
             id: 'q13',
@@ -432,7 +437,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             id: 'q14',
             question: 'Can non-Backers join the Hualien tour?',
-            answer: 'Priority is given to Backer ticket holders. If spots remain, add-on tickets will likely be offered at $150–200 USD.',
+            answer: 'Yes, the Hualien tour is $200 USD for all ticket tiers.',
           },
         ],
         guideBlocks: [],
@@ -482,11 +487,6 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             id: 'q21',
             question: 'Can you provide a participation certificate or invitation letter?',
             answer: 'Yes. After purchasing a ticket, email fest@dna.org.tw with proof of purchase. The organizer will issue a participation certificate that can support visa applications.',
-          },
-          {
-            id: 'q22',
-            question: 'How do I enter the IG Reels contest?',
-            answer: 'Post a Reel on Instagram and tag @taiwandigitalfest — you\'re automatically entered. No separate registration needed. First prize is $600 USD, decided by public vote. Deadline: 4/30.',
           },
           {
             id: 'q25',
