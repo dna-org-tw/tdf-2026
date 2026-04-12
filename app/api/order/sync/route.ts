@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { updateOrder, createOrder } from '@/lib/orders';
+import { getAdminSession } from '@/lib/adminAuth';
 import type { OrderStatus } from '@/lib/types/order';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -12,7 +13,7 @@ const stripe = stripeSecretKey
   : null;
 
 /**
- * 将 Stripe 支付状态映射到订单状态
+ * Map Stripe payment status to order status
  */
 function mapPaymentStatusToOrderStatus(
   paymentStatus: string | null,
@@ -21,7 +22,7 @@ function mapPaymentStatusToOrderStatus(
   if (sessionStatus === 'complete' && paymentStatus === 'paid') {
     return 'paid';
   }
-  // session 過期或未完成且未支付，視為取消
+  // session expired or incomplete and unpaid -> cancelled
   if (sessionStatus === 'expired' || (sessionStatus !== 'complete' && paymentStatus === 'unpaid')) {
     return 'cancelled';
   }
@@ -40,6 +41,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Auth: require admin session OR internal API secret (for webhook handler)
+    const internalSecret = req.headers.get('x-internal-secret');
+    const hasValidInternalSecret =
+      internalSecret && process.env.INTERNAL_API_SECRET && internalSecret === process.env.INTERNAL_API_SECRET;
+
+    if (!hasValidInternalSecret) {
+      const adminSession = await getAdminSession(req);
+      if (!adminSession) {
+        return NextResponse.json(
+          { error: 'Unauthorized. Admin access or internal secret required.' },
+          { status: 401 }
+        );
+      }
+    }
+
     const body = await req.json().catch(() => null);
 
     if (!body || !body.session_id) {
@@ -50,14 +66,13 @@ export async function POST(req: NextRequest) {
     }
 
     const sessionId = body.session_id as string;
-    const forceStatus = body.force_status as OrderStatus | undefined;
 
-    // 從 Stripe 獲取最新的 session 資訊
+    // Retrieve latest session info from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['payment_intent', 'payment_intent.latest_charge', 'line_items'],
     });
 
-    // 獲取支付詳情
+    // Get payment details
     let charge: Stripe.Charge | null = null;
     const paymentIntent = session.payment_intent as Stripe.PaymentIntent | null;
 
@@ -74,7 +89,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 擷取客戶資訊
+    // Extract customer info
     const customerDetails = session.customer_details;
     const customerAddress = customerDetails?.address
       ? {
@@ -87,18 +102,18 @@ export async function POST(req: NextRequest) {
         }
       : null;
 
-    // 擷取支付方式資訊
+    // Extract payment method info
     const paymentMethodBrand = charge?.payment_method_details?.card?.brand || null;
     const paymentMethodLast4 = charge?.payment_method_details?.card?.last4 || null;
     const paymentMethodType = charge?.payment_method_details?.type || null;
 
-    // 确定订单状态：如果指定了强制状态则使用，否则根据 session 状态判断
-    const orderStatus = forceStatus || mapPaymentStatusToOrderStatus(
+    // Determine order status from Stripe session (no force_status override)
+    const orderStatus = mapPaymentStatusToOrderStatus(
       session.payment_status,
       session.status
     );
 
-    // 更新订单
+    // Update order
     const orderUpdateData = {
       stripe_payment_intent_id:
         typeof session.payment_intent === 'string'
@@ -120,9 +135,9 @@ export async function POST(req: NextRequest) {
 
     let updatedOrder = await updateOrder(sessionId, orderUpdateData);
 
-    // 訂單不存在時，從 request body 的 tier 或 success_url 解析後補建
+    // If order doesn't exist, try to create it from tier info
     if (!updatedOrder) {
-      console.warn('[Order Sync] Order not found for session:', sessionId, '— attempting to create');
+      console.warn('[Order Sync] Order not found for session:', sessionId, '-- attempting to create');
       const tier = (body.tier as string) || session.success_url?.match(/tier=(explore|contribute|weekly_backer|backer)/)?.[1];
 
       if (tier && ['explore', 'contribute', 'weekly_backer', 'backer'].includes(tier)) {

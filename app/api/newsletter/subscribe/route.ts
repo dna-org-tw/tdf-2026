@@ -116,7 +116,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify reCAPTCHA Enterprise
-    if (recaptchaApiKey) {
+    if (!recaptchaApiKey) {
+      console.error('[Newsletter API] RECAPTCHA_API_KEY is not configured.');
+      return NextResponse.json(
+        { error: 'reCAPTCHA is not configured on the server.' },
+        { status: 500 }
+      );
+    }
+
+    {
       const { recaptchaToken } = body;
       
       if (!recaptchaToken) {

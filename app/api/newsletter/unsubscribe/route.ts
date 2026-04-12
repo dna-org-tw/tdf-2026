@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { verifyUnsubscribeToken } from '@/lib/email';
+import { verifyUnsubscribeToken, generateUnsubscribeToken } from '@/lib/email';
+import { sendUnsubscribeConfirmationEmail } from '@/lib/unsubscribeEmail';
 import { content } from '@/data/content';
 
 // Helper function to get language from request
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
         );
       }
     } else if (body.email) {
-      // 直接以 email 取消訂閱
+      // Email provided without token: send confirmation email instead of directly unsubscribing
       const rawEmail = body.email.trim();
       if (!rawEmail) {
         return NextResponse.json(
@@ -138,7 +139,24 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      email = rawEmail.toLowerCase();
+      const normalizedEmail = rawEmail.toLowerCase();
+
+      try {
+        const token = generateUnsubscribeToken(normalizedEmail);
+        await sendUnsubscribeConfirmationEmail(normalizedEmail, token);
+      } catch (err) {
+        console.error('[Unsubscribe API] Failed to send confirmation email:', err);
+        // Return generic success to avoid leaking whether the email exists
+      }
+
+      const message = lang === 'en'
+        ? 'A confirmation email has been sent. Please check your inbox to confirm unsubscription.'
+        : '確認退訂郵件已發送，請檢查您的信箱。';
+
+      return NextResponse.json(
+        { success: true, message, confirmationSent: true },
+        { status: 200 }
+      );
     } else {
       return NextResponse.json(
         { error: t.unsubscribeTokenRequired },

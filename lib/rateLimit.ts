@@ -1,6 +1,9 @@
 /**
  * Simple in-memory rate limiter.
- * For single-instance deployments. For multi-instance, use Redis instead.
+ * WARNING: Only works for single-instance deployments.
+ * If deploying to serverless or multi-instance, migrate to Redis/Upstash.
+ * Rate limits will be ineffective across instances without a shared store.
+ * See: docs/superpowers/specs/2026-04-12-security-fixes-design.md (Medium #7)
  */
 
 interface RateLimitEntry {

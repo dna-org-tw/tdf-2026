@@ -12,8 +12,7 @@ const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 export function useRecaptcha(action: string = 'subscribe') {
   const executeRecaptcha = useCallback(async (): Promise<string | null> => {
     if (!recaptchaSiteKey) {
-      // 如果沒有配置 reCAPTCHA，回傳 null（允許繼續提交）
-      return null;
+      throw new Error('reCAPTCHA is not configured. Please set NEXT_PUBLIC_RECAPTCHA_SITE_KEY.');
     }
 
     try {

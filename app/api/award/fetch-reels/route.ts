@@ -102,14 +102,27 @@ export async function GET() {
     // 從 ig_posts 表獲取所有資料，不做任何過濾
     const posts = await fetchAllIgPosts();
     
+    const filteredPosts = posts.map((post) => {
+      const p = post as Record<string, unknown>;
+      return {
+        id: p.id,
+        shortcode: p.shortcode,
+        thumbnail_url: p.thumbnail_url,
+        caption: p.caption,
+        username: p.username,
+        permalink: p.permalink,
+        media_type: p.media_type,
+        timestamp: p.timestamp,
+      };
+    });
+
     return NextResponse.json(
-      { 
-        success: true, 
-        message: `Fetched ${posts.length} posts from ig_posts table (no filtering)`,
-        posts_count: posts.length,
-        posts: posts,
+      {
+        success: true,
+        posts_count: filteredPosts.length,
+        posts: filteredPosts,
       },
-      { 
+      {
         status: 200,
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
@@ -119,7 +132,7 @@ export async function GET() {
   } catch (error) {
     console.error('[Award API] Error in GET request:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch posts', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch posts', success: false, posts_count: 0, posts: [] },
       { status: 500 }
     );
   }
@@ -131,9 +144,8 @@ export async function POST() {
     if (!supabaseServer) {
       console.error('[Award API] Supabase client is not configured');
       return NextResponse.json(
-        { 
-          error: 'Database not configured', 
-          details: 'Supabase client is not initialized. Please check environment variables.',
+        {
+          error: 'Database not configured',
           success: false,
           posts_count: 0,
           posts: []
@@ -141,18 +153,31 @@ export async function POST() {
         { status: 500 }
       );
     }
-    
+
     // 從 ig_posts 表獲取所有資料，不做任何過濾
     const posts = await fetchAllIgPosts();
-    
+
+    const filteredPosts = posts.map((post) => {
+      const p = post as Record<string, unknown>;
+      return {
+        id: p.id,
+        shortcode: p.shortcode,
+        thumbnail_url: p.thumbnail_url,
+        caption: p.caption,
+        username: p.username,
+        permalink: p.permalink,
+        media_type: p.media_type,
+        timestamp: p.timestamp,
+      };
+    });
+
     return NextResponse.json(
-      { 
-        success: true, 
-        message: `Fetched ${posts.length} posts from ig_posts table (no filtering)`,
-        posts_count: posts.length,
-        posts: posts,
+      {
+        success: true,
+        posts_count: filteredPosts.length,
+        posts: filteredPosts,
       },
-      { 
+      {
         status: 200,
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
@@ -161,18 +186,8 @@ export async function POST() {
     );
   } catch (error) {
     console.error('[Award API] Error in POST request:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch posts', 
-        details: errorMessage,
-        stack: errorStack,
-        success: false,
-        posts_count: 0,
-        posts: []
-      },
+      { error: 'Failed to fetch posts', success: false, posts_count: 0, posts: [] },
       { status: 500 }
     );
   }

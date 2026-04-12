@@ -7,7 +7,7 @@ const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const fromEmail = process.env.EMAIL_FROM || `noreply@${mailgunDomain || 'example.com'}`;
-const unsubscribeSecret = process.env.UNSUBSCRIBE_SECRET || 'default-secret-change-in-production';
+const unsubscribeSecret = process.env.UNSUBSCRIBE_SECRET;
 
 const mailgunClient = mailgunApiKey && mailgunDomain
   ? new Mailgun(formData).client({
@@ -20,11 +20,15 @@ const mailgunClient = mailgunApiKey && mailgunDomain
  * 產生取消訂閱的 token
  */
 export function generateUnsubscribeToken(email: string): string {
+  if (!unsubscribeSecret) {
+    throw new Error('UNSUBSCRIBE_SECRET is not configured. Cannot generate unsubscribe tokens.');
+  }
+
   const hash = crypto
     .createHmac('sha256', unsubscribeSecret)
     .update(email)
     .digest('hex');
-  
+
   // 將 email 與 hash 組合為 token（使用 base64 編碼）
   const token = Buffer.from(`${email}:${hash}`).toString('base64url');
   return token;
@@ -34,24 +38,29 @@ export function generateUnsubscribeToken(email: string): string {
  * 驗證並解析取消訂閱的 token
  */
 export function verifyUnsubscribeToken(token: string): string | null {
+  if (!unsubscribeSecret) {
+    console.error('[Email] UNSUBSCRIBE_SECRET is not configured. Cannot verify unsubscribe tokens.');
+    return null;
+  }
+
   try {
     const decoded = Buffer.from(token, 'base64url').toString('utf-8');
     const [email, hash] = decoded.split(':');
-    
+
     if (!email || !hash) {
       return null;
     }
-    
+
     // 驗證 hash
     const expectedHash = crypto
       .createHmac('sha256', unsubscribeSecret)
       .update(email)
       .digest('hex');
-    
+
     if (hash !== expectedHash) {
       return null;
     }
-    
+
     return email;
   } catch (error) {
     return null;

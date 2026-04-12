@@ -10,8 +10,11 @@ const VOTING_DEADLINE = new Date('2026-04-30T12:00:00+08:00');
  * 驗證並解析投票 token
  */
 function verifyVoteToken(token: string): { postId: string; email: string } | null {
-  const voteSecret = process.env.VOTE_SECRET || 'default-vote-secret-change-in-production';
-  
+  const voteSecret = process.env.VOTE_SECRET;
+  if (!voteSecret) {
+    return null;
+  }
+
   try {
     const decoded = Buffer.from(token, 'base64url').toString('utf-8');
     const parts = decoded.split(':');
