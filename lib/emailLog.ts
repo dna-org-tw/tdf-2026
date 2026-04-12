@@ -6,17 +6,19 @@ export type EmailType =
   | 'order_success'
   | 'order_cancelled'
   | 'magic_link'
-  | 'unsubscribe_confirmation';
+  | 'unsubscribe_confirmation'
+  | 'notification';
 
 interface EmailLogEntry {
   to_email: string;
   from_email?: string;
   subject?: string;
   email_type: EmailType;
-  status: 'sent' | 'failed';
+  status: 'pending' | 'processing' | 'sent' | 'failed';
   mailgun_message_id?: string;
   error_message?: string;
   metadata?: Record<string, unknown>;
+  notification_id?: string;
 }
 
 export async function logEmail(entry: EmailLogEntry): Promise<void> {
@@ -35,6 +37,7 @@ export async function logEmail(entry: EmailLogEntry): Promise<void> {
       mailgun_message_id: entry.mailgun_message_id ?? null,
       error_message: entry.error_message ?? null,
       metadata: entry.metadata ?? null,
+      notification_id: entry.notification_id ?? null,
     });
 
     if (error) {

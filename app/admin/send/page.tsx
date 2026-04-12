@@ -136,9 +136,10 @@ export default function SendNotificationPage() {
       }
 
       if (isTestOnly) {
-        setSuccessMessage(`測試信已寄送（${data.recipientCount} 封）`);
-      } else {
-        router.push('/admin');
+        setSuccessMessage(`測試信已排入寄送佇列（${data.queued} 封）`);
+      }
+      if (data.notificationId) {
+        router.push(`/admin/history/${data.notificationId}`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '發送失敗');

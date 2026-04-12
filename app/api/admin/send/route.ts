@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { getRecipients, type RecipientGroup, type TicketTier } from '@/lib/recipients';
-import { sendBatchNotification } from '@/lib/notificationEmail';
+import { enqueueEmails, processAllPending } from '@/lib/notificationEmail';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { checkRateLimit } from '@/lib/rateLimit';
 
@@ -80,22 +80,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create send record' }, { status: 500 });
     }
 
-    // Send batch emails
-    const result = await sendBatchNotification(emails, subject, emailBody, logEntry.id);
+    // Enqueue all emails (inserted as 'pending' in email_logs)
+    const { queued } = await enqueueEmails(emails, subject, logEntry.id);
 
-    // Update log status
-    await supabaseServer
-      .from('notification_logs')
-      .update({
-        status: result.success ? 'sent' : 'partial_failure',
-        error_message: result.error || null,
-      })
-      .eq('id', logEntry.id);
+    // Fire-and-forget: start processing in the background
+    processAllPending(logEntry.id).catch((err) =>
+      console.error('[Admin Send] Background processing error:', err)
+    );
 
     return NextResponse.json({
-      success: result.success,
-      recipientCount: result.totalSent,
+      success: true,
       notificationId: logEntry.id,
+      queued,
     });
   } catch (error) {
     console.error('[Admin Send]', error);

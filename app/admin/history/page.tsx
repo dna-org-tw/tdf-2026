@@ -9,6 +9,8 @@ interface NotificationLog {
   recipient_groups: string[];
   recipient_tiers: string[] | null;
   recipient_count: number;
+  success_count: number | null;
+  failure_count: number | null;
   sent_by: string;
   status: string;
   created_at: string;
@@ -17,6 +19,7 @@ interface NotificationLog {
 const GROUP_LABELS: Record<string, string> = {
   orders: '付費會員',
   subscribers: '電子報訂閱者',
+  test: '測試',
 };
 
 const STATUS_STYLES: Record<string, { label: string; className: string }> = {
@@ -77,8 +80,13 @@ export default function AdminDashboard() {
         <div className="space-y-3">
           {notifications.map((n) => {
             const statusStyle = STATUS_STYLES[n.status] || { label: n.status, className: 'bg-slate-100 text-slate-600' };
+            const hasDetail = n.success_count !== null || n.failure_count !== null;
             return (
-              <div key={n.id} className="bg-white rounded-xl p-6 shadow-sm">
+              <Link
+                key={n.id}
+                href={`/admin/history/${n.id}`}
+                className="block bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -94,13 +102,27 @@ export default function AdminDashboard() {
                       )}
                       <span className="mx-2">·</span>
                       {n.recipient_count} 人
+                      {hasDetail && (
+                        <>
+                          <span className="mx-1">—</span>
+                          <span className="text-green-600">{n.success_count ?? 0} 成功</span>
+                          {(n.failure_count ?? 0) > 0 && (
+                            <span className="text-red-600 ml-1">{n.failure_count} 失敗</span>
+                          )}
+                        </>
+                      )}
                       <span className="mx-2">·</span>
                       {n.sent_by}
                     </p>
                   </div>
-                  <span className="text-sm text-slate-400 shrink-0">{formatDate(n.created_at)}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-sm text-slate-400">{formatDate(n.created_at)}</span>
+                    <svg className="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
