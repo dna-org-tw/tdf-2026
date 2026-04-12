@@ -4,7 +4,8 @@ import { useMemo, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
-import { MapPin, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, ExternalLink, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import type { StructuredAddress } from '@/components/NomadMap';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
@@ -309,6 +310,65 @@ export default function AccommodationSection({ taitungStores }: { taitungStores:
       {taitungStores.length > 0 && (
         <div className="mb-12">
           <AccommodationCarousel stores={taitungStores} />
+        </div>
+      )}
+
+      {/* Partner Platforms */}
+      {t.accommodation.partnerPlatforms && t.accommodation.partnerPlatforms.items.length > 0 && (
+        <div className="container mx-auto px-4 sm:px-6 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="max-w-3xl mx-auto"
+          >
+            <h3 className="text-xl sm:text-2xl font-display font-bold text-[#1E1F1C] text-center mb-2">
+              {t.accommodation.partnerPlatforms.title}
+            </h3>
+            <p className="text-sm text-slate-500 text-center mb-6">
+              {t.accommodation.partnerPlatforms.subtitle}
+            </p>
+            <div className="flex flex-col gap-4">
+              {t.accommodation.partnerPlatforms.items.map((platform) => (
+                <a
+                  key={platform.name}
+                  href={platform.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col sm:flex-row items-center gap-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 hover:border-[#10B8D9]/50 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex-shrink-0 w-[160px] h-[48px] relative">
+                    <Image
+                      src={platform.logo}
+                      alt={platform.name}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="flex-1 text-center sm:text-left">
+                    <h4 className="text-base font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors mb-1.5">
+                      {platform.name}
+                    </h4>
+                    <p className="text-sm text-slate-500 leading-relaxed mb-3">
+                      {platform.description}
+                    </p>
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                      {platform.features.map((feature) => (
+                        <span
+                          key={feature}
+                          className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-[#10B8D9]/10 text-[#10B8D9]"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-[#10B8D9] group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
+                </a>
+              ))}
+            </div>
+          </motion.div>
         </div>
       )}
 
