@@ -60,7 +60,7 @@ export const teamMembers: TeamMember[] = [
     name: 'Susu',
     title: 'Event Manager',
     bio: "A student at NTTU in the Elementary Education program. Also held a Vice President title in the Student Association. When not at the gym or traveling, loves to relax with some video games.",
-    // photo not available
+    photo: '/images/team/susu.jpg',
     email: 'susu@dna.org.tw',
     instagram: 'https://www.instagram.com/sususeal',
     whatsapp: '886908307169',
