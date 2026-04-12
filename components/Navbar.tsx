@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
   const { user, loading: authLoading } = useAuth();
+  const isAdmin = user?.email?.endsWith('@dna.org.tw') ?? false;
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -184,6 +185,17 @@ export default function Navbar() {
             </Link>
           )}
 
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={`text-sm font-medium transition-colors ${
+                scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
+              }`}
+            >
+              管理後台
+            </Link>
+          )}
+
           <Link
             href="/award"
             onClick={() => {
@@ -204,6 +216,16 @@ export default function Navbar() {
 
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={`text-xs font-medium transition-colors ${
+                scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
+              }`}
+            >
+              管理後台
+            </Link>
+          )}
           {!authLoading && (
             <Link
               href="/member"
