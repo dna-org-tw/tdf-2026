@@ -136,7 +136,7 @@ export default function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                onClick={link.href.startsWith('#') ? (e: React.MouseEvent) => handleNavClick(e, link.href) : undefined}
+                onClick={link.href.startsWith('#') ? (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, link.href) : undefined}
                 className={`text-sm font-medium hover:text-[#10B8D9] transition-colors cursor-pointer ${
                   scrolled ? 'text-[#1E1F1C]' : 'text-white'
                 }`}
