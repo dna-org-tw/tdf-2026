@@ -15,10 +15,16 @@ function AdminNav() {
           <Link href="/admin" className="text-[#10B8D9] font-bold text-lg">
             TDF 2026 Admin
           </Link>
+          <Link href="/admin/members" className="text-sm text-slate-300 hover:text-white transition-colors">
+            會員管理
+          </Link>
+          <Link href="/admin/subscribers" className="text-sm text-slate-300 hover:text-white transition-colors">
+            訂閱者
+          </Link>
           <Link href="/admin/send" className="text-sm text-slate-300 hover:text-white transition-colors">
             發送通知
           </Link>
-          <Link href="/admin" className="text-sm text-slate-300 hover:text-white transition-colors">
+          <Link href="/admin/history" className="text-sm text-slate-300 hover:text-white transition-colors">
             發送紀錄
           </Link>
         </div>
