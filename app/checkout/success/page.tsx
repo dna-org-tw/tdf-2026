@@ -151,23 +151,14 @@ export default function CheckoutSuccessPage() {
           }
         }
 
-        // Send email notification
-        if (orderData.customer_email) {
-          try {
-            await fetch('/api/email/send', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                order: orderData,
-                type: 'success',
-              }),
-            });
-          } catch (emailErr) {
-            console.error('Failed to send email notification', emailErr);
-            // Don't show error to user, email sending failure is not critical
-          }
+        // 備援寄信：主要由 Stripe webhook 觸發，但 webhook 可能延遲或遺失。
+        // 冪等檢查確保不會重複寄信。
+        if (orderData.customer_email && orderData.payment_status === 'paid') {
+          fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: orderData, type: 'success' }),
+          }).catch(() => {});
         }
       } catch (err) {
         console.error('Failed to load order details', err);

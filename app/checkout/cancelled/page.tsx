@@ -114,23 +114,13 @@ export default function CheckoutCancelledPage() {
           // Don't show error to user, sync failure is not critical for display
         }
 
-        // Send email notification
+        // 備援寄信：主要由 Stripe webhook 觸發，冪等檢查確保不會重複寄信。
         if (orderData.customer_email) {
-          try {
-            await fetch('/api/email/send', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                order: orderData,
-                type: 'cancelled',
-              }),
-            });
-          } catch (emailErr) {
-            console.error('Failed to send email notification', emailErr);
-            // Don't show error to user, email sending failure is not critical
-          }
+          fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: orderData, type: 'cancelled' }),
+          }).catch(() => {});
         }
       } catch (err) {
         console.error('Failed to load order details', err);
