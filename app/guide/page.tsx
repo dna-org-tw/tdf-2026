@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent } from '@/components/FacebookPixel';
 import Navbar from '@/components/Navbar';
-import Accordion from '@/components/Accordion';
 import { guideContent } from '@/data/guide';
 
 const Footer = dynamic(() => import('@/components/Footer'), {
@@ -79,9 +78,16 @@ export default function GuidePage() {
         <div className="max-w-3xl mx-auto">
           {activeTabData && (
             <>
-              {/* FAQ accordion items */}
+              {/* FAQ items — displayed inline */}
               {activeTabData.faqItems.length > 0 && (
-                <Accordion items={activeTabData.faqItems} />
+                <div className="space-y-8">
+                  {activeTabData.faqItems.map((item) => (
+                    <div key={item.id}>
+                      <h3 className="text-lg font-semibold mb-2">{item.question}</h3>
+                      <p className="text-stone-600 whitespace-pre-line">{item.answer}</p>
+                    </div>
+                  ))}
+                </div>
               )}
 
               {/* Guide info blocks — static HTML from data/guide.ts (not user input) */}
