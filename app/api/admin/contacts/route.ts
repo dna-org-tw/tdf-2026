@@ -41,7 +41,8 @@ export async function GET(req: NextRequest) {
       .from('orders')
       .select('customer_email, customer_name, customer_phone, ticket_tier, amount_total, currency, created_at')
       .eq('status', 'paid')
-      .not('customer_email', 'is', null);
+      .not('customer_email', 'is', null)
+      .neq('customer_email', '');
 
     if (search) {
       query = query.or(`customer_email.ilike.%${search}%,customer_name.ilike.%${search}%`);
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
     const contactMap = new Map<string, ContactRow>();
 
     for (const o of orders || []) {
-      if (!o.customer_email) continue;
+      if (!o.customer_email?.trim()) continue;
       const email = o.customer_email.toLowerCase();
       const existing = contactMap.get(email);
 
