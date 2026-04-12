@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { getOrdersByEmail } from '@/lib/orders';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
@@ -28,10 +27,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
     }
 
-    const { orderId, email, recaptchaToken } = body;
+    const { orderId, recaptchaToken } = body;
 
-    if (!orderId && !email) {
-      return NextResponse.json({ error: 'Order ID or email is required.' }, { status: 400 });
+    if (!orderId) {
+      return NextResponse.json({ error: 'Order ID is required.' }, { status: 400 });
     }
 
     // Verify reCAPTCHA Enterprise
@@ -94,32 +93,6 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-    }
-
-    // Query by email - return list of orders from Supabase
-    if (email) {
-      const dbOrders = await getOrdersByEmail(email);
-
-      if (!dbOrders.length) {
-        return NextResponse.json(
-          { error: 'No orders found for this email address.' },
-          { status: 404 }
-        );
-      }
-
-      const orders = dbOrders.map((o) => ({
-        id: o.stripe_session_id,
-        status: o.status,
-        payment_status: o.status === 'paid' ? 'paid' : 'unpaid',
-        amount_total: o.amount_total,
-        currency: o.currency,
-        created: Math.floor(new Date(o.created_at).getTime() / 1000),
-        customer_name: o.customer_name,
-        ticket_tier: o.ticket_tier,
-        product_name: null,
-      }));
-
-      return NextResponse.json({ orders });
     }
 
     // Query by order ID - return single order detail

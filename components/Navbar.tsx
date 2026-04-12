@@ -8,11 +8,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MobileMenu from './MobileMenu';
 import { trackEvent } from '@/components/FacebookPixel';
-// import { useAuth } from '@/contexts/AuthContext'; // temporarily hidden
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Navbar() {
   const { t, lang, toggleLanguage } = useTranslation();
-  // const { user, loading: authLoading } = useAuth(); // temporarily hidden
+  const { user, loading: authLoading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -173,7 +173,16 @@ export default function Navbar() {
             <Instagram className="w-5 h-5" />
           </a>
 
-          {/* Auth: Login / Member — temporarily hidden */}
+          {!authLoading && (
+            <Link
+              href="/member"
+              className={`text-sm font-medium transition-colors ${
+                scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
+              }`}
+            >
+              {user ? t.nav.member : t.nav.login}
+            </Link>
+          )}
 
           <Link
             href="/award"
@@ -195,7 +204,16 @@ export default function Navbar() {
 
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
-          {/* Auth: Login / Member (mobile) — temporarily hidden */}
+          {!authLoading && (
+            <Link
+              href="/member"
+              className={`transition-colors ${
+                scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
+              }`}
+            >
+              {user ? t.nav.member : t.nav.login}
+            </Link>
+          )}
           <button
             onClick={toggleLanguage}
             className={`hover:text-[#10B8D9] transition-colors ${
