@@ -286,6 +286,14 @@ export const content = {
             "Taitung County Government is committed to promoting Taitung as a world-class destination for sustainable tourism, digital innovation, and cultural exchange. Through partnerships with international communities and local organizations, Taitung is building a welcoming ecosystem for digital nomads and remote workers to experience its stunning natural landscapes, rich indigenous heritage, and vibrant local life.",
         },
       },
+      coOrganizers: {
+        title: "Co-Organizers",
+        nanhueiAlliance: {
+          name: "Nanhuei Sustainable Travel Alliance",
+          description:
+            "The Nanhuei Sustainable Travel Alliance connects around 40 local businesses and teams across Taitung's Nanhuei region, spanning food, accommodation, tourism, shopping, and transportation. With \"cultural sustainability, ecological sustainability, and environmental sustainability\" at its core, the alliance promotes locally distinctive sustainable travel practices. Through ocean waste recycling, local tour design, and a reusable cup system, the alliance integrates waste reduction, beach cleanups, and cultural experiences into everyday travel — enabling travelers to take responsibility for the environment while exploring the land.",
+        },
+      },
       sponsors: {
         title: "Sponsors",
         platinum: "Platinum Sponsors",
@@ -1162,6 +1170,14 @@ export const content = {
         taitungGov: {
           description:
             "臺東縣政府致力於推動臺東成為永續觀光、數位創新與文化交流的國際目的地。透過與國際社群及在地組織的合作，臺東正打造一個歡迎數位遊牧者與遠端工作者的友善生態系，讓世界看見臺東壯闊的自然地景、豐富的原住民文化，以及充滿活力的在地生活。",
+        },
+      },
+      coOrganizers: {
+        title: "協辦單位",
+        nanhueiAlliance: {
+          name: "南迴永續旅行聯盟",
+          description:
+            "南迴永續旅行聯盟串聯台東南迴地區約40個在地店家與團隊，涵蓋食、宿、遊、購、行等不同產業，以「文化永續、生態永續、環境永續」為核心，共同推動具在地特色的永續旅行模式。聯盟透過海廢再利用行動、在地遊程設計及永續杯借還系統，將減塑、淨灘與文化體驗融入日常旅行，讓旅人在探索地方的同時，也能實踐對環境與土地的責任。",
         },
       },
       sponsors: {
