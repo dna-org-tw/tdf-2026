@@ -700,8 +700,8 @@ export default function TeamSection() {
         </div>
       </div>
 
-      {/* 贊助單位 Sponsors */}
-      <div className="py-20 md:py-28 lg:py-32 bg-[#F9D2E5]">
+      {/* 贊助單位 Sponsors - 暫時隱藏 */}
+      {false && <div className="py-20 md:py-28 lg:py-32 bg-[#F9D2E5]">
         <div className="container mx-auto px-4 sm:px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -848,7 +848,7 @@ export default function TeamSection() {
             </motion.div>
           )}
         </div>
-      </div>
+      </div>}
 
       {/* 合作夥伴 Partners */}
       <div className="py-20 md:py-28 lg:py-32 bg-[#10B8D9]">
