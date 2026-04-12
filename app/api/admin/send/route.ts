@@ -5,7 +5,7 @@ import { sendBatchNotification } from '@/lib/notificationEmail';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { checkRateLimit } from '@/lib/rateLimit';
 
-const VALID_GROUPS: RecipientGroup[] = ['orders', 'subscribers'];
+const VALID_GROUPS: RecipientGroup[] = ['orders', 'subscribers', 'test'];
 const VALID_TIERS: TicketTier[] = ['explore', 'contribute', 'weekly_backer', 'backer'];
 
 export async function POST(req: NextRequest) {
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   try {
     // Fetch recipients
-    const { emails, count } = await getRecipients(groups, tiers);
+    const { emails, count } = await getRecipients(groups, tiers, session.email);
 
     if (count === 0) {
       return NextResponse.json({ error: '沒有符合條件的收件人' }, { status: 400 });
