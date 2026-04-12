@@ -333,6 +333,44 @@ export default function TeamSection() {
             </div>
           </div>
 
+          {/* 旅蒔共享工作空間 Roots Coworking */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500 mt-16 md:mt-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative h-48 md:h-56 lg:h-64 w-auto flex-shrink-0 rounded-2xl overflow-hidden"
+            >
+              <Image
+                src="/images/partners/roots_coworking.jpeg"
+                alt={t.partners.coOrganizers?.rootsCoworking?.name || "旅蒔共享工作空間"}
+                width={400}
+                height={300}
+                className="h-full w-auto object-cover"
+                loading="lazy"
+              />
+            </motion.div>
+            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
+              <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-xl md:text-2xl font-display font-bold text-[#1E1F1C]"
+              >
+                {t.partners.coOrganizers?.rootsCoworking?.name}
+              </motion.h3>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
+              >
+                {t.partners.coOrganizers?.rootsCoworking?.description}
+              </motion.p>
+            </div>
+          </div>
+
           {/* 合流生活提案所 HerFlow */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500 mt-16 md:mt-20">
             <motion.div

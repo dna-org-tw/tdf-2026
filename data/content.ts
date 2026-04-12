@@ -298,6 +298,11 @@ export const content = {
           description:
             "Yuan Natural is an agricultural brand rooted in Taitung's Chishang and Guanshan regions. The team specializes in rice, functional rice, and rice-based foods, with their proprietary \"Black Fiber Rice®\" winning international acclaim including the 2017 iTQi Superior Taste Award and 2018 Monde Selection Gold Award. Certified under ISO22000, HACCP, and Tse-Xin organic processing standards, Yuan Natural believes that \"healthy land grows healthy crops\" and promotes eco-friendly farming and healthy eating. Over the past decade, their contract farming and natural agriculture practices have helped restore protected species including crested serpent eagles, pangolins, and Reeves's muntjac.",
         },
+        rootsCoworking: {
+          name: "Roots Coworking Space",
+          description:
+            "Roots Coworking Space is located in Chishang, Taitung, and serves as a shared hub designed for freelancers and digital nomads. It provides a coworking space where digital nomads and freelancers from around the world can share knowledge, exchange experiences, and collaborate on diverse projects. The space actively hosts community building workshops, events, and exhibitions. Roots welcomes digital nomads, freelancers, and aspiring entrepreneurs to explore new possibilities through the perspectives of land, local products, and people — writing their own life chapters between work and travel, digital and humanities.",
+        },
         herflow: {
           name: "HerFlow Living Lab",
           description:
@@ -1193,6 +1198,11 @@ export const content = {
           name: "源天然股份有限公司",
           description:
             "源天然是一家深耕於台東池上與關山地區的農業品牌。團隊以稻米、功能米與米製食品為主，獨家研發並註冊商標的「黑纖米®」獲得國際金獎肯定，曾拿下 2017 年 iTQi 絕佳風味獎與 2018 年世界品質金獎。公司通過 ISO22000、HACCP 及慈心有機加工廠等驗證，確保產品安全。源天然認為「土地健康，作物才能健康」，因此推動友善耕作與健康飲食，藉由消費者購買支持永續農法並增加農民收入。十多年來，透過契作與自然農法，復育了大冠鷲、穿山甲與山羌等保育類動物。",
+        },
+        rootsCoworking: {
+          name: "旅蒔共享工作空間（Roots Coworking）",
+          description:
+            "旅蒔共享工作空間位於台東池上，是專為自由工作者與數位遊牧者打造的共享交流基地。提供來自世界各地的數位遊牧者與自由工作者一個共享工作空間，透過知識與經驗交流及資源人脈共享，大家可以一起完成多元專案、互相認識並成長；這個空間也積極舉辦社區營造、工作坊、活動與展覽規劃等地方創生活動。旅蒔歡迎旅居各地的數位游牧者、自由工作者、創業築夢者等走進這裡，從「地、產、人」的多元視角探索更多可能，在工作與旅行、數位與人文之間譜寫自己的生活篇章。",
         },
         herflow: {
           name: "合流生活提案所（HerFlow）",
