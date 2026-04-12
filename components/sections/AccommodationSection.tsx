@@ -313,62 +313,85 @@ export default function AccommodationSection({ taitungStores }: { taitungStores:
         </div>
       )}
 
-      {/* Partner Platforms */}
+      {/* Partner Platforms — Branded Banner */}
       {t.accommodation.partnerPlatforms && t.accommodation.partnerPlatforms.items.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h3 className="text-xl sm:text-2xl font-display font-bold text-[#1E1F1C] text-center mb-2">
-              {t.accommodation.partnerPlatforms.title}
-            </h3>
-            <p className="text-sm text-slate-500 text-center mb-6">
-              {t.accommodation.partnerPlatforms.subtitle}
-            </p>
-            <div className="flex flex-col gap-4">
-              {t.accommodation.partnerPlatforms.items.map((platform) => (
-                <a
-                  key={platform.name}
-                  href={platform.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col sm:flex-row items-center gap-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 hover:border-[#10B8D9]/50 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="flex-shrink-0 w-[160px] h-[48px] relative">
+          <h3 className="text-lg sm:text-xl font-display font-bold text-[#1E1F1C] text-center mb-6">
+            {t.accommodation.partnerPlatforms.title}
+          </h3>
+          {t.accommodation.partnerPlatforms.items.map((platform) => (
+            <motion.a
+              key={platform.name}
+              href={platform.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="group block max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
+            >
+              {/* Blue banner area */}
+              <div className="relative bg-[#0068B7] px-6 sm:px-10 py-8 sm:py-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+                {/* Decorative house shapes */}
+                <div className="absolute top-0 right-0 w-48 h-48 opacity-[0.08] pointer-events-none">
+                  <svg viewBox="0 0 200 200" fill="white">
+                    <path d="M100 10L190 90V190H10V90L100 10Z" />
+                  </svg>
+                </div>
+                <div className="absolute bottom-0 left-4 w-24 h-24 opacity-[0.06] pointer-events-none">
+                  <svg viewBox="0 0 200 200" fill="white">
+                    <path d="M100 10L190 90V190H10V90L100 10Z" />
+                  </svg>
+                </div>
+
+                {/* Logo */}
+                <div className="flex-shrink-0 relative z-10">
+                  <div className="relative w-[180px] sm:w-[220px] h-[44px] sm:h-[54px]">
                     <Image
-                      src={platform.logo}
+                      src={platform.logoWhite}
                       alt={platform.name}
                       fill
                       className="object-contain"
                     />
                   </div>
-                  <div className="flex-1 text-center sm:text-left">
-                    <h4 className="text-base font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors mb-1.5">
-                      {platform.name}
-                    </h4>
-                    <p className="text-sm text-slate-500 leading-relaxed mb-3">
-                      {platform.description}
+                  {platform.tagline && (
+                    <p className="text-white/70 text-xs sm:text-sm mt-2 text-center sm:text-left tracking-wide">
+                      {platform.tagline}
                     </p>
-                    <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                      {platform.features.map((feature) => (
-                        <span
-                          key={feature}
-                          className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-[#10B8D9]/10 text-[#10B8D9]"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
+                  )}
+                </div>
+
+                {/* Divider — desktop only */}
+                <div className="hidden sm:block w-px h-16 bg-white/20 flex-shrink-0" />
+
+                {/* Description + features */}
+                <div className="relative z-10 flex-1 text-center sm:text-left">
+                  <p className="text-white/90 text-sm sm:text-base leading-relaxed mb-4">
+                    {platform.description}
+                  </p>
+                  <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                    {platform.features.map((feature) => (
+                      <span
+                        key={feature}
+                        className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-white/15 text-white border border-white/20"
+                      >
+                        {feature}
+                      </span>
+                    ))}
                   </div>
-                  <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-[#10B8D9] group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
-                </a>
-              ))}
-            </div>
-          </motion.div>
+                </div>
+              </div>
+
+              {/* CTA bar */}
+              <div className="bg-[#004F8A] px-6 sm:px-10 py-3 flex items-center justify-center sm:justify-end gap-2 group-hover:bg-[#003D6B] transition-colors duration-300">
+                <span className="text-white text-sm font-medium">
+                  {platform.cta}
+                </span>
+                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-300" />
+              </div>
+            </motion.a>
+          ))}
         </div>
       )}
 
