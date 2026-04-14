@@ -112,6 +112,7 @@ export default function OrdersPage() {
   const [search, setSearch] = useState('');
   const [tier, setTier] = useState('');
   const [status, setStatus] = useState('');
+  const [hasCustomer, setHasCustomer] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -146,6 +147,7 @@ export default function OrdersPage() {
       if (search) params.set('search', search);
       if (tier) params.set('tier', tier);
       if (status) params.set('status', status);
+      if (hasCustomer) params.set('hasCustomer', '1');
       params.set('page', String(page));
       params.set('limit', '20');
 
@@ -161,7 +163,7 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, tier, status, page]);
+  }, [search, tier, status, hasCustomer, page]);
 
   useEffect(() => {
     const timer = setTimeout(fetchOrders, 300);
@@ -170,7 +172,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, tier, status]);
+  }, [search, tier, status, hasCustomer]);
 
   const formatAmount = (amount: number, currency: string) => {
     return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
@@ -299,7 +301,28 @@ export default function OrdersPage() {
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
+        <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={hasCustomer}
+            onChange={(e) => setHasCustomer(e.target.checked)}
+            className="w-4 h-4 rounded border-slate-300 text-[#10B8D9] focus:ring-[#10B8D9]"
+          />
+          只顯示有顧客資訊
+        </label>
         <span className="text-sm text-slate-500">共 {total} 筆訂單</span>
+        <a
+          href={`/api/admin/orders/export?${new URLSearchParams({
+            ...(search ? { search } : {}),
+            ...(tier ? { tier } : {}),
+            ...(status ? { status } : {}),
+            ...(hasCustomer ? { hasCustomer: '1' } : {}),
+          }).toString()}`}
+          className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4] transition-colors whitespace-nowrap"
+          title="以目前篩選條件匯出 CSV"
+        >
+          匯出 CSV
+        </a>
       </div>
 
       {/* Table */}
