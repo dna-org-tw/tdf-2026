@@ -161,7 +161,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https: http:",
               "font-src 'self' https://fonts.gstatic.com",
               "connect-src 'self' https://*.supabase.co https://*.stripe.com https://www.google.com https://recaptchaenterprise.googleapis.com https://www.facebook.com https://api.lu.ma",
-              "frame-src 'self' https://www.google.com https://www.recaptcha.net https://js.stripe.com https://www.instagram.com",
+              "frame-src 'self' https://www.google.com https://www.recaptcha.net https://js.stripe.com https://www.instagram.com https://www.youtube.com https://www.youtube-nocookie.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
