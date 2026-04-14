@@ -343,8 +343,12 @@ export const content = {
             description: "A Japanese platform specializing in mid-to-long-term stays (14+ nights). Furnished apartments, hotels, share houses, and co-living — all bookable online with no deposit required.",
             logo: "/images/partners/goodroom.png",
             logoWhite: "/images/partners/goodroom_white.png",
-            url: "https://lp.livingpass.goodrooms.jp/international/TW",
+            url: "https://livingpass.goodrooms.jp/?utm_source=tdf2026&utm_medium=referral&utm_campaign=tdna",
             cta: "Browse Listings",
+            ctas: [
+              { label: "For Attendees", url: "https://livingpass.goodrooms.jp/?utm_source=tdf2026&utm_medium=referral&utm_campaign=tdna" },
+              { label: "For Operators", url: "https://forms.gle/DS3veNCSkH9PpKch7" },
+            ],
             features: ["No Deposit", "Fully Furnished", "Online Booking", "14+ Night Stays"],
           }
         ]
@@ -1242,8 +1246,12 @@ export const content = {
             description: "日本中長期住宿平台，提供 14 泊以上的月租公寓、飯店、共享住宅及 Co-living。免押金、家具家電齊全、線上即可完成預約。",
             logo: "/images/partners/goodroom.png",
             logoWhite: "/images/partners/goodroom_white.png",
-            url: "https://lp.livingpass.goodrooms.jp/international/TW",
+            url: "https://livingpass.goodrooms.jp/?utm_source=tdf2026&utm_medium=referral&utm_campaign=tdna",
             cta: "瀏覽房源",
+            ctas: [
+              { label: "給會眾：瀏覽房源", url: "https://livingpass.goodrooms.jp/?utm_source=tdf2026&utm_medium=referral&utm_campaign=tdna" },
+              { label: "給業者：合作申請", url: "https://forms.gle/DS3veNCSkH9PpKch7" },
+            ],
             features: ["免押金", "家具家電齊全", "線上預約", "14泊以上"],
           }
         ]

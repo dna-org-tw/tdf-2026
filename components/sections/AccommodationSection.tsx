@@ -241,17 +241,18 @@ export default function AccommodationSection() {
       {/* Partner Platforms — Obi-style full-width banner */}
       {t.accommodation.partnerPlatforms && t.accommodation.partnerPlatforms.items.length > 0 && (
         <div>
-          {t.accommodation.partnerPlatforms.items.map((platform) => (
-            <motion.a
+          {t.accommodation.partnerPlatforms.items.map((platform) => {
+            const ctaItems = platform.ctas && platform.ctas.length > 0
+              ? platform.ctas
+              : [{ label: platform.cta, url: platform.url }];
+            return (
+            <motion.div
               key={platform.name}
-              href={platform.url}
-              target="_blank"
-              rel="noopener noreferrer"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="group block w-full overflow-hidden shadow-[0_4px_30px_rgba(0,104,183,0.25)] hover:shadow-[0_4px_40px_rgba(0,104,183,0.4)] transition-shadow duration-300"
+              className="block w-full overflow-hidden shadow-[0_4px_30px_rgba(0,104,183,0.25)] transition-shadow duration-300"
             >
               <div className="relative bg-gradient-to-r from-[#004F8A] via-[#0068B7] to-[#0080DD] px-6 sm:px-12 lg:px-20 py-8 sm:py-10">
                 <div className="absolute inset-0 opacity-[0.06] pointer-events-none overflow-hidden">
@@ -301,23 +302,44 @@ export default function AccommodationSection() {
                     </div>
                   </div>
 
-                  <div className="flex-shrink-0 hidden sm:flex items-center gap-2 bg-white/15 hover:bg-white/25 border border-white/30 rounded-full px-6 py-3 transition-colors duration-300">
-                    <span className="text-white text-sm font-bold whitespace-nowrap">
-                      {platform.cta}
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-300" />
+                  <div className="flex-shrink-0 hidden sm:flex flex-col gap-2">
+                    {ctaItems.map((c) => (
+                      <a
+                        key={c.url}
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/cta flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 border border-white/30 rounded-full px-6 py-3 transition-colors duration-300"
+                      >
+                        <span className="text-white text-sm font-bold whitespace-nowrap">
+                          {c.label}
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-white group-hover/cta:translate-x-1 transition-transform duration-300" />
+                      </a>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              <div className="sm:hidden bg-[#003D6B] px-6 py-3 flex items-center justify-center gap-2 group-hover:bg-[#002D50] transition-colors duration-300">
-                <span className="text-white text-sm font-bold">
-                  {platform.cta}
-                </span>
-                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform duration-300" />
+              <div className="sm:hidden flex flex-col">
+                {ctaItems.map((c) => (
+                  <a
+                    key={c.url}
+                    href={c.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/cta bg-[#003D6B] hover:bg-[#002D50] px-6 py-3 flex items-center justify-center gap-2 transition-colors duration-300 border-t border-white/10"
+                  >
+                    <span className="text-white text-sm font-bold">
+                      {c.label}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-white group-hover/cta:translate-x-1 transition-transform duration-300" />
+                  </a>
+                ))}
               </div>
-            </motion.a>
-          ))}
+            </motion.div>
+            );
+          })}
         </div>
       )}
 
