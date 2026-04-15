@@ -1,12 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
-import { getRecipients, type RecipientGroup, type TicketTier } from '@/lib/recipients';
+import { getRecipients, type RecipientGroup } from '@/lib/recipients';
+import {
+  type MemberStatus,
+  type MemberTier,
+  type TicketTier,
+  MEMBER_STATUSES,
+  MEMBER_TIERS,
+  TICKET_TIERS,
+} from '@/lib/members';
 import { enqueueEmails, processAllPending } from '@/lib/notificationEmail';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { checkRateLimit } from '@/lib/rateLimit';
 
 const VALID_GROUPS: RecipientGroup[] = ['orders', 'subscribers', 'test'];
-const VALID_TIERS: TicketTier[] = ['explore', 'contribute', 'weekly_backer', 'backer'];
+
+function toList<T extends string>(val: unknown, allowed: readonly T[]): T[] | undefined {
+  if (!Array.isArray(val)) return undefined;
+  const list = (val as string[]).filter((v) => (allowed as readonly string[]).includes(v)) as T[];
+  return list.length ? list : undefined;
+}
 
 export async function POST(req: NextRequest) {
   const session = await getAdminSession(req);
@@ -25,34 +38,39 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  if (!body?.subject?.trim() || !body?.body?.trim() || !body?.groups) {
+
+  if (!body?.subject?.trim() || !body?.body?.trim()) {
     return NextResponse.json(
-      { error: '主旨、內容和收件群組為必填' },
+      { error: '主旨和內容為必填' },
       { status: 400 }
     );
   }
 
   const subject = body.subject.trim();
   const emailBody = body.body.trim();
-  const groups = (body.groups as string[]).filter((g): g is RecipientGroup =>
-    VALID_GROUPS.includes(g as RecipientGroup)
-  );
 
-  if (groups.length === 0) {
-    return NextResponse.json({ error: '請至少選擇一個收件群組' }, { status: 400 });
-  }
-
-  const tiers = body.tiers
-    ? (body.tiers as string[]).filter((t): t is TicketTier =>
-        VALID_TIERS.includes(t as TicketTier)
-      )
+  const rawGroups = Array.isArray(body.groups) ? (body.groups as string[]) : undefined;
+  const groups = rawGroups
+    ? rawGroups.filter((g): g is RecipientGroup => VALID_GROUPS.includes(g as RecipientGroup))
     : undefined;
+
+  const legacyTicketTiers = toList<TicketTier>(body.tiers, TICKET_TIERS);
+  const statuses = toList<MemberStatus>(body.statuses, MEMBER_STATUSES);
+  const memberTiers = toList<MemberTier>(body.memberTiers, MEMBER_TIERS);
+  const ticketTiers = toList<TicketTier>(body.ticketTiers, TICKET_TIERS);
+
+  if ((!groups || groups.length === 0) && !statuses && !memberTiers && !ticketTiers) {
+    return NextResponse.json({ error: '請至少選擇一組收件人條件' }, { status: 400 });
+  }
 
   try {
     // Fetch recipients
     const { emails, count } = await getRecipients({
       groups,
-      legacyTicketTiers: tiers,
+      statuses,
+      memberTiers,
+      ticketTiers,
+      legacyTicketTiers,
       adminEmail: session.email,
     });
 
@@ -70,8 +88,8 @@ export async function POST(req: NextRequest) {
       .insert({
         subject,
         body: emailBody,
-        recipient_groups: groups,
-        recipient_tiers: tiers || null,
+        recipient_groups: groups ?? [],
+        recipient_tiers: legacyTicketTiers ?? ticketTiers ?? null,
         recipient_count: count,
         sent_by: session.email,
         status: 'sending',

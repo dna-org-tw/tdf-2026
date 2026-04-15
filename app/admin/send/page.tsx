@@ -2,21 +2,33 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  type MemberStatus,
+  type MemberTier,
+  type TicketTier,
+  MEMBER_STATUSES,
+  MEMBER_TIERS,
+  TICKET_TIERS,
+  STATUS_LABELS_ZH,
+  TIER_LABELS_ZH,
+  TICKET_TIER_LABELS,
+} from '@/lib/members';
 
-type RecipientGroup = 'orders' | 'subscribers' | 'test';
-type TicketTier = 'explore' | 'contribute' | 'weekly_backer' | 'backer';
+interface Preset {
+  id: string;
+  label: string;
+  statuses?: MemberStatus[];
+  memberTiers?: MemberTier[];
+  ticketTiers?: TicketTier[];
+  testOnly?: boolean;
+}
 
-const GROUP_OPTIONS: { value: RecipientGroup; label: string; description?: string }[] = [
-  { value: 'test', label: '寄送測試信', description: '寄送至自己的信箱' },
-  { value: 'orders', label: '付費會員' },
-  { value: 'subscribers', label: '電子報訂閱者' },
-];
-
-const TIER_OPTIONS: { value: TicketTier; label: string }[] = [
-  { value: 'explore', label: 'Explore' },
-  { value: 'contribute', label: 'Contribute' },
-  { value: 'weekly_backer', label: 'Weekly Backer' },
-  { value: 'backer', label: 'Backer' },
+const PRESETS: Preset[] = [
+  { id: 'test', label: '寄送測試信（寄給自己）', testOnly: true },
+  { id: 'all-paid', label: '全體付費', statuses: ['paid'] },
+  { id: 'vip', label: 'VIP (付費 + S/A)', statuses: ['paid'], memberTiers: ['S', 'A'] },
+  { id: 'chase', label: '催單 (待付/放棄)', statuses: ['pending', 'abandoned'] },
+  { id: 'wake', label: '冷名單喚醒 (訂閱者 B/C)', statuses: ['subscriber'], memberTiers: ['B', 'C'] },
 ];
 
 function buildPreviewHtml(body: string, subject: string): string {
@@ -25,7 +37,6 @@ function buildPreviewHtml(body: string, subject: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/\n/g, '<br>');
-
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
@@ -47,8 +58,10 @@ function buildPreviewHtml(body: string, subject: string): string {
 
 export default function SendNotificationPage() {
   const router = useRouter();
-  const [groups, setGroups] = useState<RecipientGroup[]>([]);
-  const [tiers, setTiers] = useState<TicketTier[]>([]);
+  const [testOnly, setTestOnly] = useState(false);
+  const [statuses, setStatuses] = useState<MemberStatus[]>([]);
+  const [memberTiers, setMemberTiers] = useState<MemberTier[]>([]);
+  const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([]);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [recipientCount, setRecipientCount] = useState<number | null>(null);
@@ -67,79 +80,79 @@ export default function SendNotificationPage() {
       .catch(() => {});
   }, []);
 
+  const applyPreset = (p: Preset) => {
+    setTestOnly(!!p.testOnly);
+    setStatuses(p.statuses || []);
+    setMemberTiers(p.memberTiers || []);
+    setTicketTiers(p.ticketTiers || []);
+  };
+
+  const toggle = <T extends string>(val: T, cur: T[], setCur: (v: T[]) => void) => {
+    setCur(cur.includes(val) ? cur.filter((x) => x !== val) : [...cur, val]);
+  };
+
   const fetchCount = useCallback(async () => {
-    if (groups.length === 0) {
+    if (testOnly) {
+      setRecipientCount(1);
+      return;
+    }
+    if (!statuses.length && !memberTiers.length && !ticketTiers.length) {
       setRecipientCount(null);
       return;
     }
     setLoadingCount(true);
     try {
       const params = new URLSearchParams();
-      params.set('groups', groups.join(','));
-      if (groups.includes('orders') && tiers.length > 0) {
-        params.set('tiers', tiers.join(','));
-      }
+      if (statuses.length) params.set('statuses', statuses.join(','));
+      if (memberTiers.length) params.set('memberTiers', memberTiers.join(','));
+      if (ticketTiers.length) params.set('ticketTiers', ticketTiers.join(','));
       const res = await fetch(`/api/admin/recipients?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setRecipientCount(data.count);
+        setRecipientCount(data.count ?? 0);
+      } else {
+        setRecipientCount(null);
       }
-    } catch {
-      setRecipientCount(null);
     } finally {
       setLoadingCount(false);
     }
-  }, [groups, tiers]);
+  }, [testOnly, statuses, memberTiers, ticketTiers]);
 
   useEffect(() => {
-    const timer = setTimeout(fetchCount, 300);
-    return () => clearTimeout(timer);
+    const t = setTimeout(fetchCount, 200);
+    return () => clearTimeout(t);
   }, [fetchCount]);
 
-  const toggleGroup = (group: RecipientGroup) => {
-    setGroups((prev) =>
-      prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
-    );
-  };
+  const canSubmit =
+    subject.trim().length > 0 &&
+    body.trim().length > 0 &&
+    (testOnly || statuses.length > 0 || memberTiers.length > 0 || ticketTiers.length > 0);
 
-  const toggleTier = (tier: TicketTier) => {
-    setTiers((prev) =>
-      prev.includes(tier) ? prev.filter((t) => t !== tier) : [...prev, tier]
-    );
-  };
-
-  const isTestOnly = groups.length === 1 && groups[0] === 'test';
-  const canSend = groups.length > 0 && subject.trim() && body.trim() && recipientCount && recipientCount > 0;
-
-  const handleSend = async () => {
-    setShowConfirm(false);
-    setSending(true);
+  const submit = async () => {
     setError('');
     setSuccessMessage('');
-
+    setSending(true);
     try {
+      const payload: Record<string, unknown> = { subject, body };
+      if (testOnly) {
+        payload.groups = ['test'];
+      } else {
+        if (statuses.length) payload.statuses = statuses;
+        if (memberTiers.length) payload.memberTiers = memberTiers;
+        if (ticketTiers.length) payload.ticketTiers = ticketTiers;
+      }
       const res = await fetch('/api/admin/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject: subject.trim(),
-          body: body.trim(),
-          groups,
-          tiers: groups.includes('orders') ? tiers : undefined,
-        }),
+        body: JSON.stringify(payload),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.error || '發送失敗');
-      }
-
-      if (isTestOnly) {
-        setSuccessMessage(`測試信已排入寄送佇列（${data.queued} 封）`);
-      }
-      if (data.notificationId) {
-        router.push(`/admin/history/${data.notificationId}`);
+        setError(data.error || '發送失敗');
+      } else {
+        setSuccessMessage(`已寄送給 ${data.queued ?? recipientCount} 位收件人`);
+        setShowConfirm(false);
+        router.refresh();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '發送失敗');
@@ -150,167 +163,162 @@ export default function SendNotificationPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">發送通知信</h1>
+      <h1 className="text-2xl font-bold text-slate-900 mb-6">發送通知</h1>
 
-      {/* Email Config Info */}
-      {emailConfig && (
-        <section className="bg-slate-50 rounded-xl p-4 shadow-sm mb-4 border border-slate-200">
-          <h2 className="font-semibold text-slate-700 mb-2 text-sm">信件設定</h2>
-          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-            <span className="text-slate-500">寄件者 (From)：</span>
-            <span className="text-slate-900 font-mono">{emailConfig.from}</span>
-            <span className="text-slate-500">回覆地址 (Reply-To)：</span>
-            <span className="text-slate-900 font-mono">{emailConfig.replyTo || '未設定（回覆將寄至 From 地址）'}</span>
-            <span className="text-slate-500">Mailgun Domain：</span>
-            <span className="text-slate-900 font-mono">{emailConfig.domain || '未設定'}</span>
-          </div>
-        </section>
-      )}
-
-      {/* Recipient Selection */}
-      <section className="bg-white rounded-xl p-6 shadow-sm mb-4">
-        <h2 className="font-semibold text-slate-900 mb-3">收件群組</h2>
-        <div className="flex flex-wrap gap-3">
-          {GROUP_OPTIONS.map((opt) => (
-            <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={groups.includes(opt.value)}
-                onChange={() => toggleGroup(opt.value)}
-                className="w-4 h-4 accent-[#10B8D9]"
-              />
-              <span className="text-sm text-slate-700">
-                {opt.label}
-                {opt.description && <span className="text-slate-400 ml-1">({opt.description})</span>}
-              </span>
-            </label>
+      <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
+        <div className="text-xs text-slate-500 mb-2">快速預設</div>
+        <div className="flex flex-wrap gap-2">
+          {PRESETS.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => applyPreset(p)}
+              className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              {p.label}
+            </button>
           ))}
         </div>
-
-        {groups.includes('orders') && (
-          <div className="mt-4">
-            <h3 className="text-sm font-medium text-slate-600 mb-2">票種篩選（不選則包含全部）</h3>
-            <div className="flex flex-wrap gap-3">
-              {TIER_OPTIONS.map((opt) => (
-                <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={tiers.includes(opt.value)}
-                    onChange={() => toggleTier(opt.value)}
-                    className="w-4 h-4 accent-[#10B8D9]"
-                  />
-                  <span className="text-sm text-slate-700">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-4 text-sm text-slate-500">
-          {loadingCount ? (
-            '計算收件人數...'
-          ) : recipientCount !== null ? (
-            <span>共 <strong className="text-slate-900">{recipientCount}</strong> 位收件人</span>
-          ) : (
-            '請選擇收件群組'
-          )}
-        </div>
-      </section>
-
-      {/* Email Content */}
-      <section className="bg-white rounded-xl p-6 shadow-sm mb-4">
-        <h2 className="font-semibold text-slate-900 mb-3">信件內容</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">主旨</label>
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="輸入信件主旨"
-              className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B8D9] text-slate-900"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">內容（純文字）</label>
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="輸入信件內容..."
-              rows={10}
-              className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B8D9] text-slate-900 resize-y"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Preview */}
-      {subject.trim() && body.trim() && (
-        <section className="bg-white rounded-xl p-6 shadow-sm mb-4">
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            className="text-sm font-medium text-[#10B8D9] hover:underline"
-          >
-            {showPreview ? '隱藏預覽' : '顯示信件預覽'}
-          </button>
-          {showPreview && (
-            <div className="mt-4 border border-slate-200 rounded-lg overflow-hidden">
-              <iframe
-                srcDoc={buildPreviewHtml(body, subject)}
-                title="Email preview"
-                className="w-full h-[400px] border-0"
-              />
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* Actions */}
-      {error && (
-        <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>
-      )}
-
-      {successMessage && (
-        <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">{successMessage}</div>
-      )}
-
-      <div className="flex gap-3">
-        <button
-          onClick={isTestOnly ? handleSend : () => setShowConfirm(true)}
-          disabled={!canSend || sending}
-          className="bg-[#10B8D9] hover:bg-[#0EA5C4] disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors"
-        >
-          {sending ? '發送中...' : isTestOnly ? '寄送測試信' : '發送通知'}
-        </button>
-        <button
-          onClick={() => router.push('/admin')}
-          className="text-slate-500 hover:text-slate-700 font-medium px-6 py-2.5 transition-colors"
-        >
-          取消
-        </button>
       </div>
 
-      {/* Confirmation Dialog */}
+      <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
+        <label className="flex items-center gap-2 mb-3">
+          <input
+            type="checkbox"
+            checked={testOnly}
+            onChange={(e) => setTestOnly(e.target.checked)}
+          />
+          <span className="text-sm text-slate-700">寄送測試信（僅寄到自己的信箱）</span>
+        </label>
+
+        {!testOnly && (
+          <>
+            <div className="mb-3">
+              <div className="text-xs text-slate-500 mb-1">會員狀態（多選）</div>
+              <div className="flex flex-wrap gap-2">
+                {MEMBER_STATUSES.map((s) => (
+                  <label key={s} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
+                    <input
+                      type="checkbox"
+                      checked={statuses.includes(s)}
+                      onChange={() => toggle(s, statuses, setStatuses)}
+                    />
+                    {STATUS_LABELS_ZH[s]}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <div className="text-xs text-slate-500 mb-1">會員等級（多選）</div>
+              <div className="flex flex-wrap gap-2">
+                {MEMBER_TIERS.map((t) => (
+                  <label key={t} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
+                    <input
+                      type="checkbox"
+                      checked={memberTiers.includes(t)}
+                      onChange={() => toggle(t, memberTiers, setMemberTiers)}
+                    />
+                    {TIER_LABELS_ZH[t]}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-slate-500 mb-1">票種篩選（僅對「已付費」生效）</div>
+              <div className="flex flex-wrap gap-2">
+                {TICKET_TIERS.map((t) => (
+                  <label key={t} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
+                    <input
+                      type="checkbox"
+                      checked={ticketTiers.includes(t)}
+                      onChange={() => toggle(t, ticketTiers, setTicketTiers)}
+                    />
+                    {TICKET_TIER_LABELS[t]}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        <div className="mt-3 text-sm text-slate-500">
+          {testOnly
+            ? '將只寄給自己'
+            : loadingCount
+              ? '計算收件人中…'
+              : recipientCount !== null
+                ? `符合收件人：${recipientCount} 位`
+                : '請選擇至少一個篩選條件'}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl p-4 shadow-sm mb-4 space-y-3">
+        {emailConfig && (
+          <div className="text-xs text-slate-500">
+            寄件人：{emailConfig.from}{emailConfig.replyTo ? ` · 回信至 ${emailConfig.replyTo}` : ''}
+          </div>
+        )}
+        <input
+          type="text"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          placeholder="主旨"
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm"
+        />
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="內文（支援換行）"
+          rows={12}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm font-mono"
+        />
+        <div className="flex gap-2">
+          <button
+            type="button"
+            disabled={!canSubmit}
+            onClick={() => setShowPreview(true)}
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50"
+          >
+            預覽
+          </button>
+          <button
+            type="button"
+            disabled={!canSubmit || sending}
+            onClick={() => setShowConfirm(true)}
+            className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:opacity-90 disabled:opacity-50"
+          >
+            {sending ? '發送中…' : '發送'}
+          </button>
+        </div>
+        {error && <div className="text-sm text-red-600">{error}</div>}
+        {successMessage && <div className="text-sm text-green-700">{successMessage}</div>}
+      </div>
+
+      {showPreview && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowPreview(false)}>
+          <div className="bg-white rounded-xl p-4 max-w-xl w-full max-h-[80vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold mb-3">預覽</h3>
+            <iframe
+              className="w-full h-[60vh] border border-slate-200 rounded"
+              srcDoc={buildPreviewHtml(body, subject)}
+            />
+          </div>
+        </div>
+      )}
+
       {showConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">確認發送</h3>
-            <p className="text-slate-600 mb-1">主旨：{subject}</p>
-            <p className="text-slate-600 mb-4">
-              將發送給 <strong>{recipientCount}</strong> 位收件人。此操作無法撤銷。
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-2">確認發送</h3>
+            <p className="text-sm text-slate-700 mb-4">
+              即將寄送「{subject}」給 {testOnly ? '你自己' : `${recipientCount ?? '?'} 位收件人`}，確認嗎？
             </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="text-slate-500 hover:text-slate-700 font-medium px-4 py-2 transition-colors"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleSend}
-                className="bg-[#10B8D9] hover:bg-[#0EA5C4] text-white font-semibold px-5 py-2 rounded-lg transition-colors"
-              >
-                確認發送
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-sm border border-slate-300 rounded-lg">取消</button>
+              <button onClick={submit} disabled={sending} className="px-4 py-2 text-sm text-white bg-[#10B8D9] rounded-lg disabled:opacity-50">
+                {sending ? '發送中…' : '確認發送'}
               </button>
             </div>
           </div>
