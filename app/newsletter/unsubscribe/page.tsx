@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { trackEvent } from '@/components/FacebookPixel';
 
 export default function UnsubscribePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { t } = useTranslation();
+  const { executeRecaptcha } = useRecaptcha('unsubscribe');
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'form'>('idle');
   const [message, setMessage] = useState<string>('');
@@ -58,10 +60,20 @@ export default function UnsubscribePage() {
       setStatus('loading');
       setMessage(t.unsubscribe.processing);
 
+      let recaptchaToken: string | null = null;
+      try {
+        recaptchaToken = await executeRecaptcha();
+      } catch (err) {
+        console.error('reCAPTCHA execution failed:', err);
+        setStatus('error');
+        setMessage(t.unsubscribe.errorTitle);
+        return;
+      }
+
       const res = await fetch('/api/newsletter/unsubscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), recaptchaToken }),
       });
 
       const data = await res.json();
