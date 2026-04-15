@@ -2,6 +2,12 @@ import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import crypto from 'crypto';
 import { logEmail } from './emailLog';
+import {
+  buildComplianceFooterHtml,
+  buildComplianceFooterText,
+  buildMailgunComplianceOptions,
+  isSuppressed,
+} from './emailCompliance';
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
@@ -77,11 +83,18 @@ export async function sendSubscriptionThankYouEmail(email: string): Promise<bool
     return false;
   }
 
+  if (await isSuppressed(email)) {
+    console.log(`[Email] Skipping subscription thank-you to suppressed address: ${email}`);
+    return false;
+  }
+
   const subject = 'Thank You for Joining Taiwan Digital Nomad Community!';
 
   try {
     const unsubscribeToken = generateUnsubscribeToken(email);
     const unsubscribeUrl = `${baseUrl}/newsletter/unsubscribe?token=${unsubscribeToken}`;
+    const footerHtml = buildComplianceFooterHtml({ email });
+    const footerText = buildComplianceFooterText({ email });
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -132,14 +145,7 @@ export async function sendSubscriptionThankYouEmail(email: string): Promise<bool
     </p>
   </div>
   
-  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-    <p>This is an automated email. Please do not reply directly to this message.</p>
-    <p>
-      <a href="${unsubscribeUrl}" style="color: #999; text-decoration: underline;">
-        Unsubscribe
-      </a>
-    </p>
-  </div>
+  ${footerHtml}
 </body>
 </html>
     `;
@@ -167,9 +173,7 @@ ${unsubscribeUrl}
 Thank you again for your support!
 Taiwan Digital Fest 2026 Team
 
----
-This is an automated email. Please do not reply directly to this message.
-Unsubscribe: ${unsubscribeUrl}
+${footerText}
     `;
 
     const messageData = {
@@ -178,6 +182,10 @@ Unsubscribe: ${unsubscribeUrl}
       subject,
       html: htmlContent,
       text: textContent,
+      ...buildMailgunComplianceOptions({
+        unsubscribeEmail: email,
+        tag: 'subscription_thank_you',
+      }),
     };
 
     const response = await mailgunClient.messages.create(mailgunDomain, messageData);
@@ -232,10 +240,17 @@ export async function sendVoteConfirmationEmail(
     return false;
   }
 
+  if (await isSuppressed(email)) {
+    console.log(`[Email] Skipping vote confirmation to suppressed address: ${email}`);
+    return false;
+  }
+
   const subject = 'Confirm Your Nomad Award Vote - Taiwan Digital Fest 2026';
 
   try {
     const confirmUrl = `${baseUrl}/api/award/confirm-vote?token=${encodeURIComponent(confirmToken)}`;
+    const footerHtml = buildComplianceFooterHtml({ includeUnsubscribe: false });
+    const footerText = buildComplianceFooterText({ includeUnsubscribe: false });
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -287,9 +302,7 @@ export async function sendVoteConfirmationEmail(
     </p>
   </div>
   
-  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-    <p>This is an automated email. Please do not reply directly to this message.</p>
-  </div>
+  ${footerHtml}
 </body>
 </html>
     `;
@@ -313,8 +326,7 @@ Important Notes:
 Thank you for participating in the Nomad Award contest!
 Taiwan Digital Fest 2026 Team
 
----
-This is an automated email. Please do not reply directly to this message.
+${footerText}
     `;
 
     const messageData = {
@@ -323,6 +335,7 @@ This is an automated email. Please do not reply directly to this message.
       subject,
       html: htmlContent,
       text: textContent,
+      ...buildMailgunComplianceOptions({ tag: 'vote_confirmation' }),
     };
 
     const response = await mailgunClient.messages.create(mailgunDomain, messageData);

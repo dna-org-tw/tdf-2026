@@ -1,6 +1,12 @@
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import { supabaseServer } from '@/lib/supabaseServer';
+import {
+  buildComplianceFooterHtml,
+  buildComplianceFooterText,
+  buildMailgunComplianceOptions,
+  filterSuppressed,
+} from '@/lib/emailCompliance';
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
@@ -12,7 +18,7 @@ const mailgunClient = mailgunApiKey && mailgunDomain
   ? new Mailgun(formData).client({ username: 'api', key: mailgunApiKey })
   : null;
 
-function buildHtml(body: string, subject: string): string {
+function buildHtml(body: string, subject: string, recipientEmail: string): string {
   const bodyHtml = body
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -38,20 +44,24 @@ function buildHtml(body: string, subject: string): string {
       Taiwan Digital Fest 2026 Team
     </p>
   </div>
-  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-    <p>This is an automated email from Taiwan Digital Fest 2026.</p>
-  </div>
+  ${buildComplianceFooterHtml({ email: recipientEmail })}
 </body>
 </html>`;
 }
 
-function buildPlainText(body: string): string {
-  return `Taiwan Digital Fest 2026\n\n${body}\n\nBest regards,\nTaiwan Digital Fest 2026 Team`;
+function buildPlainText(body: string, recipientEmail: string): string {
+  return `Taiwan Digital Fest 2026\n\n${body}\n\nBest regards,\nTaiwan Digital Fest 2026 Team\n\n${buildComplianceFooterText({ email: recipientEmail })}`;
 }
 
-// Mailgun Basic 10k plan: ~1 msg/sec is safe; back off on 429
+// Mailgun Basic 10k plan: ~1 msg/sec is safe; back off on 429 with exponential retry.
 const SEND_INTERVAL_MS = 1000;
-const RATE_LIMIT_BACKOFF_MS = 60_000;
+const RATE_LIMIT_BACKOFF_BASE_MS = 30_000;
+const RATE_LIMIT_BACKOFF_MAX_MS = 300_000; // cap at 5 minutes
+
+/** Exponential backoff: 30s, 60s, 120s, 240s, 300s (capped). */
+function computeBackoff(attempt: number): number {
+  return Math.min(RATE_LIMIT_BACKOFF_BASE_MS * 2 ** attempt, RATE_LIMIT_BACKOFF_MAX_MS);
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
@@ -75,10 +85,18 @@ export async function enqueueEmails(
   emails: string[],
   subject: string,
   notificationId: string,
-): Promise<{ queued: number }> {
+): Promise<{ queued: number; suppressed: number }> {
   if (!supabaseServer) throw new Error('Database not configured');
 
-  const rows = emails.map((email) => ({
+  // Remove addresses on the suppression list before enqueueing — never send to
+  // bounced/complained/unsubscribed recipients.
+  const { allowed, suppressed } = await filterSuppressed(emails);
+
+  if (allowed.length === 0) {
+    return { queued: 0, suppressed: suppressed.length };
+  }
+
+  const rows = allowed.map((email) => ({
     to_email: email,
     from_email: fromEmail,
     subject,
@@ -90,7 +108,7 @@ export async function enqueueEmails(
   const { error } = await supabaseServer.from('email_logs').insert(rows);
   if (error) throw error;
 
-  return { queued: rows.length };
+  return { queued: rows.length, suppressed: suppressed.length };
 }
 
 // ---------------------------------------------------------------------------
@@ -145,17 +163,21 @@ export async function processQueueBatch(
     .single();
 
   const subject = notif?.subject ?? pending[0].subject ?? '';
-  const html = buildHtml(notif?.body ?? '', subject);
-  const text = buildPlainText(notif?.body ?? '');
+  const body = notif?.body ?? '';
 
   let sent = 0;
   let failed = 0;
+  let rateLimitAttempt = 0;
 
   for (let idx = 0; idx < pending.length; idx++) {
     const email = pending[idx];
 
     // Throttle: wait between sends to respect Mailgun rate limits
     if (idx > 0) await sleep(SEND_INTERVAL_MS);
+
+    // Per-recipient body so each email gets its own unsubscribe link.
+    const html = buildHtml(body, subject, email.to_email);
+    const text = buildPlainText(body, email.to_email);
 
     try {
       const response = await mailgunClient.messages.create(mailgunDomain, {
@@ -164,8 +186,13 @@ export async function processQueueBatch(
         subject,
         html,
         text,
-        'h:Reply-To': replyToEmail,
+        ...buildMailgunComplianceOptions({
+          unsubscribeEmail: email.to_email,
+          replyTo: replyToEmail,
+          tag: 'notification',
+        }),
       });
+      rateLimitAttempt = 0; // reset on success
 
       await supabaseServer
         .from('email_logs')
@@ -180,9 +207,12 @@ export async function processQueueBatch(
     } catch (error) {
       const mgError = error as { status?: number };
 
-      // Back off on 429 rate limit — revert to pending so it gets retried next batch
+      // Back off on 429 rate limit — revert to pending so it gets retried next batch.
+      // Use exponential backoff (30s, 60s, 120s, 240s, 300s cap) per consecutive rate-limit hit.
       if (mgError.status === 429) {
-        console.warn(`[NotificationEmail] Rate limited, backing off ${RATE_LIMIT_BACKOFF_MS}ms`);
+        const backoff = computeBackoff(rateLimitAttempt);
+        rateLimitAttempt += 1;
+        console.warn(`[NotificationEmail] Rate limited (attempt ${rateLimitAttempt}), backing off ${backoff}ms`);
         await supabaseServer
           .from('email_logs')
           .update({ status: 'pending' })
@@ -194,7 +224,7 @@ export async function processQueueBatch(
             .update({ status: 'pending' })
             .eq('id', pending[j].id);
         }
-        await sleep(RATE_LIMIT_BACKOFF_MS);
+        await sleep(backoff);
         break;
       }
 
