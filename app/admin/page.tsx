@@ -8,6 +8,8 @@ interface Stats {
   orders: {
     total: number;
     paid: number;
+    purchased: number;
+    complimentary: number;
     uniqueMembers: number;
     totalRevenue: number;
     currency: string;
@@ -91,9 +93,11 @@ export default function AdminDashboard() {
           <p className="text-3xl font-bold text-[#10B8D9]">{stats.orders.uniqueMembers}</p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
-          <p className="text-sm text-slate-500 mb-1">已付款訂單</p>
+          <p className="text-sm text-slate-500 mb-1">成功訂單</p>
           <p className="text-3xl font-bold text-green-600">{stats.orders.paid}</p>
-          <p className="text-xs text-slate-400 mt-1">共 {stats.orders.total} 筆訂單</p>
+          <p className="text-xs text-slate-400 mt-1">
+            {stats.orders.purchased} 筆購買 / {stats.orders.complimentary} 筆招待
+          </p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <p className="text-sm text-slate-500 mb-1">總收入</p>

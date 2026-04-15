@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
       .select('amount_total, currency, ticket_tier, status, customer_email');
 
     const paidOrders = (orders || []).filter((o) => o.status === 'paid');
+    const purchasedOrders = paidOrders.filter((o) => (o.amount_total || 0) > 0);
+    const complimentaryOrders = paidOrders.filter((o) => (o.amount_total || 0) === 0);
     const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.amount_total || 0), 0);
 
     // Unique paid members
@@ -46,6 +48,8 @@ export async function GET(req: NextRequest) {
       orders: {
         total: (orders || []).length,
         paid: paidOrders.length,
+        purchased: purchasedOrders.length,
+        complimentary: complimentaryOrders.length,
         uniqueMembers,
         totalRevenue,
         currency: paidOrders[0]?.currency || 'usd',
