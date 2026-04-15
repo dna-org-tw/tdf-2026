@@ -3,8 +3,8 @@ export async function register() {
     const requiredEnvVars = [
       'STRIPE_SECRET_KEY',
       'STRIPE_WEBHOOK_SECRET',
-      'SUPABASE_URL',
-      'SUPABASE_SERVICE_ROLE_KEY',
+      'NEXT_PUBLIC_SUPABASE_URL',
+      'SUPABASE_SECRET_KEY',
       'MAILGUN_API_KEY',
       'MAILGUN_DOMAIN',
       'RECAPTCHA_API_KEY',
@@ -12,7 +12,7 @@ export async function register() {
       'RECAPTCHA_PROJECT_ID',
       'UNSUBSCRIBE_SECRET',
       'VOTE_SECRET',
-      'SESSION_SECRET',
+      'AUTH_SECRET',
     ];
 
     const missing = requiredEnvVars.filter((key) => !process.env[key]);
