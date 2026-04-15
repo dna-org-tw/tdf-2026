@@ -26,6 +26,8 @@ export async function createOrder(input: CreateOrderInput): Promise<Order | null
       currency: input.currency,
     };
     if (input.visitor_fingerprint) insertData.visitor_fingerprint = input.visitor_fingerprint;
+    if (input.stripe_invoice_id) insertData.stripe_invoice_id = input.stripe_invoice_id;
+    if (input.source) insertData.source = input.source;
 
     const { data, error } = await supabaseServer
       .from('orders')
@@ -160,6 +162,18 @@ export async function updateOrder(
     }
     if (input.payment_method_type !== undefined) {
       updateData.payment_method_type = input.payment_method_type;
+    }
+    if (input.stripe_invoice_id !== undefined) {
+      updateData.stripe_invoice_id = input.stripe_invoice_id;
+    }
+    if (input.source !== undefined) {
+      updateData.source = input.source;
+    }
+    if (input.amount_refunded !== undefined) {
+      updateData.amount_refunded = input.amount_refunded;
+    }
+    if (input.internal_notes !== undefined) {
+      updateData.internal_notes = input.internal_notes;
     }
 
     const { data, error } = await supabaseServer

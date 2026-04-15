@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { createManualOrder, OrderActionError } from '@/lib/orderActions';
 
 export async function GET(req: NextRequest) {
   const session = await getAdminSession(req);
@@ -58,5 +59,49 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('[Admin Orders]', error);
     return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
+  }
+}
+
+const VALID_TIERS = ['explore', 'contribute', 'weekly_backer', 'backer'] as const;
+const VALID_WEEKS = ['week1', 'week2', 'week3', 'week4'] as const;
+
+export async function POST(req: NextRequest) {
+  const session = await getAdminSession(req);
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json().catch(() => ({}));
+
+  if (!body?.customer_email || typeof body.customer_email !== 'string') {
+    return NextResponse.json({ error: 'customer_email required' }, { status: 400 });
+  }
+  if (!body?.customer_name || typeof body.customer_name !== 'string') {
+    return NextResponse.json({ error: 'customer_name required' }, { status: 400 });
+  }
+  if (!VALID_TIERS.includes(body.ticket_tier)) {
+    return NextResponse.json({ error: 'invalid ticket_tier' }, { status: 400 });
+  }
+  if (body.ticket_tier === 'weekly_backer' && !VALID_WEEKS.includes(body.week)) {
+    return NextResponse.json({ error: 'week required for weekly_backer' }, { status: 400 });
+  }
+
+  try {
+    const order = await createManualOrder(
+      {
+        customer_email: body.customer_email,
+        customer_name: body.customer_name,
+        ticket_tier: body.ticket_tier,
+        week: body.week,
+        payment_reference: body.payment_reference,
+        note: body.note,
+      },
+      session.email,
+    );
+    return NextResponse.json({ order });
+  } catch (err) {
+    if (err instanceof OrderActionError) {
+      return NextResponse.json({ error: err.message, stripe_code: err.stripeCode }, { status: err.httpStatus });
+    }
+    console.error('[POST manual create]', err);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

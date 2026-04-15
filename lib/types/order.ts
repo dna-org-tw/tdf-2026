@@ -1,17 +1,35 @@
-// 订单状态类型
-export type OrderStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+export type OrderStatus =
+  | 'pending'
+  | 'paid'
+  | 'failed'
+  | 'cancelled'
+  | 'expired'
+  | 'refunded'
+  | 'partially_refunded';
 
-// 訂單資料庫記錄類型
+export type OrderSource = 'stripe_checkout' | 'stripe_invoice_offline';
+
+export type OrderActionType =
+  | 'refund'
+  | 'cancel'
+  | 'edit'
+  | 'resend_receipt'
+  | 'note'
+  | 'manual_create';
+
 export interface Order {
-  id: string; // UUID
-  stripe_session_id: string; // Stripe checkout session ID
-  stripe_payment_intent_id: string | null; // Stripe payment intent ID
+  id: string;
+  stripe_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  stripe_invoice_id: string | null;
   ticket_tier: 'explore' | 'contribute' | 'weekly_backer' | 'backer';
   status: OrderStatus;
-  amount_subtotal: number; // 以分為單位
-  amount_total: number; // 以分為單位
-  amount_tax: number; // 以分為單位
-  amount_discount: number; // 以分為單位
+  source: OrderSource;
+  amount_subtotal: number;
+  amount_total: number;
+  amount_tax: number;
+  amount_discount: number;
+  amount_refunded: number;
   currency: string;
   customer_email: string | null;
   customer_name: string | null;
@@ -27,42 +45,52 @@ export interface Order {
   payment_method_brand: string | null;
   payment_method_last4: string | null;
   payment_method_type: string | null;
-  created_at: string; // ISO timestamp
-  updated_at: string; // ISO timestamp
+  internal_notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
-// 建立訂單的輸入類型
+export interface OrderAction {
+  id: string;
+  order_id: string;
+  admin_email: string;
+  action: OrderActionType;
+  payload: Record<string, unknown> | null;
+  stripe_response: Record<string, unknown> | null;
+  status: 'success' | 'failed';
+  error_message: string | null;
+  created_at: string;
+}
+
 export interface CreateOrderInput {
-  stripe_session_id: string;
+  stripe_session_id: string | null;
+  stripe_invoice_id?: string | null;
   ticket_tier: 'explore' | 'contribute' | 'weekly_backer' | 'backer';
   amount_subtotal: number;
   amount_total: number;
   amount_tax: number;
   amount_discount: number;
   currency: string;
+  source?: OrderSource;
   visitor_fingerprint?: string | null;
 }
 
-// 更新订单的输入类型（可选字段传 undefined 表示不更新，传 null 表示清空）
 export interface UpdateOrderInput {
   stripe_payment_intent_id?: string | null;
+  stripe_invoice_id?: string | null;
   status?: OrderStatus;
+  source?: OrderSource;
   amount_subtotal?: number;
   amount_total?: number;
   amount_tax?: number;
   amount_discount?: number;
+  amount_refunded?: number;
   customer_email?: string | null;
   customer_name?: string | null;
   customer_phone?: string | null;
-  customer_address?: {
-    line1: string | null;
-    line2: string | null;
-    city: string | null;
-    state: string | null;
-    postal_code: string | null;
-    country: string | null;
-  } | null;
+  customer_address?: Order['customer_address'];
   payment_method_brand?: string | null;
   payment_method_last4?: string | null;
   payment_method_type?: string | null;
+  internal_notes?: string | null;
 }
