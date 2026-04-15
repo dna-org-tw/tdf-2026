@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { resolveMember } from '@/lib/adminMembers';
+import { applyUnsubscribe } from '@/lib/newsletterSubscriptions';
 
 export async function POST(
   req: NextRequest,
@@ -15,14 +16,11 @@ export async function POST(
   const member = await resolveMember(memberNo);
   if (!member) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const { data, error } = await supabaseServer
-    .from('newsletter_subscriptions')
-    .delete()
-    .ilike('email', member.email)
-    .select('id');
-  if (error) {
-    console.error('[Admin Unsubscribe]', error);
-    return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
+  const err = await applyUnsubscribe(member.email, `admin:${session.email}`);
+  if (err) {
+    console.error('[Admin Unsubscribe]', err);
+    return NextResponse.json({ error: 'Unsubscribe failed' }, { status: 500 });
   }
-  return NextResponse.json({ removed: data?.length ?? 0 });
+
+  return NextResponse.json({ success: true });
 }
