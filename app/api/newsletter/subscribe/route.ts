@@ -120,7 +120,12 @@ export async function POST(req: NextRequest) {
       if (existing.unsubscribed_at) {
         const { data: updated, error: updateError } = await supabaseServer
           .from('newsletter_subscriptions')
-          .update({ unsubscribed_at: null })
+          .update({
+            unsubscribed_at: null,
+            pref_newsletter: true,
+            pref_events: true,
+            pref_award: true,
+          })
           .eq('id', existing.id)
           .select()
           .single();
