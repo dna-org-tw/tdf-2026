@@ -35,6 +35,7 @@ ALTER TABLE email_suppressions FORCE ROW LEVEL SECURITY;
 
 -- 3. email_logs tracking columns ---------------------------------------------
 ALTER TABLE email_logs
+  ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS delivered_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS opened_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS clicked_at TIMESTAMPTZ,

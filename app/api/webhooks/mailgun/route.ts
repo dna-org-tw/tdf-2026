@@ -150,6 +150,11 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (event) {
+      case 'accepted':
+        // Mailgun has accepted the message and queued it for delivery.
+        await updateLogRow(messageId, { accepted_at: eventTs });
+        break;
+
       case 'delivered':
         await updateLogRow(messageId, { delivered_at: eventTs });
         break;
@@ -222,8 +227,15 @@ export async function POST(req: NextRequest) {
         });
         break;
 
+      case 'stored':
+      case 'list_member_uploaded':
+      case 'list_member_upload_error':
+      case 'list_uploaded':
+        // Inbound storage / mailing-list events — not used by this app.
+        break;
+
       default:
-        // Other events (accepted, stored, etc.) — no-op.
+        console.log(`[MailgunWebhook] Unhandled event: ${event}`);
         break;
     }
   } catch (err) {
