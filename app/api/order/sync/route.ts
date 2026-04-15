@@ -22,6 +22,9 @@ function mapPaymentStatusToOrderStatus(
   if (sessionStatus === 'complete' && paymentStatus === 'paid') {
     return 'paid';
   }
+  if (sessionStatus === 'complete' && paymentStatus === 'no_payment_required') {
+    return 'paid';
+  }
   // session expired or incomplete and unpaid -> cancelled
   if (sessionStatus === 'expired' || (sessionStatus !== 'complete' && paymentStatus === 'unpaid')) {
     return 'cancelled';
