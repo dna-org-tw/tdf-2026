@@ -133,14 +133,32 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // Also remove from the global suppression list so future bulk sends deliver.
+        // Only clear 'unsubscribed' suppressions. Bounces, spam complaints,
+        // and manual blocks are deliverability signals that must survive
+        // a re-subscribe — otherwise a complainer can keep re-adding themselves.
         const normalizedEmail = email.toLowerCase();
-        const { error: suppressionError } = await supabaseServer
+        const { data: existingSuppression, error: suppressionLookupError } = await supabaseServer
           .from('email_suppressions')
-          .delete()
-          .eq('email', normalizedEmail);
-        if (suppressionError) {
-          console.error('[Newsletter API] Suppression cleanup failed:', suppressionError);
+          .select('reason')
+          .eq('email', normalizedEmail)
+          .maybeSingle();
+
+        if (suppressionLookupError) {
+          console.error('[Newsletter API] Suppression lookup failed:', suppressionLookupError);
+        } else if (existingSuppression && existingSuppression.reason === 'unsubscribed') {
+          const { error: suppressionError } = await supabaseServer
+            .from('email_suppressions')
+            .delete()
+            .eq('email', normalizedEmail)
+            .eq('reason', 'unsubscribed');
+          if (suppressionError) {
+            console.error('[Newsletter API] Suppression cleanup failed:', suppressionError);
+          }
+        } else if (existingSuppression) {
+          console.warn(
+            '[Newsletter API] Reactivation kept non-unsubscribe suppression',
+            { email: normalizedEmail, reason: existingSuppression.reason },
+          );
         }
 
         sendSubscriptionThankYouEmail(email).catch((emailError) => {
