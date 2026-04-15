@@ -1,9 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { verifyUnsubscribeToken, generateUnsubscribeToken } from '@/lib/email';
+import { addSuppression } from '@/lib/emailCompliance';
 import { sendUnsubscribeConfirmationEmail } from '@/lib/unsubscribeEmail';
 import { content } from '@/data/content';
 import { verifyRecaptcha } from '@/lib/recaptcha';
+
+/**
+ * Soft-unsubscribe: mark newsletter_subscriptions row and insert a row into
+ * the global email_suppressions list so that ALL bulk sends (newsletters,
+ * notifications) honor the opt-out — not just the newsletter table.
+ */
+async function applyUnsubscribe(email: string, source: string): Promise<Error | null> {
+  if (!supabaseServer) return new Error('Supabase not configured');
+
+  const { error } = await supabaseServer
+    .from('newsletter_subscriptions')
+    .update({ unsubscribed_at: new Date().toISOString() })
+    .eq('email', email)
+    .is('unsubscribed_at', null);
+
+  if (error) return error;
+
+  await addSuppression(email, 'unsubscribed', source);
+  return null;
+}
 
 // Helper function to get language from request
 function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
@@ -60,14 +81,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 從資料庫中刪除訂閱記錄
-    const { error } = await supabaseServer
-      .from('newsletter_subscriptions')
-      .delete()
-      .eq('email', email);
-
-    if (error) {
-      console.error('[Unsubscribe API] Supabase delete error:', error);
+    const err = await applyUnsubscribe(email, 'token_link');
+    if (err) {
+      console.error('[Unsubscribe API] soft-unsubscribe error:', err);
       return NextResponse.json(
         { error: t.unsubscribeFailed },
         { status: 500 }
@@ -87,6 +103,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
+/**
+ * RFC 8058 one-click POST (triggered by the `List-Unsubscribe-Post` header).
+ * Mail clients like Gmail/Yahoo POST to the List-Unsubscribe URL with
+ * `List-Unsubscribe=One-Click` in the body; we accept the token from the URL.
+ */
+
 // 簡單的 Email 格式驗證
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -96,12 +118,38 @@ function isValidEmail(email: string): boolean {
 export async function POST(req: NextRequest) {
   const lang = getLangFromRequest(req);
   const t = content[lang].api;
-  
+
   try {
     if (!supabaseServer) {
       return NextResponse.json(
         { error: t.supabaseNotConfigured },
         { status: 500 }
+      );
+    }
+
+    // RFC 8058 one-click path: token in query string, body is form-encoded
+    // `List-Unsubscribe=One-Click` from the mail client. Must succeed without
+    // requiring JSON or authentication.
+    const queryToken = new URL(req.url).searchParams.get('token');
+    if (queryToken) {
+      const email = verifyUnsubscribeToken(queryToken);
+      if (!email) {
+        return NextResponse.json(
+          { error: t.invalidUnsubscribeToken },
+          { status: 400 }
+        );
+      }
+      const err = await applyUnsubscribe(email, 'one_click_post');
+      if (err) {
+        console.error('[Unsubscribe API] one-click unsubscribe error:', err);
+        return NextResponse.json(
+          { error: t.unsubscribeFailed },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json(
+        { success: true, message: t.unsubscribeSuccess },
+        { status: 200 }
       );
     }
 
@@ -180,14 +228,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 從資料庫中刪除訂閱記錄
-    const { error } = await supabaseServer
-      .from('newsletter_subscriptions')
-      .delete()
-      .eq('email', email);
-
-    if (error) {
-      console.error('[Unsubscribe API] Supabase delete error:', error);
+    const err = await applyUnsubscribe(email, 'post_token');
+    if (err) {
+      console.error('[Unsubscribe API] soft-unsubscribe error:', err);
       return NextResponse.json(
         { error: t.unsubscribeFailed },
         { status: 500 }

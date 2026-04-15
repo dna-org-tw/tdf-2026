@@ -1,6 +1,11 @@
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import { logEmail } from './emailLog';
+import {
+  buildComplianceFooterHtml,
+  buildComplianceFooterText,
+  buildMailgunComplianceOptions,
+} from './emailCompliance';
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
@@ -78,9 +83,7 @@ export async function sendUnsubscribeConfirmationEmail(
     </p>
   </div>
 
-  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-    <p>This is an automated email. Please do not reply directly to this message.</p>
-  </div>
+  ${buildComplianceFooterHtml({ includeUnsubscribe: false })}
 </body>
 </html>
     `;
@@ -102,8 +105,7 @@ If you did not request this, you can safely ignore this email and your subscript
 Thank you,
 Taiwan Digital Fest 2026 Team
 
----
-This is an automated email. Please do not reply directly to this message.
+${buildComplianceFooterText({ includeUnsubscribe: false })}
     `;
 
     const messageData = {
@@ -112,6 +114,7 @@ This is an automated email. Please do not reply directly to this message.
       subject,
       html: htmlContent,
       text: textContent,
+      ...buildMailgunComplianceOptions({ tag: 'unsubscribe_confirmation' }),
     };
 
     const response = await mailgunClient.messages.create(mailgunDomain, messageData);
