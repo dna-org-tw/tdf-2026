@@ -9,33 +9,33 @@ function AdminNav() {
   const { user, signOut } = useAuth();
 
   return (
-    <nav className="bg-[#1E1F1C] text-white px-6 py-4">
-      <div className="max-w-5xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link href="/admin" className="text-[#10B8D9] font-bold text-lg">
+    <nav className="bg-[#1E1F1C] text-white px-4 sm:px-6 py-3 sm:py-4">
+      <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-4">
+        <div className="flex items-center gap-3 sm:gap-6 overflow-x-auto flex-1 min-w-0">
+          <Link href="/admin" className="text-[#10B8D9] font-bold text-base sm:text-lg whitespace-nowrap shrink-0">
             TDF 2026 Admin
           </Link>
-          <Link href="/admin/members" className="text-sm text-slate-300 hover:text-white transition-colors">
+          <Link href="/admin/members" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             會員管理
           </Link>
-          <Link href="/admin/orders" className="text-sm text-slate-300 hover:text-white transition-colors">
+          <Link href="/admin/orders" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             訂單管理
           </Link>
-          <Link href="/admin/subscribers" className="text-sm text-slate-300 hover:text-white transition-colors">
+          <Link href="/admin/subscribers" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             訂閱者
           </Link>
-          <Link href="/admin/send" className="text-sm text-slate-300 hover:text-white transition-colors">
+          <Link href="/admin/send" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             發送通知
           </Link>
-          <Link href="/admin/history" className="text-sm text-slate-300 hover:text-white transition-colors">
+          <Link href="/admin/history" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             發送紀錄
           </Link>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-slate-400">{user?.email}</span>
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+          <span className="hidden md:inline text-sm text-slate-400 truncate max-w-[200px]">{user?.email}</span>
           <button
             onClick={signOut}
-            className="text-sm text-slate-400 hover:text-red-400 transition-colors"
+            className="text-sm text-slate-400 hover:text-red-400 transition-colors whitespace-nowrap"
           >
             登出
           </button>
@@ -195,7 +195,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-stone-50">
       <AdminNav />
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {children}
       </main>
     </div>

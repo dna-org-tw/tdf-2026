@@ -162,7 +162,7 @@ export default function SendNotificationPage() {
   };
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-4xl">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">發送通知</h1>
 
       <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
