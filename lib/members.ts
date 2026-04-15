@@ -33,6 +33,9 @@ export const TIER_THRESHOLDS: Record<MemberTier, number> = {
 };
 
 export interface EnrichedMember {
+  member_id: number;
+  member_no: string;
+  first_seen_at: string;
   email: string;
   name: string | null;
   phone: string | null;
