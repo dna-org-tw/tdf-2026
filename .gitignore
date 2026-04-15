@@ -40,6 +40,15 @@ yarn-error.log*
 # screenshots archive
 .screenshots/
 
+# local tooling / caches
+.claude/
+.playwright-mcp/
+supabase/.temp/
+
+# playwright test artifacts
+test-results/
+playwright-report/
+
 # vercel
 .vercel
 
