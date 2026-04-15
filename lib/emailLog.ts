@@ -7,7 +7,8 @@ export type EmailType =
   | 'order_cancelled'
   | 'magic_link'
   | 'unsubscribe_confirmation'
-  | 'notification';
+  | 'notification'
+  | 'admin_one_off';
 
 interface EmailLogEntry {
   to_email: string;
