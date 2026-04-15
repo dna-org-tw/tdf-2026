@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import {
   type EnrichedMember,
   type MemberStatus,
@@ -168,6 +169,7 @@ export default function MembersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="text-left px-4 py-3 font-medium text-slate-600">編號</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">姓名</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Email</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">狀態</th>
@@ -183,7 +185,7 @@ export default function MembersPage() {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-slate-100">
-                    {Array.from({ length: 9 }).map((_, j) => (
+                    {Array.from({ length: 10 }).map((_, j) => (
                       <td key={j} className="px-4 py-3">
                         <div className="h-4 bg-slate-200 rounded animate-pulse w-20" />
                       </td>
@@ -192,15 +194,30 @@ export default function MembersPage() {
                 ))
               ) : members.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={10} className="px-4 py-12 text-center text-slate-400">
                     沒有符合條件的會員
                   </td>
                 </tr>
               ) : (
-                members.map((m) => (
+                members.map((m) => {
+                  const slug = m.member_no || encodeURIComponent(m.email);
+                  return (
                   <tr key={m.email} className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className="px-4 py-3 text-slate-900 font-medium">{m.name || '-'}</td>
-                    <td className="px-4 py-3 text-slate-600">{m.email}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-slate-500">
+                      <Link href={`/admin/members/${slug}`} className="hover:text-[#10B8D9] hover:underline">
+                        {m.member_no || '-'}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-slate-900 font-medium">
+                      <Link href={`/admin/members/${slug}`} className="hover:underline">
+                        {m.name || '-'}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      <Link href={`/admin/members/${slug}`} className="hover:underline">
+                        {m.email}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE_CLASSES[m.status]}`}>
                         {STATUS_LABELS_ZH[m.status]}
@@ -229,7 +246,8 @@ export default function MembersPage() {
                       {formatDate(m.last_interaction_at)}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
