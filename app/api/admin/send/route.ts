@@ -49,6 +49,16 @@ export async function POST(req: NextRequest) {
   const subject = body.subject.trim();
   const emailBody = body.body.trim();
 
+  const VALID_CATEGORIES = ['newsletter', 'events', 'award'] as const;
+  type Category = typeof VALID_CATEGORIES[number];
+  const category = body.category as Category | undefined;
+  if (!category || !VALID_CATEGORIES.includes(category)) {
+    return NextResponse.json(
+      { error: '請選擇信件分類（newsletter / events / award）' },
+      { status: 400 }
+    );
+  }
+
   const rawGroups = Array.isArray(body.groups) ? (body.groups as string[]) : undefined;
   const groups = rawGroups
     ? rawGroups.filter((g): g is RecipientGroup => VALID_GROUPS.includes(g as RecipientGroup))
@@ -72,6 +82,7 @@ export async function POST(req: NextRequest) {
       ticketTiers,
       legacyTicketTiers,
       adminEmail: session.email,
+      category,
     });
 
     if (count === 0) {

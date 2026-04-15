@@ -39,6 +39,12 @@ export async function GET(req: NextRequest) {
   const memberTiers = parseList<MemberTier>(searchParams.get('memberTiers'), MEMBER_TIERS);
   const ticketTiers = parseList<TicketTier>(searchParams.get('ticketTiers'), TICKET_TIERS);
 
+  const VALID_CATEGORIES = ['newsletter', 'events', 'award'] as const;
+  const categoryRaw = searchParams.get('category');
+  const category = (VALID_CATEGORIES as readonly string[]).includes(categoryRaw ?? '')
+    ? (categoryRaw as 'newsletter' | 'events' | 'award')
+    : undefined;
+
   if (!groups && !statuses && !memberTiers && !ticketTiers) {
     return NextResponse.json(
       { error: 'At least one of groups, statuses, memberTiers, or ticketTiers is required' },
@@ -54,6 +60,7 @@ export async function GET(req: NextRequest) {
       ticketTiers,
       legacyTicketTiers,
       adminEmail: session.email,
+      category,
     });
     return NextResponse.json(result);
   } catch (error) {
