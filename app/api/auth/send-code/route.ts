@@ -32,10 +32,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
     }
 
+    const isProd = process.env.NODE_ENV === 'production';
+
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const ipLimit = await checkRateLimit(`send-code:ip:${ip}`, { limit: 5, windowSeconds: 15 * 60 });
-    if (!ipLimit.allowed) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    if (isProd) {
+      const ipLimit = await checkRateLimit(`send-code:ip:${ip}`, { limit: 20, windowSeconds: 15 * 60 });
+      if (!ipLimit.allowed) {
+        const retryAfterSec = Math.max(1, Math.ceil((ipLimit.resetAt - Date.now()) / 1000));
+        return NextResponse.json(
+          { error: 'rate_limited', retryAfter: retryAfterSec },
+          { status: 429, headers: { 'Retry-After': String(retryAfterSec) } },
+        );
+      }
     }
 
     const body = await req.json().catch(() => null);
@@ -48,9 +56,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    const emailLimit = await checkRateLimit(`send-code:email:${email}`, { limit: 3, windowSeconds: 15 * 60 });
-    if (!emailLimit.allowed) {
-      return NextResponse.json({ error: 'Too many requests for this email' }, { status: 429 });
+    if (isProd) {
+      const emailLimit = await checkRateLimit(`send-code:email:${email}`, { limit: 10, windowSeconds: 15 * 60 });
+      if (!emailLimit.allowed) {
+        const retryAfterSec = Math.max(1, Math.ceil((emailLimit.resetAt - Date.now()) / 1000));
+        return NextResponse.json(
+          { error: 'rate_limited', retryAfter: retryAfterSec },
+          { status: 429, headers: { 'Retry-After': String(retryAfterSec) } },
+        );
+      }
     }
 
     // Upsert user

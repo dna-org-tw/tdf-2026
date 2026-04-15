@@ -40,6 +40,11 @@ function LoginForm() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          const mins = Math.max(1, Math.ceil((Number(data.retryAfter) || 60) / 60));
+          setError(t.auth.rateLimitedMessage.replace('{minutes}', String(mins)));
+          return;
+        }
         throw new Error(data.error || 'Failed');
       }
 
@@ -87,7 +92,15 @@ function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          const mins = Math.max(1, Math.ceil((Number(data.retryAfter) || 60) / 60));
+          setError(t.auth.rateLimitedMessage.replace('{minutes}', String(mins)));
+          return;
+        }
+        throw new Error();
+      }
       setCode('');
     } catch {
       setError(t.auth.errorMessage);
