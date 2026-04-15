@@ -10,6 +10,9 @@ import {
 export type RecipientGroup = 'orders' | 'subscribers' | 'test';
 export type { TicketTier, MemberStatus, MemberTier };
 
+export type EmailCategory = 'newsletter' | 'events' | 'award';
+export const EMAIL_CATEGORIES: readonly EmailCategory[] = ['newsletter', 'events', 'award'] as const;
+
 interface RecipientsQuery {
   statuses?: MemberStatus[];
   memberTiers?: MemberTier[];
@@ -17,6 +20,10 @@ interface RecipientsQuery {
   groups?: RecipientGroup[]; // legacy
   legacyTicketTiers?: TicketTier[]; // legacy: old `tiers` param
   adminEmail?: string;
+  // When set, exclude addresses whose newsletter_subscriptions row has the
+  // matching pref_<category> = false or unsubscribed_at IS NOT NULL. Addresses
+  // with no subscription row pass through (treated as opted-in by default).
+  category?: EmailCategory;
 }
 
 interface RecipientsResult {
@@ -76,8 +83,38 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
     console.error('[Recipients] Error fetching members_enriched:', error);
     throw new Error('Failed to fetch recipients');
   }
+
+  const candidateEmails: string[] = [];
   for (const row of data || []) {
-    if (row.email) emailSet.add(String(row.email).trim().toLowerCase());
+    if (row.email) candidateEmails.push(String(row.email).trim().toLowerCase());
+  }
+
+  // Category filter: drop addresses whose newsletter_subscriptions row has the
+  // matching pref turned off, or that have unsubscribed_at set. Addresses with
+  // no subscription row pass through (treated as opted-in by default).
+  if (q.category && candidateEmails.length > 0) {
+    const prefColumn = `pref_${q.category}` as 'pref_newsletter' | 'pref_events' | 'pref_award';
+    const { data: subs, error: subsErr } = await supabaseServer
+      .from('newsletter_subscriptions')
+      .select(`email, ${prefColumn}, unsubscribed_at`)
+      .in('email', candidateEmails);
+    if (subsErr) {
+      console.error('[Recipients] Error fetching subscription preferences:', subsErr);
+      throw new Error('Failed to fetch recipient preferences');
+    }
+    const blocked = new Set<string>();
+    for (const sRow of (subs || []) as Array<Record<string, unknown>>) {
+      const e = String(sRow.email ?? '').trim().toLowerCase();
+      if (!e) continue;
+      const prefValue = sRow[prefColumn];
+      const unsub = sRow.unsubscribed_at;
+      if (unsub || prefValue === false) blocked.add(e);
+    }
+    for (const e of candidateEmails) {
+      if (!blocked.has(e)) emailSet.add(e);
+    }
+  } else {
+    for (const e of candidateEmails) emailSet.add(e);
   }
 
   const emails = Array.from(emailSet);

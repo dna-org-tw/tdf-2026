@@ -13,6 +13,7 @@ import {
   TICKET_TIER_BADGE_CLASSES,
   type TicketTier,
 } from '@/lib/members';
+import EmailPreferences from '@/components/member/EmailPreferences';
 
 function LoginForm() {
   const { t } = useTranslation();
@@ -334,6 +335,12 @@ function MemberDashboard() {
           </div>
         )}
       </div>
+
+      {user?.email && (
+        <div className="mt-8">
+          <EmailPreferences userEmail={user.email} />
+        </div>
+      )}
     </div>
   );
 }

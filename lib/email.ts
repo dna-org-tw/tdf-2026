@@ -2,6 +2,7 @@ import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import crypto from 'crypto';
 import { logEmail } from './emailLog';
+import { supabaseServer } from './supabaseServer';
 import {
   buildComplianceFooterHtml,
   buildComplianceFooterText,
@@ -86,6 +87,21 @@ export async function sendSubscriptionThankYouEmail(email: string): Promise<bool
   if (await isSuppressed(email)) {
     console.log(`[Email] Skipping subscription thank-you to suppressed address: ${email}`);
     return false;
+  }
+
+  // Skip if the recipient has explicitly disabled the newsletter category.
+  // Protects against admin-triggered resends and any future caller of this
+  // helper outside the homepage subscribe flow (which resets prefs to true).
+  if (supabaseServer) {
+    const { data: pref } = await supabaseServer
+      .from('newsletter_subscriptions')
+      .select('pref_newsletter, unsubscribed_at')
+      .eq('email', email)
+      .maybeSingle();
+    if (pref && (pref.unsubscribed_at || pref.pref_newsletter === false)) {
+      console.log(`[Email] Skipping subscription_thank_you for ${email}: newsletter pref off`);
+      return false;
+    }
   }
 
   const subject = 'Thank You for Joining Taiwan Digital Nomad Community!';

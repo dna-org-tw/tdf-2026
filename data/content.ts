@@ -76,6 +76,31 @@ export const content = {
       statusExpired: "Expired",
       yourTier: "Your Ticket Tier",
       noPaidTier: "No active ticket yet",
+      memberPreferences: {
+        title: "Email Preferences",
+        description: "Manage which emails you receive at {email}.",
+        categories: {
+          newsletter: {
+            label: "Festival Newsletter",
+            description: "General announcements about Taiwan Digital Fest 2026."
+          },
+          events: {
+            label: "Event & Schedule Updates",
+            description: "Session changes, check-in info, and on-site updates."
+          },
+          award: {
+            label: "Nomad Award & Community",
+            description: "Award contest news and community activities."
+          }
+        },
+        save: "Save preferences",
+        saving: "Saving…",
+        saved: "Preferences saved.",
+        unsubscribeAll: "Unsubscribe from all",
+        unsubscribed: "You are unsubscribed from all newsletters. Tick any category and save to resubscribe.",
+        mandatoryNote: "Important account and order emails (sign-in codes, payment receipts, vote confirmations) are always sent.",
+        error: "Could not save your preferences. Please try again."
+      },
     },
     navShort: {
       about: "About",
@@ -983,6 +1008,31 @@ export const content = {
       statusExpired: "已過期",
       yourTier: "你的票種",
       noPaidTier: "尚無有效票券",
+      memberPreferences: {
+        title: "電子報訂閱偏好",
+        description: "管理 {email} 將收到哪些信件。",
+        categories: {
+          newsletter: {
+            label: "節慶電子報",
+            description: "Taiwan Digital Fest 2026 一般訊息與通知。"
+          },
+          events: {
+            label: "活動與議程更新",
+            description: "議程變動、報到資訊、活動現場通知。"
+          },
+          award: {
+            label: "Nomad Award 與社群活動",
+            description: "Nomad Award 投票活動與社群相關訊息。"
+          }
+        },
+        save: "儲存偏好",
+        saving: "儲存中…",
+        saved: "已儲存偏好。",
+        unsubscribeAll: "完全退訂所有電子報",
+        unsubscribed: "你已退訂所有電子報。勾選任一分類並儲存即可恢復訂閱。",
+        mandatoryNote: "重要的帳號與訂單通知（登入驗證、付款收據、投票確認）將永遠寄送。",
+        error: "無法儲存偏好，請稍後再試。"
+      },
     },
     navShort: {
       about: "關於",
