@@ -151,10 +151,10 @@ export default function OrdersPage() {
       params.set('page', String(page));
       params.set('limit', '20');
 
-      const res = await fetch(`/api/admin/members?${params}`);
+      const res = await fetch(`/api/admin/orders?${params}`);
       if (res.ok) {
         const data = await res.json();
-        setOrders(data.members || []);
+        setOrders(data.orders || []);
         setTotal(data.total || 0);
         setTotalPages(data.totalPages || 0);
       }
