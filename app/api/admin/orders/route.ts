@@ -83,6 +83,14 @@ export async function POST(req: NextRequest) {
   if (body.ticket_tier === 'weekly_backer' && !VALID_WEEKS.includes(body.week)) {
     return NextResponse.json({ error: 'week required for weekly_backer' }, { status: 400 });
   }
+  let amountCents: number | undefined;
+  if (body.amount_cents !== undefined && body.amount_cents !== null && body.amount_cents !== '') {
+    const n = Number(body.amount_cents);
+    if (!Number.isInteger(n) || n < 0) {
+      return NextResponse.json({ error: 'amount_cents must be a non-negative integer' }, { status: 400 });
+    }
+    amountCents = n;
+  }
 
   try {
     const order = await createManualOrder(
@@ -91,6 +99,7 @@ export async function POST(req: NextRequest) {
         customer_name: body.customer_name,
         ticket_tier: body.ticket_tier,
         week: body.week,
+        amount_cents: amountCents,
         payment_reference: body.payment_reference,
         note: body.note,
       },
