@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { sendSubscriptionThankYouEmail } from '@/lib/email';
 import { content } from '@/data/content';
-
-const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
-const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6Lcu81gsAAAAAIrVoGK7urIEt9_w7gOoUSjzC5Uv';
-const recaptchaProjectId = process.env.RECAPTCHA_PROJECT_ID || 'tdna-1769599168858';
+import { verifyRecaptcha } from '@/lib/recaptcha';
+import { getClientIP } from '@/lib/clientIp';
 
 // Helper function to get language from request
 function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
@@ -28,34 +26,6 @@ function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
     }
   }
   return 'zh'; // Default to Chinese
-}
-
-// Helper function to get client IP address
-function getClientIP(req: NextRequest): string | null {
-  // 嘗試從各種請求頭獲取真實 IP
-  const forwardedFor = req.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    // x-forwarded-for 可能包含多个IP，取第一个
-    return forwardedFor.split(',')[0].trim();
-  }
-  
-  const realIP = req.headers.get('x-real-ip');
-  if (realIP) {
-    return realIP;
-  }
-  
-  const cfConnectingIP = req.headers.get('cf-connecting-ip'); // Cloudflare
-  if (cfConnectingIP) {
-    return cfConnectingIP;
-  }
-  
-  // 如果都沒有，嘗試從請求 URL 獲取（開發環境）
-  try {
-    const url = new URL(req.url);
-    return url.hostname;
-  } catch {
-    return null;
-  }
 }
 
 // Helper function to get country from IP using ipapi.co (free tier)
@@ -115,83 +85,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify reCAPTCHA Enterprise
-    if (!recaptchaApiKey) {
-      console.error('[Newsletter API] RECAPTCHA_API_KEY is not configured.');
-      return NextResponse.json(
-        { error: 'reCAPTCHA is not configured on the server.' },
-        { status: 500 }
-      );
-    }
-
-    {
-      const { recaptchaToken } = body;
-      
-      if (!recaptchaToken) {
+    const { recaptchaToken } = body;
+    const rc = await verifyRecaptcha(recaptchaToken, 'subscribe');
+    if (!rc.ok) {
+      if (rc.reason === 'not_configured') {
         return NextResponse.json(
-          { error: t.recaptchaRequired },
-          { status: 400 }
+          { error: 'reCAPTCHA is not configured on the server.' },
+          { status: 500 }
         );
       }
-
-      try {
-        const requestBody = {
-          event: {
-            token: recaptchaToken,
-            expectedAction: 'subscribe',
-            siteKey: recaptchaSiteKey,
-          },
-        };
-
-        const recaptchaResponse = await fetch(
-          `https://recaptchaenterprise.googleapis.com/v1/projects/${recaptchaProjectId}/assessments?key=${recaptchaApiKey}`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-          }
-        );
-
-        if (!recaptchaResponse.ok) {
-          const errorData = await recaptchaResponse.text();
-          console.error('[reCAPTCHA Enterprise] API error:', errorData);
-          return NextResponse.json(
-            { error: t.recaptchaFailed },
-            { status: 400 }
-          );
-        }
-
-        const recaptchaData = await recaptchaResponse.json();
-
-        // Enterprise API 回傳的格式不同，檢查 tokenProperties
-        if (!recaptchaData.tokenProperties?.valid || recaptchaData.tokenProperties?.action !== 'subscribe') {
-          return NextResponse.json(
-            { error: t.recaptchaFailed },
-            { status: 400 }
-          );
-        }
-
-        // 檢查風險評分（如可用）
-        if (recaptchaData.riskAnalysis?.score !== undefined) {
-          const score = recaptchaData.riskAnalysis.score;
-          // 分數範圍 0.0-1.0，越低表示越可疑
-          // 可以根據需要設定閾值，例如低於 0.5 拒絕
-          if (score < 0.5) {
-            return NextResponse.json(
-              { error: t.recaptchaFailed },
-              { status: 400 }
-            );
-          }
-        }
-      } catch (error) {
-        console.error('[reCAPTCHA Enterprise] Verification error:', error);
-        return NextResponse.json(
-          { error: t.recaptchaFailed },
-          { status: 400 }
-        );
+      if (rc.reason === 'missing_token') {
+        return NextResponse.json({ error: t.recaptchaRequired }, { status: 400 });
       }
+      return NextResponse.json({ error: t.recaptchaFailed }, { status: 400 });
     }
 
     // 取得 IP 位址與國家資訊
