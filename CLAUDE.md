@@ -15,6 +15,10 @@ Taiwan Digital Fest 2026 (TDF 2026) — official website for a month-long digita
 
 No test framework is configured.
 
+## Screenshots
+
+All E2E / review screenshots (Playwright, browser automation, manual captures) must be saved under `.screenshots/<YYYY-MM-DD>/`. This directory is gitignored — never place screenshots in the repo root or commit them.
+
 ## Tech Stack
 
 - **Next.js 16** (App Router, standalone output, ISR with `revalidate`)
