@@ -50,7 +50,11 @@ export async function POST(req: NextRequest) {
 
   try {
     // Fetch recipients
-    const { emails, count } = await getRecipients(groups, tiers, session.email);
+    const { emails, count } = await getRecipients({
+      groups,
+      legacyTicketTiers: tiers,
+      adminEmail: session.email,
+    });
 
     if (count === 0) {
       return NextResponse.json({ error: '沒有符合條件的收件人' }, { status: 400 });

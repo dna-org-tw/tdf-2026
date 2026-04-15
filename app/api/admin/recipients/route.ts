@@ -34,7 +34,11 @@ export async function GET(req: NextRequest) {
     : undefined;
 
   try {
-    const result = await getRecipients(groups, tiers, session.email);
+    const result = await getRecipients({
+      groups,
+      legacyTicketTiers: tiers,
+      adminEmail: session.email,
+    });
     return NextResponse.json(result);
   } catch (error) {
     console.error('[Admin Recipients]', error);
