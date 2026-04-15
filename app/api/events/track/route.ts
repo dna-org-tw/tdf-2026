@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { enforceRateLimit } from '@/lib/rateLimitResponse';
 
 const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
 const META_CAPI_PIXEL_ID = process.env.META_CAPI_PIXEL_ID;
@@ -131,6 +132,9 @@ async function dispatchEventActions(_evt: PersistedEvent) {
  * 並轉發至 Meta CAPI（若已設定）。與 Facebook Pixel 並行，不影響原有追蹤。
  */
 export async function POST(request: NextRequest) {
+  const rl = enforceRateLimit(request, { key: 'events-track', limit: 180, windowSeconds: 60 });
+  if (rl) return rl;
+
   let body: TrackEventBody;
   try {
     body = await request.json();
