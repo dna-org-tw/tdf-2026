@@ -72,22 +72,27 @@ export default function OrderDetailPage() {
   const [actions, setActions] = useState<OrderAction[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string>('');
+  const [notes, setNotes] = useState('');
 
   const load = useCallback(async () => {
-    setLoading(true);
     const res = await fetch(`/api/admin/orders/${params.id}`);
     if (res.ok) {
       const data = await res.json();
       setOrder(data.order);
       setActions(data.actions);
+      setNotes(data.order.internal_notes ?? '');
     } else if (res.status === 404) {
       router.replace('/admin/orders');
     }
-    setLoading(false);
   }, [params.id, router]);
 
   useEffect(() => {
-    load();
+    let cancelled = false;
+    (async () => {
+      await load();
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, [load]);
 
   const showToast = (msg: string) => {
@@ -176,8 +181,6 @@ export default function OrderDetailPage() {
   };
 
   // --- Notes ---
-  const [notes, setNotes] = useState('');
-  useEffect(() => { if (order) setNotes(order.internal_notes ?? ''); }, [order]);
   const saveNotes = async () => {
     const res = await fetch(`/api/admin/orders/${params.id}/notes`, {
       method: 'POST',
