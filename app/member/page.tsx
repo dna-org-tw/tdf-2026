@@ -1,12 +1,18 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import type { Order } from '@/lib/types/order';
+import {
+  TICKET_TIER_RANK,
+  TICKET_TIER_LABELS,
+  TICKET_TIER_BADGE_CLASSES,
+  type TicketTier,
+} from '@/lib/members';
 
 function LoginForm() {
   const { t } = useTranslation();
@@ -204,6 +210,16 @@ function MemberDashboard() {
     fetchOrders();
   }, [user?.email]);
 
+  const highestTier = useMemo<TicketTier | null>(() => {
+    const paidTiers = orders
+      .filter((o) => o.status === 'paid')
+      .map((o) => o.ticket_tier);
+    if (paidTiers.length === 0) return null;
+    return paidTiers.reduce((best, curr) =>
+      TICKET_TIER_RANK[curr] > TICKET_TIER_RANK[best] ? curr : best
+    );
+  }, [orders]);
+
   const formatAmount = (amount: number, currency: string) => {
     return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
   };
@@ -231,6 +247,24 @@ function MemberDashboard() {
           {t.auth.logout}
         </button>
       </div>
+
+      {/* Current Ticket Tier */}
+      {!loading && (
+        <div className="mb-8 bg-white rounded-xl p-6 shadow-sm flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-sm text-slate-500 mb-1">{t.auth.yourTier}</p>
+            {highestTier ? (
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-base font-semibold ${TICKET_TIER_BADGE_CLASSES[highestTier]}`}
+              >
+                {TICKET_TIER_LABELS[highestTier]}
+              </span>
+            ) : (
+              <p className="text-slate-600">{t.auth.noPaidTier}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Order History */}
       <div>

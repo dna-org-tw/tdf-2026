@@ -73,6 +73,8 @@ export const content = {
       statusCancelled: "Cancelled",
       statusRefunded: "Refunded",
       statusExpired: "Expired",
+      yourTier: "Your Ticket Tier",
+      noPaidTier: "No active ticket yet",
     },
     navShort: {
       about: "About",
@@ -977,6 +979,8 @@ export const content = {
       statusCancelled: "已取消",
       statusRefunded: "已退款",
       statusExpired: "已過期",
+      yourTier: "你的票種",
+      noPaidTier: "尚無有效票券",
     },
     navShort: {
       about: "關於",
