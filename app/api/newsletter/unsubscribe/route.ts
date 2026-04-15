@@ -1,30 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { verifyUnsubscribeToken, generateUnsubscribeToken } from '@/lib/email';
-import { addSuppression } from '@/lib/emailCompliance';
 import { sendUnsubscribeConfirmationEmail } from '@/lib/unsubscribeEmail';
 import { content } from '@/data/content';
 import { verifyRecaptcha } from '@/lib/recaptcha';
-
-/**
- * Soft-unsubscribe: mark newsletter_subscriptions row and insert a row into
- * the global email_suppressions list so that ALL bulk sends (newsletters,
- * notifications) honor the opt-out — not just the newsletter table.
- */
-async function applyUnsubscribe(email: string, source: string): Promise<Error | null> {
-  if (!supabaseServer) return new Error('Supabase not configured');
-
-  const { error } = await supabaseServer
-    .from('newsletter_subscriptions')
-    .update({ unsubscribed_at: new Date().toISOString() })
-    .eq('email', email)
-    .is('unsubscribed_at', null);
-
-  if (error) return error;
-
-  await addSuppression(email, 'unsubscribed', source);
-  return null;
-}
+import { applyUnsubscribe } from '@/lib/newsletterSubscriptions';
 
 // Helper function to get language from request
 function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
