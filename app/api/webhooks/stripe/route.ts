@@ -23,8 +23,11 @@ function mapPaymentStatusToOrderStatus(
   if (sessionStatus === 'complete' && paymentStatus === 'paid') {
     return 'paid';
   }
+  if (sessionStatus === 'complete' && paymentStatus === 'no_payment_required') {
+    return 'paid';
+  }
   if (sessionStatus === 'expired') {
-    return 'cancelled';
+    return 'expired';
   }
   if (paymentStatus === 'unpaid' || paymentStatus === 'no_payment_required') {
     return 'pending';
@@ -298,7 +301,7 @@ export async function POST(req: NextRequest) {
       );
 
       const updatedOrder = await updateOrder(session.id, {
-        status: 'cancelled',
+        status: 'expired',
       });
 
       if (updatedOrder) {
