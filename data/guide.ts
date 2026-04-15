@@ -73,6 +73,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             answer: '購票成功後系統會自動寄送確認信。若未收到，可能是被信箱攔截。可至官網會員後台登入查詢訂單。',
           },
           {
+            id: 'q3b',
+            question: '我購買/兌換了票券，但是沒有收到任何信件，要怎麼確認？',
+            answer: '請到官網右上角使用 email 登入，即可查看你的票券。如果還是找不到票券，請聯繫我們 IG @taiwandigitalfest，或來信至 registration@taiwandigitalfest.com。',
+          },
+          {
             id: 'q4',
             question: '可以退票嗎？',
             answer: '票券條款預設不可退款，但可以轉讓給其他人。',
@@ -122,6 +127,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             id: 'q9',
             question: '主辦方會安排住宿嗎？',
             answer: '住宿不由主辦方統一安排，參與者需自行預訂。官網會提供台東住宿推薦資訊。如果需要協助訂房，可以到 WhatsApp 社群群組與我們聯繫，我們有保留住宿給需要協助訂房的會眾。',
+          },
+          {
+            id: 'q9b',
+            question: '想要找 TDF 合作住宿？',
+            answer: '我們提供限量優惠合作住宿——路得行旅一館（https://taitung.nordenruder.com/），每晚 25 USD。如有需要，請來信至 accommodation@taiwandigitalfest.com。',
           },
         ],
         guideBlocks: [
@@ -298,7 +308,9 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
     homeFaq: [
       { question: '票券分幾個等級？', summary: '四個等級：PURPLE 免費 → YELLOW VIP，含不同活動權限', guideTab: 'tickets' },
       { question: '活動怎麼報名？', summary: '購票後到 Luma 頁面預約，工作人員核對後發送確認', guideTab: 'registration' },
+      { question: '購買/兌換票券後沒收到信，要怎麼確認？', summary: '官網右上角用 email 登入即可查看票券，仍找不到請聯繫 IG 或 registration@taiwandigitalfest.com', guideTab: 'tickets' },
       { question: '在台東住一個月大概花多少？', summary: '整體約 25,000–40,000 TWD，依生活型態而定', guideTab: 'accommodation' },
+      { question: '有沒有 TDF 合作住宿？', summary: '路得行旅一館每晚 25 USD，來信 accommodation@taiwandigitalfest.com', guideTab: 'accommodation' },
       { question: '各場活動之間怎麼移動？', summary: '自行前往，建議用 WhatsApp 群組共乘', guideTab: 'transportation' },
       { question: '我想當講者，怎麼申請？', summary: '填寫 Call for Speaker 表單，通過審核可獲免費票券', guideTab: 'speakers' },
       { question: '活動場地有哪些？', summary: '邸 Tai Dang、旅蒔 Roots Coworking、合流生活提案所、野室珈琲等', guideTab: 'living' },
@@ -328,6 +340,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             id: 'q3',
             question: 'How do I confirm my order after purchasing?',
             answer: 'A confirmation email is sent automatically after purchase. If you didn\'t receive it, check your spam folder. You can also log in to your account on the website to check order status.',
+          },
+          {
+            id: 'q3b',
+            question: 'I purchased/redeemed a ticket but didn\'t receive any email. How can I check it?',
+            answer: 'Log in with your email via the top-right of the website to view your tickets. If you still can\'t find them, contact us on Instagram @taiwandigitalfest or email registration@taiwandigitalfest.com.',
           },
           {
             id: 'q4',
@@ -377,6 +394,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             id: 'q9',
             question: 'Does the organizer arrange accommodation?',
             answer: 'Accommodation is not centrally arranged — participants book their own. The website provides recommended lodging options in Taitung. If you need help booking, reach out to us on the WhatsApp community group. We have reserved accommodation for attendees who need booking assistance.',
+          },
+          {
+            id: 'q9b',
+            question: 'Is there a TDF partner accommodation?',
+            answer: 'We offer a limited number of partner stays at Norden Ruder Hotel I (https://taitung.nordenruder.com/) for $25 USD per night. If interested, please email accommodation@taiwandigitalfest.com.',
           },
         ],
         guideBlocks: [
@@ -548,7 +570,9 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
     homeFaq: [
       { question: 'What ticket tiers are available?', summary: 'Four tiers: PURPLE (free) → YELLOW (VIP), each with different event access', guideTab: 'tickets' },
       { question: 'How do I register for events?', summary: 'Purchase a pass, then reserve on Luma. Staff will verify and approve.', guideTab: 'registration' },
+      { question: 'Purchased/redeemed a ticket but got no email — how do I check?', summary: 'Log in with your email via the top-right of the site. Still missing? Contact IG or registration@taiwandigitalfest.com', guideTab: 'tickets' },
       { question: 'How much does a month in Taitung cost?', summary: 'Around 25,000–40,000 TWD/month including accommodation and meals', guideTab: 'accommodation' },
+      { question: 'Is there a TDF partner accommodation?', summary: 'Norden Ruder Hotel I at $25 USD/night — email accommodation@taiwandigitalfest.com', guideTab: 'accommodation' },
       { question: 'How do I get between venues?', summary: 'Self-arranged. Use WhatsApp group for carpooling.', guideTab: 'transportation' },
       { question: 'How do I apply to speak?', summary: 'Fill out the Call for Speaker form. Approved speakers get a free ticket.', guideTab: 'speakers' },
       { question: 'Where are the event venues?', summary: 'Tai Dang, Roots Coworking, Heliu Living Lab, Yeshi Coffee, and more', guideTab: 'living' },
