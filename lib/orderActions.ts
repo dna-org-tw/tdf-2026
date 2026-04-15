@@ -293,6 +293,7 @@ export interface ManualCreateInput {
   customer_name: string;
   ticket_tier: Order['ticket_tier'];
   week?: 'week1' | 'week2' | 'week3' | 'week4';
+  amount_cents?: number;
   payment_reference?: string;
   note?: string;
 }
@@ -305,8 +306,15 @@ export async function createManualOrder(
   if (input.ticket_tier === 'weekly_backer' && !input.week) {
     throw new OrderActionError('week is required for weekly_backer');
   }
+
+  const hasCustomAmount = typeof input.amount_cents === 'number';
+  if (hasCustomAmount && (!Number.isInteger(input.amount_cents) || input.amount_cents! < 0)) {
+    throw new OrderActionError('amount_cents must be a non-negative integer');
+  }
   const priceId = PRICE_IDS[input.ticket_tier];
-  if (!priceId) throw new OrderActionError(`No price configured for ${input.ticket_tier}`);
+  if (!hasCustomAmount && !priceId) {
+    throw new OrderActionError(`No price configured for ${input.ticket_tier}`);
+  }
 
   const s = requireStripe();
 
@@ -320,7 +328,9 @@ export async function createManualOrder(
     });
     await s.invoiceItems.create({
       customer: customer.id,
-      pricing: { price: priceId },
+      ...(hasCustomAmount
+        ? { amount: input.amount_cents!, currency: 'usd' }
+        : { pricing: { price: priceId! } }),
     });
     const draft = await s.invoices.create({
       customer: customer.id,

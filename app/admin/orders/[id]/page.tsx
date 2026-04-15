@@ -259,6 +259,16 @@ export default function OrderDetailPage() {
           <div className="space-y-1 text-sm">
             <div><span className="text-slate-500">姓名：</span><span className="text-slate-900">{order.customer_name ?? '-'}</span></div>
             <div><span className="text-slate-500">Email：</span><span className="text-slate-900">{order.customer_email ?? '-'}</span></div>
+            {order.customer_email && (
+              <div>
+                <a
+                  href={`/admin/members/${encodeURIComponent(order.customer_email)}`}
+                  className="text-xs text-[#10B8D9] hover:underline"
+                >
+                  查看會員頁 →
+                </a>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-2">

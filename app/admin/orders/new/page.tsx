@@ -23,6 +23,7 @@ export default function NewOrderPage() {
   const [name, setName] = useState('');
   const [tier, setTier] = useState('explore');
   const [week, setWeek] = useState('week1');
+  const [amountUsd, setAmountUsd] = useState('');
   const [paymentReference, setPaymentReference] = useState('');
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -32,6 +33,16 @@ export default function NewOrderPage() {
     e.preventDefault();
     setSubmitting(true);
     setError('');
+    let amountCents: number | undefined;
+    if (amountUsd.trim() !== '') {
+      const parsed = Number(amountUsd);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        setSubmitting(false);
+        setError('金額必須是 0 或正數');
+        return;
+      }
+      amountCents = Math.round(parsed * 100);
+    }
     const res = await fetch('/api/admin/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -40,6 +51,7 @@ export default function NewOrderPage() {
         customer_name: name,
         ticket_tier: tier,
         ...(tier === 'weekly_backer' ? { week } : {}),
+        ...(amountCents !== undefined ? { amount_cents: amountCents } : {}),
         payment_reference: paymentReference,
         note,
       }),
@@ -86,6 +98,12 @@ export default function NewOrderPage() {
             </select>
           </label>
         )}
+        <label className="block text-sm">
+          金額 (USD) — 留空則使用票種預設價格
+          <input type="number" min="0" step="0.01" value={amountUsd}
+            onChange={(e) => setAmountUsd(e.target.value)} placeholder="例如 99.00"
+            className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm" />
+        </label>
         <label className="block text-sm">
           付款參考（如銀行轉帳日期 / 末四碼）
           <input value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)}
