@@ -35,10 +35,10 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
       return null;
     }
     
-    // 檢查 token 是否過期（24 小時）
+    // Token valid for 7 days (matches generator in app/api/award/vote/route.ts).
     const tokenTime = parseInt(timestamp, 10);
     const now = Date.now();
-    if (now - tokenTime > 24 * 60 * 60 * 1000) {
+    if (now - tokenTime > 7 * 24 * 60 * 60 * 1000) {
       return null;
     }
     

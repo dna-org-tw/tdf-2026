@@ -60,7 +60,11 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
     return { emails, count: emails.length };
   }
 
-  let query = supabaseServer.from('members_enriched').select('email');
+  let query = supabaseServer
+    .from('members_enriched')
+    .select('email')
+    // Never send to emails on the suppression list (unsubscribed, bounced, complained).
+    .eq('suppressed', false);
   if (statuses && statuses.length) query = query.in('status', statuses);
   if (memberTiers && memberTiers.length) query = query.in('tier', memberTiers);
   if (ticketTiers && ticketTiers.length) query = query.in('highest_ticket_tier', ticketTiers);

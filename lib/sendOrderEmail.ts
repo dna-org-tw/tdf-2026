@@ -2,6 +2,11 @@ import formData from 'form-data';
 import Mailgun from 'mailgun.js';
 import { logEmail, type EmailType } from '@/lib/emailLog';
 import { supabaseServer } from '@/lib/supabaseServer';
+import {
+  buildComplianceFooterHtml,
+  buildComplianceFooterText,
+  buildMailgunComplianceOptions,
+} from '@/lib/emailCompliance';
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
@@ -194,9 +199,7 @@ export async function sendOrderEmail(
     </p>
   </div>
 
-  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-    <p>This is an automated email. Please do not reply to this message.</p>
-  </div>
+  ${buildComplianceFooterHtml({ includeUnsubscribe: false })}
 </body>
 </html>
   `;
@@ -229,6 +232,8 @@ If you have any questions, please don't hesitate to contact us.
 
 Best regards,
 Taiwan Digital Fest 2026 Team
+
+${buildComplianceFooterText({ includeUnsubscribe: false })}
   `;
 
   const logMeta = {
@@ -245,6 +250,7 @@ Taiwan Digital Fest 2026 Team
       subject,
       html: htmlContent,
       text: textContent,
+      ...buildMailgunComplianceOptions({ tag: emailType }),
     });
 
     if (!response || !response.id) {
