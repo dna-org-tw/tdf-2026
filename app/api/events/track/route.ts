@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
+import { supabaseServer } from '@/lib/supabaseServer';
 
-const EVENTS_WEBHOOK_URL = process.env.EVENTS_WEBHOOK_URL;
 const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
 const META_CAPI_PIXEL_ID = process.env.META_CAPI_PIXEL_ID;
 const META_CAPI_TEST_EVENT_CODE = process.env.META_CAPI_TEST_EVENT_CODE;
@@ -84,9 +84,51 @@ async function forwardToMetaCapi(
   return { forwarded: true };
 }
 
+type PersistedEvent = {
+  eventId: string;
+  eventType: 'standard' | 'custom';
+  eventName: string;
+  parameters: Record<string, unknown>;
+  occurredAt: string;
+  clientIp: string | null;
+  userAgent: string | null;
+  referer: string | null;
+};
+
+async function persistEvent(evt: PersistedEvent) {
+  if (!supabaseServer) return { persisted: false };
+
+  const { error } = await supabaseServer
+    .from('tracking_events')
+    .upsert(
+      {
+        event_id: evt.eventId,
+        event_type: evt.eventType,
+        event_name: evt.eventName,
+        parameters: evt.parameters,
+        client_ip: evt.clientIp,
+        user_agent: evt.userAgent,
+        referer: evt.referer,
+        occurred_at: evt.occurredAt,
+      },
+      { onConflict: 'event_id', ignoreDuplicates: true }
+    );
+
+  if (error) {
+    console.warn('[events/track] Supabase insert failed:', error.message);
+    return { persisted: false };
+  }
+  return { persisted: true };
+}
+
+async function dispatchEventActions(_evt: PersistedEvent) {
+  // 觸發動作的骨架：未來若要在特定事件（例如 InitiateCheckout、CompleteRegistration）
+  // 觸發通知 / 外部整合，在這裡分派。目前為空實作。
+}
+
 /**
- * 接收前端追蹤事件，轉發至 EVENTS_WEBHOOK_URL / Meta CAPI（若已設定）。
- * 與 Facebook Pixel 並行，不影響原有追蹤。
+ * 接收前端追蹤事件，持久化至 Supabase tracking_events，
+ * 並轉發至 Meta CAPI（若已設定）。與 Facebook Pixel 並行，不影響原有追蹤。
  */
 export async function POST(request: NextRequest) {
   let body: TrackEventBody;
@@ -105,31 +147,31 @@ export async function POST(request: NextRequest) {
   const safeEventId = eventId && typeof eventId === 'string'
     ? eventId
     : `srv_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  const safeEventType: 'standard' | 'custom' = eventType === 'standard' ? 'standard' : 'custom';
 
-  const payload = {
-    eventType: eventType ?? 'custom',
+  const persisted: PersistedEvent = {
+    eventId: safeEventId,
+    eventType: safeEventType,
     eventName,
     parameters: safeParameters,
-    eventId: safeEventId,
-    timestamp: new Date().toISOString(),
+    occurredAt: new Date().toISOString(),
+    clientIp: pickString(request.headers.get('x-forwarded-for')?.split(',')[0] ?? '') || null,
+    userAgent: pickString(request.headers.get('user-agent')) || null,
+    referer: request.headers.get('referer') || null,
   };
 
-  let webhookForwarded = false;
-  if (EVENTS_WEBHOOK_URL && EVENTS_WEBHOOK_URL.trim() !== '') {
-    try {
-      const res = await fetch(EVENTS_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        console.warn('[events/track] Webhook responded with', res.status, await res.text());
-      }
-      webhookForwarded = true;
-    } catch (err) {
-      console.warn('[events/track] Webhook request failed:', err);
-      // 不讓前端失敗，僅記錄
-    }
+  let persistedOk = false;
+  try {
+    const res = await persistEvent(persisted);
+    persistedOk = res.persisted;
+  } catch (err) {
+    console.warn('[events/track] persistEvent threw:', err);
+  }
+
+  try {
+    await dispatchEventActions(persisted);
+  } catch (err) {
+    console.warn('[events/track] dispatchEventActions threw:', err);
   }
 
   let capiForwarded = false;
@@ -142,8 +184,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    forwarded: webhookForwarded || capiForwarded,
-    webhookForwarded,
+    persisted: persistedOk,
     capiForwarded,
   });
 }
