@@ -294,7 +294,9 @@ export async function POST(req: NextRequest) {
         console.warn('[Webhook] Failed to update order for session:', session.id);
       }
     }
-    // invoice.paid: mark pending upgrade orders as paid when the customer pays via hosted URL
+    // invoice.paid: mark pending upgrade orders as paid AND backfill the
+    // payment intent / method metadata so downstream actions (refund, resend)
+    // have what they need.
     else if (event.type === 'invoice.paid') {
       const inv = event.data.object as Stripe.Invoice;
       if (inv.id && supabaseServer) {
@@ -304,11 +306,76 @@ export async function POST(req: NextRequest) {
           .eq('stripe_invoice_id', inv.id)
           .maybeSingle();
         if (order && order.status === 'pending') {
+          // Under Stripe API 2025-12-15.clover, `invoice.payment_intent` is no
+          // longer on the Invoice object; PI IDs live in `invoice.payments`.
+          // Handle both shapes defensively.
+          const invAny = inv as unknown as {
+            payment_intent?: string | { id?: string } | null;
+            payments?: { data?: Array<{ payment?: { payment_intent?: string | { id?: string } | null; type?: string } }> };
+          };
+          let paymentIntentId: string | null = null;
+          if (typeof invAny.payment_intent === 'string') {
+            paymentIntentId = invAny.payment_intent;
+          } else if (invAny.payment_intent && typeof invAny.payment_intent === 'object') {
+            paymentIntentId = invAny.payment_intent.id ?? null;
+          }
+          if (!paymentIntentId && invAny.payments?.data?.length) {
+            for (const p of invAny.payments.data) {
+              const pi = p.payment?.payment_intent;
+              if (typeof pi === 'string') { paymentIntentId = pi; break; }
+              if (pi && typeof pi === 'object' && pi.id) { paymentIntentId = pi.id; break; }
+            }
+          }
+          // Fallback: re-fetch the invoice with payments expanded.
+          if (!paymentIntentId && inv.id) {
+            try {
+              const full = await stripe.invoices.retrieve(inv.id, {
+                expand: ['payments.data.payment.payment_intent'],
+              });
+              const fullAny = full as unknown as {
+                payments?: { data?: Array<{ payment?: { payment_intent?: string | { id?: string } | null } }> };
+              };
+              for (const p of fullAny.payments?.data ?? []) {
+                const pi = p.payment?.payment_intent;
+                if (typeof pi === 'string') { paymentIntentId = pi; break; }
+                if (pi && typeof pi === 'object' && pi.id) { paymentIntentId = pi.id; break; }
+              }
+            } catch (err) {
+              console.error('[Webhook] invoice.paid: failed to re-fetch invoice for PI', err);
+            }
+          }
+
+          let paymentMethodBrand: string | null = null;
+          let paymentMethodLast4: string | null = null;
+          let paymentMethodType: string | null = null;
+
+          if (paymentIntentId) {
+            try {
+              const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+                expand: ['latest_charge'],
+              });
+              const charge = pi.latest_charge && typeof pi.latest_charge !== 'string'
+                ? pi.latest_charge
+                : null;
+              paymentMethodBrand = charge?.payment_method_details?.card?.brand ?? null;
+              paymentMethodLast4 = charge?.payment_method_details?.card?.last4 ?? null;
+              paymentMethodType = charge?.payment_method_details?.type ?? null;
+            } catch (err) {
+              console.error('[Webhook] invoice.paid: failed to expand PI', err);
+            }
+          }
+
           await supabaseServer
             .from('orders')
-            .update({ status: 'paid' })
+            .update({
+              status: 'paid',
+              stripe_payment_intent_id: paymentIntentId,
+              payment_method_brand: paymentMethodBrand,
+              payment_method_last4: paymentMethodLast4,
+              payment_method_type: paymentMethodType,
+            })
             .eq('id', order.id);
-          console.log('[Webhook] Marked upgrade order paid:', order.id);
+          console.log('[Webhook] Marked upgrade order paid:', order.id, { paymentIntentId });
         }
       }
     }
