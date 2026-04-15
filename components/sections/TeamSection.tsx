@@ -43,8 +43,15 @@ function getSocialUrl(
       return `https://x.com/${v}`;
     case 'youtube_handle':
       return `https://www.youtube.com/@${v}`;
-    case 'linkedin_handle':
-      return `https://www.linkedin.com/in/${v}`;
+    case 'linkedin_handle': {
+      if (raw.startsWith('http')) return raw;
+      const handle = v
+        .replace(/^(?:www\.)?linkedin\.com\//i, '')
+        .replace(/^\/+/, '')
+        .replace(/^in\//i, '')
+        .replace(/\/+$/, '');
+      return `https://www.linkedin.com/in/${handle}`;
+    }
     case 'instagram_handle':
       return `https://www.instagram.com/${v}`;
     case 'tiktok_handle':
