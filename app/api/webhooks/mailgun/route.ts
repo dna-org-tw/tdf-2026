@@ -69,6 +69,23 @@ async function updateLogRow(
   }
 }
 
+/**
+ * Mark the recipient's newsletter row as inactive so `members_enriched.status`
+ * and `subscribed_newsletter` reflect reality — keeps the suppression list and
+ * the subscription table in sync.
+ */
+async function syncNewsletterUnsubscribe(email: string): Promise<void> {
+  if (!supabaseServer || !email) return;
+  const { error } = await supabaseServer
+    .from('newsletter_subscriptions')
+    .update({ unsubscribed_at: new Date().toISOString() })
+    .eq('email', email)
+    .is('unsubscribed_at', null);
+  if (error) {
+    console.error('[MailgunWebhook] Failed to sync newsletter_subscriptions:', error);
+  }
+}
+
 async function incrementCounter(
   messageId: string | undefined,
   column: 'open_count' | 'click_count',
@@ -146,22 +163,26 @@ export async function POST(req: NextRequest) {
         break;
 
       case 'complained':
-        // Spam complaint — hardest signal to hit; suppress immediately.
+        // Spam complaint — hardest signal to hit; suppress immediately and
+        // mark the newsletter row inactive too.
         if (recipient) {
           await addSuppression(recipient, 'complained', 'mailgun_webhook', {
             message_id: messageId,
             tags: data.tags,
           });
+          await syncNewsletterUnsubscribe(recipient);
         }
         await updateLogRow(messageId, { complained_at: eventTs });
         break;
 
       case 'unsubscribed':
-        // User clicked a Mailgun-tracked unsubscribe link.
+        // User clicked a Mailgun-tracked unsubscribe link — mirror the opt-out
+        // into newsletter_subscriptions so the admin UI status matches reality.
         if (recipient) {
           await addSuppression(recipient, 'unsubscribed', 'mailgun_webhook', {
             message_id: messageId,
           });
+          await syncNewsletterUnsubscribe(recipient);
         }
         await updateLogRow(messageId, { unsubscribed_at: eventTs });
         break;
@@ -182,11 +203,14 @@ export async function POST(req: NextRequest) {
             null,
         });
         if (severity === 'permanent' && recipient) {
+          // Hard bounce: address is dead. Suppress AND deactivate the
+          // newsletter row so we stop counting it as an active subscriber.
           await addSuppression(recipient, 'bounced', 'mailgun_webhook', {
             message_id: messageId,
             reason: data.reason,
             delivery_status: data['delivery-status'],
           });
+          await syncNewsletterUnsubscribe(recipient);
         }
         break;
       }
