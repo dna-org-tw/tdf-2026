@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
       .from('orders')
       .select('*')
       .eq('customer_email', email)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error) {
       console.error('[Auth/Orders] Failed to fetch orders:', error);

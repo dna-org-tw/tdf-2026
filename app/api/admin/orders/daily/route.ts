@@ -18,20 +18,23 @@ export async function GET(req: NextRequest) {
     const since = new Date();
     since.setDate(since.getDate() - days);
 
-    // Revenue from all paid orders before the range
+    // Revenue from all paid orders before the range.
+    // amount_total is BIGINT -> returned as string by supabase-js; Number() coerces for math.
     const { data: priorOrders } = await supabaseServer
       .from('orders')
       .select('amount_total')
       .eq('status', 'paid')
-      .lt('created_at', since.toISOString());
+      .lt('created_at', since.toISOString())
+      .limit(50000);
 
-    const priorRevenue = (priorOrders || []).reduce((sum, o) => sum + (o.amount_total || 0), 0);
+    const priorRevenue = (priorOrders || []).reduce((sum, o) => sum + Number(o.amount_total || 0), 0);
 
     const { data: orders, error } = await supabaseServer
       .from('orders')
       .select('amount_total, status, created_at')
       .gte('created_at', since.toISOString())
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .limit(50000);
 
     if (error) {
       console.error('[Admin Daily]', error);
@@ -54,7 +57,7 @@ export async function GET(req: NextRequest) {
         entry.orders += 1;
         if (o.status === 'paid') {
           entry.paid += 1;
-          entry.revenue += o.amount_total || 0;
+          entry.revenue += Number(o.amount_total || 0);
         }
       }
     }

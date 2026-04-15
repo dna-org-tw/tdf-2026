@@ -13,14 +13,16 @@ export async function GET(req: NextRequest) {
 
   try {
     // Paid orders count + total revenue
+    // Note: amount_total is BIGINT -> returned as string by supabase-js. Convert to Number for math.
     const { data: orders } = await supabaseServer
       .from('orders')
-      .select('amount_total, currency, ticket_tier, status, customer_email');
+      .select('amount_total, currency, ticket_tier, status, customer_email')
+      .limit(50000);
 
     const paidOrders = (orders || []).filter((o) => o.status === 'paid');
-    const purchasedOrders = paidOrders.filter((o) => (o.amount_total || 0) > 0);
-    const complimentaryOrders = paidOrders.filter((o) => (o.amount_total || 0) === 0);
-    const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.amount_total || 0), 0);
+    const purchasedOrders = paidOrders.filter((o) => Number(o.amount_total || 0) > 0);
+    const complimentaryOrders = paidOrders.filter((o) => Number(o.amount_total || 0) === 0);
+    const totalRevenue = paidOrders.reduce((sum, o) => sum + Number(o.amount_total || 0), 0);
 
     // Unique paid members
     const uniqueMembers = new Set(

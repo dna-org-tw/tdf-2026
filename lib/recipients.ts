@@ -64,6 +64,8 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
   if (statuses && statuses.length) query = query.in('status', statuses);
   if (memberTiers && memberTiers.length) query = query.in('tier', memberTiers);
   if (ticketTiers && ticketTiers.length) query = query.in('highest_ticket_tier', ticketTiers);
+  // Explicit cap to avoid supabase-js's 1000-row default truncating bulk-send audiences.
+  query = query.limit(50000);
 
   const { data, error } = await query;
   if (error) {
