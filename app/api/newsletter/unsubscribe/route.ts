@@ -3,6 +3,7 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { verifyUnsubscribeToken, generateUnsubscribeToken } from '@/lib/email';
 import { sendUnsubscribeConfirmationEmail } from '@/lib/unsubscribeEmail';
 import { content } from '@/data/content';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 
 // Helper function to get language from request
 function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
@@ -139,6 +140,21 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
+
+      const rc = await verifyRecaptcha(body.recaptchaToken, 'unsubscribe');
+      if (!rc.ok) {
+        if (rc.reason === 'not_configured') {
+          return NextResponse.json(
+            { error: 'reCAPTCHA is not configured on the server.' },
+            { status: 500 }
+          );
+        }
+        if (rc.reason === 'missing_token') {
+          return NextResponse.json({ error: t.recaptchaRequired }, { status: 400 });
+        }
+        return NextResponse.json({ error: t.recaptchaFailed }, { status: 400 });
+      }
+
       const normalizedEmail = rawEmail.toLowerCase();
 
       try {
