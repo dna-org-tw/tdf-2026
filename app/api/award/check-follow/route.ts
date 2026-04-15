@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     if (subscriptionError) {
       console.error('[Award Check Follow API] Error checking subscription:', subscriptionError);
       return NextResponse.json(
-        { error: 'Failed to check subscription status', details: subscriptionError.message },
+        { error: 'Failed to check subscription status' },
         { status: 500 }
       );
     }

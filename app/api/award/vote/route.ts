@@ -240,7 +240,7 @@ export async function POST(req: NextRequest) {
     if (postCheckError) {
       console.error('[Award Vote API] Error checking post existence:', postCheckError);
       return NextResponse.json(
-        { error: 'Failed to verify post', details: postCheckError.message },
+        { error: 'Failed to verify post' },
         { status: 500 }
       );
     }
@@ -262,8 +262,12 @@ export async function POST(req: NextRequest) {
 
     if (subscriptionError) {
       console.error('[Award Vote API] Error checking subscription:', subscriptionError);
-      // 如果查詢出錯，繼續執行投票流程（不阻止投票）
-    } else if (!subscription || subscription.length === 0) {
+      return NextResponse.json(
+        { error: 'Failed to verify eligibility' },
+        { status: 500 }
+      );
+    }
+    if (!subscription || subscription.length === 0) {
       // 使用者未訂閱，回傳需要關注的錯誤
       return NextResponse.json(
         { 
@@ -286,7 +290,7 @@ export async function POST(req: NextRequest) {
     if (existingVoteError) {
       console.error('[Award Vote API] Error checking existing vote:', existingVoteError);
       return NextResponse.json(
-        { error: 'Failed to check existing vote', details: existingVoteError.message },
+        { error: 'Failed to check existing vote' },
         { status: 500 }
       );
     }
@@ -322,23 +326,23 @@ export async function POST(req: NextRequest) {
           postId,
           email: emailLower,
         });
-        
-        // 提供更友善的錯誤資訊
-        let errorMessage = 'Failed to create vote';
+
+        // Return a generic message to the client; only distinguish
+        // known-safe cases that the UI can act on.
         if (insertError.code === '23503') {
-          errorMessage = 'Invalid post ID. The post may not exist.';
-        } else if (insertError.code === '23505') {
-          errorMessage = 'A vote record already exists for this post and email.';
-        } else if (insertError.message) {
-          errorMessage = insertError.message;
+          return NextResponse.json(
+            { error: 'Invalid post ID. The post may not exist.' },
+            { status: 400 }
+          );
         }
-        
+        if (insertError.code === '23505') {
+          return NextResponse.json(
+            { error: 'A vote is already pending for this post.' },
+            { status: 409 }
+          );
+        }
         return NextResponse.json(
-          { 
-            error: errorMessage,
-            details: insertError.details || insertError.hint || 'Database insert failed',
-            code: insertError.code,
-          },
+          { error: 'Failed to create vote' },
           { status: 500 }
         );
       }

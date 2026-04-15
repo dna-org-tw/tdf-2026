@@ -15,10 +15,7 @@ if (supabaseUrl && supabaseSecretKey) {
 
   if (process.env.NODE_ENV === 'development') {
     // eslint-disable-next-line no-console
-    console.log('[Supabase] 客戶端已初始化:', {
-      url: supabaseUrl,
-      hasSecretKey: true,
-    });
+    console.log('[Supabase] server client initialised');
   }
 } else if (process.env.NODE_ENV === 'development') {
   // eslint-disable-next-line no-console

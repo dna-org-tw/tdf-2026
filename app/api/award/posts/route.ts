@@ -413,7 +413,7 @@ export async function GET(_req: NextRequest) {
   } catch (error) {
     console.error('[Award API] Error fetching posts:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch posts', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch posts' },
       { status: 500 }
     );
   }
