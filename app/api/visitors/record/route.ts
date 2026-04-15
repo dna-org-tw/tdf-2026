@@ -29,7 +29,7 @@ async function getCountryFromIP(ip: string | null): Promise<string | null> {
  * Body: { fingerprint, timezone?, locale?, user_agent? }
  */
 export async function POST(req: NextRequest) {
-  const rl = enforceRateLimit(req, { key: 'visitors-record', limit: 180, windowSeconds: 60 });
+  const rl = await enforceRateLimit(req, { key: 'visitors-record', limit: 180, windowSeconds: 60 });
   if (rl) return rl;
 
   try {

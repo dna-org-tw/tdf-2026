@@ -99,7 +99,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
-  const rl = enforceRateLimit(req, { key: 'fetch-reels', limit: 120, windowSeconds: 60 });
+  const rl = await enforceRateLimit(req, { key: 'fetch-reels', limit: 120, windowSeconds: 60 });
   if (rl) return rl;
 
   try {
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const rl = enforceRateLimit(req, { key: 'fetch-reels', limit: 120, windowSeconds: 60 });
+  const rl = await enforceRateLimit(req, { key: 'fetch-reels', limit: 120, windowSeconds: 60 });
   if (rl) return rl;
 
   try {

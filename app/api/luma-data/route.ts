@@ -25,7 +25,7 @@ const FETCH_OPTIONS = {
  * so the frontend can avoid duplicate requests (EventsSection + TeamSection).
  */
 export async function GET(req: NextRequest) {
-  const rl = enforceRateLimit(req, { key: 'luma-data', limit: 120, windowSeconds: 60 });
+  const rl = await enforceRateLimit(req, { key: 'luma-data', limit: 120, windowSeconds: 60 });
   if (rl) return rl;
 
   try {

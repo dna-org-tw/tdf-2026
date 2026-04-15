@@ -70,7 +70,7 @@ function parseCSV(csvText: string): Partner[] {
 }
 
 export async function GET(req: NextRequest) {
-  const rl = enforceRateLimit(req, { key: 'partners', limit: 120, windowSeconds: 60 });
+  const rl = await enforceRateLimit(req, { key: 'partners', limit: 120, windowSeconds: 60 });
   if (rl) return rl;
 
   try {

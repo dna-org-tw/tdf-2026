@@ -132,7 +132,7 @@ async function dispatchEventActions(_evt: PersistedEvent) {
  * 並轉發至 Meta CAPI（若已設定）。與 Facebook Pixel 並行，不影響原有追蹤。
  */
 export async function POST(request: NextRequest) {
-  const rl = enforceRateLimit(request, { key: 'events-track', limit: 180, windowSeconds: 60 });
+  const rl = await enforceRateLimit(request, { key: 'events-track', limit: 180, windowSeconds: 60 });
   if (rl) return rl;
 
   let body: TrackEventBody;

@@ -7,7 +7,7 @@ const AOTTER_API_URL =
 export const revalidate = 3600; // ISR: revalidate every hour
 
 export async function GET(req: NextRequest) {
-  const rl = enforceRateLimit(req, { key: 'news', limit: 120, windowSeconds: 60 });
+  const rl = await enforceRateLimit(req, { key: 'news', limit: 120, windowSeconds: 60 });
   if (rl) return rl;
 
   try {
