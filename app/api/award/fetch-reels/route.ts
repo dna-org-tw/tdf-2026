@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { enforceRateLimit } from '@/lib/rateLimitResponse';
 
 /**
  * 從 Supabase 的 ig_posts 表獲取所有資料
@@ -97,7 +98,10 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const rl = enforceRateLimit(req, { key: 'fetch-reels', limit: 120, windowSeconds: 60 });
+  if (rl) return rl;
+
   try {
     // 從 ig_posts 表獲取所有資料，不做任何過濾
     const posts = await fetchAllIgPosts();
@@ -138,7 +142,10 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const rl = enforceRateLimit(req, { key: 'fetch-reels', limit: 120, windowSeconds: 60 });
+  if (rl) return rl;
+
   try {
     // 檢查 Supabase 連線
     if (!supabaseServer) {

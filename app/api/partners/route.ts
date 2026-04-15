@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { enforceRateLimit } from '@/lib/rateLimitResponse';
 
 const PARTNERS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTckI1tuhUDdRC1K_OpG9m-_NFyan6VH6x_XlebMWXkqO9n9joS9xZxyYpvikX6h7zZchMyk2ZOcpPK/pub?gid=1354685664&single=true&output=csv';
 
@@ -68,7 +69,10 @@ function parseCSV(csvText: string): Partner[] {
   return partners;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const rl = enforceRateLimit(req, { key: 'partners', limit: 120, windowSeconds: 60 });
+  if (rl) return rl;
+
   try {
     const response = await fetch(PARTNERS_CSV_URL, {
       headers: {

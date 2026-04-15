@@ -77,6 +77,7 @@ const ticketTiers: TicketTier[] = [
 export default function TicketsSection() {
   const { t } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
+  const { executeRecaptcha: executeCheckoutRecaptcha } = useRecaptcha('checkout');
   const [countdown, setCountdown] = useState<CountdownTime | null>(null);
   const [loadingTier, setLoadingTier] = useState<TicketKey | null>(null);
   const [weekModalOpen, setWeekModalOpen] = useState(false);
@@ -174,6 +175,15 @@ export default function TicketsSection() {
         tier: tier.key,
       });
 
+      let recaptchaToken: string | null = null;
+      try {
+        recaptchaToken = await executeCheckoutRecaptcha();
+      } catch (err) {
+        console.error('reCAPTCHA execution failed:', err);
+        alert('Unable to start checkout. Please try again later or contact us.');
+        return;
+      }
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -182,6 +192,7 @@ export default function TicketsSection() {
         body: JSON.stringify({
           tier: tier.key,
           visitor_fingerprint: getVisitorFingerprint(),
+          recaptchaToken,
           ...(week ? { week } : {}),
         }),
       });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createOrder } from '@/lib/orders';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -33,6 +34,26 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => null);
+
+    const rc = await verifyRecaptcha(body?.recaptchaToken, 'checkout');
+    if (!rc.ok) {
+      if (rc.reason === 'not_configured') {
+        return NextResponse.json(
+          { error: 'reCAPTCHA is not configured on the server.' },
+          { status: 500 }
+        );
+      }
+      if (rc.reason === 'missing_token') {
+        return NextResponse.json(
+          { error: 'reCAPTCHA verification is required' },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json(
+        { error: 'reCAPTCHA verification failed' },
+        { status: 400 }
+      );
+    }
 
     const tier: 'explore' | 'contribute' | 'weekly_backer' | 'backer' | undefined = body?.tier;
     const week: string | undefined = body?.week;

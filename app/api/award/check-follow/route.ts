@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 
 /**
  * 檢查使用者是否已關注（訂閱 newsletter）
@@ -29,6 +30,26 @@ export async function POST(req: NextRequest) {
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    const rc = await verifyRecaptcha(body.recaptchaToken, 'check_follow');
+    if (!rc.ok) {
+      if (rc.reason === 'not_configured') {
+        return NextResponse.json(
+          { error: 'reCAPTCHA is not configured on the server.' },
+          { status: 500 }
+        );
+      }
+      if (rc.reason === 'missing_token') {
+        return NextResponse.json(
+          { error: 'reCAPTCHA verification is required' },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json(
+        { error: 'reCAPTCHA verification failed' },
         { status: 400 }
       );
     }

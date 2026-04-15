@@ -31,14 +31,14 @@ Fires automatically on page load — can't insert a reCAPTCHA challenge. Use `li
 
 | Endpoint | Limit | Window |
 |---|---|---|
-| `POST /api/visitors/record` | 120 req | 60s |
-| `POST /api/events/track` | 120 req | 60s |
-| `GET/POST /api/award/fetch-reels` | 60 req | 60s |
-| `GET /api/luma-data` | 60 req | 60s |
-| `GET /api/luma-schedule` | 60 req | 60s |
-| `GET /api/luma-speakers` | 60 req | 60s |
-| `GET /api/luma-events` | 60 req | 60s |
-| `GET /api/luma-partners` | 60 req | 60s |
+| `POST /api/visitors/record` | 180 req | 60s |
+| `POST /api/events/track` | 180 req | 60s |
+| `GET/POST /api/award/fetch-reels` | 120 req | 60s |
+| `GET /api/luma-data` | 120 req | 60s |
+| `GET /api/luma-schedule` | 120 req | 60s |
+| `GET /api/luma-speakers` | 120 req | 60s |
+| `GET /api/luma-events` | 120 req | 60s |
+| `GET /api/luma-partners` | 120 req | 60s |
 
 Rate-limit key: `<endpoint>:<ip>`. Use the same IP extraction pattern as `newsletter/subscribe` (`x-forwarded-for` → `x-real-ip` → `cf-connecting-ip`). On rate-limit hit, return HTTP 429 with `Retry-After` header derived from `resetAt`.
 

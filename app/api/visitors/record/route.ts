@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { recordVisitor } from '@/lib/visitors';
+import { getClientIP } from '@/lib/clientIp';
+import { enforceRateLimit } from '@/lib/rateLimitResponse';
 
 const MD5_REGEX = /^[a-f0-9]{32}$/;
-
-function getClientIP(req: NextRequest): string | null {
-  const forwardedFor = req.headers.get('x-forwarded-for');
-  if (forwardedFor) return forwardedFor.split(',')[0].trim();
-
-  const realIP = req.headers.get('x-real-ip');
-  if (realIP) return realIP;
-
-  const cfConnectingIP = req.headers.get('cf-connecting-ip');
-  if (cfConnectingIP) return cfConnectingIP;
-
-  return null;
-}
 
 async function getCountryFromIP(ip: string | null): Promise<string | null> {
   if (!ip || ip === 'localhost' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
@@ -40,6 +29,9 @@ async function getCountryFromIP(ip: string | null): Promise<string | null> {
  * Body: { fingerprint, timezone?, locale?, user_agent? }
  */
 export async function POST(req: NextRequest) {
+  const rl = enforceRateLimit(req, { key: 'visitors-record', limit: 180, windowSeconds: 60 });
+  if (rl) return rl;
+
   try {
     const body = await req.json().catch(() => null);
 
