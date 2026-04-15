@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { updateOrder, createOrder, getOrderBySessionId } from '@/lib/orders';
 import { sendOrderEmail } from '@/lib/sendOrderEmail';
-import type { OrderStatus } from '@/lib/types/order';
+import { mapPaymentStatusToOrderStatus } from '@/lib/orderStatus';
 import { supabaseServer } from '@/lib/supabaseServer';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -13,28 +13,6 @@ const stripe = stripeSecretKey
       apiVersion: '2025-12-15.clover',
     })
   : null;
-
-/**
- * 将 Stripe 支付状态映射到订单状态
- */
-function mapPaymentStatusToOrderStatus(
-  paymentStatus: string | null,
-  sessionStatus: string | null
-): OrderStatus {
-  if (sessionStatus === 'complete' && paymentStatus === 'paid') {
-    return 'paid';
-  }
-  if (sessionStatus === 'complete' && paymentStatus === 'no_payment_required') {
-    return 'paid';
-  }
-  if (sessionStatus === 'expired') {
-    return 'expired';
-  }
-  if (paymentStatus === 'unpaid' || paymentStatus === 'no_payment_required') {
-    return 'pending';
-  }
-  return 'pending';
-}
 
 export async function POST(req: NextRequest) {
   try {
