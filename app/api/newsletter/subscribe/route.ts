@@ -108,6 +108,57 @@ export async function POST(req: NextRequest) {
     const timezone = body.timezone || null;
     const locale = body.locale || null;
 
+    // Check for existing row so we can reactivate previously-unsubscribed addresses
+    // instead of returning 409 and stranding the user in an unsubscribed state.
+    const { data: existing } = await supabaseServer
+      .from('newsletter_subscriptions')
+      .select('id, unsubscribed_at')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existing) {
+      if (existing.unsubscribed_at) {
+        const { data: updated, error: updateError } = await supabaseServer
+          .from('newsletter_subscriptions')
+          .update({ unsubscribed_at: null })
+          .eq('id', existing.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('[Newsletter API] Reactivation update error:', updateError);
+          return NextResponse.json(
+            { error: t.subscriptionFailed },
+            { status: 500 }
+          );
+        }
+
+        // Also remove from the global suppression list so future bulk sends deliver.
+        const normalizedEmail = email.toLowerCase();
+        const { error: suppressionError } = await supabaseServer
+          .from('email_suppressions')
+          .delete()
+          .eq('email', normalizedEmail);
+        if (suppressionError) {
+          console.error('[Newsletter API] Suppression cleanup failed:', suppressionError);
+        }
+
+        sendSubscriptionThankYouEmail(email).catch((emailError) => {
+          console.error('[Newsletter API] Failed to send thank you email:', emailError);
+        });
+
+        return NextResponse.json(
+          { success: true, message: t.subscriptionSuccess, data: updated, reactivated: true },
+          { status: 200 }
+        );
+      }
+
+      return NextResponse.json(
+        { error: t.alreadySubscribed, duplicate: true },
+        { status: 409 }
+      );
+    }
+
     // 插入資料到 Supabase
     const insertData: Record<string, unknown> = {
       email,
@@ -129,7 +180,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      // 如果是重複的 email（根據你的資料表設定，可能會有唯一約束）
+      // Race: row was created between the SELECT and INSERT above. Treat as duplicate.
       if (error.code === '23505') {
         return NextResponse.json(
           { error: t.alreadySubscribed, duplicate: true },
