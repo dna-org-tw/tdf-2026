@@ -25,6 +25,7 @@ export default function VoteEmailModal({
 }: VoteEmailModalProps) {
   const { t, lang } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
+  const { executeRecaptcha: executeCheckFollowRecaptcha } = useRecaptcha('check_follow');
   const [email, setEmail] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
@@ -49,12 +50,23 @@ export default function VoteEmailModal({
     setError(null);
 
     try {
+      let recaptchaToken: string | null = null;
+      try {
+        recaptchaToken = await executeCheckFollowRecaptcha();
+      } catch (err) {
+        console.error('reCAPTCHA execution failed:', err);
+        setError(lang === 'en' ? 'Unable to verify request. Please try again.' : '無法驗證請求，請再試一次。');
+        setIsFollowing(null);
+        setCanVote(false);
+        return;
+      }
+
       const response = await fetch('/api/award/check-follow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: emailToCheck }),
+        body: JSON.stringify({ email: emailToCheck, recaptchaToken }),
       });
 
       const data = await response.json();
