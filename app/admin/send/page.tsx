@@ -64,6 +64,8 @@ export default function SendNotificationPage() {
   const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([]);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  type Category = 'newsletter' | 'events' | 'award';
+  const [category, setCategory] = useState<Category>('newsletter');
   const [recipientCount, setRecipientCount] = useState<number | null>(null);
   const [loadingCount, setLoadingCount] = useState(false);
   const [sending, setSending] = useState(false);
@@ -106,6 +108,7 @@ export default function SendNotificationPage() {
       if (statuses.length) params.set('statuses', statuses.join(','));
       if (memberTiers.length) params.set('memberTiers', memberTiers.join(','));
       if (ticketTiers.length) params.set('ticketTiers', ticketTiers.join(','));
+      params.set('category', category);
       const res = await fetch(`/api/admin/recipients?${params}`);
       if (res.ok) {
         const data = await res.json();
@@ -116,7 +119,7 @@ export default function SendNotificationPage() {
     } finally {
       setLoadingCount(false);
     }
-  }, [testOnly, statuses, memberTiers, ticketTiers]);
+  }, [testOnly, statuses, memberTiers, ticketTiers, category]);
 
   useEffect(() => {
     const t = setTimeout(fetchCount, 200);
@@ -133,7 +136,7 @@ export default function SendNotificationPage() {
     setSuccessMessage('');
     setSending(true);
     try {
-      const payload: Record<string, unknown> = { subject, body };
+      const payload: Record<string, unknown> = { subject, body, category };
       if (testOnly) {
         payload.groups = ['test'];
       } else {
@@ -179,6 +182,39 @@ export default function SendNotificationPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
+        <div className="text-xs text-slate-500 mb-2">信件分類（必選）</div>
+        <div className="flex flex-wrap gap-2">
+          {([
+            { value: 'newsletter', label: '節慶電子報' },
+            { value: 'events', label: '活動與議程更新' },
+            { value: 'award', label: 'Nomad Award 與社群活動' },
+          ] as const).map((opt) => (
+            <label
+              key={opt.value}
+              className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer ${
+                category === opt.value
+                  ? 'border-[#10B8D9] bg-[#10B8D9]/10 text-[#10B8D9]'
+                  : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <input
+                type="radio"
+                name="category"
+                value={opt.value}
+                checked={category === opt.value}
+                onChange={() => setCategory(opt.value)}
+                className="hidden"
+              />
+              {opt.label}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-slate-500 mt-2">
+          收件人若關閉此分類偏好將自動排除。
+        </p>
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
