@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   try {
     // Rate limit by IP: 10 attempts per 15 minutes
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const limit = checkRateLimit(`verify:ip:${ip}`, { limit: 10, windowSeconds: 15 * 60 });
+    const limit = await checkRateLimit(`verify:ip:${ip}`, { limit: 10, windowSeconds: 15 * 60 });
     if (!limit.allowed) {
       return NextResponse.redirect(`${baseUrl}/auth/callback?error=rate_limited`);
     }

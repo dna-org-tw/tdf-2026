@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { sendSubscriptionThankYouEmail } from '@/lib/email';
+import { getMinRecaptchaScore } from '@/lib/recaptchaScore';
 import { content } from '@/data/content';
 
 const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
@@ -173,12 +174,12 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // 檢查風險評分（如可用）
+        // 檢查風險評分（預設門檻 0.7，可經由 RECAPTCHA_MIN_SCORE 調整）
         if (recaptchaData.riskAnalysis?.score !== undefined) {
           const score = recaptchaData.riskAnalysis.score;
-          // 分數範圍 0.0-1.0，越低表示越可疑
-          // 可以根據需要設定閾值，例如低於 0.5 拒絕
-          if (score < 0.5) {
+          const minScore = getMinRecaptchaScore();
+          if (score < minScore) {
+            console.warn(`[reCAPTCHA] subscribe rejected, score ${score} < ${minScore}`);
             return NextResponse.json(
               { error: t.recaptchaFailed },
               { status: 400 }

@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const ipLimit = checkRateLimit(`send-code:ip:${ip}`, { limit: 5, windowSeconds: 15 * 60 });
+    const ipLimit = await checkRateLimit(`send-code:ip:${ip}`, { limit: 5, windowSeconds: 15 * 60 });
     if (!ipLimit.allowed) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    const emailLimit = checkRateLimit(`send-code:email:${email}`, { limit: 3, windowSeconds: 15 * 60 });
+    const emailLimit = await checkRateLimit(`send-code:email:${email}`, { limit: 3, windowSeconds: 15 * 60 });
     if (!emailLimit.allowed) {
       return NextResponse.json({ error: 'Too many requests for this email' }, { status: 429 });
     }

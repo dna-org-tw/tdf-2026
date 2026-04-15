@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     // Rate limit by IP: 5 requests per 15 minutes
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const ipLimit = checkRateLimit(`magic-link:ip:${ip}`, { limit: 5, windowSeconds: 15 * 60 });
+    const ipLimit = await checkRateLimit(`magic-link:ip:${ip}`, { limit: 5, windowSeconds: 15 * 60 });
     if (!ipLimit.allowed) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limit by email: 3 requests per 15 minutes
-    const emailLimit = checkRateLimit(`magic-link:email:${email}`, { limit: 3, windowSeconds: 15 * 60 });
+    const emailLimit = await checkRateLimit(`magic-link:email:${email}`, { limit: 3, windowSeconds: 15 * 60 });
     if (!emailLimit.allowed) {
       return NextResponse.json({ error: 'Too many requests for this email. Please try again later.' }, { status: 429 });
     }
