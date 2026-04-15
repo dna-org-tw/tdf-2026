@@ -6,7 +6,8 @@ import { logEmail } from './emailLog';
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const fromEmail = process.env.EMAIL_FROM || `noreply@${mailgunDomain || 'example.com'}`;
+const fromRaw = process.env.EMAIL_FROM || `noreply@${mailgunDomain || 'example.com'}`;
+const fromEmail = fromRaw.includes('<') ? fromRaw : `Taiwan Digital Fest <${fromRaw}>`;
 const unsubscribeSecret = process.env.UNSUBSCRIBE_SECRET;
 
 const mailgunClient = mailgunApiKey && mailgunDomain

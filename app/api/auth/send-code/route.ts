@@ -9,7 +9,8 @@ import Mailgun from 'mailgun.js';
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
-const fromEmail = process.env.EMAIL_FROM || `noreply@${mailgunDomain || 'example.com'}`;
+const fromRaw = process.env.EMAIL_FROM || `noreply@${mailgunDomain || 'example.com'}`;
+const fromEmail = fromRaw.includes('<') ? fromRaw : `Taiwan Digital Fest <${fromRaw}>`;
 
 const CODE_EXPIRY_MINUTES = 10;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
