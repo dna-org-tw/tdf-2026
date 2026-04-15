@@ -295,7 +295,11 @@ export default function OrderDetailPage() {
             {STATUS_LABELS[order.status] ?? order.status}
           </span>
           <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
-            {order.source === 'stripe_invoice_offline' ? '手動（線下付款）' : 'Stripe Checkout'}
+            {order.source === 'stripe_invoice_offline'
+              ? '手動（線下付款）'
+              : order.source === 'stripe_invoice_upgrade'
+                ? 'Stripe Invoice（升級）'
+                : 'Stripe Checkout'}
           </span>
           <span className="text-sm text-slate-500 ml-auto">{formatDate(order.created_at)}</span>
         </div>

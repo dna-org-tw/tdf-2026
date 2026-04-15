@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { updateOrder, createOrder } from '@/lib/orders';
 import { getAdminSession } from '@/lib/adminAuth';
-import type { OrderStatus } from '@/lib/types/order';
+import { mapPaymentStatusToOrderStatus } from '@/lib/orderStatus';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -11,29 +11,6 @@ const stripe = stripeSecretKey
       apiVersion: '2025-12-15.clover',
     })
   : null;
-
-/**
- * Map Stripe payment status to order status
- */
-function mapPaymentStatusToOrderStatus(
-  paymentStatus: string | null,
-  sessionStatus: string | null
-): OrderStatus {
-  if (sessionStatus === 'complete' && paymentStatus === 'paid') {
-    return 'paid';
-  }
-  if (sessionStatus === 'complete' && paymentStatus === 'no_payment_required') {
-    return 'paid';
-  }
-  // session expired or incomplete and unpaid -> cancelled
-  if (sessionStatus === 'expired' || (sessionStatus !== 'complete' && paymentStatus === 'unpaid')) {
-    return 'cancelled';
-  }
-  if (paymentStatus === 'unpaid' || paymentStatus === 'no_payment_required') {
-    return 'pending';
-  }
-  return 'pending';
-}
 
 export async function POST(req: NextRequest) {
   try {
