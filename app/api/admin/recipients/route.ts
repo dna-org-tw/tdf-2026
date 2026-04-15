@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
-import { getRecipients, type RecipientGroup, type TicketTier } from '@/lib/recipients';
+import { getRecipients, type RecipientGroup } from '@/lib/recipients';
+import {
+  type MemberStatus,
+  type MemberTier,
+  type TicketTier,
+  MEMBER_STATUSES,
+  MEMBER_TIERS,
+  TICKET_TIERS,
+} from '@/lib/members';
 
 const VALID_GROUPS: RecipientGroup[] = ['orders', 'subscribers', 'test'];
-const VALID_TIERS: TicketTier[] = ['explore', 'contribute', 'weekly_backer', 'backer'];
+
+function parseList<T extends string>(raw: string | null, allowed: readonly T[]): T[] | undefined {
+  if (!raw) return undefined;
+  const list = raw.split(',').map((s) => s.trim()).filter(Boolean) as T[];
+  const filtered = list.filter((v) => (allowed as readonly string[]).includes(v));
+  return filtered.length ? filtered : undefined;
+}
 
 export async function GET(req: NextRequest) {
   const session = await getAdminSession(req);
@@ -12,31 +26,33 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
-  const groupsParam = searchParams.get('groups');
-  const tiersParam = searchParams.get('tiers');
 
-  if (!groupsParam) {
-    return NextResponse.json({ error: 'groups parameter is required' }, { status: 400 });
-  }
-
-  const groups = groupsParam.split(',').filter((g): g is RecipientGroup =>
-    VALID_GROUPS.includes(g as RecipientGroup)
-  );
-
-  if (groups.length === 0) {
-    return NextResponse.json({ error: 'At least one valid group is required' }, { status: 400 });
-  }
-
-  const tiers = tiersParam
-    ? tiersParam.split(',').filter((t): t is TicketTier =>
-        VALID_TIERS.includes(t as TicketTier)
-      )
+  const groupsRaw = searchParams.get('groups');
+  const groups = groupsRaw
+    ? (groupsRaw.split(',').filter((g): g is RecipientGroup =>
+        VALID_GROUPS.includes(g as RecipientGroup)))
     : undefined;
+
+  // Legacy `tiers` query param (meant ticket tier). New API uses `ticketTiers`.
+  const legacyTicketTiers = parseList<TicketTier>(searchParams.get('tiers'), TICKET_TIERS);
+  const statuses = parseList<MemberStatus>(searchParams.get('statuses'), MEMBER_STATUSES);
+  const memberTiers = parseList<MemberTier>(searchParams.get('memberTiers'), MEMBER_TIERS);
+  const ticketTiers = parseList<TicketTier>(searchParams.get('ticketTiers'), TICKET_TIERS);
+
+  if (!groups && !statuses && !memberTiers && !ticketTiers) {
+    return NextResponse.json(
+      { error: 'At least one of groups, statuses, memberTiers, or ticketTiers is required' },
+      { status: 400 },
+    );
+  }
 
   try {
     const result = await getRecipients({
       groups,
-      legacyTicketTiers: tiers,
+      statuses,
+      memberTiers,
+      ticketTiers,
+      legacyTicketTiers,
       adminEmail: session.email,
     });
     return NextResponse.json(result);
@@ -44,7 +60,7 @@ export async function GET(req: NextRequest) {
     console.error('[Admin Recipients]', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to fetch recipients' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
