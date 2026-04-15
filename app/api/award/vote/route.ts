@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { sendVoteConfirmationEmail } from '@/lib/email';
 import { getTaipeiDayBounds } from '@/lib/taipeiTime';
+import { getMinRecaptchaScore } from '@/lib/recaptchaScore';
 import crypto from 'crypto';
 
 const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
@@ -203,10 +204,12 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // 檢查風險評分
+      // 檢查風險評分（預設門檻 0.7，可經由 RECAPTCHA_MIN_SCORE 調整）
       if (recaptchaData.riskAnalysis?.score !== undefined) {
         const score = recaptchaData.riskAnalysis.score;
-        if (score < 0.5) {
+        const minScore = getMinRecaptchaScore();
+        if (score < minScore) {
+          console.warn(`[reCAPTCHA] vote rejected, score ${score} < ${minScore}`);
           return NextResponse.json(
             { error: 'reCAPTCHA verification failed' },
             { status: 400 }

@@ -46,7 +46,14 @@ export async function POST(req: NextRequest) {
     }
 
     if (!webhookSecret) {
-      console.warn('[Webhook] STRIPE_WEBHOOK_SECRET is not set. Webhook verification will be skipped.');
+      if (process.env.NODE_ENV === 'production') {
+        console.error('[Webhook] STRIPE_WEBHOOK_SECRET is required in production. Rejecting request.');
+        return NextResponse.json(
+          { error: 'Webhook signature verification is not configured.' },
+          { status: 500 }
+        );
+      }
+      console.warn('[Webhook] STRIPE_WEBHOOK_SECRET is not set. Signature verification skipped (non-production only).');
     }
 
     const body = await req.text();
@@ -61,7 +68,6 @@ export async function POST(req: NextRequest) {
 
     let event: Stripe.Event;
 
-    // 驗證 webhook 簽章
     if (webhookSecret) {
       try {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
@@ -73,7 +79,6 @@ export async function POST(req: NextRequest) {
         );
       }
     } else {
-      // 如果沒有設定 webhook secret，直接解析（僅用於開發環境）
       try {
         event = JSON.parse(body) as Stripe.Event;
       } catch (err) {

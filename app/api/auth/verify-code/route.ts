@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const limit = checkRateLimit(`verify-code:ip:${ip}`, { limit: 10, windowSeconds: 15 * 60 });
+    const limit = await checkRateLimit(`verify-code:ip:${ip}`, { limit: 10, windowSeconds: 15 * 60 });
     if (!limit.allowed) {
       return NextResponse.json({ error: 'Too many attempts' }, { status: 429 });
     }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Per-email rate limit to prevent brute force (10 attempts per 15 min)
-    const emailLimit = checkRateLimit(`verify-code:email:${email}`, { limit: 10, windowSeconds: 15 * 60 });
+    const emailLimit = await checkRateLimit(`verify-code:email:${email}`, { limit: 10, windowSeconds: 15 * 60 });
     if (!emailLimit.allowed) {
       return NextResponse.json({ error: 'Too many attempts for this email' }, { status: 429 });
     }

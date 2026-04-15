@@ -1,15 +1,28 @@
+import { randomBytes } from 'crypto';
 import { SignJWT, jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
 const SESSION_COOKIE = 'tdf_session';
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
-function getSecretKey() {
+let cachedSecret: Uint8Array | null = null;
+
+function getSecretKey(): Uint8Array {
+  if (cachedSecret) return cachedSecret;
   const secret = process.env.AUTH_SECRET;
-  if (!secret && process.env.NODE_ENV === 'production') {
+  if (secret) {
+    cachedSecret = new TextEncoder().encode(secret);
+    return cachedSecret;
+  }
+  if (process.env.NODE_ENV === 'production') {
     throw new Error('AUTH_SECRET environment variable is required in production');
   }
-  return new TextEncoder().encode(secret || 'dev-secret-change-in-production');
+  // Dev/test: generate an ephemeral per-process secret so sessions never leak
+  // across environments sharing the old hardcoded default.
+  const ephemeral = randomBytes(32).toString('hex');
+  console.warn('[auth] AUTH_SECRET not set — using ephemeral per-process secret. Sessions will invalidate on restart. Set AUTH_SECRET to persist sessions.');
+  cachedSecret = new TextEncoder().encode(ephemeral);
+  return cachedSecret;
 }
 
 export interface SessionPayload {

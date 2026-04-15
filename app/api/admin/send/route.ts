@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   // Rate limit: 1 batch send per minute per admin
   const rateKey = `admin-send:${session.email}`;
-  const limit = checkRateLimit(rateKey, { limit: 1, windowSeconds: 60 });
+  const limit = await checkRateLimit(rateKey, { limit: 1, windowSeconds: 60 });
   if (!limit.allowed) {
     return NextResponse.json(
       { error: '請等待一分鐘後再發送' },
