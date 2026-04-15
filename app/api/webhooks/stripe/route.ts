@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { updateOrder, createOrder, getOrderBySessionId } from '@/lib/orders';
 import { sendOrderEmail } from '@/lib/sendOrderEmail';
 import type { OrderStatus } from '@/lib/types/order';
+import { supabaseServer } from '@/lib/supabaseServer';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -313,6 +314,40 @@ export async function POST(req: NextRequest) {
         console.log('[Webhook] Order updated successfully:', updatedOrder.id);
       } else {
         console.warn('[Webhook] Failed to update order for session:', session.id);
+      }
+    }
+    // charge.refunded / charge.refund.updated: reconcile refund state with Stripe
+    else if (event.type === 'charge.refunded' || event.type === 'charge.refund.updated') {
+      const object = event.data.object as Stripe.Charge | Stripe.Refund;
+      const paymentIntentId = 'payment_intent' in object
+        ? (typeof object.payment_intent === 'string' ? object.payment_intent : object.payment_intent?.id)
+        : null;
+      if (paymentIntentId && supabaseServer) {
+        const { data: order } = await supabaseServer
+          .from('orders')
+          .select('id, amount_total, amount_refunded')
+          .eq('stripe_payment_intent_id', paymentIntentId)
+          .maybeSingle();
+
+        if (!order) {
+          console.warn('[Webhook] Refund event for unknown PI:', paymentIntentId);
+        } else {
+          try {
+            const pi = await stripe.paymentIntents.retrieve(paymentIntentId, { expand: ['latest_charge'] });
+            const chargeObj = pi.latest_charge && typeof pi.latest_charge !== 'string' ? pi.latest_charge : null;
+            const stripeRefunded = chargeObj?.amount_refunded ?? 0;
+            if (stripeRefunded !== order.amount_refunded) {
+              const newStatus = stripeRefunded >= order.amount_total ? 'refunded' : 'partially_refunded';
+              await supabaseServer
+                .from('orders')
+                .update({ amount_refunded: stripeRefunded, status: newStatus })
+                .eq('id', order.id);
+              console.log('[Webhook] Reconciled refund for order:', order.id, { stripeRefunded });
+            }
+          } catch (err) {
+            console.error('[Webhook] Error reconciling refund:', err);
+          }
+        }
       }
     }
 
