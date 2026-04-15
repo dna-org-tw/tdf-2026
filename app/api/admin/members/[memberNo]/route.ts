@@ -48,24 +48,24 @@ export async function GET(
     let visitors: unknown[] = [];
     let trackingEvents: unknown[] = [];
     if (visitorIds.length > 0) {
+      // Filter by visitor_id server-side (the JSONB parameters->>'visitor_id' path)
+      // before applying the row cap, otherwise this member's older events get
+      // pushed out of the window by global traffic.
+      const visitorOr = visitorIds
+        .map((v) => `parameters->>visitor_id.eq.${v}`)
+        .join(',');
+
       const [vRes, tRes] = await Promise.all([
         supabaseServer.from('visitors').select('*').in('fingerprint', visitorIds),
         supabaseServer
           .from('tracking_events')
           .select('event_name, parameters, occurred_at, created_at')
+          .or(visitorOr)
           .order('occurred_at', { ascending: false })
-          .limit(500),
+          .limit(50),
       ]);
       visitors = vRes.data ?? [];
-      const allEvents = (tRes.data ?? []) as Array<{
-        event_name: string;
-        parameters: Record<string, unknown>;
-        occurred_at: string;
-        created_at: string;
-      }>;
-      trackingEvents = allEvents
-        .filter((ev) => visitorIds.includes(String(ev.parameters?.visitor_id ?? '')))
-        .slice(0, 50);
+      trackingEvents = tRes.data ?? [];
     }
 
     const notificationIds = Array.from(
