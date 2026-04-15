@@ -13,9 +13,10 @@ export async function GET(
 
   const { id } = await params;
 
-  const [orderRes, actionsRes] = await Promise.all([
+  const [orderRes, actionsRes, upgradesRes] = await Promise.all([
     supabaseServer.from('orders').select('*').eq('id', id).maybeSingle(),
     supabaseServer.from('order_actions').select('*').eq('order_id', id).order('created_at', { ascending: false }),
+    supabaseServer.from('orders').select('*').eq('parent_order_id', id).order('created_at', { ascending: false }),
   ]);
 
   if (orderRes.error || !orderRes.data) {
@@ -25,6 +26,7 @@ export async function GET(
   return NextResponse.json({
     order: orderRes.data,
     actions: actionsRes.data ?? [],
+    upgrades: upgradesRes.data ?? [],
   });
 }
 

@@ -7,7 +7,7 @@ export type OrderStatus =
   | 'refunded'
   | 'partially_refunded';
 
-export type OrderSource = 'stripe_checkout' | 'stripe_invoice_offline';
+export type OrderSource = 'stripe_checkout' | 'stripe_invoice_offline' | 'stripe_invoice_upgrade';
 
 export type OrderActionType =
   | 'refund'
@@ -15,7 +15,8 @@ export type OrderActionType =
   | 'edit'
   | 'resend_receipt'
   | 'note'
-  | 'manual_create';
+  | 'manual_create'
+  | 'upgrade';
 
 export interface Order {
   id: string;
@@ -46,6 +47,7 @@ export interface Order {
   payment_method_last4: string | null;
   payment_method_type: string | null;
   internal_notes: string | null;
+  parent_order_id: string | null;
   created_at: string;
   updated_at: string;
 }
