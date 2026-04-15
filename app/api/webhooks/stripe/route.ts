@@ -316,6 +316,24 @@ export async function POST(req: NextRequest) {
         console.warn('[Webhook] Failed to update order for session:', session.id);
       }
     }
+    // invoice.paid: mark pending upgrade orders as paid when the customer pays via hosted URL
+    else if (event.type === 'invoice.paid') {
+      const inv = event.data.object as Stripe.Invoice;
+      if (inv.id && supabaseServer) {
+        const { data: order } = await supabaseServer
+          .from('orders')
+          .select('id, status')
+          .eq('stripe_invoice_id', inv.id)
+          .maybeSingle();
+        if (order && order.status === 'pending') {
+          await supabaseServer
+            .from('orders')
+            .update({ status: 'paid' })
+            .eq('id', order.id);
+          console.log('[Webhook] Marked upgrade order paid:', order.id);
+        }
+      }
+    }
     // charge.refunded / charge.refund.updated: reconcile refund state with Stripe
     else if (event.type === 'charge.refunded' || event.type === 'charge.refund.updated') {
       const object = event.data.object as Stripe.Charge | Stripe.Refund;

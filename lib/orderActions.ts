@@ -378,3 +378,138 @@ export async function createManualOrder(
   );
   return created as Order;
 }
+
+// ---------- Upgrade ----------
+
+export interface UpgradeOrderInput {
+  target_tier: Order['ticket_tier'];
+  target_week?: 'week1' | 'week2' | 'week3' | 'week4';
+  mode: 'comp' | 'invoice';
+  amount_cents?: number;
+  description?: string;
+  note?: string;
+}
+
+export interface UpgradeOrderResult {
+  order: Order;
+  hosted_invoice_url: string | null;
+}
+
+export async function upgradeOrder(
+  orderId: string,
+  input: UpgradeOrderInput,
+  adminEmail: string,
+): Promise<UpgradeOrderResult> {
+  if (!supabaseServer) throw new OrderActionError('DB not configured', undefined, 500);
+
+  const parent = await getOrder(orderId);
+
+  if (parent.parent_order_id) {
+    throw new OrderActionError('Cannot upgrade an upgrade order; upgrade the original instead');
+  }
+  if (parent.status !== 'paid' && parent.status !== 'partially_refunded') {
+    throw new OrderActionError(`Cannot upgrade order with status ${parent.status}`);
+  }
+  if (!parent.customer_email) {
+    throw new OrderActionError('Original order has no customer email');
+  }
+  if (input.target_tier === 'weekly_backer' && !input.target_week) {
+    throw new OrderActionError('target_week required for weekly_backer');
+  }
+  if (input.mode === 'invoice' && (input.amount_cents == null || input.amount_cents <= 0)) {
+    throw new OrderActionError('amount_cents > 0 required for invoice mode');
+  }
+
+  const amount = input.mode === 'comp' ? 0 : input.amount_cents!;
+  const currency = parent.currency || 'usd';
+  const description =
+    input.description?.trim() ||
+    `Upgrade: ${parent.ticket_tier} → ${input.target_tier}${input.target_week ? ` (${input.target_week})` : ''}`;
+
+  const s = requireStripe();
+
+  let customer: Stripe.Customer;
+  let invoice: Stripe.Invoice;
+  try {
+    const existing = await s.customers.list({ email: parent.customer_email, limit: 1 });
+    customer = existing.data[0] ?? await s.customers.create({
+      email: parent.customer_email,
+      name: parent.customer_name ?? undefined,
+    });
+
+    await s.invoiceItems.create({
+      customer: customer.id,
+      currency,
+      amount,
+      description,
+    });
+
+    const draft = await s.invoices.create({
+      customer: customer.id,
+      collection_method: 'send_invoice',
+      days_until_due: 0,
+      metadata: {
+        admin_email: adminEmail,
+        source: 'upgrade',
+        parent_order_id: parent.id,
+        from_tier: parent.ticket_tier,
+        to_tier: input.target_tier,
+        ...(input.target_week ? { week: input.target_week } : {}),
+        mode: input.mode,
+        note: input.note ?? '',
+      },
+    });
+    if (!draft.id) throw new OrderActionError('Invoice has no ID');
+
+    const finalized = await s.invoices.finalizeInvoice(draft.id);
+    if (!finalized.id) throw new OrderActionError('Finalized invoice has no ID');
+
+    if (input.mode === 'comp') {
+      invoice = finalized.status === 'paid'
+        ? finalized
+        : await s.invoices.pay(finalized.id, { paid_out_of_band: true });
+    } else {
+      invoice = finalized;
+    }
+  } catch (err) {
+    const stripeErr = err as Stripe.errors.StripeError;
+    await writeAction(parent.id, adminEmail, 'upgrade', { ...input }, null, 'failed', stripeErr.message);
+    throw new OrderActionError(stripeErr.message, stripeErr.code, 400);
+  }
+
+  const isPaid = input.mode === 'comp' || invoice.status === 'paid';
+  const hostedInvoiceUrl = invoice.hosted_invoice_url ?? null;
+
+  const { data: created, error: createErr } = await supabaseServer
+    .from('orders')
+    .insert({
+      stripe_session_id: null,
+      stripe_invoice_id: invoice.id,
+      ticket_tier: input.target_tier,
+      status: isPaid ? 'paid' : 'pending',
+      source: 'stripe_invoice_upgrade',
+      amount_subtotal: invoice.subtotal ?? amount,
+      amount_total: invoice.total ?? amount,
+      amount_tax: invoice.total_taxes?.reduce((sum, t) => sum + (t.amount ?? 0), 0) ?? 0,
+      amount_discount: 0,
+      currency: invoice.currency ?? currency,
+      customer_email: parent.customer_email,
+      customer_name: parent.customer_name,
+      parent_order_id: parent.id,
+      internal_notes: input.note ?? null,
+    })
+    .select()
+    .single();
+  if (createErr || !created) throw new OrderActionError(createErr?.message ?? 'Insert failed', undefined, 500);
+
+  await writeAction(
+    parent.id,
+    adminEmail,
+    'upgrade',
+    { ...input, upgrade_order_id: created.id },
+    { invoice_id: invoice.id, customer_id: customer.id, hosted_invoice_url: hostedInvoiceUrl, status: invoice.status },
+    'success',
+  );
+
+  return { order: created as Order, hosted_invoice_url: hostedInvoiceUrl };
+}

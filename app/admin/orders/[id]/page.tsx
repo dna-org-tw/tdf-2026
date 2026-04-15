@@ -10,7 +10,7 @@ interface Order {
   stripe_invoice_id: string | null;
   ticket_tier: string;
   status: string;
-  source: 'stripe_checkout' | 'stripe_invoice_offline';
+  source: 'stripe_checkout' | 'stripe_invoice_offline' | 'stripe_invoice_upgrade';
   amount_subtotal: number;
   amount_total: number;
   amount_tax: number;
@@ -20,6 +20,7 @@ interface Order {
   customer_email: string | null;
   customer_name: string | null;
   internal_notes: string | null;
+  parent_order_id: string | null;
   created_at: string;
 }
 
@@ -51,8 +52,22 @@ const STATUS_LABELS: Record<string, string> = {
 
 const ACTION_LABELS: Record<string, string> = {
   refund: '退款', cancel: '取消', edit: '編輯顧客', resend_receipt: '重寄收據',
-  note: '備註', manual_create: '手動建單',
+  note: '備註', manual_create: '手動建單', upgrade: '升級票種',
 };
+
+const TIER_OPTIONS = [
+  { value: 'explore', label: 'Explore' },
+  { value: 'contribute', label: 'Contribute' },
+  { value: 'weekly_backer', label: 'Weekly Backer' },
+  { value: 'backer', label: 'Backer' },
+];
+
+const WEEK_OPTIONS = [
+  { value: 'week1', label: 'Week 1' },
+  { value: 'week2', label: 'Week 2' },
+  { value: 'week3', label: 'Week 3' },
+  { value: 'week4', label: 'Week 4' },
+];
 
 function formatAmount(amount: number, currency: string) {
   return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
@@ -70,6 +85,7 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [actions, setActions] = useState<OrderAction[]>([]);
+  const [upgrades, setUpgrades] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string>('');
   const [notes, setNotes] = useState('');
@@ -80,6 +96,7 @@ export default function OrderDetailPage() {
       const data = await res.json();
       setOrder(data.order);
       setActions(data.actions);
+      setUpgrades(data.upgrades ?? []);
       setNotes(data.order.internal_notes ?? '');
     } else if (res.status === 404) {
       router.replace('/admin/orders');
@@ -180,6 +197,57 @@ export default function OrderDetailPage() {
     }
   };
 
+  // --- Upgrade modal ---
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upTier, setUpTier] = useState('contribute');
+  const [upWeek, setUpWeek] = useState('week1');
+  const [upMode, setUpMode] = useState<'comp' | 'invoice'>('invoice');
+  const [upAmount, setUpAmount] = useState(0);
+  const [upDescription, setUpDescription] = useState('');
+  const [upNote, setUpNote] = useState('');
+  const [upSubmitting, setUpSubmitting] = useState(false);
+  const [upHostedUrl, setUpHostedUrl] = useState<string | null>(null);
+  const openUpgrade = () => {
+    setUpTier('contribute');
+    setUpWeek('week1');
+    setUpMode('invoice');
+    setUpAmount(0);
+    setUpDescription('');
+    setUpNote('');
+    setUpHostedUrl(null);
+    setUpgradeOpen(true);
+  };
+  const submitUpgrade = async () => {
+    setUpSubmitting(true);
+    const res = await fetch(`/api/admin/orders/${params.id}/upgrade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        target_tier: upTier,
+        ...(upTier === 'weekly_backer' ? { target_week: upWeek } : {}),
+        mode: upMode,
+        ...(upMode === 'invoice' ? { amount_cents: upAmount } : {}),
+        description: upDescription || undefined,
+        note: upNote || undefined,
+      }),
+    });
+    setUpSubmitting(false);
+    if (res.ok) {
+      const data = await res.json();
+      load();
+      if (upMode === 'invoice' && data.hosted_invoice_url) {
+        setUpHostedUrl(data.hosted_invoice_url);
+        showToast('已建立 Stripe 發票');
+      } else {
+        showToast('已升級（招待）');
+        setUpgradeOpen(false);
+      }
+    } else {
+      const data = await res.json().catch(() => ({}));
+      showToast(`升級失敗：${data.error ?? '未知錯誤'}`);
+    }
+  };
+
   // --- Notes ---
   const saveNotes = async () => {
     const res = await fetch(`/api/admin/orders/${params.id}/notes`, {
@@ -200,6 +268,7 @@ export default function OrderDetailPage() {
   const canRefund = order.status === 'paid' || order.status === 'partially_refunded';
   const canCancel = order.status === 'pending';
   const canResend = (order.status === 'paid' || order.status === 'partially_refunded') && order.source === 'stripe_checkout';
+  const canUpgrade = !order.parent_order_id && (order.status === 'paid' || order.status === 'partially_refunded');
   const remaining = order.amount_total - order.amount_refunded;
 
   return (
@@ -209,6 +278,15 @@ export default function OrderDetailPage() {
       </div>
 
       <h1 className="text-2xl font-bold text-slate-900">訂單 {order.id.slice(0, 8)}</h1>
+
+      {order.parent_order_id && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-lg px-4 py-2 text-sm text-indigo-900">
+          這是一筆升級訂單，來自{' '}
+          <a href={`/admin/orders/${order.parent_order_id}`} className="font-mono underline">
+            {order.parent_order_id.slice(0, 8)}
+          </a>
+        </div>
+      )}
 
       {/* Info card */}
       <div className="bg-white rounded-xl p-6 shadow-sm space-y-3">
@@ -275,6 +353,7 @@ export default function OrderDetailPage() {
           {canRefund && <button onClick={openRefund} className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600">退款</button>}
           {canCancel && <button onClick={doCancel} className="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">取消訂單</button>}
           {canResend && <button onClick={doResend} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200">重寄收據</button>}
+          {canUpgrade && <button onClick={openUpgrade} className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4]">升級票種</button>}
         </div>
         <div className="pt-3 border-t border-slate-100">
           <label className="text-sm text-slate-700 font-medium">內部備註</label>
@@ -282,6 +361,26 @@ export default function OrderDetailPage() {
           <button onClick={saveNotes} className="mt-2 px-3 py-1 text-xs font-medium text-white bg-[#10B8D9] rounded">儲存備註</button>
         </div>
       </div>
+
+      {/* Upgrades */}
+      {upgrades.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <h2 className="font-semibold text-slate-900 mb-3">升級記錄</h2>
+          <ul className="space-y-2">
+            {upgrades.map((u) => (
+              <li key={u.id} className="flex items-center gap-3 text-sm border-l-2 border-[#10B8D9] pl-3">
+                <a href={`/admin/orders/${u.id}`} className="font-mono text-[#10B8D9] hover:underline">{u.id.slice(0, 8)}</a>
+                <span className="text-slate-700">→ {u.ticket_tier}</span>
+                <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_STYLES[u.status] ?? 'bg-slate-100'}`}>
+                  {STATUS_LABELS[u.status] ?? u.status}
+                </span>
+                <span className="font-mono text-slate-600">{formatAmount(u.amount_total, u.currency)}</span>
+                <span className="ml-auto text-slate-400 text-xs">{formatDate(u.created_at)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Timeline */}
       <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -351,6 +450,103 @@ export default function OrderDetailPage() {
                 {refundSubmitting ? '處理中…' : '確認退款'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade modal */}
+      {upgradeOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto">
+            <h3 className="font-semibold text-slate-900">升級票種</h3>
+            <p className="text-xs text-slate-500">
+              建立一筆新的升級訂單，原訂單保留不動。招待 = $0 自動標記付清；Stripe 發票 = 取得付款連結傳給客戶，付款後自動標記已付。
+            </p>
+
+            {upHostedUrl ? (
+              <div className="space-y-2">
+                <div className="text-sm bg-green-50 text-green-800 p-3 rounded">
+                  發票已建立，將此連結傳給對方付款：
+                </div>
+                <input readOnly value={upHostedUrl}
+                  className="w-full px-3 py-2 border border-slate-300 rounded text-xs font-mono bg-slate-50"
+                  onFocus={(e) => e.target.select()} />
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(upHostedUrl); showToast('已複製'); }}
+                    className="px-3 py-1 text-sm text-white bg-[#10B8D9] rounded">
+                    複製連結
+                  </button>
+                  <button onClick={() => setUpgradeOpen(false)} className="px-3 py-1 text-sm text-slate-600 border border-slate-300 rounded">
+                    關閉
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <label className="block text-sm">
+                  目標票種
+                  <select value={upTier} onChange={(e) => setUpTier(e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm">
+                    {TIER_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                </label>
+
+                {upTier === 'weekly_backer' && (
+                  <label className="block text-sm">
+                    週次
+                    <select value={upWeek} onChange={(e) => setUpWeek(e.target.value)}
+                      className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm">
+                      {WEEK_OPTIONS.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
+                    </select>
+                  </label>
+                )}
+
+                <fieldset className="space-y-1">
+                  <legend className="text-sm font-medium text-slate-700">升級方式</legend>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="radio" checked={upMode === 'invoice'} onChange={() => setUpMode('invoice')} />
+                    Stripe 發票（請對方付款）
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="radio" checked={upMode === 'comp'} onChange={() => setUpMode('comp')} />
+                    招待（$0 自動付清）
+                  </label>
+                </fieldset>
+
+                {upMode === 'invoice' && (
+                  <label className="block text-sm">
+                    金額（分，差額）
+                    <input type="number" min={1} value={upAmount}
+                      onChange={(e) => setUpAmount(Number(e.target.value))}
+                      className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm" />
+                    <span className="text-xs text-slate-500">例：3000 = 30 元 / 30 USD</span>
+                  </label>
+                )}
+
+                <label className="block text-sm">
+                  發票品項說明（選填）
+                  <input value={upDescription} onChange={(e) => setUpDescription(e.target.value)}
+                    placeholder={`Upgrade: ${order.ticket_tier} → ${upTier}`}
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm" />
+                </label>
+
+                <label className="block text-sm">
+                  內部備註
+                  <textarea value={upNote} onChange={(e) => setUpNote(e.target.value)} rows={2}
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm" />
+                </label>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <button onClick={() => setUpgradeOpen(false)} className="px-3 py-1 text-sm text-slate-600 border border-slate-300 rounded">取消</button>
+                  <button onClick={submitUpgrade}
+                    disabled={upSubmitting || (upMode === 'invoice' && upAmount <= 0)}
+                    className="px-3 py-1 text-sm text-white bg-[#10B8D9] rounded disabled:opacity-50">
+                    {upSubmitting ? '處理中…' : (upMode === 'comp' ? '建立招待升級' : '建立發票')}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
