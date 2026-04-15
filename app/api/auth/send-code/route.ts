@@ -93,7 +93,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to generate code' }, { status: 500 });
     }
 
-    // Send email
+    // Send email. Login codes are transactional: they must reach the user
+    // even if they previously unsubscribed from marketing mail. We do NOT
+    // check email_suppressions here on purpose — the user is actively trying
+    // to sign in to their own account.
     const subject = 'Your Login Code / 您的登入驗證碼 — Taiwan Digital Fest 2026';
     const htmlContent = `
 <!DOCTYPE html>

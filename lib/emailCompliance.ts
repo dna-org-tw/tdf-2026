@@ -1,5 +1,23 @@
 import { supabaseServer } from '@/lib/supabaseServer';
 import { generateUnsubscribeToken } from '@/lib/email';
+import type { EmailType } from '@/lib/emailLog';
+
+/**
+ * Email types that are transactional: sent in direct response to a user action
+ * (login attempt, purchase, unsubscribe click). These MUST reach the recipient
+ * regardless of suppression status — a login code to an unsubscribed user is
+ * still the user's own request to access their account.
+ */
+export const TRANSACTIONAL_EMAIL_TYPES: readonly EmailType[] = [
+  'magic_link',
+  'order_success',
+  'order_cancelled',
+  'unsubscribe_confirmation',
+] as const;
+
+export function isTransactionalEmailType(type: EmailType): boolean {
+  return TRANSACTIONAL_EMAIL_TYPES.includes(type);
+}
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -123,8 +141,15 @@ function extractDomain(url: string): string {
 /**
  * Check whether an email is on the suppression list (unsubscribed / bounced / complained).
  * Use before any outbound send to avoid wasting quota + damaging sender reputation.
+ *
+ * Pass `emailType` for transactional sends (login codes, order receipts) — these
+ * always return `false` so the user still receives account-critical mail.
  */
-export async function isSuppressed(email: string): Promise<boolean> {
+export async function isSuppressed(
+  email: string,
+  emailType?: EmailType,
+): Promise<boolean> {
+  if (emailType && isTransactionalEmailType(emailType)) return false;
   if (!supabaseServer) return false;
   const normalized = email.trim().toLowerCase();
   if (!normalized) return true;
