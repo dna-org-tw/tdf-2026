@@ -22,8 +22,9 @@ interface MemberRow {
 
 interface Order {
   id: string;
-  stripe_session_id: string;
+  stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
+  stripe_invoice_id: string | null;
   ticket_tier: string;
   status: string;
   amount_total: number;
@@ -369,11 +370,20 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
                       <td className="px-3 py-2 text-xs text-slate-500">{formatDateTime(o.created_at)}</td>
                       <td className="px-3 py-2 text-right">
                         <div className="flex gap-1 justify-end">
-                          <a
-                            href={`https://dashboard.stripe.com/payments/${o.stripe_payment_intent_id || o.stripe_session_id}`}
-                            target="_blank" rel="noreferrer"
-                            className="text-xs text-slate-600 hover:text-[#10B8D9] px-2 py-1 border border-slate-200 rounded"
-                          >Stripe</a>
+                          {(o.stripe_payment_intent_id || o.stripe_session_id) && (
+                            <a
+                              href={`https://dashboard.stripe.com/payments/${o.stripe_payment_intent_id || o.stripe_session_id}`}
+                              target="_blank" rel="noreferrer"
+                              className="text-xs text-slate-600 hover:text-[#10B8D9] px-2 py-1 border border-slate-200 rounded"
+                            >Stripe</a>
+                          )}
+                          {o.stripe_invoice_id && (
+                            <a
+                              href={`https://dashboard.stripe.com/invoices/${o.stripe_invoice_id}`}
+                              target="_blank" rel="noreferrer"
+                              className="text-xs text-slate-600 hover:text-[#10B8D9] px-2 py-1 border border-slate-200 rounded"
+                            >Invoice</a>
+                          )}
                           {o.status === 'paid' && (
                             <button onClick={() => handleResend(o.id)} className="text-xs text-slate-600 hover:text-[#10B8D9] px-2 py-1 border border-slate-200 rounded">
                               重寄確認信

@@ -315,7 +315,14 @@ export default function OrderDetailPage() {
             <div><span className="text-slate-500">PaymentIntent：</span><span className="font-mono text-slate-700">{order.stripe_payment_intent_id}</span></div>
           )}
           {order.stripe_invoice_id && (
-            <div><span className="text-slate-500">Invoice：</span><span className="font-mono text-slate-700">{order.stripe_invoice_id}</span></div>
+            <div>
+              <span className="text-slate-500">Invoice：</span>
+              <a
+                href={`https://dashboard.stripe.com/invoices/${order.stripe_invoice_id}`}
+                target="_blank" rel="noreferrer"
+                className="font-mono text-[#10B8D9] hover:underline"
+              >{order.stripe_invoice_id}</a>
+            </div>
           )}
         </div>
       </div>
