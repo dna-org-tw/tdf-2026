@@ -337,7 +337,12 @@ export async function createManualOrder(
     if (!draft.id) throw new OrderActionError('Invoice has no ID');
     const finalized = await s.invoices.finalizeInvoice(draft.id);
     if (!finalized.id) throw new OrderActionError('Finalized invoice has no ID');
-    invoice = await s.invoices.pay(finalized.id, { paid_out_of_band: true });
+    // Zero-amount invoices (and those brought to $0 by a 100%-off coupon) are
+    // auto-paid by Stripe at finalize time, so calling .pay() again would throw
+    // `invoice_not_open` / "Invoice is already paid".
+    invoice = finalized.status === 'paid'
+      ? finalized
+      : await s.invoices.pay(finalized.id, { paid_out_of_band: true });
   } catch (err) {
     const stripeErr = err as Stripe.errors.StripeError;
     throw new OrderActionError(stripeErr.message, stripeErr.code, 400);
