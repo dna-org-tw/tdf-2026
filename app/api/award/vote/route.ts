@@ -3,10 +3,8 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { sendVoteConfirmationEmail } from '@/lib/email';
 import { getTaipeiDayBounds } from '@/lib/taipeiTime';
 import crypto from 'crypto';
+import { verifyRecaptcha } from '@/lib/recaptcha';
 
-const recaptchaApiKey = process.env.RECAPTCHA_API_KEY;
-const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-const recaptchaProjectId = process.env.RECAPTCHA_PROJECT_ID;
 const voteSecret = process.env.VOTE_SECRET;
 
 // 投票截止時間：2026年4月30日 12:00（台灣時間）
@@ -151,70 +149,20 @@ export async function POST(req: NextRequest) {
     }
 
     // 驗證 reCAPTCHA
-    if (!recaptchaApiKey) {
-      return NextResponse.json(
-        { error: 'reCAPTCHA is not configured on the server.' },
-        { status: 500 }
-      );
-    }
-
-    if (!recaptchaToken) {
-      return NextResponse.json(
-        { error: 'reCAPTCHA verification is required' },
-        { status: 400 }
-      );
-    }
-
-    try {
-      const requestBody = {
-        event: {
-          token: recaptchaToken,
-          expectedAction: 'vote',
-          siteKey: recaptchaSiteKey,
-        },
-      };
-
-      const recaptchaResponse = await fetch(
-        `https://recaptchaenterprise.googleapis.com/v1/projects/${recaptchaProjectId}/assessments?key=${recaptchaApiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      if (!recaptchaResponse.ok) {
-        const errorData = await recaptchaResponse.text();
-        console.error('[reCAPTCHA Enterprise] API error:', errorData);
+    const rc = await verifyRecaptcha(recaptchaToken, 'vote');
+    if (!rc.ok) {
+      if (rc.reason === 'not_configured') {
         return NextResponse.json(
-          { error: 'reCAPTCHA verification failed' },
+          { error: 'reCAPTCHA is not configured on the server.' },
+          { status: 500 }
+        );
+      }
+      if (rc.reason === 'missing_token') {
+        return NextResponse.json(
+          { error: 'reCAPTCHA verification is required' },
           { status: 400 }
         );
       }
-
-      const recaptchaData = await recaptchaResponse.json();
-
-      if (!recaptchaData.tokenProperties?.valid || recaptchaData.tokenProperties?.action !== 'vote') {
-        return NextResponse.json(
-          { error: 'reCAPTCHA verification failed' },
-          { status: 400 }
-        );
-      }
-
-      // 檢查風險評分
-      if (recaptchaData.riskAnalysis?.score !== undefined) {
-        const score = recaptchaData.riskAnalysis.score;
-        if (score < 0.5) {
-          return NextResponse.json(
-            { error: 'reCAPTCHA verification failed' },
-            { status: 400 }
-          );
-        }
-      }
-    } catch (error) {
-      console.error('[reCAPTCHA Enterprise] Verification error:', error);
       return NextResponse.json(
         { error: 'reCAPTCHA verification failed' },
         { status: 400 }
