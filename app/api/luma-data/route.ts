@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { buildScheduleFromEntries, type LumaApiEntry, type CalendarEvent } from '@/lib/lumaSchedule';
 import { getSpeakersFromEntries, type SpeakerGrouped } from '@/lib/lumaSpeakers';
 import eventLocations from '@/data/event-locations.json';
+import { enforceRateLimit } from '@/lib/rateLimitResponse';
 
 const LUMA_API_URL =
   'https://api2.luma.com/calendar/get-items?calendar_api_id=cal-S2KwfjOEzcZl8E8&pagination_limit=100&period=future';
@@ -23,7 +24,10 @@ const FETCH_OPTIONS = {
  * Single calendar fetch: returns both schedule events and speakers
  * so the frontend can avoid duplicate requests (EventsSection + TeamSection).
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const rl = enforceRateLimit(req, { key: 'luma-data', limit: 120, windowSeconds: 60 });
+  if (rl) return rl;
+
   try {
     const calRes = await fetch(LUMA_API_URL, FETCH_OPTIONS);
     if (!calRes.ok) {
