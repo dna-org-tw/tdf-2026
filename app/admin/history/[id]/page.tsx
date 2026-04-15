@@ -321,9 +321,9 @@ export default function NotificationDetailPage() {
                   <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0 flex-1 flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${es.dotClass}`} title={es.label} />
-                      <span className="text-sm text-slate-900 font-mono">{log.to_email}</span>
+                      <span className="text-sm text-slate-900 font-mono truncate" title={log.to_email}>{log.to_email}</span>
                       {(log.status === 'pending' || log.status === 'processing') && (
-                        <span className="text-xs text-slate-400">{es.label}</span>
+                        <span className="text-xs text-slate-400 shrink-0">{es.label}</span>
                       )}
                     </div>
                     <span className="text-xs text-slate-400 shrink-0">{formatDate(log.created_at)}</span>

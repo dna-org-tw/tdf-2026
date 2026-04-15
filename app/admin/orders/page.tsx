@@ -375,18 +375,19 @@ export default function OrdersPage() {
                     <td className="px-4 py-3 text-slate-500 font-mono text-xs">
                       {o.id.slice(0, 8)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 max-w-[240px]">
                       {o.customer_email ? (
                         <a
                           href={`/admin/members/${encodeURIComponent(o.customer_email)}`}
                           className="block hover:underline"
+                          title={o.customer_email}
                         >
-                          <div className="text-slate-900 font-medium">{o.customer_name || '-'}</div>
-                          <div className="text-slate-500 text-xs">{o.customer_email}</div>
+                          <div className="text-slate-900 font-medium truncate">{o.customer_name || '-'}</div>
+                          <div className="text-slate-500 text-xs truncate">{o.customer_email}</div>
                         </a>
                       ) : (
                         <>
-                          <div className="text-slate-900 font-medium">{o.customer_name || '-'}</div>
+                          <div className="text-slate-900 font-medium truncate">{o.customer_name || '-'}</div>
                           <div className="text-slate-500 text-xs">-</div>
                         </>
                       )}

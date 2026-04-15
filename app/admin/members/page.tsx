@@ -213,22 +213,22 @@ export default function MembersPage() {
                         {m.name || '-'}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      <Link href={`/admin/members/${slug}`} className="hover:underline">
+                    <td className="px-4 py-3 text-slate-600 max-w-[220px]">
+                      <Link href={`/admin/members/${slug}`} className="block truncate hover:underline" title={m.email}>
                         {m.email}
                       </Link>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE_CLASSES[m.status]}`}>
                         {STATUS_LABELS_ZH[m.status]}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${TIER_BADGE_CLASSES[m.tier]}`}>
                         {TIER_LABELS_ZH[m.tier]}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       {m.highest_ticket_tier ? (
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${TICKET_TIER_BADGE_CLASSES[m.highest_ticket_tier]}`}>
                           {TICKET_TIER_LABELS[m.highest_ticket_tier]}
@@ -238,11 +238,11 @@ export default function MembersPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right text-slate-900">{m.paid_order_count}</td>
-                    <td className="px-4 py-3 text-right text-slate-900 font-mono">
+                    <td className="px-4 py-3 text-right text-slate-900 font-mono whitespace-nowrap">
                       {m.total_spent_cents > 0 ? formatAmount(m.total_spent_cents, m.currency) : '-'}
                     </td>
                     <td className="px-4 py-3 text-right text-slate-900 font-mono">{m.score}</td>
-                    <td className="px-4 py-3 text-right text-slate-500">
+                    <td className="px-4 py-3 text-right text-slate-500 whitespace-nowrap">
                       {formatDate(m.last_interaction_at)}
                     </td>
                   </tr>

@@ -121,11 +121,13 @@ export default function SubscribersPage() {
               ) : (
                 subscribers.map((s) => (
                   <tr key={s.email} className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className="px-4 py-3 text-slate-900">{s.email}</td>
-                    <td className="px-4 py-3 text-slate-600">{SOURCE_LABELS[s.source || ''] || s.source || '-'}</td>
-                    <td className="px-4 py-3 text-slate-600">{s.country || '-'}</td>
-                    <td className="px-4 py-3 text-slate-600">{s.timezone || '-'}</td>
-                    <td className="px-4 py-3 text-right text-slate-500">{formatDate(s.created_at)}</td>
+                    <td className="px-4 py-3 text-slate-900 max-w-[280px]">
+                      <div className="truncate" title={s.email}>{s.email}</div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{SOURCE_LABELS[s.source || ''] || s.source || '-'}</td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{s.country || '-'}</td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{s.timezone || '-'}</td>
+                    <td className="px-4 py-3 text-right text-slate-500 whitespace-nowrap">{formatDate(s.created_at)}</td>
                   </tr>
                 ))
               )}
