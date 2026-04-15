@@ -50,6 +50,7 @@ const STATUS_OPTIONS = [
   { value: 'cancelled', label: '已取消' },
   { value: 'expired', label: '已過期' },
   { value: 'refunded', label: '已退款' },
+  { value: 'partially_refunded', label: '部分退款' },
 ];
 
 const STATUS_STYLES: Record<string, string> = {
@@ -59,6 +60,7 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: 'bg-slate-100 text-slate-600',
   expired: 'bg-orange-100 text-orange-700',
   refunded: 'bg-purple-100 text-purple-700',
+  partially_refunded: 'bg-fuchsia-100 text-fuchsia-700',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -68,6 +70,7 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: '已取消',
   expired: '已過期',
   refunded: '已退款',
+  partially_refunded: '部分退款',
 };
 
 const TIER_LABELS: Record<string, string> = {
@@ -191,7 +194,15 @@ export default function OrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">訂單管理</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-slate-900">訂單管理</h1>
+        <a
+          href="/admin/orders/new"
+          className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4] transition-colors"
+        >
+          手動建單
+        </a>
+      </div>
 
       {/* Daily Sales Chart */}
       <div className="bg-white rounded-xl p-6 shadow-sm mb-4">
@@ -338,13 +349,14 @@ export default function OrdersPage() {
                 <th className="text-left px-4 py-3 font-medium text-slate-600">付款方式</th>
                 <th className="text-right px-4 py-3 font-medium text-slate-600">金額</th>
                 <th className="text-right px-4 py-3 font-medium text-slate-600">建立時間</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-slate-100">
-                    {Array.from({ length: 7 }).map((_, j) => (
+                    {Array.from({ length: 8 }).map((_, j) => (
                       <td key={j} className="px-4 py-3">
                         <div className="h-4 bg-slate-200 rounded animate-pulse w-20" />
                       </td>
@@ -353,7 +365,7 @@ export default function OrdersPage() {
                 ))
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
                     沒有符合條件的訂單
                   </td>
                 </tr>
@@ -387,6 +399,14 @@ export default function OrdersPage() {
                     </td>
                     <td className="px-4 py-3 text-right text-slate-500 text-xs whitespace-nowrap">
                       {formatDate(o.created_at)}
+                    </td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <a
+                        href={`/admin/orders/${o.id}`}
+                        className="text-[#10B8D9] hover:underline text-xs font-medium"
+                      >
+                        查看
+                      </a>
                     </td>
                   </tr>
                 ))
