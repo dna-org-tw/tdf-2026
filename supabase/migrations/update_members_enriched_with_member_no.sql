@@ -1,7 +1,10 @@
 -- Replace members_enriched view to expose member_id, member_no, first_seen_at
 -- from the new members table. All existing columns unchanged.
+-- DROP first because CREATE OR REPLACE VIEW cannot reorder/rename columns.
 
-CREATE OR REPLACE VIEW members_enriched AS
+DROP VIEW IF EXISTS members_enriched;
+
+CREATE VIEW members_enriched AS
 WITH
 all_emails AS (
   SELECT DISTINCT lower(trim(customer_email)) AS email
