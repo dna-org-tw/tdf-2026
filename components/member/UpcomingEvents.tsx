@@ -15,6 +15,7 @@ function diffDays(target: Date, now: Date) {
 interface Props {
   registrations: Registration[];
   lang: 'en' | 'zh';
+  noShowConsumedCount: number;
 }
 
 const STATUS_LABELS: Record<string, { zh: string; en: string; tone: 'pos' | 'warn' | 'neutral' | 'neg' }> = {
@@ -55,7 +56,7 @@ const subscribe = (cb: () => void) => {
 const getServerSnapshot = () => null;
 const getClientSnapshot = () => cachedNow;
 
-export default function UpcomingEvents({ registrations, lang }: Props) {
+export default function UpcomingEvents({ registrations, lang, noShowConsumedCount }: Props) {
   const now = useSyncExternalStore<number | null>(subscribe, getClientSnapshot, getServerSnapshot);
 
   const { upcoming, past } = useMemo(() => {
@@ -187,8 +188,8 @@ export default function UpcomingEvents({ registrations, lang }: Props) {
             <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-red-400" aria-hidden />
             <p className="text-[11px] text-red-600/90 leading-snug">
               {lang === 'zh'
-                ? `${noShowCount} 次未到場，已喪失 ${noShowCount} 次報名資格`
-                : `${noShowCount} no-show${noShowCount > 1 ? 's' : ''} — ${noShowCount} registration${noShowCount > 1 ? 's' : ''} lost`}
+                ? `${noShowCount} 次未到場${noShowConsumedCount > 0 ? `，已消化 ${noShowConsumedCount} 次` : ''}${noShowCount - noShowConsumedCount > 0 ? `（剩餘 ${noShowCount - noShowConsumedCount} 次待消化）` : '（已全部消化）'}`
+                : `${noShowCount} no-show${noShowCount > 1 ? 's' : ''}${noShowConsumedCount > 0 ? ` — ${noShowConsumedCount} consumed` : ''}${noShowCount - noShowConsumedCount > 0 ? ` (${noShowCount - noShowConsumedCount} remaining)` : ' (all consumed)'}`}
             </p>
           </div>
         )}
@@ -240,6 +241,17 @@ function CheckInBadge({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh
   return null;
 }
 
+function getWaitlistLabel(reg: Registration, lang: 'en' | 'zh'): { label: string; tone: 'pos' | 'warn' | 'neutral' | 'neg' } | null {
+  if (reg.activityStatus !== 'waitlist') return null;
+  if (reg.reviewReason === 'waitlist:no_show_penalty') {
+    return {
+      label: lang === 'zh' ? '候補中（消化未到場）' : 'Waitlisted (no-show)',
+      tone: 'warn',
+    };
+  }
+  return { label: lang === 'zh' ? '候補中' : 'Waitlist', tone: 'warn' };
+}
+
 function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; past: boolean }) {
   const start = reg.startAt ? new Date(reg.startAt) : null;
   const status = reg.activityStatus ? STATUS_LABELS[reg.activityStatus] : null;
@@ -281,11 +293,24 @@ function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; p
             {reg.eventName}
           </p>
           {/* Approval status badge — inline with title for upcoming */}
-          {status && !past && (
-            <span className={`shrink-0 text-[10px] px-1.5 py-[1px] rounded-full font-medium leading-none ${TONE_CLASSES[status.tone]}`}>
-              {status[lang]}
-            </span>
-          )}
+          {!past && (() => {
+            const waitlistOverride = getWaitlistLabel(reg, lang);
+            if (waitlistOverride) {
+              return (
+                <span className={`shrink-0 text-[10px] px-1.5 py-[1px] rounded-full font-medium leading-none ${TONE_CLASSES[waitlistOverride.tone]}`}>
+                  {waitlistOverride.label}
+                </span>
+              );
+            }
+            if (status) {
+              return (
+                <span className={`shrink-0 text-[10px] px-1.5 py-[1px] rounded-full font-medium leading-none ${TONE_CLASSES[status.tone]}`}>
+                  {status[lang]}
+                </span>
+              );
+            }
+            return null;
+          })()}
         </div>
         <div className="mt-1 flex items-center gap-2">
           {start && (
