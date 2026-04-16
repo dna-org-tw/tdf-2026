@@ -22,6 +22,30 @@ export async function GET(req: NextRequest) {
     .order('registered_at', { ascending: false, nullsFirst: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const registrations = await shapeRegistrations((data ?? []) as unknown as LumaGuestRow[]);
-  return NextResponse.json({ registrations });
+  // Fetch review reasons for this user's registrations
+  const { data: reviews } = await supabaseServer
+    .from('luma_review_log')
+    .select('event_api_id, reason')
+    .eq('email', email)
+    .order('created_at', { ascending: false });
+
+  // Build map: event_api_id → most recent reason
+  const reviewReasons = new Map<string, string>();
+  for (const r of reviews ?? []) {
+    if (!reviewReasons.has(r.event_api_id)) {
+      reviewReasons.set(r.event_api_id, r.reason);
+    }
+  }
+
+  // Count no-show penalty consumptions
+  const noShowConsumedCount = (reviews ?? []).filter(
+    (r) => r.reason === 'waitlist:no_show_penalty',
+  ).length;
+
+  const registrations = await shapeRegistrations(
+    (data ?? []) as unknown as LumaGuestRow[],
+    reviewReasons,
+  );
+
+  return NextResponse.json({ registrations, noShowConsumedCount });
 }
