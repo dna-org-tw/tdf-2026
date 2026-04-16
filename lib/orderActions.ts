@@ -243,9 +243,32 @@ export async function resendReceipt(orderId: string, adminEmail: string): Promis
     throw new OrderActionError('Can only resend receipt for paid orders');
   }
   if (!order.customer_email) throw new OrderActionError('Order has no customer email');
-  if (!order.stripe_payment_intent_id) throw new OrderActionError('Order has no payment intent');
 
   const s = requireStripe();
+
+  // Invoice-based orders (manual offline / upgrade) have no PI — re-send
+  // the Stripe Invoice email instead. Stripe's sendInvoice triggers the same
+  // hosted-invoice email the customer originally received.
+  if (!order.stripe_payment_intent_id) {
+    if (!order.stripe_invoice_id) {
+      throw new OrderActionError('Order has no payment intent or invoice');
+    }
+    try {
+      const invoice = await s.invoices.sendInvoice(order.stripe_invoice_id);
+      await writeAction(
+        orderId, adminEmail, 'resend_receipt',
+        { receipt_email: order.customer_email, via: 'invoice' },
+        { invoice_id: invoice.id, hosted_invoice_url: invoice.hosted_invoice_url },
+        'success',
+      );
+      return;
+    } catch (err) {
+      const stripeErr = err as Stripe.errors.StripeError;
+      await writeAction(orderId, adminEmail, 'resend_receipt', { via: 'invoice' }, null, 'failed', stripeErr.message);
+      throw new OrderActionError(stripeErr.message, stripeErr.code, 400);
+    }
+  }
+
   try {
     const pi = await s.paymentIntents.retrieve(order.stripe_payment_intent_id, {
       expand: ['latest_charge'],
@@ -255,13 +278,13 @@ export async function resendReceipt(orderId: string, adminEmail: string): Promis
     const charge = await s.charges.update(chargeId, { receipt_email: order.customer_email });
     await writeAction(
       orderId, adminEmail, 'resend_receipt',
-      { receipt_email: order.customer_email },
+      { receipt_email: order.customer_email, via: 'charge' },
       { charge_id: charge.id, receipt_url: charge.receipt_url },
       'success',
     );
   } catch (err) {
     const stripeErr = err as Stripe.errors.StripeError;
-    await writeAction(orderId, adminEmail, 'resend_receipt', {}, null, 'failed', stripeErr.message);
+    await writeAction(orderId, adminEmail, 'resend_receipt', { via: 'charge' }, null, 'failed', stripeErr.message);
     throw new OrderActionError(stripeErr.message, stripeErr.code, 400);
   }
 }
@@ -326,12 +349,10 @@ export async function createManualOrder(
       email: input.customer_email,
       name: input.customer_name,
     });
-    await s.invoiceItems.create({
-      customer: customer.id,
-      ...(hasCustomAmount
-        ? { amount: input.amount_cents!, currency: 'usd' }
-        : { pricing: { price: priceId! } }),
-    });
+    // Create the draft invoice first, then attach the line item with an explicit
+    // `invoice` parameter. Stripe API 2024+ no longer auto-pulls pending
+    // (unattached) invoice items into the next created invoice, so without the
+    // explicit attach the invoice finalizes with $0 (subtotal/total = 0).
     const draft = await s.invoices.create({
       customer: customer.id,
       collection_method: 'send_invoice',
@@ -345,6 +366,13 @@ export async function createManualOrder(
       },
     });
     if (!draft.id) throw new OrderActionError('Invoice has no ID');
+    await s.invoiceItems.create({
+      customer: customer.id,
+      invoice: draft.id,
+      ...(hasCustomAmount
+        ? { amount: input.amount_cents!, currency: 'usd' }
+        : { pricing: { price: priceId! } }),
+    });
     const finalized = await s.invoices.finalizeInvoice(draft.id);
     if (!finalized.id) throw new OrderActionError('Finalized invoice has no ID');
     // Zero-amount invoices (and those brought to $0 by a 100%-off coupon) are
@@ -447,13 +475,9 @@ export async function upgradeOrder(
       name: parent.customer_name ?? undefined,
     });
 
-    await s.invoiceItems.create({
-      customer: customer.id,
-      currency,
-      amount,
-      description,
-    });
-
+    // Draft invoice first, then attach the line item with explicit `invoice`.
+    // See createManualOrder above — pending (unattached) items no longer
+    // auto-flow into a customer's next invoice on API 2024+.
     const draft = await s.invoices.create({
       customer: customer.id,
       collection_method: 'send_invoice',
@@ -470,6 +494,14 @@ export async function upgradeOrder(
       },
     });
     if (!draft.id) throw new OrderActionError('Invoice has no ID');
+
+    await s.invoiceItems.create({
+      customer: customer.id,
+      invoice: draft.id,
+      currency,
+      amount,
+      description,
+    });
 
     const finalized = await s.invoices.finalizeInvoice(draft.id);
     if (!finalized.id) throw new OrderActionError('Finalized invoice has no ID');

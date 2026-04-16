@@ -201,8 +201,18 @@ export async function filterSuppressed(
   return { allowed, suppressed };
 }
 
+// Deliverability signals from the mail provider must outrank user-initiated
+// unsubscribes. If a user later "unsubscribes" an address that was already
+// bouncing or marked as spam, we keep the original reason so we don't lose
+// the deliverability history when audits/exports look at the suppression set.
+const STRONGER_REASONS = new Set(['bounced', 'complained', 'spam']);
+
 /**
  * Upsert an email into the suppression list.
+ *
+ * If a stronger deliverability signal (bounced/complained/spam) is already
+ * recorded for this email, an incoming `unsubscribed`/`manual` signal will
+ * NOT overwrite the reason — only the timestamp/source/metadata refresh.
  */
 export async function addSuppression(
   email: string,
@@ -214,10 +224,22 @@ export async function addSuppression(
   const normalized = email.trim().toLowerCase();
   if (!normalized) return;
 
+  const { data: existing } = await supabaseServer
+    .from('email_suppressions')
+    .select('reason')
+    .eq('email', normalized)
+    .maybeSingle();
+
+  const incomingIsStronger = STRONGER_REASONS.has(reason);
+  const existingIsStronger = existing ? STRONGER_REASONS.has(existing.reason) : false;
+  const effectiveReason = existingIsStronger && !incomingIsStronger
+    ? existing!.reason
+    : reason;
+
   const { error } = await supabaseServer.from('email_suppressions').upsert(
     {
       email: normalized,
-      reason,
+      reason: effectiveReason,
       source: source ?? null,
       metadata: metadata ?? null,
       updated_at: new Date().toISOString(),
