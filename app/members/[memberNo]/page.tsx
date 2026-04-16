@@ -59,18 +59,16 @@ function PublicMemberCard() {
         <Navbar />
         <main className="pt-24 pb-16 px-4 sm:px-6 flex flex-col items-center justify-center min-h-[60vh]">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
-            {lang === 'zh' ? '找不到此名片' : 'Card not found'}
+            {t.memberDetail.notFoundTitle}
           </h1>
           <p className="text-slate-500 mb-6 text-center">
-            {lang === 'zh'
-              ? '此會員名片不存在或尚未公開。'
-              : 'This member card does not exist or is not public.'}
+            {t.memberDetail.notFoundDesc}
           </p>
           <Link
             href="/"
             className="inline-block bg-[#10B8D9] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#0EA5C4] transition-colors"
           >
-            {lang === 'zh' ? '回首頁' : 'Back to Home'}
+            {t.memberDetail.backHome}
           </Link>
         </main>
         <Footer />
@@ -109,7 +107,7 @@ function PublicMemberCard() {
           {data.languages.length > 0 && (
             <div className="bg-white rounded-xl border border-slate-200 p-4">
               <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-2">
-                {lang === 'zh' ? '語言' : 'Languages'}
+                {t.memberDetail.languages}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {data.languages.map((l) => (
@@ -131,13 +129,13 @@ function PublicMemberCard() {
           {/* CTA: get your own card */}
           <div className="text-center pt-4">
             <p className="text-[13px] text-slate-500 mb-3">
-              {lang === 'zh' ? '想要自己的名片？' : 'Want your own card?'}
+              {t.memberDetail.wantCard}
             </p>
             <Link
-              href="/#tickets"
+              href="/me"
               className="inline-block bg-[#10B8D9] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#0EA5C4] transition-colors"
             >
-              {lang === 'zh' ? '加入 TDF 2026' : 'Join TDF 2026'}
+              {t.memberDetail.joinCta}
             </Link>
           </div>
         </div>

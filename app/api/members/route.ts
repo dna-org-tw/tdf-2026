@@ -51,12 +51,12 @@ export async function GET(req: NextRequest) {
     const memberNos = (members ?? []).map((m) => m.member_no);
     const { data: enriched } = await supabaseServer
       .from('members_enriched')
-      .select('member_no, active_ticket_tier, highest_ticket_tier')
+      .select('member_no, highest_ticket_tier')
       .in('member_no', memberNos);
 
     const tierMap = new Map((enriched ?? []).map((e) => [
       e.member_no,
-      e.active_ticket_tier || e.highest_ticket_tier || 'follower',
+      e.highest_ticket_tier || 'follower',
     ]));
 
     const result = profiles.map((p) => {

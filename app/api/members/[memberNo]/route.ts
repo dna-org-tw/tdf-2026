@@ -42,9 +42,31 @@ export async function GET(
     // Get the member's ticket tier from enriched view
     const { data: enriched } = await supabaseServer
       .from('members_enriched')
-      .select('active_ticket_tier, highest_ticket_tier, earliest_valid_from, latest_valid_until')
+      .select('highest_ticket_tier')
       .eq('member_no', member_no)
       .maybeSingle();
+
+    // Get validity from orders by email
+    const { data: memberEmail } = await supabaseServer
+      .from('members')
+      .select('email')
+      .eq('member_no', member_no)
+      .maybeSingle();
+
+    let validFrom: string | null = null;
+    let validUntil: string | null = null;
+    if (memberEmail?.email) {
+      const { data: order } = await supabaseServer
+        .from('orders')
+        .select('valid_from, valid_until')
+        .eq('customer_email', memberEmail.email)
+        .eq('status', 'paid')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      validFrom = order?.valid_from ?? null;
+      validUntil = order?.valid_until ?? null;
+    }
 
     return NextResponse.json({
       member_no: member.member_no,
@@ -57,9 +79,9 @@ export async function GET(
       tags: profile.tags,
       languages: profile.languages,
       social_links: profile.social_links,
-      tier: enriched?.active_ticket_tier || enriched?.highest_ticket_tier || 'follower',
-      valid_from: enriched?.earliest_valid_from ?? null,
-      valid_until: enriched?.latest_valid_until ?? null,
+      tier: enriched?.highest_ticket_tier || 'follower',
+      valid_from: validFrom,
+      valid_until: validUntil,
     });
   } catch (e) {
     console.error('[Public Member Profile]', e);
