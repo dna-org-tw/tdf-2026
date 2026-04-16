@@ -18,7 +18,7 @@ interface NotificationLog {
 
 const GROUP_LABELS: Record<string, string> = {
   orders: '付費會員',
-  subscribers: '電子報訂閱者',
+  subscribers: 'Follower（電子報）',
   test: '測試',
 };
 

@@ -21,9 +21,6 @@ function AdminNav() {
           <Link href="/admin/orders" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             訂單管理
           </Link>
-          <Link href="/admin/subscribers" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
-            訂閱者
-          </Link>
           <Link href="/admin/send" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             發送通知
           </Link>

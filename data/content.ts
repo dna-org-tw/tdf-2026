@@ -74,7 +74,7 @@ export const content = {
       statusCancelled: "Cancelled",
       statusRefunded: "Refunded",
       statusExpired: "Expired",
-      yourTier: "Your Ticket Tier",
+      yourTier: "Your Identity",
       noPaidTier: "No active ticket yet",
       memberPreferences: {
         title: "Email Preferences",
@@ -1006,7 +1006,7 @@ export const content = {
       statusCancelled: "已取消",
       statusRefunded: "已退款",
       statusExpired: "已過期",
-      yourTier: "你的票種",
+      yourTier: "你的身份",
       noPaidTier: "尚無有效票券",
       memberPreferences: {
         title: "電子報訂閱偏好",

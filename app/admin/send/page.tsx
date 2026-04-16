@@ -5,30 +5,32 @@ import { useRouter } from 'next/navigation';
 import {
   type MemberStatus,
   type MemberTier,
-  type TicketTier,
-  MEMBER_STATUSES,
+  type MemberIdentity,
+  type DisplayStatus,
   MEMBER_TIERS,
-  TICKET_TIERS,
-  STATUS_LABELS_ZH,
+  MEMBER_IDENTITIES,
+  DISPLAY_STATUSES,
+  DISPLAY_STATUS_LABELS_ZH,
+  DISPLAY_STATUS_TO_DB,
+  IDENTITY_LABELS_ZH,
   TIER_LABELS_ZH,
-  TICKET_TIER_LABELS,
 } from '@/lib/members';
 
 interface Preset {
   id: string;
   label: string;
-  statuses?: MemberStatus[];
+  displayStatuses?: DisplayStatus[];
   memberTiers?: MemberTier[];
-  ticketTiers?: TicketTier[];
+  identities?: MemberIdentity[];
   testOnly?: boolean;
 }
 
 const PRESETS: Preset[] = [
   { id: 'test', label: '寄送測試信（寄給自己）', testOnly: true },
-  { id: 'all-paid', label: '全體付費', statuses: ['paid'] },
-  { id: 'vip', label: 'VIP (付費 + S/A)', statuses: ['paid'], memberTiers: ['S', 'A'] },
-  { id: 'chase', label: '催單 (待付/放棄)', statuses: ['pending', 'abandoned'] },
-  { id: 'wake', label: '冷名單喚醒 (訂閱者 B/C)', statuses: ['subscriber'], memberTiers: ['B', 'C'] },
+  { id: 'all-paid', label: '全體已完成', displayStatuses: ['completed'] },
+  { id: 'vip', label: 'VIP (已完成 + S/A)', displayStatuses: ['completed'], memberTiers: ['S', 'A'] },
+  { id: 'chase', label: '催單 (待完成/已放棄)', displayStatuses: ['pending', 'abandoned'] },
+  { id: 'wake', label: '冷名單喚醒 (未開始 B/C)', displayStatuses: ['not_started'], memberTiers: ['B', 'C'] },
 ];
 
 function buildPreviewHtml(body: string, subject: string): string {
@@ -59,9 +61,9 @@ function buildPreviewHtml(body: string, subject: string): string {
 export default function SendNotificationPage() {
   const router = useRouter();
   const [testOnly, setTestOnly] = useState(false);
-  const [statuses, setStatuses] = useState<MemberStatus[]>([]);
+  const [displayStatuses, setDisplayStatuses] = useState<DisplayStatus[]>([]);
   const [memberTiers, setMemberTiers] = useState<MemberTier[]>([]);
-  const [ticketTiers, setTicketTiers] = useState<TicketTier[]>([]);
+  const [identities, setIdentities] = useState<MemberIdentity[]>([]);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   type Category = 'newsletter' | 'events' | 'award';
@@ -84,13 +86,32 @@ export default function SendNotificationPage() {
 
   const applyPreset = (p: Preset) => {
     setTestOnly(!!p.testOnly);
-    setStatuses(p.statuses || []);
+    setDisplayStatuses(p.displayStatuses || []);
     setMemberTiers(p.memberTiers || []);
-    setTicketTiers(p.ticketTiers || []);
+    setIdentities(p.identities || []);
   };
 
   const toggle = <T extends string>(val: T, cur: T[], setCur: (v: T[]) => void) => {
     setCur(cur.includes(val) ? cur.filter((x) => x !== val) : [...cur, val]);
+  };
+
+  // Map identity selections to ticketTier values for the API
+  const identityToTicketTiers = (ids: MemberIdentity[]): string[] => {
+    const tiers: string[] = [];
+    for (const id of ids) {
+      if (id === 'backer') tiers.push('backer', 'weekly_backer');
+      else if (id === 'contributor') tiers.push('contribute');
+      else if (id === 'explorer') tiers.push('explore');
+      // follower has no ticket tier — handled via status filter
+    }
+    return tiers;
+  };
+
+  // Map display status selections to DB status values for the API
+  const displayStatusToDbStatuses = (dss: DisplayStatus[]): MemberStatus[] => {
+    const result: MemberStatus[] = [];
+    for (const ds of dss) result.push(...DISPLAY_STATUS_TO_DB[ds]);
+    return result;
   };
 
   const fetchCount = useCallback(async () => {
@@ -98,14 +119,16 @@ export default function SendNotificationPage() {
       setRecipientCount(1);
       return;
     }
-    if (!statuses.length && !memberTiers.length && !ticketTiers.length) {
+    if (!displayStatuses.length && !memberTiers.length && !identities.length) {
       setRecipientCount(null);
       return;
     }
     setLoadingCount(true);
     try {
       const params = new URLSearchParams();
-      if (statuses.length) params.set('statuses', statuses.join(','));
+      const dbStatuses = displayStatusToDbStatuses(displayStatuses);
+      const ticketTiers = identityToTicketTiers(identities);
+      if (dbStatuses.length) params.set('statuses', dbStatuses.join(','));
       if (memberTiers.length) params.set('memberTiers', memberTiers.join(','));
       if (ticketTiers.length) params.set('ticketTiers', ticketTiers.join(','));
       params.set('category', category);
@@ -119,7 +142,7 @@ export default function SendNotificationPage() {
     } finally {
       setLoadingCount(false);
     }
-  }, [testOnly, statuses, memberTiers, ticketTiers, category]);
+  }, [testOnly, displayStatuses, memberTiers, identities, category]);
 
   useEffect(() => {
     const t = setTimeout(fetchCount, 200);
@@ -129,7 +152,7 @@ export default function SendNotificationPage() {
   const canSubmit =
     subject.trim().length > 0 &&
     body.trim().length > 0 &&
-    (testOnly || statuses.length > 0 || memberTiers.length > 0 || ticketTiers.length > 0);
+    (testOnly || displayStatuses.length > 0 || memberTiers.length > 0 || identities.length > 0);
 
   const submit = async () => {
     setError('');
@@ -140,7 +163,9 @@ export default function SendNotificationPage() {
       if (testOnly) {
         payload.groups = ['test'];
       } else {
-        if (statuses.length) payload.statuses = statuses;
+        const dbStatuses = displayStatusToDbStatuses(displayStatuses);
+        const ticketTiers = identityToTicketTiers(identities);
+        if (dbStatuses.length) payload.statuses = dbStatuses;
         if (memberTiers.length) payload.memberTiers = memberTiers;
         if (ticketTiers.length) payload.ticketTiers = ticketTiers;
       }
@@ -230,23 +255,39 @@ export default function SendNotificationPage() {
         {!testOnly && (
           <>
             <div className="mb-3">
-              <div className="text-xs text-slate-500 mb-1">會員狀態（多選）</div>
+              <div className="text-xs text-slate-500 mb-1">身份（多選）</div>
               <div className="flex flex-wrap gap-2">
-                {MEMBER_STATUSES.map((s) => (
-                  <label key={s} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
+                {MEMBER_IDENTITIES.map((id) => (
+                  <label key={id} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
                     <input
                       type="checkbox"
-                      checked={statuses.includes(s)}
-                      onChange={() => toggle(s, statuses, setStatuses)}
+                      checked={identities.includes(id)}
+                      onChange={() => toggle(id, identities, setIdentities)}
                     />
-                    {STATUS_LABELS_ZH[s]}
+                    {IDENTITY_LABELS_ZH[id]}
                   </label>
                 ))}
               </div>
             </div>
 
             <div className="mb-3">
-              <div className="text-xs text-slate-500 mb-1">會員等級（多選）</div>
+              <div className="text-xs text-slate-500 mb-1">狀態（多選）</div>
+              <div className="flex flex-wrap gap-2">
+                {DISPLAY_STATUSES.map((ds) => (
+                  <label key={ds} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
+                    <input
+                      type="checkbox"
+                      checked={displayStatuses.includes(ds)}
+                      onChange={() => toggle(ds, displayStatuses, setDisplayStatuses)}
+                    />
+                    {DISPLAY_STATUS_LABELS_ZH[ds]}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs text-slate-500 mb-1">等級（多選）</div>
               <div className="flex flex-wrap gap-2">
                 {MEMBER_TIERS.map((t) => (
                   <label key={t} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
@@ -256,22 +297,6 @@ export default function SendNotificationPage() {
                       onChange={() => toggle(t, memberTiers, setMemberTiers)}
                     />
                     {TIER_LABELS_ZH[t]}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-xs text-slate-500 mb-1">票種篩選（僅對「已付費」生效）</div>
-              <div className="flex flex-wrap gap-2">
-                {TICKET_TIERS.map((t) => (
-                  <label key={t} className="flex items-center gap-1 px-2 py-1 border border-slate-300 rounded-lg text-sm">
-                    <input
-                      type="checkbox"
-                      checked={ticketTiers.includes(t)}
-                      onChange={() => toggle(t, ticketTiers, setTicketTiers)}
-                    />
-                    {TICKET_TIER_LABELS[t]}
                   </label>
                 ))}
               </div>

@@ -4,12 +4,14 @@ import { useEffect, useState, useCallback, use } from 'react';
 import Link from 'next/link';
 import {
   type EnrichedMember,
-  STATUS_LABELS_ZH,
-  STATUS_BADGE_CLASSES,
-  TIER_LABELS_ZH,
-  TIER_BADGE_CLASSES,
   TICKET_TIER_LABELS,
   TICKET_TIER_BADGE_CLASSES,
+  IDENTITY_LABELS_ZH,
+  IDENTITY_BADGE_CLASSES,
+  DISPLAY_STATUS_LABELS_ZH,
+  DISPLAY_STATUS_BADGE_CLASSES,
+  ticketTierToIdentity,
+  memberStatusToDisplay,
 } from '@/lib/members';
 import LumaRegistrationsList from '@/components/admin/LumaRegistrationsList';
 import type { Registration } from '@/lib/lumaSyncTypes';
@@ -305,11 +307,11 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
               <h1 className="text-2xl font-bold text-slate-900 font-mono">{member.member_no}</h1>
               {enriched && (
                 <>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE_CLASSES[enriched.status]}`}>
-                    {STATUS_LABELS_ZH[enriched.status]}
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${IDENTITY_BADGE_CLASSES[ticketTierToIdentity(enriched.highest_ticket_tier)]}`}>
+                    {IDENTITY_LABELS_ZH[ticketTierToIdentity(enriched.highest_ticket_tier)]}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${TIER_BADGE_CLASSES[enriched.tier]}`}>
-                    {TIER_LABELS_ZH[enriched.tier]}
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${DISPLAY_STATUS_BADGE_CLASSES[memberStatusToDisplay(enriched.status)]}`}>
+                    {DISPLAY_STATUS_LABELS_ZH[memberStatusToDisplay(enriched.status)]}
                   </span>
                   <span className="text-sm text-slate-500">score: <span className="font-mono text-slate-900">{enriched.score}</span></span>
                 </>
@@ -355,7 +357,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="text-left px-3 py-2 font-medium text-slate-600">ID</th>
-                  <th className="text-left px-3 py-2 font-medium text-slate-600">Tier</th>
+                  <th className="text-left px-3 py-2 font-medium text-slate-600">票種</th>
                   <th className="text-left px-3 py-2 font-medium text-slate-600">狀態</th>
                   <th className="text-right px-3 py-2 font-medium text-slate-600">金額</th>
                   <th className="text-left px-3 py-2 font-medium text-slate-600">付款方式</th>

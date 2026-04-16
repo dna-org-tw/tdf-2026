@@ -102,3 +102,67 @@ export const TICKET_TIER_BADGE_CLASSES: Record<TicketTier, string> = {
   weekly_backer: 'bg-amber-100 text-amber-700',
   backer: 'bg-purple-100 text-purple-700',
 };
+
+// --- Identity (derived from highest_ticket_tier) ---
+
+export type MemberIdentity = 'backer' | 'contributor' | 'explorer' | 'follower';
+
+export const MEMBER_IDENTITIES: MemberIdentity[] = ['backer', 'contributor', 'explorer', 'follower'];
+
+export const IDENTITY_LABELS_ZH: Record<MemberIdentity, string> = {
+  backer: 'Backer',
+  contributor: 'Contributor',
+  explorer: 'Explorer',
+  follower: 'Follower',
+};
+
+export const IDENTITY_BADGE_CLASSES: Record<MemberIdentity, string> = {
+  backer: 'bg-purple-100 text-purple-700',
+  contributor: 'bg-teal-100 text-teal-700',
+  explorer: 'bg-blue-100 text-blue-700',
+  follower: 'bg-slate-100 text-slate-600',
+};
+
+/** Map a highest_ticket_tier value to the display identity. */
+export function ticketTierToIdentity(tier: TicketTier | null): MemberIdentity {
+  if (!tier) return 'follower';
+  if (tier === 'backer' || tier === 'weekly_backer') return 'backer';
+  if (tier === 'contribute') return 'contributor';
+  return 'explorer';
+}
+
+// --- Display status (grouped from MemberStatus) ---
+
+export type DisplayStatus = 'completed' | 'pending' | 'abandoned' | 'not_started';
+
+export const DISPLAY_STATUSES: DisplayStatus[] = ['completed', 'pending', 'abandoned', 'not_started'];
+
+export const DISPLAY_STATUS_LABELS_ZH: Record<DisplayStatus, string> = {
+  completed: '已完成',
+  pending: '待完成',
+  abandoned: '已放棄',
+  not_started: '未開始',
+};
+
+export const DISPLAY_STATUS_BADGE_CLASSES: Record<DisplayStatus, string> = {
+  completed: 'bg-green-100 text-green-700',
+  pending: 'bg-yellow-100 text-yellow-800',
+  abandoned: 'bg-orange-100 text-orange-700',
+  not_started: 'bg-slate-100 text-slate-600',
+};
+
+/** Map a DB MemberStatus to the display status. */
+export function memberStatusToDisplay(status: MemberStatus): DisplayStatus {
+  if (status === 'paid') return 'completed';
+  if (status === 'pending') return 'pending';
+  if (status === 'abandoned') return 'abandoned';
+  return 'not_started';
+}
+
+/** Map a display status back to DB MemberStatus values for API queries. */
+export const DISPLAY_STATUS_TO_DB: Record<DisplayStatus, MemberStatus[]> = {
+  completed: ['paid'],
+  pending: ['pending'],
+  abandoned: ['abandoned'],
+  not_started: ['subscriber', 'other'],
+};

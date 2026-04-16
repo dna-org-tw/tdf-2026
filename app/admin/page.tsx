@@ -286,11 +286,11 @@ export default function AdminDashboard() {
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
-          <h2 className="font-semibold text-slate-900 mb-4">票種 × 狀態</h2>
+          <h2 className="font-semibold text-slate-900 mb-4">身份 × 訂單狀態</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs text-slate-500">
-                <th className="pb-2 font-normal">票種</th>
+                <th className="pb-2 font-normal">身份</th>
                 {MATRIX_STATUSES.map((s) => (
                   <th key={s} className="pb-2 pl-2 font-normal text-right">
                     {STATUS_LABELS[s]}
@@ -374,10 +374,6 @@ export default function AdminDashboard() {
         <Link href="/admin/orders" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
           <h3 className="font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors">訂單管理 →</h3>
           <p className="text-sm text-slate-500 mt-1">查看所有交易訂單明細</p>
-        </Link>
-        <Link href="/admin/subscribers" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
-          <h3 className="font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors">訂閱者管理 →</h3>
-          <p className="text-sm text-slate-500 mt-1">查看電子報訂閱者</p>
         </Link>
         <Link href="/admin/send" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
           <h3 className="font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors">發送通知 →</h3>

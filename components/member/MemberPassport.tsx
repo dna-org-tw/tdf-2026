@@ -225,10 +225,10 @@ export default function MemberPassport({ email, memberNo, firstSeenAt, tier, val
         />
 
         <div className="relative px-5 py-6 sm:px-8 sm:py-8">
-          {/* Top row: title + stars */}
+          {/* Top row: member no + stars */}
           <div className="flex items-center justify-between mb-5">
-            <p className="text-[10px] font-mono tracking-[0.3em] uppercase text-white/50">
-              TDF · 2026 · {labels.title}
+            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/40">
+              {memberNo ?? 'M-———'} · TDF 2026
             </p>
             <ClearanceStars rank={rank} accent={accent} />
           </div>
@@ -259,33 +259,20 @@ export default function MemberPassport({ email, memberNo, firstSeenAt, tier, val
             {tierName}
           </h2>
 
-          <p className="mt-3 text-[13px] text-white/65 italic">{tagline}</p>
-
-          {/* Validity period */}
-          {tier !== 'follower' && validFrom && validUntil && (
-            <div className="mt-3">
+          {/* Validity period — primary secondary info */}
+          {tier !== 'follower' && validFrom && validUntil ? (
+            <div className="mt-4">
               <ValidityBadge validFrom={validFrom} validUntil={validUntil} lang={lang} />
             </div>
+          ) : (
+            <p className="mt-3 text-[13px] text-white/50 italic">{tagline}</p>
           )}
-
-          {/* Meta line */}
-          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-mono">
-            <span className="text-white/45">{labels.no}</span>
-            <span className="font-semibold" style={{ color: accent }}>
-              {memberNo ?? 'M-———'}
-            </span>
-            <span className="text-white/30">·</span>
-            <span className="text-white/45">{labels.since}</span>
-            <span className="font-semibold text-white/85">{formatIssueDate(firstSeenAt, lang)}</span>
-          </div>
-
-          <p className="mt-1.5 text-[11px] text-white/45 truncate">{email}</p>
 
           {/* Perks toggle */}
           <button
             type="button"
             onClick={() => setShowPerks((v) => !v)}
-            className="mt-7 w-full flex items-center justify-between gap-2 py-3 px-4 rounded-lg border text-[12px] font-mono tracking-[0.15em] uppercase transition-colors"
+            className="mt-6 w-full flex items-center justify-between gap-2 py-3 px-4 rounded-lg border text-[12px] font-mono tracking-[0.15em] uppercase transition-colors"
             style={{
               borderColor: `${accent}40`,
               color: accent,

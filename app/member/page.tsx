@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import type { Order } from '@/lib/types/order';
 import { TICKET_TIER_RANK, type TicketTier } from '@/lib/members';
-import { FESTIVAL_START } from '@/lib/ticketPricing';
+import { FESTIVAL_START, getValidityPeriod } from '@/lib/ticketPricing';
 import type { Registration } from '@/lib/lumaSyncTypes';
 import EmailPreferences from '@/components/member/EmailPreferences';
 import MemberPassport, { type IdentityTier } from '@/components/member/MemberPassport';
@@ -226,6 +226,16 @@ function MemberDashboard() {
       .catch(() => {});
   }, [user?.email]);
 
+  // Resolve validity dates: use DB values, or compute from tier as fallback
+  const resolveValidity = (order: Order) => {
+    if (order.valid_from && order.valid_until) {
+      return { validFrom: order.valid_from, validUntil: order.valid_until };
+    }
+    // Fallback: compute from tier (week info not stored in orders, defaults to full month)
+    const fallback = getValidityPeriod(order.ticket_tier);
+    return { validFrom: fallback.valid_from, validUntil: fallback.valid_until };
+  };
+
   // Compute identity tier: during festival, only show tiers with active validity
   const { identityTier, validFrom, validUntil } = useMemo(() => {
     const paidOrders = orders.filter((o) => o.status === 'paid');
@@ -236,36 +246,27 @@ function MemberDashboard() {
 
     if (festivalStarted) {
       // During/after festival: only consider orders with active validity
-      const activeOrders = paidOrders.filter(
-        (o) => o.valid_from && o.valid_until && today >= o.valid_from && today <= o.valid_until,
-      );
+      const activeOrders = paidOrders.filter((o) => {
+        const { validFrom: vf, validUntil: vu } = resolveValidity(o);
+        return today >= vf && today <= vu;
+      });
       if (activeOrders.length === 0) {
-        // All memberships expired — show highest historical tier info
         const best = paidOrders.reduce<Order>((a, b) =>
           TICKET_TIER_RANK[b.ticket_tier] > TICKET_TIER_RANK[a.ticket_tier] ? b : a, paidOrders[0]);
-        return {
-          identityTier: best.ticket_tier as IdentityTier,
-          validFrom: best.valid_from,
-          validUntil: best.valid_until,
-        };
+        const v = resolveValidity(best);
+        return { identityTier: best.ticket_tier as IdentityTier, ...v };
       }
       const best = activeOrders.reduce<Order>((a, b) =>
         TICKET_TIER_RANK[b.ticket_tier] > TICKET_TIER_RANK[a.ticket_tier] ? b : a, activeOrders[0]);
-      return {
-        identityTier: best.ticket_tier as IdentityTier,
-        validFrom: best.valid_from,
-        validUntil: best.valid_until,
-      };
+      const v = resolveValidity(best);
+      return { identityTier: best.ticket_tier as IdentityTier, ...v };
     }
 
     // Before festival: show highest purchased tier with its validity
     const best = paidOrders.reduce<Order>((a, b) =>
       TICKET_TIER_RANK[b.ticket_tier] > TICKET_TIER_RANK[a.ticket_tier] ? b : a, paidOrders[0]);
-    return {
-      identityTier: best.ticket_tier as IdentityTier,
-      validFrom: best.valid_from,
-      validUntil: best.valid_until,
-    };
+    const v = resolveValidity(best);
+    return { identityTier: best.ticket_tier as IdentityTier, ...v };
   }, [orders]);
 
   const formatAmount = (amount: number, currency: string) =>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 interface SlideControllerProps {
   totalSlides: number;
@@ -12,7 +12,17 @@ export default function SlideController({ totalSlides, bare }: SlideControllerPr
   const containerRef = useRef<HTMLElement | null>(null);
   const [current, setCurrent] = useState(1);
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const isBare = bare ?? searchParams.get('bare') === '1';
+  const lang = searchParams.get('lang') || 'zh';
+
+  const toggleLang = useCallback(() => {
+    const newLang = lang === 'zh' ? 'en' : 'zh';
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('lang', newLang);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [lang, searchParams, router, pathname]);
 
   const scrollToSlide = useCallback((index: number) => {
     const container = containerRef.current;
@@ -64,6 +74,13 @@ export default function SlideController({ totalSlides, bare }: SlideControllerPr
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 print:hidden">
+      <button
+        onClick={toggleLang}
+        className="rounded-full bg-black/60 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-transform hover:scale-105"
+        style={{ cursor: 'pointer', border: 'none' }}
+      >
+        {lang === 'zh' ? 'EN' : '中文'}
+      </button>
       <span className="rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm tabular-nums">
         {current} / {totalSlides}
       </span>

@@ -4,18 +4,16 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   type EnrichedMember,
-  type MemberStatus,
-  type MemberTier,
-  type TicketTier,
-  MEMBER_STATUSES,
-  MEMBER_TIERS,
-  TICKET_TIERS,
-  STATUS_LABELS_ZH,
-  STATUS_BADGE_CLASSES,
-  TIER_LABELS_ZH,
-  TIER_BADGE_CLASSES,
-  TICKET_TIER_LABELS,
-  TICKET_TIER_BADGE_CLASSES,
+  type MemberIdentity,
+  type DisplayStatus,
+  MEMBER_IDENTITIES,
+  DISPLAY_STATUSES,
+  IDENTITY_LABELS_ZH,
+  IDENTITY_BADGE_CLASSES,
+  DISPLAY_STATUS_LABELS_ZH,
+  DISPLAY_STATUS_BADGE_CLASSES,
+  ticketTierToIdentity,
+  memberStatusToDisplay,
 } from '@/lib/members';
 
 interface ApiResponse {
@@ -24,8 +22,8 @@ interface ApiResponse {
   totalPages: number;
   page: number;
   summary: {
-    byStatus: Record<MemberStatus, number>;
-    byTier: Record<MemberTier, number>;
+    byIdentity: Record<MemberIdentity, number>;
+    byDisplayStatus: Record<DisplayStatus, number>;
   };
 }
 
@@ -34,9 +32,8 @@ export default function MembersPage() {
   const [summary, setSummary] = useState<ApiResponse['summary'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statuses, setStatuses] = useState<MemberStatus[]>([]);
-  const [tiers, setTiers] = useState<MemberTier[]>([]);
-  const [ticketTier, setTicketTier] = useState<TicketTier | ''>('');
+  const [identities, setIdentities] = useState<MemberIdentity[]>([]);
+  const [displayStatuses, setDisplayStatuses] = useState<DisplayStatus[]>([]);
   const [repeatOnly, setRepeatOnly] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -47,9 +44,8 @@ export default function MembersPage() {
     try {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
-      if (statuses.length) params.set('status', statuses.join(','));
-      if (tiers.length) params.set('tier', tiers.join(','));
-      if (ticketTier) params.set('ticketTier', ticketTier);
+      if (identities.length) params.set('identity', identities.join(','));
+      if (displayStatuses.length) params.set('displayStatus', displayStatuses.join(','));
       if (repeatOnly) params.set('repeat', '1');
       params.set('page', String(page));
       params.set('limit', '20');
@@ -67,20 +63,20 @@ export default function MembersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statuses, tiers, ticketTier, repeatOnly, page]);
+  }, [search, identities, displayStatuses, repeatOnly, page]);
 
   useEffect(() => {
     const timer = setTimeout(fetchMembers, 300);
     return () => clearTimeout(timer);
   }, [fetchMembers]);
 
-  useEffect(() => { setPage(1); }, [search, statuses, tiers, ticketTier, repeatOnly]);
+  useEffect(() => { setPage(1); }, [search, identities, displayStatuses, repeatOnly]);
 
-  const toggleStatus = (s: MemberStatus) => {
-    setStatuses((cur) => cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s]);
+  const toggleIdentity = (id: MemberIdentity) => {
+    setIdentities((cur) => cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]);
   };
-  const toggleTier = (t: MemberTier) => {
-    setTiers((cur) => cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]);
+  const toggleDisplayStatus = (ds: DisplayStatus) => {
+    setDisplayStatuses((cur) => cur.includes(ds) ? cur.filter((x) => x !== ds) : [...cur, ds]);
   };
 
   const formatAmount = (cents: number, currency: string) =>
@@ -99,35 +95,35 @@ export default function MembersPage() {
 
       {summary && (
         <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
-          <div className="text-xs text-slate-500 mb-2">狀態分佈（點擊切換篩選）</div>
+          <div className="text-xs text-slate-500 mb-2">身份（點擊切換篩選）</div>
           <div className="flex flex-wrap gap-2 mb-3">
-            {MEMBER_STATUSES.map((s) => (
+            {MEMBER_IDENTITIES.map((id) => (
               <button
-                key={s}
-                onClick={() => toggleStatus(s)}
+                key={id}
+                onClick={() => toggleIdentity(id)}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition ${
-                  statuses.includes(s)
-                    ? `${STATUS_BADGE_CLASSES[s]} border-current`
+                  identities.includes(id)
+                    ? `${IDENTITY_BADGE_CLASSES[id]} border-current`
                     : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                {STATUS_LABELS_ZH[s]} <span className="opacity-70">({summary.byStatus[s]})</span>
+                {IDENTITY_LABELS_ZH[id]} <span className="opacity-70">({summary.byIdentity[id]})</span>
               </button>
             ))}
           </div>
-          <div className="text-xs text-slate-500 mb-2">等級分佈</div>
+          <div className="text-xs text-slate-500 mb-2">狀態</div>
           <div className="flex flex-wrap gap-2">
-            {MEMBER_TIERS.map((t) => (
+            {DISPLAY_STATUSES.map((ds) => (
               <button
-                key={t}
-                onClick={() => toggleTier(t)}
+                key={ds}
+                onClick={() => toggleDisplayStatus(ds)}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition ${
-                  tiers.includes(t)
-                    ? `${TIER_BADGE_CLASSES[t]} border-current`
+                  displayStatuses.includes(ds)
+                    ? `${DISPLAY_STATUS_BADGE_CLASSES[ds]} border-current`
                     : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                {TIER_LABELS_ZH[t]} <span className="opacity-70">({summary.byTier[t]})</span>
+                {DISPLAY_STATUS_LABELS_ZH[ds]} <span className="opacity-70">({summary.byDisplayStatus[ds]})</span>
               </button>
             ))}
           </div>
@@ -142,16 +138,6 @@ export default function MembersPage() {
           placeholder="搜尋 Email 或姓名..."
           className="flex-1 min-w-[200px] px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B8D9] text-slate-900 text-sm"
         />
-        <select
-          value={ticketTier}
-          onChange={(e) => setTicketTier(e.target.value as TicketTier | '')}
-          className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B8D9]"
-        >
-          <option value="">全部票種</option>
-          {TICKET_TIERS.map((t) => (
-            <option key={t} value={t}>{TICKET_TIER_LABELS[t]}</option>
-          ))}
-        </select>
         <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -172,9 +158,8 @@ export default function MembersPage() {
                 <th className="text-left px-4 py-3 font-medium text-slate-600">編號</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">姓名</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Email</th>
+                <th className="text-left px-4 py-3 font-medium text-slate-600">身份</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">狀態</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-600">等級</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-600">最高票種</th>
                 <th className="text-right px-4 py-3 font-medium text-slate-600">訂單</th>
                 <th className="text-right px-4 py-3 font-medium text-slate-600">總消費</th>
                 <th className="text-right px-4 py-3 font-medium text-slate-600">分數</th>
@@ -185,7 +170,7 @@ export default function MembersPage() {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-slate-100">
-                    {Array.from({ length: 10 }).map((_, j) => (
+                    {Array.from({ length: 9 }).map((_, j) => (
                       <td key={j} className="px-4 py-3">
                         <div className="h-4 bg-slate-200 rounded animate-pulse w-20" />
                       </td>
@@ -194,7 +179,7 @@ export default function MembersPage() {
                 ))
               ) : members.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={9} className="px-4 py-12 text-center text-slate-400">
                     沒有符合條件的會員
                   </td>
                 </tr>
@@ -219,23 +204,24 @@ export default function MembersPage() {
                       </Link>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE_CLASSES[m.status]}`}>
-                        {STATUS_LABELS_ZH[m.status]}
-                      </span>
+                      {(() => {
+                        const identity = ticketTierToIdentity(m.highest_ticket_tier);
+                        return (
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${IDENTITY_BADGE_CLASSES[identity]}`}>
+                            {IDENTITY_LABELS_ZH[identity]}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${TIER_BADGE_CLASSES[m.tier]}`}>
-                        {TIER_LABELS_ZH[m.tier]}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {m.highest_ticket_tier ? (
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${TICKET_TIER_BADGE_CLASSES[m.highest_ticket_tier]}`}>
-                          {TICKET_TIER_LABELS[m.highest_ticket_tier]}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">-</span>
-                      )}
+                      {(() => {
+                        const ds = memberStatusToDisplay(m.status);
+                        return (
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${DISPLAY_STATUS_BADGE_CLASSES[ds]}`}>
+                            {DISPLAY_STATUS_LABELS_ZH[ds]}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-right text-slate-900">{m.paid_order_count}</td>
                     <td className="px-4 py-3 text-right text-slate-900 font-mono whitespace-nowrap">
