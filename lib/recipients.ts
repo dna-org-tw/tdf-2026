@@ -94,16 +94,24 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
   // no subscription row pass through (treated as opted-in by default).
   if (q.category && candidateEmails.length > 0) {
     const prefColumn = `pref_${q.category}` as 'pref_newsletter' | 'pref_events' | 'pref_award';
-    const { data: subs, error: subsErr } = await supabaseServer
-      .from('newsletter_subscriptions')
-      .select(`email, ${prefColumn}, unsubscribed_at`)
-      .in('email', candidateEmails);
-    if (subsErr) {
-      console.error('[Recipients] Error fetching subscription preferences:', subsErr);
-      throw new Error('Failed to fetch recipient preferences');
+    // Batch the .in() lookup — a single 990-email IN list overflows the
+    // PostgREST URL/payload limit. 200/batch keeps the URL well under 16KB.
+    const BATCH_SIZE = 200;
+    const subs: Array<Record<string, unknown>> = [];
+    for (let i = 0; i < candidateEmails.length; i += BATCH_SIZE) {
+      const chunk = candidateEmails.slice(i, i + BATCH_SIZE);
+      const { data, error: subsErr } = await supabaseServer
+        .from('newsletter_subscriptions')
+        .select(`email, ${prefColumn}, unsubscribed_at`)
+        .in('email', chunk);
+      if (subsErr) {
+        console.error('[Recipients] Error fetching subscription preferences:', subsErr);
+        throw new Error('Failed to fetch recipient preferences');
+      }
+      if (data) subs.push(...(data as Array<Record<string, unknown>>));
     }
     const blocked = new Set<string>();
-    for (const sRow of (subs || []) as Array<Record<string, unknown>>) {
+    for (const sRow of subs) {
       const e = String(sRow.email ?? '').trim().toLowerCase();
       if (!e) continue;
       const prefValue = sRow[prefColumn];

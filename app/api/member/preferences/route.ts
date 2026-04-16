@@ -97,39 +97,19 @@ export async function PATCH(req: NextRequest) {
     };
   }
 
-  const { data: existing, error: existingErr } = await supabaseServer
+  // newsletter_subscriptions has email as PK (no id column) — upsert by email.
+  const upsertRow = {
+    email,
+    source: 'member_preferences',
+    created_at: new Date().toISOString(),
+    ...prefRow,
+  };
+  const { error: upsertErr } = await supabaseServer
     .from('newsletter_subscriptions')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle();
-  if (existingErr) {
-    console.error('[Member Preferences PATCH] existing lookup:', existingErr);
+    .upsert(upsertRow, { onConflict: 'email' });
+  if (upsertErr) {
+    console.error('[Member Preferences PATCH] upsert:', upsertErr);
     return NextResponse.json({ error: 'Failed to save preferences' }, { status: 500 });
-  }
-
-  if (existing) {
-    const { error: updateErr } = await supabaseServer
-      .from('newsletter_subscriptions')
-      .update(prefRow)
-      .eq('id', existing.id);
-    if (updateErr) {
-      console.error('[Member Preferences PATCH] update:', updateErr);
-      return NextResponse.json({ error: 'Failed to save preferences' }, { status: 500 });
-    }
-  } else {
-    const insertRow = {
-      email,
-      source: 'member_preferences',
-      created_at: new Date().toISOString(),
-      ...prefRow,
-    };
-    const { error: insertErr } = await supabaseServer
-      .from('newsletter_subscriptions')
-      .insert(insertRow);
-    if (insertErr) {
-      console.error('[Member Preferences PATCH] insert:', insertErr);
-      return NextResponse.json({ error: 'Failed to save preferences' }, { status: 500 });
-    }
   }
 
   // If the user is opting back in to anything, drop only the 'unsubscribed'

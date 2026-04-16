@@ -110,9 +110,10 @@ export async function POST(req: NextRequest) {
 
     // Check for existing row so we can reactivate previously-unsubscribed addresses
     // instead of returning 409 and stranding the user in an unsubscribed state.
+    // Note: newsletter_subscriptions has email as PK (no id column) — key by email.
     const { data: existing } = await supabaseServer
       .from('newsletter_subscriptions')
-      .select('id, unsubscribed_at')
+      .select('email, unsubscribed_at')
       .eq('email', email)
       .maybeSingle();
 
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest) {
             pref_events: true,
             pref_award: true,
           })
-          .eq('id', existing.id)
+          .eq('email', email)
           .select()
           .single();
 
