@@ -33,6 +33,12 @@ function AdminNav() {
         </div>
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
           <span className="hidden md:inline text-sm text-slate-400 truncate max-w-[200px]">{user?.email}</span>
+          <Link
+            href="/"
+            className="text-sm text-slate-400 hover:text-[#10B8D9] transition-colors whitespace-nowrap"
+          >
+            回到前台
+          </Link>
           <button
             onClick={signOut}
             className="text-sm text-slate-400 hover:text-red-400 transition-colors whitespace-nowrap"
