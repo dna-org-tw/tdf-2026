@@ -122,37 +122,36 @@ export default function UpcomingEvents({ registrations, lang }: Props) {
 
   return (
     <section className="rounded-2xl bg-white shadow-sm overflow-hidden">
-      <header className="px-5 py-4 border-b border-stone-100">
-        {countdownLine && (
-          <p className="text-[11px] font-mono text-slate-400 mb-1.5">{countdownLine}</p>
-        )}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-mono tracking-[0.3em] uppercase text-slate-400">
-              {lang === 'zh' ? '我的活動' : 'My events'}
+      {/* Header: title row + countdown */}
+      <header className="px-5 pt-4 pb-3 border-b border-stone-100">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-display font-bold text-slate-900 text-base leading-tight">
+              {lang === 'zh' ? '我的活動' : 'My Events'}
             </p>
-            <p className="font-display font-bold text-slate-900 text-lg leading-tight">
+            <p className="mt-0.5 text-[11px] font-mono text-slate-400">
+              {countdownLine}
+              {countdownLine && (upcoming.length > 0 ? ' · ' : '')}
               {upcoming.length > 0
                 ? lang === 'zh'
-                  ? `即將參加 ${upcoming.length} 場`
+                  ? `${upcoming.length} 場即將開始`
                   : `${upcoming.length} upcoming`
-                : lang === 'zh'
-                  ? '已無即將舉辦的活動'
-                  : 'No upcoming events'}
+                : null}
             </p>
           </div>
           <a
             href={LUMA_CALENDAR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 text-[11px] font-mono tracking-[0.1em] text-[#10B8D9] hover:underline"
+            className="shrink-0 mt-0.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium text-[#10B8D9] bg-[#10B8D9]/8 hover:bg-[#10B8D9]/15 transition-colors"
           >
-            {lang === 'zh' ? '報名活動' : 'Register'}
-            <span aria-hidden> →</span>
+            {lang === 'zh' ? '報名' : 'Register'}
+            <span aria-hidden>→</span>
           </a>
         </div>
       </header>
 
+      {/* Event list */}
       <ul className="divide-y divide-stone-100">
         {upcoming.map((r) => (
           <EventRow key={r.eventApiId} reg={r} lang={lang} past={false} />
@@ -162,9 +161,10 @@ export default function UpcomingEvents({ registrations, lang }: Props) {
         ))}
       </ul>
 
+      {/* Past events */}
       {past.length > 0 && upcoming.length > 0 && (
         <details className="border-t border-stone-100 group">
-          <summary className="px-5 py-3 cursor-pointer text-[12px] font-mono tracking-[0.2em] uppercase text-slate-500 hover:text-slate-700 list-none flex items-center justify-between">
+          <summary className="px-5 py-3 cursor-pointer text-[12px] font-mono tracking-[0.2em] uppercase text-slate-400 hover:text-slate-600 list-none flex items-center justify-between transition-colors">
             <span>
               {lang === 'zh' ? `過往活動 (${past.length})` : `Past events (${past.length})`}
             </span>
@@ -180,28 +180,26 @@ export default function UpcomingEvents({ registrations, lang }: Props) {
         </details>
       )}
 
-      {/* No-show warning */}
-      {noShowCount > 0 && (
-        <div className="border-t border-red-100 bg-red-50/60 px-5 py-3 flex items-start gap-2.5">
-          <svg viewBox="0 0 16 16" className="w-4 h-4 mt-0.5 shrink-0 text-red-500" aria-hidden>
-            <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM8 4v5M8 11v1" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          <p className="text-[12px] text-red-700 leading-relaxed">
+      {/* Footer: no-show warning + check-in rule */}
+      <footer className="border-t border-stone-100">
+        {noShowCount > 0 && (
+          <div className="px-5 py-2.5 bg-red-50/50 border-b border-red-100/60 flex items-center gap-2">
+            <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-red-400" aria-hidden />
+            <p className="text-[11px] text-red-600/90 leading-snug">
+              {lang === 'zh'
+                ? `${noShowCount} 次未到場，已喪失 ${noShowCount} 次報名資格`
+                : `${noShowCount} no-show${noShowCount > 1 ? 's' : ''} — ${noShowCount} registration${noShowCount > 1 ? 's' : ''} lost`}
+            </p>
+          </div>
+        )}
+        <div className="px-5 py-2.5">
+          <p className="text-[11px] text-slate-400 leading-snug">
             {lang === 'zh'
-              ? `你有 ${noShowCount} 場活動報名成功但未到場簽到，已喪失 ${noShowCount} 次報名資格。`
-              : `You have ${noShowCount} no-show${noShowCount > 1 ? 's' : ''} — ${noShowCount} registration opportunity lost.`}
+              ? '請務必到場簽到，未簽到將喪失一次報名資格。'
+              : 'Check in at registered events. No-shows lose one future registration.'}
           </p>
         </div>
-      )}
-
-      {/* Check-in rule */}
-      <div className="border-t border-stone-100 px-5 py-3">
-        <p className="text-[11px] text-slate-400 leading-relaxed">
-          {lang === 'zh'
-            ? '報名成功後請務必到場簽到。未到場簽到將喪失一次活動報名資格。'
-            : 'Please check in at events you register for. Each no-show costs one future registration opportunity.'}
-        </p>
-      </div>
+      </footer>
     </section>
   );
 }
@@ -260,15 +258,15 @@ function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; p
         : 'bg-stone-100';
 
   const content = (
-    <div className={`flex items-center gap-3 px-5 py-3.5 ${past && !isCheckedIn ? 'opacity-60' : past ? 'opacity-75' : ''}`}>
+    <div className={`flex gap-3 px-5 py-3 ${past && !isCheckedIn ? 'opacity-55' : past ? 'opacity-70' : ''}`}>
       {/* Date tile */}
-      <div className={`shrink-0 w-12 h-14 rounded-lg flex flex-col items-center justify-center ${tileClasses}`}>
+      <div className={`shrink-0 w-11 h-12 rounded-lg flex flex-col items-center justify-center ${tileClasses}`}>
         {start ? (
           <>
-            <span className="text-[9px] font-mono uppercase text-slate-500 leading-none">
+            <span className="text-[8px] font-mono uppercase text-slate-500/80 leading-none tracking-wide">
               {formatMonth(start, lang)}
             </span>
-            <span className="font-display font-black text-xl text-slate-900 leading-none mt-1">
+            <span className="font-display font-black text-lg text-slate-900 leading-none mt-0.5">
               {start.getDate()}
             </span>
           </>
@@ -277,27 +275,28 @@ function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; p
         )}
       </div>
 
-      <div className="min-w-0 flex-1">
-        <p className="font-semibold text-slate-900 truncate text-[14px] leading-tight">
-          {reg.eventName}
-        </p>
-        <div className="mt-1 flex items-center gap-2 flex-wrap">
-          {start && (
-            <span className="text-[11px] text-slate-500">{formatTime(start, lang)}</span>
-          )}
-          {/* Approval status badge — always show for upcoming, show for past only if not approved */}
+      <div className="min-w-0 flex-1 py-0.5">
+        <div className="flex items-center gap-2">
+          <p className="font-semibold text-slate-900 truncate text-[13px] leading-tight">
+            {reg.eventName}
+          </p>
+          {/* Approval status badge — inline with title for upcoming */}
           {status && !past && (
-            <span className={`text-[10px] px-2 py-[1px] rounded-full font-medium ${TONE_CLASSES[status.tone]}`}>
+            <span className={`shrink-0 text-[10px] px-1.5 py-[1px] rounded-full font-medium leading-none ${TONE_CLASSES[status.tone]}`}>
               {status[lang]}
             </span>
           )}
-          {/* Check-in badge */}
+        </div>
+        <div className="mt-1 flex items-center gap-2">
+          {start && (
+            <span className="text-[11px] text-slate-400">{formatTime(start, lang)}</span>
+          )}
           <CheckInBadge reg={reg} lang={lang} past={past} />
         </div>
       </div>
 
       {href && !past && (
-        <span className="shrink-0 text-slate-300 group-hover:text-[#10B8D9]" aria-hidden>
+        <span className="shrink-0 self-center text-slate-300 group-hover:text-[#10B8D9] transition-colors" aria-hidden>
           →
         </span>
       )}
