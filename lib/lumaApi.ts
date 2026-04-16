@@ -80,6 +80,19 @@ export async function fetchCalendarItems(cookie: string): Promise<LumaCalendarIt
   return items;
 }
 
+export async function probeCookie(cookie: string): Promise<{ entryCount: number }> {
+  const params = new URLSearchParams({
+    calendar_api_id: CALENDAR_API_ID,
+    pagination_limit: '1',
+    period: 'all',
+  });
+  const data = (await lumaFetch(
+    `https://api2.luma.com/calendar/get-items?${params}`,
+    cookie,
+  )) as { entries?: unknown[] };
+  return { entryCount: data.entries?.length ?? 0 };
+}
+
 export async function fetchEventGuests(eventApiId: string, cookie: string): Promise<LumaGuest[]> {
   const guests: LumaGuest[] = [];
   let cursor: string | null = null;

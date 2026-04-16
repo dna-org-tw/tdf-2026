@@ -291,6 +291,7 @@ export default function FollowUsSection() {
               <div className="flex-1 relative" suppressHydrationWarning>
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                 <input
+                  id="follow-us-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

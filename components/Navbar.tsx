@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Globe, Instagram } from 'lucide-react';
+import { Menu, X, Instagram, Heart } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -77,6 +77,18 @@ export default function Navbar() {
       router.push(`/${href}`);
     }
     setIsOpen(false);
+
+    return hash;
+  };
+
+  // Handle follow-us click: scroll + focus input
+  const handleFollowUsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const hash = handleNavClick(e, '#follow-us');
+    if (hash) {
+      setTimeout(() => {
+        document.getElementById('follow-us-email')?.focus();
+      }, 600);
+    }
   };
 
   // Handle hash navigation after page load (when navigating from other pages)
@@ -97,12 +109,10 @@ export default function Navbar() {
   }, [isHomePage, pathname]);
 
   const navLinks = [
-    { name: t.nav.news, href: '#news' },
     { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.highlights, href: '#events' },
     { name: t.nav.accommodation, href: '#accommodation' },
     { name: t.nav.team, href: '#team' },
-    { name: t.nav.followUs, href: '#follow-us' },
     { name: t.nav.guide, href: '/guide' },
   ];
 
@@ -153,7 +163,7 @@ export default function Navbar() {
             }`}
             aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
           >
-            <Globe className="w-5 h-5" />
+            <span className="text-sm font-semibold">{lang === 'en' ? '中文' : 'EN'}</span>
           </button>
 
           <a
@@ -174,6 +184,17 @@ export default function Navbar() {
             aria-label="Instagram"
           >
             <Instagram className="w-5 h-5" />
+          </a>
+
+          <a
+            href="#follow-us"
+            onClick={handleFollowUsClick}
+            className={`hover:text-[#10B8D9] transition-colors ${
+              scrolled ? 'text-[#1E1F1C]' : 'text-white'
+            }`}
+            aria-label={t.nav.followUs || 'Follow Us'}
+          >
+            <Heart className="w-5 h-5" />
           </a>
 
           {!authLoading && (
@@ -198,6 +219,7 @@ export default function Navbar() {
             </Link>
           )}
 
+          {/* Hidden: IG Contest button temporarily disabled
           <Link
             href="/award"
             onClick={() => {
@@ -214,6 +236,7 @@ export default function Navbar() {
           >
             {t.nav.award || 'Award'}
           </Link>
+          */}
         </div>
 
         {/* Mobile Menu Button and Icons */}
@@ -245,7 +268,7 @@ export default function Navbar() {
             }`}
             aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
           >
-            <Globe className="w-5 h-5" />
+            <span className="text-sm font-semibold">{lang === 'en' ? '中文' : 'EN'}</span>
           </button>
           <a
             href="http://instagram.com/taiwandigitalfest"

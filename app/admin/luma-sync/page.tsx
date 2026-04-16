@@ -15,6 +15,13 @@ export default function LumaSyncPage() {
   const [scheduleDraft, setScheduleDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testResult, setTestResult] = useState<
+    | { kind: 'ok'; entryCount: number }
+    | { kind: 'invalid'; status?: number }
+    | { kind: 'error'; message: string }
+    | null
+  >(null);
+  const [testing, setTesting] = useState(false);
 
   const fetchConfig = useCallback(async () => {
     const r = await fetch('/api/admin/luma-sync/config');
@@ -74,6 +81,27 @@ export default function LumaSyncPage() {
       if (!r.ok) setError(data.error ?? 'failed');
       await fetchJobs();
     } finally { setBusy(false); }
+  };
+
+  const testCookie = async () => {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const r = await fetch('/api/admin/luma-sync/test', { method: 'POST' });
+      const data = await r.json();
+      if (data.ok) {
+        setTestResult({ kind: 'ok', entryCount: data.entryCount ?? 0 });
+      } else if (data.error === 'cookie_invalid') {
+        setTestResult({ kind: 'invalid', status: data.status });
+      } else {
+        setTestResult({ kind: 'error', message: data.error ?? `http_${r.status}` });
+      }
+      await fetchConfig();
+    } catch (e) {
+      setTestResult({ kind: 'error', message: (e as Error).message });
+    } finally {
+      setTesting(false);
+    }
   };
 
   const saveCookie = async () => {
@@ -136,41 +164,72 @@ export default function LumaSyncPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-slate-900">Luma 同步</h1>
 
+      {config?.cookieInvalid && (
+        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <div className="font-semibold">Luma session 已失效</div>
+          <div className="mt-1 text-red-700">
+            最近一次呼叫 Luma API 收到 401/403，請重新從瀏覽器取得 <code className="font-mono">luma.auth-session-key</code> 並更新。
+          </div>
+        </div>
+      )}
+
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="mb-3 text-lg font-semibold text-slate-900">設定</h2>
         {config && (
           <div className="space-y-3 text-sm">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="w-28 shrink-0 text-slate-500">Session cookie</span>
+              <span className="w-28 shrink-0 text-slate-500">Session key</span>
               <span className="font-mono text-slate-700">
                 {config.hasCookie ? `…${config.cookieLast4}` : '未設定'}
               </span>
               {config.cookieInvalid && (
                 <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
-                  已失效，請重新設定
+                  已失效
                 </span>
               )}
-              <button
-                onClick={() => { setEditingCookie(true); setCookieDraft(''); }}
-                className="ml-auto rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
-              >
-                編輯
-              </button>
+              <div className="ml-auto flex gap-2">
+                <button
+                  disabled={testing || !config.hasCookie}
+                  onClick={testCookie}
+                  className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50 disabled:opacity-50"
+                >
+                  {testing ? '測試中…' : '測試'}
+                </button>
+                <button
+                  onClick={() => { setEditingCookie(true); setCookieDraft(''); }}
+                  className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
+                >
+                  編輯
+                </button>
+              </div>
             </div>
+            {testResult && (
+              <div
+                className={`rounded-md border px-3 py-2 text-xs ${
+                  testResult.kind === 'ok'
+                    ? 'border-green-200 bg-green-50 text-green-800'
+                    : 'border-red-200 bg-red-50 text-red-800'
+                }`}
+              >
+                {testResult.kind === 'ok' && `測試成功，Luma 回傳 ${testResult.entryCount} 筆活動樣本。`}
+                {testResult.kind === 'invalid' && `Session 已失效（HTTP ${testResult.status ?? '?'}），請重新取得 key。`}
+                {testResult.kind === 'error' && `測試失敗：${testResult.message}`}
+              </div>
+            )}
             {editingCookie && (
               <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3">
                 <p className="text-xs text-slate-600">
-                  從瀏覽器登入 lu.ma calendar admin 帳號後，DevTools → Network → 任一 api2.luma.com 請求 → 複製 Cookie header 整段貼上。
+                  登入 lu.ma calendar admin 後，DevTools → Application → Cookies → <code className="font-mono">lu.ma</code>，複製 <code className="font-mono">luma.auth-session-key</code> 的值貼上（僅需 value，不用整段 Cookie header）。
                 </p>
                 <textarea
                   value={cookieDraft}
                   onChange={(e) => setCookieDraft(e.target.value)}
-                  placeholder="luma.auth-session-key=...; ..."
-                  className="h-24 w-full rounded border border-slate-300 p-2 font-mono text-xs"
+                  placeholder="usr-xxxxxxxxxxxx"
+                  className="h-20 w-full rounded border border-slate-300 p-2 font-mono text-xs"
                 />
                 <div className="flex gap-2">
                   <button
-                    disabled={busy || cookieDraft.trim().length < 10}
+                    disabled={busy || cookieDraft.trim().length < 4}
                     onClick={saveCookie}
                     className="rounded-md bg-[#10B8D9] px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
                   >

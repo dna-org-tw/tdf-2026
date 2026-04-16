@@ -87,7 +87,11 @@ export async function updateConfig(input: {
       patch.luma_session_cookie_tag = null;
       patch.cookie_last4 = null;
     } else {
-      const { enc, iv, tag, last4 } = encryptCookie(trimmed);
+      const match = trimmed.match(/luma\.auth-session-key=([^;\s]+)/);
+      const value = match ? match[1] : trimmed;
+      const normalized = `luma.auth-session-key=${value}`;
+      const { enc, iv, tag } = encryptCookie(normalized);
+      const last4 = value.slice(-4);
       patch.luma_session_cookie_enc = enc.toString('base64');
       patch.luma_session_cookie_iv = iv.toString('base64');
       patch.luma_session_cookie_tag = tag.toString('base64');
