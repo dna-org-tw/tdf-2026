@@ -165,11 +165,11 @@ function MemberDirectory() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={labels.search}
-                className="w-full px-4 py-3 pl-10 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:border-transparent"
+                className="w-full px-4 py-3 pl-11 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:border-transparent"
               />
               <svg
                 viewBox="0 0 24 24"
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"

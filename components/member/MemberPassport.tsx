@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useMemo, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import type { TicketTier } from '@/lib/members';
 
@@ -152,6 +152,435 @@ function MemberAvatar({ name, email, accent, avatarUrl, size = 48 }: { name: str
   );
 }
 
+function InlineField({
+  value,
+  placeholder,
+  onSave,
+  multiline,
+  maxLength,
+  className,
+}: {
+  value: string;
+  placeholder: string;
+  onSave: (v: string) => void;
+  multiline?: boolean;
+  maxLength?: number;
+  className?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
+  const startEdit = () => {
+    setDraft(value);
+    setEditing(true);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const save = () => {
+    const trimmed = draft.trim();
+    if (trimmed !== value) onSave(trimmed);
+    setEditing(false);
+  };
+
+  const cancel = () => {
+    setDraft(value);
+    setEditing(false);
+  };
+
+  if (editing) {
+    const shared = {
+      ref: inputRef as never,
+      value: draft,
+      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDraft(e.target.value),
+      onKeyDown: (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !multiline) { e.preventDefault(); save(); }
+        if (e.key === 'Escape') cancel();
+      },
+      onBlur: save,
+      maxLength,
+      className: 'bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-[13px] w-full outline-none focus:border-white/40 ' + (className ?? ''),
+      placeholder,
+    };
+    return multiline ? <textarea {...shared} rows={2} /> : <input type="text" {...shared} />;
+  }
+
+  if (!value) {
+    return (
+      <button
+        type="button"
+        onClick={startEdit}
+        className="text-left w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2"
+      >
+        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M8 3v10M3 8h10" />
+        </svg>
+        <span className={'text-white/35 text-[12px] ' + (className ?? '')}>{placeholder}</span>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={startEdit}
+      className={'text-left group inline-flex items-center gap-1 ' + (className ?? '')}
+    >
+      <span>{value}</span>
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
+      </svg>
+    </button>
+  );
+}
+
+const COUNTRIES = [
+  { code: 'TW', en: 'Taiwan', zh: '台灣' },
+  { code: 'JP', en: 'Japan', zh: '日本' },
+  { code: 'KR', en: 'South Korea', zh: '韓國' },
+  { code: 'TH', en: 'Thailand', zh: '泰國' },
+  { code: 'VN', en: 'Vietnam', zh: '越南' },
+  { code: 'ID', en: 'Indonesia', zh: '印尼' },
+  { code: 'MY', en: 'Malaysia', zh: '馬來西亞' },
+  { code: 'SG', en: 'Singapore', zh: '新加坡' },
+  { code: 'PH', en: 'Philippines', zh: '菲律賓' },
+  { code: 'HK', en: 'Hong Kong', zh: '香港' },
+  { code: 'CN', en: 'China', zh: '中國' },
+  { code: 'US', en: 'United States', zh: '美國' },
+  { code: 'CA', en: 'Canada', zh: '加拿大' },
+  { code: 'GB', en: 'United Kingdom', zh: '英國' },
+  { code: 'DE', en: 'Germany', zh: '德國' },
+  { code: 'FR', en: 'France', zh: '法國' },
+  { code: 'NL', en: 'Netherlands', zh: '荷蘭' },
+  { code: 'ES', en: 'Spain', zh: '西班牙' },
+  { code: 'PT', en: 'Portugal', zh: '葡萄牙' },
+  { code: 'IT', en: 'Italy', zh: '義大利' },
+  { code: 'SE', en: 'Sweden', zh: '瑞典' },
+  { code: 'AU', en: 'Australia', zh: '澳洲' },
+  { code: 'NZ', en: 'New Zealand', zh: '紐西蘭' },
+  { code: 'MX', en: 'Mexico', zh: '墨西哥' },
+  { code: 'CO', en: 'Colombia', zh: '哥倫比亞' },
+  { code: 'BR', en: 'Brazil', zh: '巴西' },
+  { code: 'AR', en: 'Argentina', zh: '阿根廷' },
+  { code: 'TR', en: 'Turkey', zh: '土耳其' },
+  { code: 'GE', en: 'Georgia', zh: '喬治亞' },
+  { code: 'IN', en: 'India', zh: '印度' },
+  { code: 'AE', en: 'UAE', zh: '阿聯酋' },
+];
+
+function parseLocation(location: string | null): { country: string; city: string } {
+  if (!location) return { country: '', city: '' };
+  const parts = location.split(',').map((s) => s.trim());
+  if (parts.length >= 2) return { city: parts[0], country: parts.slice(1).join(', ') };
+  // Check if it's just a country name
+  const match = COUNTRIES.find((c) => c.en === location || c.zh === location);
+  if (match) return { country: match.en, city: '' };
+  return { city: location, country: '' };
+}
+
+function InlineLocationField({
+  value,
+  placeholder,
+  onSave,
+  lang,
+}: {
+  value: string;
+  placeholder: string;
+  onSave: (v: string) => void;
+  lang: 'en' | 'zh';
+}) {
+  const [editing, setEditing] = useState(false);
+  const parsed = parseLocation(value);
+  const [country, setCountry] = useState(parsed.country);
+  const [city, setCity] = useState(parsed.city);
+
+  const startEdit = () => {
+    const p = parseLocation(value);
+    setCountry(p.country);
+    setCity(p.city);
+    setEditing(true);
+  };
+
+  const save = () => {
+    const parts = [city.trim(), country.trim()].filter(Boolean);
+    onSave(parts.join(', '));
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="space-y-1.5 w-full">
+        <select
+          autoFocus
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="bg-white/10 border border-white/20 rounded px-2 py-1.5 text-white text-[12px] w-full outline-none focus:border-white/40 appearance-none"
+        >
+          <option value="" className="bg-neutral-800">{lang === 'zh' ? '選擇國家' : 'Select country'}</option>
+          {COUNTRIES.map((c) => (
+            <option key={c.code} value={c.en} className="bg-neutral-800">
+              {lang === 'zh' ? `${c.zh} ${c.en}` : c.en}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') { e.preventDefault(); save(); }
+            if (e.key === 'Escape') setEditing(false);
+          }}
+          placeholder={lang === 'zh' ? '城市' : 'City'}
+          className="bg-white/10 border border-white/20 rounded px-2 py-1.5 text-white text-[12px] w-full outline-none focus:border-white/40"
+        />
+        <div className="flex gap-2">
+          <button type="button" onClick={save} className="text-[11px] font-medium text-green-400 hover:text-green-300">
+            {lang === 'zh' ? '儲存' : 'Save'}
+          </button>
+          <button type="button" onClick={() => setEditing(false)} className="text-[11px] text-white/40 hover:text-white/60">
+            {lang === 'zh' ? '取消' : 'Cancel'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!value) {
+    return (
+      <button
+        type="button"
+        onClick={startEdit}
+        className="w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2"
+      >
+        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M8 3v10M3 8h10" />
+        </svg>
+        <span className="text-white/35 text-[12px]">{placeholder}</span>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={startEdit}
+      className="text-left group inline-flex items-center gap-1 text-[12px] text-white/70"
+    >
+      <span>{value}</span>
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
+      </svg>
+    </button>
+  );
+}
+
+function InlineTagsField({
+  tags,
+  accent,
+  onSave,
+  placeholder,
+}: {
+  tags: string[];
+  accent: string;
+  onSave: (tags: string[]) => void;
+  placeholder: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(tags.join(', '));
+
+  const startEdit = () => {
+    setDraft(tags.join(', '));
+    setEditing(true);
+  };
+
+  const save = () => {
+    const newTags = draft.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 10);
+    onSave(newTags);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <input
+        type="text"
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); save(); }
+          if (e.key === 'Escape') { setDraft(tags.join(', ')); setEditing(false); }
+        }}
+        onBlur={save}
+        placeholder={placeholder}
+        className="bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-[11px] w-full outline-none focus:border-white/40"
+      />
+    );
+  }
+
+  if (tags.length === 0) {
+    return (
+      <button
+        type="button"
+        onClick={startEdit}
+        className="w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2"
+      >
+        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M8 3v10M3 8h10" />
+        </svg>
+        <span className="text-white/35 text-[12px]">{placeholder}</span>
+      </button>
+    );
+  }
+
+  return (
+    <button type="button" onClick={startEdit} className="flex flex-wrap gap-1.5 group items-center">
+      {tags.slice(0, 5).map((tag) => (
+        <span
+          key={tag}
+          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+          style={{ backgroundColor: `${accent}20`, color: accent }}
+        >
+          {tag}
+        </span>
+      ))}
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
+      </svg>
+    </button>
+  );
+}
+
+const SOCIAL_PLATFORMS = [
+  { key: 'instagram', label: 'Instagram', prefix: 'https://instagram.com/', icon: '@', placeholder: 'username' },
+  { key: 'twitter', label: 'X / Twitter', prefix: 'https://x.com/', icon: '@', placeholder: 'handle' },
+  { key: 'linkedin', label: 'LinkedIn', prefix: 'https://linkedin.com/in/', icon: 'in', placeholder: 'username' },
+  { key: 'github', label: 'GitHub', prefix: 'https://github.com/', icon: '<>', placeholder: 'username' },
+  { key: 'website', label: 'Website', prefix: '', icon: '🔗', placeholder: 'https://...' },
+] as const;
+
+function extractHandle(url: string, prefix: string): string {
+  if (!url) return '';
+  if (!prefix) return url; // website: keep full URL
+  if (url.startsWith(prefix)) return url.slice(prefix.length).replace(/\/$/, '');
+  // Also handle with/without www, http vs https
+  const cleaned = url.replace(/^https?:\/\/(www\.)?/, '');
+  const prefixClean = prefix.replace(/^https?:\/\/(www\.)?/, '');
+  if (cleaned.startsWith(prefixClean)) return cleaned.slice(prefixClean.length).replace(/\/$/, '');
+  return url;
+}
+
+function buildUrl(handle: string, prefix: string): string {
+  if (!handle) return '';
+  if (!prefix) return handle.startsWith('http') ? handle : `https://${handle}`; // website
+  if (handle.startsWith('http')) return handle; // already full URL
+  return prefix + handle.replace(/^@/, '');
+}
+
+function InlineSocialLinks({
+  links,
+  onSave,
+  lang,
+}: {
+  links: Record<string, string>;
+  onSave: (links: Record<string, string>) => void;
+  lang: 'en' | 'zh';
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Record<string, string>>({});
+
+  const startEdit = () => {
+    // Convert URLs to handles for display
+    const handles: Record<string, string> = {};
+    for (const p of SOCIAL_PLATFORMS) {
+      handles[p.key] = extractHandle(links[p.key] ?? '', p.prefix);
+    }
+    setDraft(handles);
+    setEditing(true);
+  };
+
+  const save = () => {
+    const cleaned: Record<string, string> = {};
+    for (const p of SOCIAL_PLATFORMS) {
+      const handle = (draft[p.key] ?? '').trim();
+      if (handle) cleaned[p.key] = buildUrl(handle, p.prefix);
+    }
+    onSave(cleaned);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="space-y-1.5 mt-2">
+        {SOCIAL_PLATFORMS.map((p) => (
+          <div key={p.key} className="flex items-center gap-2">
+            <span className="text-[10px] font-mono text-white/50 w-6 shrink-0 text-center">{p.icon}</span>
+            <div className="flex-1 flex items-center bg-white/10 border border-white/20 rounded overflow-hidden focus-within:border-white/40">
+              {p.prefix && (
+                <span className="text-[9px] text-white/30 pl-2 shrink-0 select-none">{p.prefix.replace('https://', '')}</span>
+              )}
+              <input
+                type="text"
+                value={draft[p.key] ?? ''}
+                onChange={(e) => setDraft((d) => ({ ...d, [p.key]: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === 'Escape') { setEditing(false); } }}
+                placeholder={p.placeholder}
+                className="bg-transparent px-1.5 py-1 text-white text-[11px] flex-1 outline-none min-w-0"
+              />
+            </div>
+          </div>
+        ))}
+        <div className="flex gap-2 pt-1">
+          <button type="button" onClick={save} className="text-[11px] font-medium text-green-400 hover:text-green-300">
+            {lang === 'zh' ? '儲存' : 'Save'}
+          </button>
+          <button type="button" onClick={() => setEditing(false)} className="text-[11px] text-white/40 hover:text-white/60">
+            {lang === 'zh' ? '取消' : 'Cancel'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const entries = Object.entries(links);
+  if (entries.length === 0) {
+    return (
+      <button
+        type="button"
+        onClick={startEdit}
+        className="w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2 mt-2"
+      >
+        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M8 3v10M3 8h10" />
+        </svg>
+        <span className="text-white/35 text-[12px]">
+          {lang === 'zh' ? '新增社群連結' : 'Add social links'}
+        </span>
+      </button>
+    );
+  }
+
+  return (
+    <button type="button" onClick={startEdit} className="flex flex-wrap gap-3 group items-center mt-2">
+      {entries.map(([platform, url]) => (
+        <a
+          key={platform}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
+        >
+          {platform}
+        </a>
+      ))}
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
+      </svg>
+    </button>
+  );
+}
+
 function formatIssueDate(iso: string | null, lang: 'en' | 'zh'): string {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -226,11 +655,11 @@ function ValidityBadge({ validFrom, validUntil, lang }: { validFrom: string; val
         />
         {statusLabel}
       </span>
-      <span className="text-white/50">
+      <span className="text-white/75">
         {from} → {until}
       </span>
       {isUpcoming && (
-        <span className="text-white/35">
+        <span className="text-white/55">
           ({lang === 'zh' ? '即將開始' : 'starts soon'})
         </span>
       )}
@@ -244,8 +673,19 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
   const surface = TIER_SURFACE[tier];
   const glow = TIER_GLOW[tier];
 
-  const [showPerks, setShowPerks] = useState(false);
-  const [showQr, setShowQr] = useState(false);
+  const saveField = useCallback((field: string, value: unknown) => {
+    if (!profile || !onProfileChange) return;
+    const updated = { ...profile, [field]: value };
+    onProfileChange(updated);
+    // Persist to API
+    const snakeField = field.replace(/[A-Z]/g, (c) => '_' + c.toLowerCase());
+    const payload = { [snakeField]: value };
+    fetch('/api/member/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => onProfileChange(profile)); // rollback on error
+  }, [profile, onProfileChange]);
 
   const publicUrl = useMemo(() => {
     if (!memberNo) return null;
@@ -260,16 +700,10 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
     holder: lang === 'zh' ? '持有人' : 'Holder',
     no: lang === 'zh' ? '編號' : 'No.',
     since: lang === 'zh' ? '加入於' : 'Since',
-    perks: lang === 'zh' ? '展開權益' : 'View privileges',
-    hidePerks: lang === 'zh' ? '收合權益' : 'Hide privileges',
-    privileges: lang === 'zh' ? '權益' : 'Privileges',
-    showQr: lang === 'zh' ? '名片 QR Code' : 'Card QR Code',
-    hideQr: lang === 'zh' ? '隱藏 QR Code' : 'Hide QR Code',
   };
 
   const tierName = TIER_NAMES[tier][lang] || TIER_NAMES[tier].en;
   const tagline = TIER_TAGLINES[tier][lang];
-  const perks = TIER_PERKS[tier][lang];
 
   const isFoil = tier === 'backer';
 
@@ -301,7 +735,7 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
         <div className="relative px-5 py-6 sm:px-8 sm:py-8">
           {/* Top row: member no + stars */}
           <div className="flex items-center justify-between mb-5">
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/40">
+            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/65">
               {memberNo ?? 'M-———'} · TDF 2026
             </p>
             <ClearanceStars rank={rank} accent={accent} />
@@ -333,78 +767,88 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
             {tierName}
           </h2>
 
-          {/* Profile: avatar + name + bio */}
+          {/* Profile: avatar + name + bio + tags + social links (inline editable) */}
           <div className="mt-5 flex items-start gap-4">
             <MemberAvatar name={profile?.displayName ?? null} email={email} accent={accent} avatarUrl={profile?.avatarUrl} size={52} />
-            <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-semibold text-white truncate">
-                {profile?.displayName || email.split('@')[0]}
-              </p>
-              {profile?.location && (
-                <p className="text-[12px] text-white/50 mt-0.5 truncate">{profile.location}</p>
-              )}
-              {profile?.bio && (
-                <p className="text-[13px] text-white/60 mt-1 line-clamp-2">{profile.bio}</p>
-              )}
-              {profile && profile.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {profile.tags.slice(0, 5).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-                      style={{ backgroundColor: `${accent}20`, color: accent }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+            <div className="min-w-0 flex-1 space-y-1">
+              {editable && profile ? (
+                <>
+                  <InlineField
+                    value={profile.displayName ?? ''}
+                    placeholder={lang === 'zh' ? '顯示名稱' : 'Display name'}
+                    onSave={(v) => saveField('displayName', v || null)}
+                    maxLength={50}
+                    className="text-[16px] font-bold text-white"
+                  />
+                  <InlineLocationField
+                    value={profile.location ?? ''}
+                    placeholder={lang === 'zh' ? '所在地' : 'Location'}
+                    onSave={(v) => saveField('location', v || null)}
+                    lang={lang}
+                  />
+                  <InlineField
+                    value={profile.bio ?? ''}
+                    placeholder={lang === 'zh' ? '自我介紹' : 'Bio'}
+                    onSave={(v) => saveField('bio', v || null)}
+                    multiline
+                    maxLength={280}
+                    className="text-[13px] text-white/75"
+                  />
+                  <InlineTagsField
+                    tags={profile.tags}
+                    accent={accent}
+                    onSave={(v) => saveField('tags', v)}
+                    placeholder={lang === 'zh' ? '新增標籤' : 'Add tags'}
+                  />
+                  <InlineSocialLinks
+                    links={profile.socialLinks}
+                    onSave={(v) => saveField('socialLinks', v)}
+                    lang={lang}
+                  />
+                </>
+              ) : (
+                <>
+                  <p className="text-[16px] font-bold text-white truncate">
+                    {profile?.displayName || email.split('@')[0]}
+                  </p>
+                  {profile?.location && (
+                    <p className="text-[12px] text-white/70 truncate">{profile.location}</p>
+                  )}
+                  {profile?.bio && (
+                    <p className="text-[13px] text-white/75 line-clamp-2">{profile.bio}</p>
+                  )}
+                  {profile && profile.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {profile.tags.slice(0, 5).map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          style={{ backgroundColor: `${accent}20`, color: accent }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {profile && Object.keys(profile.socialLinks).length > 0 && (
+                    <div className="flex flex-wrap gap-3 mt-1">
+                      {Object.entries(profile.socialLinks).map(([platform, url]) => (
+                        <a
+                          key={platform}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
+                        >
+                          {platform}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
-            {editable && onEdit && (
-              <button
-                type="button"
-                onClick={onEdit}
-                className="shrink-0 p-2 rounded-lg transition-colors hover:bg-white/10"
-                aria-label="Edit profile"
-              >
-                <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/50">
-                  <path
-                    d="M16.474 5.408l2.118 2.118m-.756-3.982L12.109 9.27a2.118 2.118 0 0 0-.58 1.082L11 13l2.648-.53a2.118 2.118 0 0 0 1.082-.58l5.727-5.727a1.853 1.853 0 1 0-2.621-2.621z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M19 15v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            )}
           </div>
-
-          {/* Social links */}
-          {profile && Object.keys(profile.socialLinks).length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-3">
-              {Object.entries(profile.socialLinks).map(([platform, url]) => (
-                <a
-                  key={platform}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] font-mono text-white/40 hover:text-white/70 transition-colors"
-                >
-                  {platform}
-                </a>
-              ))}
-            </div>
-          )}
 
           {/* Validity period — primary secondary info */}
           {tier !== 'follower' && validFrom && validUntil ? (
@@ -415,104 +859,22 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
             <p className="mt-3 text-[13px] text-white/50 italic">{tagline}</p>
           )}
 
-          {/* Perks toggle */}
-          <button
-            type="button"
-            onClick={() => setShowPerks((v) => !v)}
-            className="mt-6 w-full flex items-center justify-between gap-2 py-3 px-4 rounded-lg border text-[12px] font-mono tracking-[0.15em] uppercase transition-colors"
-            style={{
-              borderColor: `${accent}40`,
-              color: accent,
-              backgroundColor: showPerks ? `${accent}10` : 'transparent',
-            }}
-          >
-            <span>
-              {showPerks ? labels.hidePerks : labels.perks} · {perks.length}
-            </span>
-            <motion.span
-              animate={{ rotate: showPerks ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              aria-hidden
-            >
-              ▾
-            </motion.span>
-          </button>
-
-          <AnimatePresence initial={false}>
-            {showPerks && (
-              <motion.ul
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden mt-3 space-y-2"
-              >
-                {perks.map((perk) => (
-                  <li key={perk} className="flex items-start gap-2.5 text-[13px] text-white/85">
-                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 mt-[3px] shrink-0" aria-hidden>
-                      <path
-                        d="M5 12.5l4 4 10-11"
-                        fill="none"
-                        stroke={accent}
-                        strokeWidth="2.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span>{perk}</span>
-                  </li>
-                ))}
-              </motion.ul>
-            )}
-          </AnimatePresence>
-
           {/* QR Code */}
           {publicUrl && profile?.isPublic && (
-            <>
-              <button
-                type="button"
-                onClick={() => setShowQr((v) => !v)}
-                className="mt-3 w-full flex items-center justify-between gap-2 py-2.5 px-4 rounded-lg border text-[12px] font-mono tracking-[0.15em] uppercase transition-colors"
-                style={{
-                  borderColor: `${accent}25`,
-                  color: `${accent}90`,
-                  backgroundColor: showQr ? `${accent}08` : 'transparent',
-                }}
-              >
-                <span>{showQr ? labels.hideQr : labels.showQr}</span>
-                <motion.span
-                  animate={{ rotate: showQr ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  aria-hidden
-                >
-                  ▾
-                </motion.span>
-              </button>
-              <AnimatePresence initial={false}>
-                {showQr && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden mt-3 flex flex-col items-center gap-3"
-                  >
-                    <div className="bg-white p-3 rounded-xl">
-                      <QRCodeSVG
-                        value={publicUrl}
-                        size={160}
-                        level="M"
-                        bgColor="#FFFFFF"
-                        fgColor={surface}
-                      />
-                    </div>
-                    <p className="text-[11px] text-white/40 font-mono text-center break-all">
-                      {publicUrl}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </>
+            <div className="mt-5 flex flex-col items-center gap-3">
+              <div className="bg-white p-3 rounded-xl">
+                <QRCodeSVG
+                  value={publicUrl}
+                  size={160}
+                  level="M"
+                  bgColor="#FFFFFF"
+                  fgColor={surface}
+                />
+              </div>
+              <p className="text-[11px] text-white/40 font-mono text-center break-all">
+                {publicUrl}
+              </p>
+            </div>
           )}
         </div>
       </div>
