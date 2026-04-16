@@ -45,9 +45,15 @@ export interface LumaGuest {
   event_tickets?: LumaGuestTicket[];
 }
 
-async function lumaFetch(url: string, cookie: string): Promise<unknown> {
+async function lumaFetch(url: string, cookie: string, init?: RequestInit): Promise<unknown> {
   const res = await fetch(url, {
-    headers: { ...BASE_HEADERS, Cookie: cookie },
+    ...init,
+    headers: {
+      ...BASE_HEADERS,
+      Cookie: cookie,
+      ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+      ...init?.headers,
+    },
     cache: 'no-store',
   });
   if (res.status === 401 || res.status === 403) {
@@ -113,4 +119,26 @@ export async function fetchEventGuests(eventApiId: string, cookie: string): Prom
     cursor = data.next_cursor;
   }
   return guests;
+}
+
+export async function updateGuestStatus(
+  cookie: string,
+  eventApiId: string,
+  rsvpApiId: string,
+  approvalStatus: 'approved' | 'declined' | 'waitlist',
+): Promise<void> {
+  await lumaFetch(
+    'https://api2.luma.com/event/admin/update-guest-status',
+    cookie,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        event_api_id: eventApiId,
+        rsvp_api_id: rsvpApiId,
+        approval_status: approvalStatus,
+        should_refund: false,
+        event_ticket_type_api_id: null,
+      }),
+    },
+  );
 }
