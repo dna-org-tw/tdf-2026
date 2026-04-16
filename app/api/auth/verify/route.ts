@@ -7,7 +7,7 @@ import { createHash } from 'crypto';
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export async function GET(req: NextRequest) {
-  const memberUrl = `${baseUrl}/member`;
+  const memberUrl = `${baseUrl}/me`;
 
   try {
     // Rate limit by IP: 10 attempts per 15 minutes

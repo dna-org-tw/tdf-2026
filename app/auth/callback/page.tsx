@@ -55,7 +55,7 @@ function CallbackContent() {
         <p className="text-slate-500 text-sm mb-6">{msg.zh}</p>
         <div className="flex flex-col gap-3">
           <Link
-            href="/member"
+            href="/me"
             className="inline-block bg-[#10B8D9] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#0EA5C4] transition-colors"
           >
             Resend Login Link / 重新寄送登入連結

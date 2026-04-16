@@ -14,7 +14,6 @@ import EmailPreferences from '@/components/member/EmailPreferences';
 import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
 import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
-import ProfileEditor from '@/components/member/ProfileEditor';
 
 const EMPTY_PROFILE: MemberProfile = {
   displayName: null,
@@ -219,7 +218,7 @@ function MemberDashboard() {
   const [noShowConsumedCount, setNoShowConsumedCount] = useState(0);
   const [me, setMe] = useState<{ memberNo: string | null; firstSeenAt: string | null } | null>(null);
   const [profile, setProfile] = useState<MemberProfile>(EMPTY_PROFILE);
-  const [editing, setEditing] = useState(false);
+
 
   useEffect(() => {
     if (!user?.email) return;
@@ -310,11 +309,6 @@ function MemberDashboard() {
     }).catch(() => setProfile((p) => ({ ...p, isPublic: !isPublic })));
   }, []);
 
-  const handleProfileSave = useCallback((updated: MemberProfile) => {
-    setProfile(updated);
-    setEditing(false);
-  }, []);
-
   const formatAmount = (amount: number, currency: string) =>
     `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
 
@@ -327,36 +321,47 @@ function MemberDashboard() {
     <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Public toggle + sign out */}
       <div className="flex items-center justify-between gap-4">
-        <button
-          type="button"
-          onClick={() => handleTogglePublic(!profile.isPublic)}
-          className="flex items-center gap-3 group min-w-0"
-        >
-          <div
-            className="w-10 h-[22px] rounded-full relative transition-colors shrink-0"
-            style={{ backgroundColor: profile.isPublic ? 'rgba(82,212,114,0.3)' : 'rgba(0,0,0,0.1)' }}
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={() => handleTogglePublic(!profile.isPublic)}
+            className="flex items-center gap-2.5 group shrink-0"
           >
             <div
-              className="absolute top-[3px] w-4 h-4 rounded-full transition-all"
+              className="rounded-full relative transition-colors"
               style={{
-                backgroundColor: profile.isPublic ? '#52D472' : '#aaa',
-                left: profile.isPublic ? '18px' : '3px',
+                width: 40,
+                height: 22,
+                minHeight: 22,
+                backgroundColor: profile.isPublic ? 'rgba(82,212,114,0.3)' : 'rgba(0,0,0,0.12)',
               }}
-            />
-          </div>
-          <div className="min-w-0">
-            <span className="text-[13px] text-slate-600 group-hover:text-slate-800 transition-colors">
+            >
+              <div
+                className="absolute rounded-full transition-all"
+                style={{
+                  width: 16,
+                  height: 16,
+                  top: 3,
+                  backgroundColor: profile.isPublic ? '#52D472' : '#aaa',
+                  left: profile.isPublic ? 21 : 3,
+                }}
+              />
+            </div>
+            <span className="text-[13px] leading-5 text-slate-600 group-hover:text-slate-800 transition-colors">
               {profile.isPublic
-                ? (lang === 'zh' ? '名片已公開' : 'Card is public')
-                : (lang === 'zh' ? '名片未公開' : 'Card is private')}
+                ? (lang === 'zh' ? '身份卡已公開' : 'Card is public')
+                : (lang === 'zh' ? '身份卡未公開' : 'Card is private')}
             </span>
-            {profile.isPublic && me?.memberNo && (
-              <span className="block text-[11px] text-[#10B8D9] truncate">
-                /member/{me.memberNo}
-              </span>
-            )}
-          </div>
-        </button>
+          </button>
+          {profile.isPublic && me?.memberNo && (
+            <Link
+              href={`/members/${me.memberNo}`}
+              className="text-[11px] text-[#10B8D9] hover:underline truncate"
+            >
+              /members/{me.memberNo}
+            </Link>
+          )}
+        </div>
         <button
           onClick={signOut}
           className="shrink-0 text-[12px] font-mono tracking-[0.15em] uppercase text-slate-400 hover:text-red-500 transition-colors"
@@ -366,7 +371,7 @@ function MemberDashboard() {
       </div>
 
       {/* Identity card (hero) */}
-      {!loading && user?.email && !editing && (
+      {!loading && user?.email && (
         <MemberPassport
           email={user.email}
           memberNo={me?.memberNo ?? null}
@@ -376,17 +381,7 @@ function MemberDashboard() {
           profile={profile}
           lang={lang}
           editable
-          onEdit={() => setEditing(true)}
-        />
-      )}
-
-      {/* Profile editor */}
-      {editing && user?.email && (
-        <ProfileEditor
-          profile={profile}
-          lang={lang}
-          onSave={handleProfileSave}
-          onCancel={() => setEditing(false)}
+          onProfileChange={setProfile}
         />
       )}
 
@@ -420,7 +415,7 @@ function MemberDashboard() {
             {orders.map((order) => (
               <li key={order.id}>
                 <Link
-                  href={`/member/order/${order.id}`}
+                  href={`/order/${order.id}`}
                   className="block rounded-lg p-3 bg-stone-50 hover:bg-stone-100 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">

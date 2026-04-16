@@ -101,7 +101,7 @@ export default function UpgradePageContent() {
             {(upgrade?.loginRequired as string) || 'Please sign in first.'}
           </h1>
           <Link
-            href={`/member?lang=${lang}`}
+            href={`/me?lang=${lang}`}
             className="inline-block bg-[#10B8D9] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0EA5C4] transition-colors"
           >
             {(upgrade?.loginCta as string) || 'Go to Member Page'}
@@ -137,7 +137,7 @@ export default function UpgradePageContent() {
               : (upgrade?.noEligibleOrder as string) || 'No eligible order found.'}
           </h1>
           <Link
-            href={`/member?lang=${lang}`}
+            href={`/me?lang=${lang}`}
             className="inline-block text-[#10B8D9] hover:underline font-medium"
           >
             &larr; {(upgrade?.loginCta as string) || 'Back to Member Page'}
@@ -208,7 +208,7 @@ export default function UpgradePageContent() {
         </div>
         <div className="mt-10 text-center">
           <Link
-            href={`/member?lang=${lang}`}
+            href={`/me?lang=${lang}`}
             className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
           >
             &larr; {lang === 'zh' ? '返回會員頁面' : 'Back to member page'}

@@ -155,7 +155,7 @@ async function testTokenVerification(
     assert(res.status === 307 || res.status === 308 || res.status === 302, `verify API → redirect (${res.status})`);
 
     const location = res.headers.get('location') || '';
-    assert(location.includes('/member'), 'Redirect 到 /member', `location: ${location}`);
+    assert(location.includes('/me'), 'Redirect 到 /me', `location: ${location}`);
 
     // Extract session cookie
     const setCookieHeader = res.headers.get('set-cookie') || '';
@@ -248,10 +248,10 @@ async function testPages() {
 
   // Member page
   try {
-    const res = await fetch(`${BASE_URL}/member`);
-    assert(res.status === 200, '/member → 頁面可達 (200)');
+    const res = await fetch(`${BASE_URL}/me`);
+    assert(res.status === 200, '/me → 頁面可達 (200)');
   } catch (err) {
-    assert(false, '/member → 頁面可達', `${err}`);
+    assert(false, '/me → 頁面可達', `${err}`);
   }
 }
 

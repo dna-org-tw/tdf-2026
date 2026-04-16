@@ -189,7 +189,7 @@ export default function Navbar() {
 
           {!authLoading && (
             <Link
-              href="/member"
+              href="/me"
               className={`text-sm font-medium transition-colors ${
                 scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
               }`}
@@ -253,7 +253,7 @@ export default function Navbar() {
           )}
           {!authLoading && (
             <Link
-              href="/member"
+              href="/me"
               className={`transition-colors ${
                 scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
               }`}
