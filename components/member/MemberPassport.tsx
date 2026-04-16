@@ -30,6 +30,7 @@ interface PassportProps {
   lang: 'en' | 'zh';
   editable?: boolean;
   onEdit?: () => void;
+  onProfileChange?: (profile: MemberProfile) => void;
 }
 
 export const TIER_ORDER: IdentityTier[] = ['follower', 'explore', 'contribute', 'weekly_backer', 'backer'];
@@ -237,7 +238,7 @@ function ValidityBadge({ validFrom, validUntil, lang }: { validFrom: string; val
   );
 }
 
-export default function MemberPassport({ email, memberNo, tier, validFrom, validUntil, profile, lang, editable, onEdit }: PassportProps) {
+export default function MemberPassport({ email, memberNo, tier, validFrom, validUntil, profile, lang, editable, onEdit, onProfileChange }: PassportProps) {
   const accent = TIER_ACCENT[tier];
   const rank = TIER_RANK[tier];
   const surface = TIER_SURFACE[tier];

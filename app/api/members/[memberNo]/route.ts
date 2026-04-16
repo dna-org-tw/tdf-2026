@@ -3,9 +3,9 @@ import { supabaseServer } from '@/lib/supabaseServer';
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ member_no: string }> },
+  { params }: { params: Promise<{ memberNo: string }> },
 ) {
-  const { member_no } = await params;
+  const { memberNo: member_no } = await params;
   if (!supabaseServer) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
   }
