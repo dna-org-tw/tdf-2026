@@ -1,4 +1,4 @@
-import type { TicketTier } from './members';
+import { TICKET_TIER_RANK, type TicketTier } from './members';
 
 export interface TicketPricing {
   key: TicketTier;
@@ -35,6 +35,31 @@ export const WEEK_DATES: Record<string, { from: string; until: string }> = {
   week3: { from: '2026-05-15', until: '2026-05-21' },
   week4: { from: '2026-05-22', until: '2026-05-28' },
 };
+
+/**
+ * Get the current ticket price in USD (not cents) for a given tier.
+ */
+export function getTicketPrice(tier: TicketTier): number {
+  const pricing = getPricingByKey(tier);
+  if (!pricing) return 0;
+  return isOnSale() ? pricing.salePrice : pricing.originalPrice;
+}
+
+/**
+ * Compute the upgrade price difference in USD cents.
+ * Returns null if upgrade is not allowed (target not higher rank).
+ */
+export function getUpgradePriceCents(
+  fromTier: TicketTier,
+  toTier: TicketTier,
+): number | null {
+  if (TICKET_TIER_RANK[toTier] <= TICKET_TIER_RANK[fromTier]) return null;
+  const fromPrice = getTicketPrice(fromTier);
+  const toPrice = getTicketPrice(toTier);
+  const diff = toPrice - fromPrice;
+  if (diff <= 0) return null;
+  return Math.round(diff * 100);
+}
 
 /**
  * Compute the validity period for a given ticket tier and optional week selection.

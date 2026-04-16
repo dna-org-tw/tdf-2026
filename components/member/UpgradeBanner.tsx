@@ -66,7 +66,7 @@ export default function UpgradeBanner({ currentTier, lang }: Props) {
 
   return (
     <Link
-      href={`/?lang=${lang}#tickets`}
+      href={`/upgrade?lang=${lang}`}
       className="group relative block rounded-2xl overflow-hidden text-white"
       style={{ backgroundColor: '#0F0F0F' }}
     >
