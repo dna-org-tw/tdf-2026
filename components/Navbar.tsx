@@ -109,11 +109,11 @@ export default function Navbar() {
   }, [isHomePage, pathname]);
 
   const navLinks = [
-    { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.highlights, href: '#events' },
+    { name: t.nav.tickets, href: '#tickets' },
     { name: t.nav.accommodation, href: '#accommodation' },
-    { name: t.nav.team, href: '#team' },
     { name: t.nav.guide, href: '/guide' },
+    { name: t.nav.team, href: '#team' },
   ];
 
   return (
@@ -155,16 +155,6 @@ export default function Navbar() {
               </a>
             )
           )}
-
-          <button
-            onClick={toggleLanguage}
-            className={`hover:text-[#10B8D9] transition-colors ${
-              scrolled ? 'text-[#1E1F1C]' : 'text-white'
-            }`}
-            aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
-          >
-            <span className="text-sm font-semibold">{lang === 'en' ? '中文' : 'EN'}</span>
-          </button>
 
           <a
             href="http://instagram.com/taiwandigitalfest"
@@ -218,6 +208,16 @@ export default function Navbar() {
               管理後台
             </Link>
           )}
+
+          <button
+            onClick={toggleLanguage}
+            className={`hover:text-[#10B8D9] transition-colors ${
+              scrolled ? 'text-[#1E1F1C]' : 'text-white'
+            }`}
+            aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
+          >
+            <span className="text-sm font-semibold">{lang === 'en' ? '中文' : 'EN'}</span>
+          </button>
 
           {/* Hidden: IG Contest button temporarily disabled
           <Link
