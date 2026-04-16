@@ -220,11 +220,29 @@ export async function runSyncJob(jobId: number): Promise<void> {
   }
 
   const finalStatus = failed === 0 ? 'succeeded' : processed > 0 ? 'partial' : 'failed';
+
+  if (finalStatus === 'failed' || !cookie) {
+    // No review phase — mark as done immediately
+    await supa
+      .from('luma_sync_jobs')
+      .update({
+        status: finalStatus,
+        phase: 'done',
+        finished_at: new Date().toISOString(),
+        processed_events: processed,
+        failed_events: failed,
+        total_guests_upserted: totalGuestsUpserted,
+      })
+      .eq('id', jobId);
+    return;
+  }
+
+  // Transition to review phase
   await supa
     .from('luma_sync_jobs')
     .update({
       status: finalStatus,
-      finished_at: new Date().toISOString(),
+      phase: 'reviewing',
       processed_events: processed,
       failed_events: failed,
       total_guests_upserted: totalGuestsUpserted,
@@ -232,16 +250,19 @@ export async function runSyncJob(jobId: number): Promise<void> {
     .eq('id', jobId);
 
   // Phase 2: Auto-review pending registrations
-  if (finalStatus !== 'failed' && cookie) {
-    try {
-      await runAutoReview(jobId, cookie);
-    } catch (err) {
-      // Log but don't fail the entire job — sync data is already saved
-      const msg = (err as Error).message ?? 'unknown';
-      await supa
-        .from('luma_sync_jobs')
-        .update({ error_summary: `review_error: ${msg}` })
-        .eq('id', jobId);
-    }
+  try {
+    await runAutoReview(jobId, cookie);
+  } catch (err) {
+    const msg = (err as Error).message ?? 'unknown';
+    await supa
+      .from('luma_sync_jobs')
+      .update({ error_summary: `review_error: ${msg}` })
+      .eq('id', jobId);
   }
+
+  // Mark fully done
+  await supa
+    .from('luma_sync_jobs')
+    .update({ phase: 'done', finished_at: new Date().toISOString() })
+    .eq('id', jobId);
 }

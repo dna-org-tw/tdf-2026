@@ -288,12 +288,25 @@ export default function LumaSyncPage() {
 
       {current && (
         <section className="rounded-lg border border-blue-200 bg-blue-50 p-5">
-          <h2 className="mb-3 text-lg font-semibold text-slate-900">進行中 (job #{current.id})</h2>
+          <h2 className="mb-3 text-lg font-semibold text-slate-900 flex items-center gap-2">
+            進行中 (job #{current.id})
+            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+              current.phase === 'reviewing' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+            }`}>
+              {current.phase === 'syncing' ? '匯入中' : current.phase === 'reviewing' ? '審核中' : '完成'}
+            </span>
+          </h2>
+
+          {/* Sync progress */}
           <div className="mb-3">
             <div className="mb-1 flex flex-wrap justify-between gap-2 text-sm">
-              <span>{current.processed_events} / {current.total_events || '?'} 活動</span>
+              <span className="flex items-center gap-1.5">
+                {current.phase === 'syncing' && <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />}
+                {current.phase !== 'syncing' && <span className="inline-block h-2 w-2 rounded-full bg-green-500" />}
+                匯入活動 {current.processed_events} / {current.total_events || '?'}
+              </span>
               <span className="text-slate-600">
-                失敗 {current.failed_events} · 已寫入 {current.total_guests_upserted} guests · {fmtDuration(current.started_at, null)}
+                失敗 {current.failed_events} · {current.total_guests_upserted} guests · {fmtDuration(current.started_at, null)}
               </span>
             </div>
             <div className="h-2 overflow-hidden rounded bg-slate-200">
@@ -307,6 +320,24 @@ export default function LumaSyncPage() {
               />
             </div>
           </div>
+
+          {/* Review progress */}
+          {(current.phase === 'reviewing' || current.phase === 'done') && (
+            <div className="mb-3 rounded-md border border-purple-200 bg-purple-50 px-3 py-2">
+              <div className="flex items-center gap-1.5 text-sm font-medium text-purple-800">
+                {current.phase === 'reviewing' && <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-purple-500" />}
+                {current.phase === 'done' && <span className="inline-block h-2 w-2 rounded-full bg-green-500" />}
+                自動審核
+              </div>
+              <div className="mt-1 flex flex-wrap gap-3 text-xs text-purple-700">
+                <span>核准 {current.review_approved}</span>
+                <span>拒絕 {current.review_declined}</span>
+                <span>候補 {current.review_waitlisted}</span>
+                {current.review_skipped > 0 && <span>跳過 {current.review_skipped}</span>}
+              </div>
+            </div>
+          )}
+
           <ul className="max-h-96 space-y-1 overflow-y-auto text-xs">
             {results.map((r) => (
               <li key={r.id} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-2 py-1">
@@ -334,6 +365,7 @@ export default function LumaSyncPage() {
                 <th className="pr-3">進度</th>
                 <th className="pr-3">失敗</th>
                 <th className="pr-3">Guests</th>
+                <th className="pr-3">審核</th>
                 <th>觸發者</th>
               </tr>
             </thead>
@@ -354,11 +386,22 @@ export default function LumaSyncPage() {
                     <td className="pr-3">{j.processed_events}/{j.total_events}</td>
                     <td className="pr-3">{j.failed_events}</td>
                     <td className="pr-3">{j.total_guests_upserted}</td>
+                    <td className="pr-3">
+                      {(j.review_approved + j.review_declined + j.review_waitlisted) > 0 ? (
+                        <span className="text-[10px]">
+                          <span className="text-green-700">{j.review_approved}✓</span>
+                          {' '}
+                          <span className="text-red-600">{j.review_declined}✗</span>
+                          {' '}
+                          <span className="text-amber-700">{j.review_waitlisted}⏳</span>
+                        </span>
+                      ) : '—'}
+                    </td>
                     <td className="max-w-[160px] truncate">{j.triggered_by ?? '—'}</td>
                   </tr>
                   {expandedJobId === j.id && (
                     <tr>
-                      <td colSpan={9} className="bg-slate-50 px-3 py-2">
+                      <td colSpan={10} className="bg-slate-50 px-3 py-2">
                         {j.error_summary && (
                           <p className="mb-2 text-red-600">錯誤：{j.error_summary}</p>
                         )}

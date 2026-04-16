@@ -9,10 +9,11 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!supabaseServer) return NextResponse.json({ error: 'db' }, { status: 500 });
 
+  // A job is "current" if it's queued/running, or if sync finished but review is still going
   const { data: current } = await supabaseServer
     .from('luma_sync_jobs')
     .select('*')
-    .in('status', ['queued', 'running'])
+    .or('status.in.(queued,running),phase.neq.done')
     .order('created_at', { ascending: false })
     .limit(1);
   const { data: recent } = await supabaseServer

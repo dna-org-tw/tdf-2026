@@ -1,10 +1,12 @@
 export type SyncJobStatus = 'queued' | 'running' | 'succeeded' | 'partial' | 'failed';
+export type SyncJobPhase = 'syncing' | 'reviewing' | 'done';
 export type SyncEventStatus = 'pending' | 'running' | 'done' | 'failed';
 
 export interface SyncJob {
   id: number;
   trigger: 'manual' | 'cron';
   status: SyncJobStatus;
+  phase: SyncJobPhase;
   started_at: string | null;
   finished_at: string | null;
   total_events: number;
