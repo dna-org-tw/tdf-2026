@@ -1,19 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QRCodeSVG } from 'qrcode.react';
 import type { TicketTier } from '@/lib/members';
 
 export type IdentityTier = 'follower' | TicketTier;
 
+export interface MemberProfile {
+  displayName: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  location: string | null;
+  timezone: string | null;
+  tags: string[];
+  languages: string[];
+  socialLinks: Record<string, string>;
+  isPublic: boolean;
+}
+
 interface PassportProps {
   email: string;
   memberNo: string | null;
-  firstSeenAt: string | null;
+  firstSeenAt?: string | null;
   tier: IdentityTier;
   validFrom?: string | null;
   validUntil?: string | null;
+  profile?: MemberProfile;
   lang: 'en' | 'zh';
+  editable?: boolean;
+  onEdit?: () => void;
 }
 
 export const TIER_ORDER: IdentityTier[] = ['follower', 'explore', 'contribute', 'weekly_backer', 'backer'];
@@ -88,6 +104,52 @@ const TIER_GLOW: Record<IdentityTier, string> = {
   weekly_backer: 'radial-gradient(ellipse at 100% 0%,rgba(255,208,40,0.35),transparent 55%),radial-gradient(ellipse at 0% 100%,rgba(231,67,16,0.32),transparent 55%)',
   backer: 'radial-gradient(ellipse at 50% 0%,rgba(255,208,40,0.4),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(197,64,144,0.35),transparent 55%)',
 };
+
+function getInitials(name: string | null, email: string): string {
+  if (name) {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return name.trim().slice(0, 2).toUpperCase();
+  }
+  if (email) return email.slice(0, 2).toUpperCase();
+  return '??';
+}
+
+function MemberAvatar({ name, email, accent, avatarUrl, size = 48 }: { name: string | null; email: string; accent: string; avatarUrl?: string | null; size?: number }) {
+  const [imgError, setImgError] = useState(false);
+  const initials = getInitials(name, email);
+
+  if (avatarUrl && !imgError) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={name || email || 'Avatar'}
+        width={size}
+        height={size}
+        className="rounded-full object-cover shrink-0"
+        style={{ width: size, height: size }}
+        onError={() => setImgError(true)}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="rounded-full flex items-center justify-center font-bold shrink-0"
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: `${accent}25`,
+        color: accent,
+        fontSize: size * 0.38,
+        letterSpacing: '0.05em',
+      }}
+      aria-label={name || email}
+    >
+      {initials}
+    </div>
+  );
+}
 
 function formatIssueDate(iso: string | null, lang: 'en' | 'zh'): string {
   if (!iso) return '—';
@@ -175,13 +237,22 @@ function ValidityBadge({ validFrom, validUntil, lang }: { validFrom: string; val
   );
 }
 
-export default function MemberPassport({ email, memberNo, firstSeenAt, tier, validFrom, validUntil, lang }: PassportProps) {
+export default function MemberPassport({ email, memberNo, tier, validFrom, validUntil, profile, lang, editable, onEdit }: PassportProps) {
   const accent = TIER_ACCENT[tier];
   const rank = TIER_RANK[tier];
   const surface = TIER_SURFACE[tier];
   const glow = TIER_GLOW[tier];
 
   const [showPerks, setShowPerks] = useState(false);
+  const [showQr, setShowQr] = useState(false);
+
+  const publicUrl = useMemo(() => {
+    if (!memberNo) return null;
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/members/${memberNo}`;
+    }
+    return `/members/${memberNo}`;
+  }, [memberNo]);
 
   const labels = {
     title: lang === 'zh' ? '後台通行證' : 'Backstage Credential',
@@ -191,6 +262,8 @@ export default function MemberPassport({ email, memberNo, firstSeenAt, tier, val
     perks: lang === 'zh' ? '展開權益' : 'View privileges',
     hidePerks: lang === 'zh' ? '收合權益' : 'Hide privileges',
     privileges: lang === 'zh' ? '權益' : 'Privileges',
+    showQr: lang === 'zh' ? '名片 QR Code' : 'Card QR Code',
+    hideQr: lang === 'zh' ? '隱藏 QR Code' : 'Hide QR Code',
   };
 
   const tierName = TIER_NAMES[tier][lang] || TIER_NAMES[tier].en;
@@ -259,6 +332,79 @@ export default function MemberPassport({ email, memberNo, firstSeenAt, tier, val
             {tierName}
           </h2>
 
+          {/* Profile: avatar + name + bio */}
+          <div className="mt-5 flex items-start gap-4">
+            <MemberAvatar name={profile?.displayName ?? null} email={email} accent={accent} avatarUrl={profile?.avatarUrl} size={52} />
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-semibold text-white truncate">
+                {profile?.displayName || email.split('@')[0]}
+              </p>
+              {profile?.location && (
+                <p className="text-[12px] text-white/50 mt-0.5 truncate">{profile.location}</p>
+              )}
+              {profile?.bio && (
+                <p className="text-[13px] text-white/60 mt-1 line-clamp-2">{profile.bio}</p>
+              )}
+              {profile && profile.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {profile.tags.slice(0, 5).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                      style={{ backgroundColor: `${accent}20`, color: accent }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            {editable && onEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="shrink-0 p-2 rounded-lg transition-colors hover:bg-white/10"
+                aria-label="Edit profile"
+              >
+                <svg viewBox="0 0 24 24" className="w-4 h-4 text-white/50">
+                  <path
+                    d="M16.474 5.408l2.118 2.118m-.756-3.982L12.109 9.27a2.118 2.118 0 0 0-.58 1.082L11 13l2.648-.53a2.118 2.118 0 0 0 1.082-.58l5.727-5.727a1.853 1.853 0 1 0-2.621-2.621z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M19 15v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Social links */}
+          {profile && Object.keys(profile.socialLinks).length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-3">
+              {Object.entries(profile.socialLinks).map(([platform, url]) => (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-mono text-white/40 hover:text-white/70 transition-colors"
+                >
+                  {platform}
+                </a>
+              ))}
+            </div>
+          )}
+
           {/* Validity period — primary secondary info */}
           {tier !== 'follower' && validFrom && validUntil ? (
             <div className="mt-4">
@@ -318,6 +464,55 @@ export default function MemberPassport({ email, memberNo, firstSeenAt, tier, val
               </motion.ul>
             )}
           </AnimatePresence>
+
+          {/* QR Code */}
+          {publicUrl && profile?.isPublic && (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowQr((v) => !v)}
+                className="mt-3 w-full flex items-center justify-between gap-2 py-2.5 px-4 rounded-lg border text-[12px] font-mono tracking-[0.15em] uppercase transition-colors"
+                style={{
+                  borderColor: `${accent}25`,
+                  color: `${accent}90`,
+                  backgroundColor: showQr ? `${accent}08` : 'transparent',
+                }}
+              >
+                <span>{showQr ? labels.hideQr : labels.showQr}</span>
+                <motion.span
+                  animate={{ rotate: showQr ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  aria-hidden
+                >
+                  ▾
+                </motion.span>
+              </button>
+              <AnimatePresence initial={false}>
+                {showQr && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mt-3 flex flex-col items-center gap-3"
+                  >
+                    <div className="bg-white p-3 rounded-xl">
+                      <QRCodeSVG
+                        value={publicUrl}
+                        size={160}
+                        level="M"
+                        bgColor="#FFFFFF"
+                        fgColor={surface}
+                      />
+                    </div>
+                    <p className="text-[11px] text-white/40 font-mono text-center break-all">
+                      {publicUrl}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
         </div>
       </div>
     </motion.div>
