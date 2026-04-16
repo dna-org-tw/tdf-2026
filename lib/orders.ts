@@ -175,6 +175,12 @@ export async function updateOrder(
     if (input.internal_notes !== undefined) {
       updateData.internal_notes = input.internal_notes;
     }
+    if (input.valid_from !== undefined) {
+      updateData.valid_from = input.valid_from;
+    }
+    if (input.valid_until !== undefined) {
+      updateData.valid_until = input.valid_until;
+    }
 
     const { data, error } = await supabaseServer
       .from('orders')

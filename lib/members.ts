@@ -44,6 +44,9 @@ export interface EnrichedMember {
   total_spent_cents: number;
   currency: string;
   highest_ticket_tier: TicketTier | null;
+  active_ticket_tier: TicketTier | null;
+  earliest_valid_from: string | null;
+  latest_valid_until: string | null;
   last_order_at: string | null;
   last_interaction_at: string | null;
   email_sent_count: number;

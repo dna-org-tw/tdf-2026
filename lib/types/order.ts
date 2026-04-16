@@ -48,6 +48,8 @@ export interface Order {
   payment_method_type: string | null;
   internal_notes: string | null;
   parent_order_id: string | null;
+  valid_from: string | null;
+  valid_until: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -95,4 +97,6 @@ export interface UpdateOrderInput {
   payment_method_last4?: string | null;
   payment_method_type?: string | null;
   internal_notes?: string | null;
+  valid_from?: string | null;
+  valid_until?: string | null;
 }

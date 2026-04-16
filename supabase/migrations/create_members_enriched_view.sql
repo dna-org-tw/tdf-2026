@@ -41,6 +41,21 @@ order_agg AS (
         WHEN 'explore' THEN 1
         ELSE 0 END DESC, created_at DESC)
       FILTER (WHERE status = 'paid'))[1] AS highest_ticket_tier,
+    -- Active ticket tier: highest tier among paid orders whose validity period covers NOW
+    (ARRAY_AGG(ticket_tier ORDER BY CASE ticket_tier
+        WHEN 'backer' THEN 4
+        WHEN 'weekly_backer' THEN 3
+        WHEN 'contribute' THEN 2
+        WHEN 'explore' THEN 1
+        ELSE 0 END DESC, created_at DESC)
+      FILTER (WHERE status = 'paid'
+              AND valid_from IS NOT NULL
+              AND valid_until IS NOT NULL
+              AND CURRENT_DATE >= valid_from
+              AND CURRENT_DATE <= valid_until))[1] AS active_ticket_tier,
+    -- Earliest valid_from and latest valid_until among paid orders
+    MIN(valid_from) FILTER (WHERE status = 'paid' AND valid_from IS NOT NULL) AS earliest_valid_from,
+    MAX(valid_until) FILTER (WHERE status = 'paid' AND valid_until IS NOT NULL) AS latest_valid_until,
     -- Sum of per-order ticket scores for paid orders only
     COALESCE(SUM(CASE
       WHEN status = 'paid' AND ticket_tier = 'backer' THEN 40
@@ -85,6 +100,9 @@ SELECT
   COALESCE(oa.total_spent_cents, 0) AS total_spent_cents,
   COALESCE(oa.latest_paid_currency, 'usd') AS currency,
   oa.highest_ticket_tier,
+  oa.active_ticket_tier,
+  oa.earliest_valid_from,
+  oa.latest_valid_until,
   oa.last_paid_order_at AS last_order_at,
   GREATEST(
     COALESCE(oa.last_order_at, 'epoch'::timestamptz),

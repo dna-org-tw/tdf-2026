@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { supabaseServer } from './supabaseServer';
 import type { Order, OrderActionType } from './types/order';
+import { getValidityPeriod } from './ticketPricing';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 export const stripe = stripeSecretKey
@@ -386,6 +387,8 @@ export async function createManualOrder(
     throw new OrderActionError(stripeErr.message, stripeErr.code, 400);
   }
 
+  const manualValidity = getValidityPeriod(input.ticket_tier, input.week);
+
   const { data: created, error: createErr } = await supabaseServer
     .from('orders')
     .insert({
@@ -401,6 +404,7 @@ export async function createManualOrder(
       currency: invoice.currency ?? 'usd',
       customer_email: input.customer_email,
       customer_name: input.customer_name,
+      ...manualValidity,
     })
     .select()
     .single();
@@ -522,6 +526,10 @@ export async function upgradeOrder(
   const isPaid = input.mode === 'comp' || invoice.status === 'paid';
   const hostedInvoiceUrl = invoice.hosted_invoice_url ?? null;
 
+  const validity = isPaid
+    ? getValidityPeriod(input.target_tier, input.target_week)
+    : {};
+
   const { data: created, error: createErr } = await supabaseServer
     .from('orders')
     .insert({
@@ -539,6 +547,7 @@ export async function upgradeOrder(
       customer_name: parent.customer_name,
       parent_order_id: parent.id,
       internal_notes: input.note ?? null,
+      ...validity,
     })
     .select()
     .single();

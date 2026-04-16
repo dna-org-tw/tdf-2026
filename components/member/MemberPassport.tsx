@@ -11,6 +11,8 @@ interface PassportProps {
   memberNo: string | null;
   firstSeenAt: string | null;
   tier: IdentityTier;
+  validFrom?: string | null;
+  validUntil?: string | null;
   lang: 'en' | 'zh';
 }
 
@@ -117,7 +119,63 @@ function ClearanceStars({ rank, accent }: { rank: number; accent: string }) {
   );
 }
 
-export default function MemberPassport({ email, memberNo, firstSeenAt, tier, lang }: PassportProps) {
+function formatValidityDate(dateStr: string, lang: 'en' | 'zh'): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return lang === 'zh'
+    ? `${d.getMonth() + 1}/${d.getDate()}`
+    : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function ValidityBadge({ validFrom, validUntil, lang }: { validFrom: string; validUntil: string; lang: 'en' | 'zh' }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const isActive = today >= validFrom && today <= validUntil;
+  const isExpired = today > validUntil;
+  const isUpcoming = today < validFrom;
+
+  const from = formatValidityDate(validFrom, lang);
+  const until = formatValidityDate(validUntil, lang);
+
+  let statusLabel: string;
+  let statusColor: string;
+
+  if (isActive) {
+    statusLabel = lang === 'zh' ? 'ACTIVE' : 'ACTIVE';
+    statusColor = '#52D472';
+  } else if (isExpired) {
+    statusLabel = lang === 'zh' ? 'EXPIRED' : 'EXPIRED';
+    statusColor = '#EF4444';
+  } else {
+    statusLabel = lang === 'zh' ? 'UPCOMING' : 'UPCOMING';
+    statusColor = '#FFD028';
+  }
+
+  return (
+    <div className="flex items-center gap-2 text-[11px] font-mono">
+      <span
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[10px] font-bold tracking-[0.1em]"
+        style={{ backgroundColor: `${statusColor}20`, color: statusColor }}
+      >
+        <span
+          className="inline-block w-1.5 h-1.5 rounded-full"
+          style={{ backgroundColor: statusColor }}
+          aria-hidden
+        />
+        {statusLabel}
+      </span>
+      <span className="text-white/50">
+        {from} → {until}
+      </span>
+      {isUpcoming && (
+        <span className="text-white/35">
+          ({lang === 'zh' ? '即將開始' : 'starts soon'})
+        </span>
+      )}
+    </div>
+  );
+}
+
+export default function MemberPassport({ email, memberNo, firstSeenAt, tier, validFrom, validUntil, lang }: PassportProps) {
   const accent = TIER_ACCENT[tier];
   const rank = TIER_RANK[tier];
   const surface = TIER_SURFACE[tier];
@@ -202,6 +260,13 @@ export default function MemberPassport({ email, memberNo, firstSeenAt, tier, lan
           </h2>
 
           <p className="mt-3 text-[13px] text-white/65 italic">{tagline}</p>
+
+          {/* Validity period */}
+          {tier !== 'follower' && validFrom && validUntil && (
+            <div className="mt-3">
+              <ValidityBadge validFrom={validFrom} validUntil={validUntil} lang={lang} />
+            </div>
+          )}
 
           {/* Meta line */}
           <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-mono">

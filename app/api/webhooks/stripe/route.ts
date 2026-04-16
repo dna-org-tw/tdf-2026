@@ -4,6 +4,7 @@ import { updateOrder, createOrder, getOrderBySessionId } from '@/lib/orders';
 import { sendOrderEmail } from '@/lib/sendOrderEmail';
 import { mapPaymentStatusToOrderStatus } from '@/lib/orderStatus';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { getValidityPeriod } from '@/lib/ticketPricing';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -133,6 +134,15 @@ export async function POST(req: NextRequest) {
         session.status
       );
 
+      // Compute membership validity dates for paid orders
+      const tierMatch = session.success_url?.match(/tier=(explore|contribute|weekly_backer|backer)/);
+      const sessionTier = tierMatch?.[1] as 'explore' | 'contribute' | 'weekly_backer' | 'backer' | undefined;
+      const sessionWeek = session.metadata?.week || null;
+
+      const validityDates = orderStatus === 'paid' && sessionTier
+        ? getValidityPeriod(sessionTier, sessionWeek)
+        : {};
+
       // 更新订单
       const orderData = {
         stripe_payment_intent_id:
@@ -151,6 +161,7 @@ export async function POST(req: NextRequest) {
         payment_method_brand: paymentMethodBrand,
         payment_method_last4: paymentMethodLast4,
         payment_method_type: paymentMethodType,
+        ...validityDates,
       };
 
       let finalOrder = await updateOrder(session.id, orderData);
