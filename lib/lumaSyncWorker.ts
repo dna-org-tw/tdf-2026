@@ -8,6 +8,7 @@ import {
 } from '@/lib/lumaApi';
 import { getDecryptedCookie, markCookieInvalid } from '@/lib/lumaSyncConfig';
 import { sendCookieExpiredAlert } from '@/lib/luma-alert-email';
+import { runAutoReview } from '@/lib/lumaAutoReview';
 
 const SLEEP_MS_BETWEEN_EVENTS = 500;
 
@@ -229,4 +230,18 @@ export async function runSyncJob(jobId: number): Promise<void> {
       total_guests_upserted: totalGuestsUpserted,
     })
     .eq('id', jobId);
+
+  // Phase 2: Auto-review pending registrations
+  if (finalStatus !== 'failed' && cookie) {
+    try {
+      await runAutoReview(jobId, cookie);
+    } catch (err) {
+      // Log but don't fail the entire job — sync data is already saved
+      const msg = (err as Error).message ?? 'unknown';
+      await supa
+        .from('luma_sync_jobs')
+        .update({ error_summary: `review_error: ${msg}` })
+        .eq('id', jobId);
+    }
+  }
 }
