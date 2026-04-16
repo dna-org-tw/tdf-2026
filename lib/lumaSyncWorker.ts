@@ -49,23 +49,20 @@ interface MappedGuest {
 function mapGuest(g: LumaGuest, eventApiId: string): MappedGuest | null {
   const email = (g.email ?? '').trim().toLowerCase();
   if (!email) return null;
-  const amountCents =
-    typeof g.amount_cents === 'number'
-      ? g.amount_cents
-      : typeof g.amount === 'number'
-        ? Math.round(g.amount * 100)
-        : null;
+  const ticket = g.event_tickets?.[0];
+  const amountCents = typeof ticket?.amount === 'number' ? Math.round(ticket.amount) : null;
+  const isFree = ticket?.event_ticket_type_info?.type === 'free' || amountCents === 0;
   return {
     event_api_id: eventApiId,
     email,
     luma_guest_api_id: g.api_id ?? null,
     activity_status: g.approval_status ?? g.registration_status ?? null,
-    paid: !!g.paid,
+    paid: ticket?.is_captured === true || (isFree && g.approval_status === 'approved'),
     checked_in_at: g.checked_in_at ?? null,
     registered_at: g.registered_at ?? null,
-    ticket_type_name: g.ticket_type_name ?? null,
+    ticket_type_name: ticket?.event_ticket_type_info?.name ?? null,
     amount_cents: amountCents,
-    currency: g.currency ?? null,
+    currency: ticket?.currency ?? null,
     last_synced_at: new Date().toISOString(),
   };
 }

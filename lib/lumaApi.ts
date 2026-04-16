@@ -28,18 +28,21 @@ export interface LumaCalendarItem {
   };
 }
 
+export interface LumaGuestTicket {
+  amount?: number | null;
+  currency?: string | null;
+  is_captured?: boolean;
+  event_ticket_type_info?: { name?: string | null; type?: string | null } | null;
+}
+
 export interface LumaGuest {
   api_id: string;
   email: string | null;
   approval_status?: string | null;
   registration_status?: string | null;
-  paid?: boolean;
   checked_in_at?: string | null;
   registered_at?: string | null;
-  ticket_type_name?: string | null;
-  amount?: number | null;
-  amount_cents?: number | null;
-  currency?: string | null;
+  event_tickets?: LumaGuestTicket[];
 }
 
 async function lumaFetch(url: string, cookie: string): Promise<unknown> {
@@ -89,9 +92,9 @@ export async function fetchEventGuests(eventApiId: string, cookie: string): Prom
     const data = (await lumaFetch(
       `https://api2.luma.com/event/admin/get-guests?${params}`,
       cookie,
-    )) as { entries?: Array<{ guest: LumaGuest }>; next_cursor?: string | null; has_more?: boolean };
-    for (const e of data.entries ?? []) {
-      if (e.guest) guests.push(e.guest);
+    )) as { entries?: LumaGuest[]; next_cursor?: string | null; has_more?: boolean };
+    for (const g of data.entries ?? []) {
+      if (g) guests.push(g);
     }
     if (!data.has_more || !data.next_cursor) break;
     cursor = data.next_cursor;
