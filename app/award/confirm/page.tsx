@@ -54,7 +54,7 @@ export default function ConfirmVotePage() {
       return;
     }
 
-    // 如果有 token，說明是從 API 重定向過來的，應該已經處理了
+    // If token exists, it was redirected from the API and should already be handled
     if (token) {
       setStatus('loading');
     } else {

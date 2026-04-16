@@ -28,7 +28,7 @@ export default function Navbar() {
   // Handle scroll effect with throttle optimization
   useEffect(() => {
     if (!isHomePage) return;
-    // 使用 requestAnimationFrame 優化 scroll 事件處理
+    // Optimize scroll event handling with requestAnimationFrame
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
@@ -205,7 +205,7 @@ export default function Navbar() {
                 scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
               }`}
             >
-              管理後台
+              {t.nav.admin}
             </Link>
           )}
 
@@ -248,7 +248,7 @@ export default function Navbar() {
                 scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
               }`}
             >
-              管理後台
+              {t.nav.admin}
             </Link>
           )}
           {!authLoading && (

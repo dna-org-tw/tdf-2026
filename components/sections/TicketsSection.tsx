@@ -513,13 +513,13 @@ export default function TicketsSection() {
                     // Check if this is a unique feature (not in previous tier)
                     const isUniqueFeature = !isPreviousTierFeature;
                     
-                    // Explorer: 專屬社群用白色
+                    // Explorer: use white for exclusive community feature
                     const isExplorerWhiteFeature = tier.key === 'explore' && (
                       featureIndex === 0 ||
                       currentCore.includes('Exclusive Digital Nomad Community') ||
                       currentCore.includes('專屬數位遊牧社群')
                     );
-                    // Explorer / Contributor / Backer：開幕市集白字，後面（＋有限酒水等）用票券等級色
+                    // Explorer / Contributor / Backer: Opening Marketplace in white, extras (e.g. limited drinks) in tier color
                     const isOpeningMarketplaceFeature =
                       feature.includes('開幕市集') || feature.includes('Opening Marketplace');
                     
@@ -539,7 +539,7 @@ export default function TicketsSection() {
                     };
                     
                     const colors = getTierColor();
-                    // 開幕市集那行：icon 用票券等級色
+                    // Opening Marketplace row: icon uses tier color
                     const getMarketplaceColor = () => {
                       if (tier.key === 'explore') return 'text-[#10B8D9]';
                       if (tier.key === 'contribute') return 'text-[#00993E]';

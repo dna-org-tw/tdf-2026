@@ -15,7 +15,7 @@ const TICKET_TIER_ORDER: TicketTier[] = ['follower', 'explorer', 'contributor', 
 
 const TICKET_FILTER_OPTIONS: (TicketTier | 'all')[] = ['all', ...TICKET_TIER_ORDER];
 
-// 篩選器按鈕：依票券級別顏色（active 實心 / inactive 框線+淺底）
+// Filter buttons: colored by ticket tier (active = solid / inactive = outlined + light bg)
 const FILTER_BUTTON_CLASS: Record<TicketTier | 'all', { active: string; inactive: string }> = {
   all: { active: 'bg-stone-500 text-white border-stone-500', inactive: 'bg-white/80 text-[#1E1F1C] border-stone-300 hover:border-stone-500 hover:bg-stone-50' },
   follower: { active: 'bg-purple-500 text-white border-purple-500', inactive: 'bg-white/80 text-[#1E1F1C] border-purple-200 hover:border-purple-400 hover:bg-purple-50' },
@@ -64,16 +64,16 @@ export default function EventsSection() {
     return null;
   };
 
-  // 取得事件實際使用的票種等級（無標籤則視為 side event）
+  // Get the actual ticket tier for an event (no tag = side event)
   const getEventTicketTier = (event: CalendarEvent): TicketTier => {
     const lowest = getLowestTicketTier(event);
     return lowest ?? 'other';
   };
 
-  // 依票券等級篩選活動：
-  // - All：顯示全部
-  // - Follower/Explorer/Contributor/Backer：顯示「小於等於」該等級的活動
-  // - Side Event：僅顯示 side event（無對應票券標籤）的活動
+  // Filter events by ticket tier:
+  // - All: show everything
+  // - Follower/Explorer/Contributor/Backer: show events at or below the selected tier
+  // - Side Event: show only side events (no matching ticket tag)
   const filteredByTicketTier = allEvents.filter((event) => {
     if (selectedTierFilter === 'all') return true;
 
@@ -89,7 +89,7 @@ export default function EventsSection() {
     return eventIndex <= selectedIndex;
   });
 
-  // 只取 5 月份的活動，並依週分組
+  // Filter to May events only and group by week
   const parseEventDate = (event: CalendarEvent) => {
     try {
       return new Date(event.startDate);
@@ -98,7 +98,7 @@ export default function EventsSection() {
     }
   };
 
-  // 日曆網格：7:00–23:00，每小時一欄
+  // Calendar grid: 7:00-23:00, one column per hour
   const HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
   const WEEK_THEMES = [
     { start: 1, end: 7, theme: 'Regional Revitalization & Startups' },
@@ -122,8 +122,8 @@ export default function EventsSection() {
     };
   });
 
-  // 展開跨日活動為每天一段（首日 startH–24:00、中間日 08:00–24:00、末日 08:00–endH）
-  // 所有時間以 Asia/Taipei 時區計算
+  // Expand multi-day events into per-day segments (first day: startH-24:00, middle days: 08:00-24:00, last day: 08:00-endH)
+  // All times are in Asia/Taipei timezone
   const getEventSegments = (event: CalendarEvent): { dayIndex: number; startH: number; endH: number }[] => {
     if (!event.startTime) {
       const date = parseEventDate(event);
@@ -201,8 +201,8 @@ export default function EventsSection() {
     return segments;
   };
 
-  // 活動區塊背景色（依票種或輪替）
-  // 活動方塊底色：依最低可參與票券級別
+  // Event block background color (by ticket tier or rotation)
+  // Block color based on the lowest eligible ticket tier
   const TIER_BG_CLASS: Record<TicketTier, string> = {
     follower: 'bg-purple-100 border-purple-200',
     explorer: 'bg-blue-100 border-blue-200',
@@ -216,7 +216,7 @@ export default function EventsSection() {
     return TIER_BG_CLASS[tier];
   };
 
-  // 依「日」分組已篩選的活動（含跨日展開），並附上網格位置
+  // Group filtered events by day (including multi-day expansion) with grid positions
   const eventsByDay = (() => {
     const allSegments: { dayIndex: number; startH: number; endH: number; event: CalendarEvent }[] = [];
     for (const event of filteredByTicketTier) {
@@ -237,11 +237,11 @@ export default function EventsSection() {
     });
   })();
 
-  // 日曆網格：本體列數 = 31 天 + 每週（分隔列 + 時間標籤列）
+  // Calendar grid: body row count = 31 days + per-week (separator row + time label row)
   const BODY_ROW_COUNT = 31 + WEEK_THEMES.length * 2;
 
-  // 每週分隔列所在的 grid row（無表頭，+1 轉為 1-based）
-  // 每週佔 2 列（主題 + 時間標籤），所以之前的週數 × 2
+  // Grid row for each week's separator (no header, +1 for 1-based index)
+  // Each week occupies 2 rows (theme + time label), so previous weeks x 2
   const getWeekSeparatorGridRow = (weekIndex: number) => {
     const week = WEEK_THEMES[weekIndex];
     const daysBefore = week.start - 1;
@@ -250,7 +250,7 @@ export default function EventsSection() {
     return bodyRowIndex + 1;
   };
 
-  // 某一天所在的 grid row（含所有在它之前的分隔列 + 時間標籤列）
+  // Grid row for a given day (including all preceding separator + time label rows)
   const getDayGridRow = (dayIndex: number) => {
     const dayNumber = dayIndex + 1;
     const weeksBeforeCount = WEEK_THEMES.filter((w) => w.start <= dayNumber).length;

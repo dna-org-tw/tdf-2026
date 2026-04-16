@@ -9,17 +9,17 @@ export default function NotFound() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    // 從目前 URL 獲取查詢參數（特別是 lang 參數）
+    // Get query params from current URL (especially the lang param)
     if (typeof window !== 'undefined') {
       const searchParams = window.location.search;
       const redirectUrl = searchParams ? `/${searchParams}` : '/';
       
-      // 重定向到首頁，保留查詢參數
+      // Redirect to home page, preserving query params
       router.replace(redirectUrl);
     }
   }, [router]);
 
-  // 顯示載入狀態，因為重定向會很快發生
+  // Show loading state since redirect will happen shortly
   return (
     <div className="h-screen w-full flex items-center justify-center bg-stone-50">
       <div className="text-center">

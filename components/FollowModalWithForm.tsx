@@ -43,7 +43,7 @@ export default function FollowModalWithForm({
     setIsSubmitting(true);
 
     try {
-      // 執行 reCAPTCHA 驗證
+      // Execute reCAPTCHA verification
       let recaptchaToken: string | null = null;
       try {
         recaptchaToken = await executeRecaptcha();
@@ -54,7 +54,7 @@ export default function FollowModalWithForm({
         return;
       }
 
-      // 獲取使用者資訊
+      // Get user info
       const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {
@@ -75,7 +75,7 @@ export default function FollowModalWithForm({
       const result = await response.json();
 
       if (!response.ok) {
-        // 處理重複訂閱的情況
+        // Handle duplicate subscription
         if (response.status === 409) {
           setModalType('duplicate');
           setModalMessage(result.error || t.hero.followForm.duplicateMessage);
@@ -179,7 +179,7 @@ export default function FollowModalWithForm({
               {/* Content */}
               <div className="p-6">
                 {modalType ? (
-                  // 顯示結果訊息
+                  // Show result message
                   <div className="text-center">
                     <div className="flex justify-center mb-4">
                       {getIcon()}
@@ -219,7 +219,7 @@ export default function FollowModalWithForm({
                     )}
                   </div>
                 ) : (
-                  // 顯示表單
+                  // Show form
                   <>
                     <p className="text-base text-white/90 leading-relaxed mb-6 text-center">
                       {getMessage()}

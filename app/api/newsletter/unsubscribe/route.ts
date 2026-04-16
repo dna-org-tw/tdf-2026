@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 驗證 token 並獲取 email
+    // Verify token and extract email
     const email = verifyUnsubscribeToken(token);
 
     if (!email) {
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
  * `List-Unsubscribe=One-Click` in the body; we accept the token from the URL.
  */
 
-// 簡單的 Email 格式驗證
+// Simple email format validation
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
     let email: string | null = null;
 
     if (body.token) {
-      // 驗證 token 並獲取 email
+      // Verify token and extract email
       email = verifyUnsubscribeToken(body.token);
       if (!email) {
         return NextResponse.json(

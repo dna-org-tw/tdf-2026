@@ -9,14 +9,14 @@ interface Partner {
   link?: string;
 }
 
-// 解析 CSV 字符串
+// Parse CSV string
 function parseCSV(csvText: string): Partner[] {
   const lines = csvText.trim().split('\n');
   if (lines.length < 2) {
     return [];
   }
 
-  // 解析表頭
+  // Parse headers
   const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
   const nameIndex = headers.indexOf('name');
   const logoIndex = headers.indexOf('logo');
@@ -28,12 +28,12 @@ function parseCSV(csvText: string): Partner[] {
 
   const partners: Partner[] = [];
 
-  // 解析資料行
+  // Parse data rows
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
 
-    // 處理 CSV 中可能包含逗號的欄位（用引號包裹）
+    // Handle CSV fields that may contain commas (enclosed in quotes)
     const values: string[] = [];
     let currentValue = '';
     let inQuotes = false;

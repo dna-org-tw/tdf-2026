@@ -19,7 +19,7 @@ interface MemberCard {
   tier: string;
 }
 
-function MemberCardItem({ member, lang }: { member: MemberCard; lang: 'en' | 'zh' }) {
+function MemberCardItem({ member, t }: { member: MemberCard; t: ReturnType<typeof useTranslation>['t'] }) {
   const tier = (member.tier || 'follower') as IdentityTier;
   const accent = TIER_ACCENT[tier] || TIER_ACCENT.follower;
   const initials = member.display_name
@@ -49,7 +49,7 @@ function MemberCardItem({ member, lang }: { member: MemberCard; lang: 'en' | 'zh
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-0.5">
             <p className="font-semibold text-slate-900 text-sm truncate group-hover:text-[#10B8D9] transition-colors">
-              {member.display_name || member.member_no || (lang === 'zh' ? '匿名' : 'Anonymous')}
+              {member.display_name || member.member_no || t.members.anonymous}
             </p>
             <span
               className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0"
@@ -86,7 +86,7 @@ function MemberCardItem({ member, lang }: { member: MemberCard; lang: 'en' | 'zh
 }
 
 function MemberDirectory() {
-  const { lang } = useTranslation();
+  const { t, lang } = useTranslation();
   const [members, setMembers] = useState<MemberCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -95,25 +95,7 @@ function MemberDirectory() {
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(20);
 
-  const labels = lang === 'zh' ? {
-    title: '社群夥伴',
-    subtitle: '認識一起參加 TDF 2026 的夥伴們',
-    search: '搜尋名稱、地點或標籤…',
-    noResults: '找不到符合的結果',
-    loading: '載入中…',
-    prev: '上一頁',
-    next: '下一頁',
-    total: '位公開夥伴',
-  } : {
-    title: 'Community',
-    subtitle: 'Meet the people joining TDF 2026',
-    search: 'Search by name, location, or tag…',
-    noResults: 'No members found',
-    loading: 'Loading…',
-    prev: 'Previous',
-    next: 'Next',
-    total: 'public members',
-  };
+  const labels = t.members;
 
   const fetchMembers = useCallback(async (q: string, p: number) => {
     setLoading(true);
@@ -212,7 +194,7 @@ function MemberDirectory() {
           ) : (
             <div className="space-y-3">
               {members.map((m) => (
-                <MemberCardItem key={m.member_no} member={m} lang={lang} />
+                <MemberCardItem key={m.member_no} member={m} t={t} />
               ))}
             </div>
           )}

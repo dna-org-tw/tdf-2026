@@ -16,28 +16,28 @@ import { AuthProvider } from '@/contexts/AuthContext';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap', // 使用 swap 避免 FOIT
-  preload: true, // 預載入主要字體
+  display: 'swap', // Use swap to avoid FOIT
+  preload: true, // Preload primary font
   fallback: ['system-ui', 'sans-serif'],
 });
 
 const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-outfit',
-  display: 'swap', // 使用 swap 避免 FOIT
+  display: 'swap', // Use swap to avoid FOIT
   fallback: ['system-ui', 'sans-serif'],
 });
 
 const notoSansTC = Noto_Sans_TC({
   subsets: ['latin'],
-  // 中文字體子集化：僅載入常用字元，大幅減少字體檔案體積
-  // 如需完整字元集，可移除 subset 限制或使用 preload
+  // CJK font subsetting: load only common characters to significantly reduce font file size
+  // For the full character set, remove the subset restriction or use preload
   variable: '--font-noto-sans-tc',
   weight: ['400', '500', '700'],
-  display: 'swap', // 使用 swap 避免 FOIT，提升 LCP
-  preload: true, // 預載入字體以減少 CLS
-  // 優化字體載入：使用 font-display: swap 確保文字立即顯示
-  fallback: ['system-ui', 'sans-serif'], // 提供 fallback 字體
+  display: 'swap', // Use swap to avoid FOIT and improve LCP
+  preload: true, // Preload font to reduce CLS
+  // Optimize font loading: use font-display: swap to ensure text is immediately visible
+  fallback: ['system-ui', 'sans-serif'], // Provide fallback fonts
 });
 
 // SEO Optimization: Rich metadata with core keyword strategy for Western digital nomads
@@ -158,7 +158,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // 可新增 Google Search Console 驗證
+    // Add Google Search Console verification here
     // google: 'your-google-verification-code',
   },
 };
@@ -168,7 +168,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 從 proxy 設置的請求頭讀取語言
+  // Read language from the request header set by proxy
   const headersList = await headers();
   const lang = headersList.get('x-lang') || 'en';
   
@@ -180,24 +180,24 @@ export default async function RootLayout({
         <ServiceWorkerRegistration />
         {/* Performance optimization: Preconnect to external domains - Next.js will move these to head */}
         <PreconnectLinks />
-        {/* AEO 優化：新增結構化資料 - Next.js 會自動將其移到 head */}
+        {/* AEO optimization: add structured data - Next.js will automatically move this to head */}
         <StructuredData lang={lang === 'zh-TW' ? 'zh' : 'en'} />
-        {/* Facebook Pixel 追踪 */}
+        {/* Facebook Pixel tracking */}
         <FacebookPixel />
         {/* Google Tag (gtag.js) - Google Ads AW-17947994689 */}
         <GoogleTag />
         {/* reCAPTCHA Enterprise API */}
         <RecaptchaScript />
-        {/* 自動記錄 visitor：fingerprint、IP、時區、語系，供訂閱/購買關聯 */}
+        {/* Auto-track visitor: fingerprint, IP, timezone, locale for subscription/purchase association */}
         <VisitorTracker />
-        {/* 捕捉 URL ?code=xxx 折扣碼並存入 cookie */}
+        {/* Capture URL ?code=xxx discount code and store in cookie */}
         <Suspense>
           <DiscountCodeCapture />
         </Suspense>
         <AuthProvider>
         {children}
         </AuthProvider>
-        {/* SEO: 為無 JavaScript 的爬蟲提供基本內容 */}
+        {/* SEO: Provide basic content for crawlers without JavaScript */}
         <noscript>
           <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
             <h1>Taiwan Digital Fest 2026</h1>

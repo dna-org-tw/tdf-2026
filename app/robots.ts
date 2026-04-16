@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/', '/_next/'],
       },
-      // AEO 優化：明確允許 AI 爬蟲存取
+      // AEO optimization: explicitly allow AI crawlers
       {
         userAgent: 'GPTBot',
         allow: '/',

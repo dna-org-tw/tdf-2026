@@ -1,25 +1,25 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
-// 設定快取策略：最多快取 60 秒，但允許重新驗證
+// Cache strategy: cache up to 60 seconds, allow revalidation
 export const revalidate = 60;
 
 /**
- * 計算隨時間遞增的 magic number
- * 基於一個起始日期，每天遞增一定數量，讓總數看起來有 1000+ 人關注
+ * Calculate a time-based incrementing magic number
+ * Based on a start date, increments daily so the total appears to have 1000+ followers
  */
 function calculateMagicNumber(): number {
-  // 設定起始日期（例如：活動開始宣傳的日期）
+  // Set start date (e.g. when event promotion began)
   const startDate = new Date('2025-01-01T00:00:00Z');
   const now = new Date();
   
-  // 計算從起始日期到現在的天數
+  // Calculate days elapsed since start date
   const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   
-  // 基礎 magic number：500
-  // 每天遞增固定數量
+  // Base magic number: 500
+  // Fixed daily increment
   const baseMagicNumber = 500;
-  const dailyIncrement = 3; // 固定每天遞增 3 個
+  const dailyIncrement = 3; // Fixed increment of 3 per day
   const totalIncrement = daysSinceStart * dailyIncrement;
   
   return baseMagicNumber + totalIncrement;
@@ -30,24 +30,24 @@ export async function GET() {
     let actualCount = 0;
     
     if (supabaseServer) {
-      // 獲取 newsletter_subscriptions 表的總數
+      // Get total count from the newsletter_subscriptions table
       const { count, error } = await supabaseServer
         .from('newsletter_subscriptions')
         .select('*', { count: 'exact', head: true });
 
       if (error) {
         console.error('[Newsletter Count API] Error:', error);
-        // 即使資料庫查詢失敗，也回傳 magic number
+        // Even if DB query fails, still return magic number
       } else {
         actualCount = count || 0;
       }
     }
 
-    // 計算 magic number
+    // Calculate magic number
     const magicNumber = calculateMagicNumber();
     
-    // 實際數量 + magic number = 顯示的總數
-    // 確保總數至少是 magic number（如果實際數量很少）
+    // Actual count + magic number = displayed total
+    // Ensure total is at least the magic number (in case actual count is very low)
     const totalCount = Math.max(actualCount + magicNumber, magicNumber);
 
     return NextResponse.json(
@@ -56,7 +56,7 @@ export async function GET() {
     );
   } catch (error) {
     console.error('[Newsletter Count API] Unexpected error:', error);
-    // 即使出錯，也回傳 magic number
+    // Even on error, return magic number
     const magicNumber = calculateMagicNumber();
     return NextResponse.json(
       { count: magicNumber },

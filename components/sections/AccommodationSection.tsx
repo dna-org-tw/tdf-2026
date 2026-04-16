@@ -26,7 +26,7 @@ const NomadMap = dynamic(
   }
 );
 
-// Nomad-friendly store data provided by organizers
+// Nomad-friendly accommodation data provided by organizers
 const NOMAD_STORES: NomadFriendlyStore[] = [
   { nameZh: "路得行旅 台東1館", addressZh: "950台東縣台東市廣東路162號", website: "https://taitung.nordenruder.com/", googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=950台東縣台東市廣東路162號", latitude: 22.7543, longitude: 121.1528 },
   { nameZh: "路得行旅 台東2館", addressZh: "950台東縣台東市中山路374號", website: "https://www.taitung2.nordenruder.com/", googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=950台東縣台東市中山路374號", latitude: 22.7512, longitude: 121.1485 },

@@ -70,13 +70,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 處理 checkout.session.completed 事件
+    // Handle checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
 
       console.log('[Webhook] Processing checkout.session.completed:', session.id);
 
-      // 獲取支付詳情
+      // Retrieve payment details
       let paymentIntent: Stripe.PaymentIntent | null = null;
       let charge: Stripe.Charge | null = null;
 
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 擷取客戶資訊
+      // Extract customer info
       const customerDetails = session.customer_details;
       const customerAddress = customerDetails?.address
         ? {
@@ -121,14 +121,14 @@ export async function POST(req: NextRequest) {
           }
         : null;
 
-      // 擷取支付方式資訊
+      // Extract payment method info
       const paymentMethodBrand =
         charge?.payment_method_details?.card?.brand || null;
       const paymentMethodLast4 =
         charge?.payment_method_details?.card?.last4 || null;
       const paymentMethodType = charge?.payment_method_details?.type || null;
 
-      // 确定订单状态
+      // Determine order status
       const orderStatus = mapPaymentStatusToOrderStatus(
         session.payment_status,
         session.status
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
         ? getValidityPeriod(sessionTier, sessionWeek)
         : {};
 
-      // 更新订单
+      // Update order
       const orderData = {
         stripe_payment_intent_id:
           typeof session.payment_intent === 'string'
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
       if (finalOrder) {
         console.log('[Webhook] Order updated successfully:', finalOrder.id);
       } else {
-        // 訂單不存在（可能建立時失敗），從 success_url 解析 tier 後補建
+        // Order not found (creation may have failed); parse tier from success_url and backfill
         console.warn('[Webhook] Order not found for session:', session.id, '— attempting to create');
         const tierMatch = session.success_url?.match(/tier=(explore|contribute|weekly_backer|backer)/);
         const tier = tierMatch?.[1] as 'explore' | 'contribute' | 'weekly_backer' | 'backer' | undefined;
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
           });
 
           if (createdOrder) {
-            // 建立後立即更新完整資料
+            // Immediately update with full data after creation
             finalOrder = await updateOrder(session.id, orderData);
             console.log('[Webhook] Order created and updated:', createdOrder.id);
           } else {
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 發送訂單確認 email（server-side，確保不依賴 client）
+      // Send order confirmation email (server-side, not dependent on client)
       if (orderStatus === 'paid' && customerDetails?.email) {
         const emailOrder = finalOrder ?? await getOrderBySessionId(session.id);
         const emailResult = await sendOrderEmail(
@@ -222,7 +222,7 @@ export async function POST(req: NextRequest) {
         }
       }
     }
-    // 處理 payment_intent.succeeded 事件（備用）
+    // Handle payment_intent.succeeded event (fallback)
     else if (event.type === 'payment_intent.succeeded') {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       const checkoutSessionId = paymentIntent.metadata?.checkout_session_id;
@@ -248,7 +248,7 @@ export async function POST(req: NextRequest) {
         }
       }
     }
-    // 處理 checkout.session.async_payment_succeeded 事件
+    // Handle checkout.session.async_payment_succeeded event
     else if (event.type === 'checkout.session.async_payment_succeeded') {
       const session = event.data.object as Stripe.Checkout.Session;
 
@@ -267,7 +267,7 @@ export async function POST(req: NextRequest) {
         console.warn('[Webhook] Failed to update order for session:', session.id);
       }
     }
-    // 處理 checkout.session.async_payment_failed 事件
+    // Handle checkout.session.async_payment_failed event
     else if (event.type === 'checkout.session.async_payment_failed') {
       const session = event.data.object as Stripe.Checkout.Session;
 
@@ -286,7 +286,7 @@ export async function POST(req: NextRequest) {
         console.warn('[Webhook] Failed to update order for session:', session.id);
       }
     }
-    // 處理 checkout.session.expired 事件（session 過期/取消）
+    // Handle checkout.session.expired event (session expired/cancelled)
     else if (event.type === 'checkout.session.expired') {
       const session = event.data.object as Stripe.Checkout.Session;
 

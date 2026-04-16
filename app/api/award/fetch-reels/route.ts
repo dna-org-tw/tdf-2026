@@ -3,8 +3,8 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { enforceRateLimit } from '@/lib/rateLimitResponse';
 
 /**
- * 從 Supabase 的 ig_posts 表獲取所有資料
- * 不做任何過濾，直接回傳所有原始資料
+ * Fetch all data from the ig_posts table in Supabase
+ * No filtering applied; returns all raw data as-is
  */
 async function fetchAllIgPosts(): Promise<unknown[]> {
   if (!supabaseServer) {
@@ -13,7 +13,7 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
   }
 
   try {
-    // 從 ig_posts 表查詢所有資料，不做任何過濾
+    // Query all data from ig_posts table without filtering
     const { data: posts, error } = await supabaseServer
       .from('ig_posts')
       .select('*');
@@ -27,7 +27,7 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
         hint: error.hint,
       });
       
-      // 如果表不存在，嘗試查詢 award_posts 表作為備選
+      // If table doesn't exist, fall back to award_posts table
       if (error.code === '42P01' || error.message?.includes('does not exist')) {
         const { data: awardPosts, error: awardError } = await supabaseServer
           .from('award_posts')
@@ -48,40 +48,40 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
       return [];
     }
 
-    // 處理資料格式，但保留所有資料
+    // Process data format but keep all data
     const processedPosts: unknown[] = [];
 
     for (const post of posts) {
       try {
-        // 處理不同的資料儲存格式
+        // Handle different data storage formats
         let postData: unknown;
         
         if (typeof post === 'string') {
-          // 如果整个 post 是字符串，尝试解析
+          // If the entire post is a string, try to parse it
           postData = JSON.parse(post);
         } else if (typeof post === 'object' && post !== null) {
-          // 檢查是否有 data 欄位（JSONB 格式）
+          // Check for a data field (JSONB format)
           if ('data' in post && post.data) {
-            // 如果 data 是字串，需要解析
+            // If data is a string, parse it
             if (typeof post.data === 'string') {
               postData = JSON.parse(post.data);
             } else {
-              // 如果 data 已經是物件，直接使用
+              // If data is already an object, use it directly
               postData = post.data;
             }
           } else {
-            // 如果沒有 data 欄位，假設整個物件就是資料
+            // If no data field, assume the entire object is the data
             postData = post;
           }
         } else {
-          // 即使格式不同，也保留原始資料
+          // Even if format differs, keep the raw data
           postData = post;
         }
 
-        // 不跳過任何資料，全部新增
+        // Don't skip any data; add everything
         processedPosts.push(postData);
       } catch (parseError) {
-        // 即使解析錯誤，也保留原始資料
+        // Even on parse error, keep the raw data
         console.warn('[Award API] Error parsing post data, keeping raw data:', parseError);
         processedPosts.push(post);
       }
@@ -94,7 +94,7 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
   }
 }
 
-// 禁用緩存，確保每次請求都會執行
+// Disable caching so every request executes fresh
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -103,9 +103,9 @@ export async function GET(req: NextRequest) {
   if (rl) return rl;
 
   try {
-    // 從 ig_posts 表獲取所有資料，不做任何過濾
+    // Fetch all data from ig_posts table without filtering
     const posts = await fetchAllIgPosts();
-    
+
     const filteredPosts = posts.map((post) => {
       const p = post as Record<string, unknown>;
       return {
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
   if (rl) return rl;
 
   try {
-    // 檢查 Supabase 連線
+    // Check Supabase connection
     if (!supabaseServer) {
       console.error('[Award API] Supabase client is not configured');
       return NextResponse.json(
@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 從 ig_posts 表獲取所有資料，不做任何過濾
+    // Fetch all data from ig_posts table without filtering
     const posts = await fetchAllIgPosts();
 
     const filteredPosts = posts.map((post) => {

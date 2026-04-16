@@ -32,7 +32,7 @@ export interface CoauthorProducer {
 
 export interface InstagramPost {
   id: string;
-  // 基礎欄位（向後相容）
+  // Basic fields (backward compatible)
   permalink?: string;
   media_url?: string;
   caption?: string;
@@ -40,14 +40,14 @@ export interface InstagramPost {
   timestamp: string;
   vote_count?: number;
   has_voted?: boolean;
-  // API 回傳的主要欄位
+  // Primary fields from API response
   input_url?: string | null;
   post_type?: string | null;
   type?: string | null;
   short_code?: string | null;
   url?: string | null;
   error?: string | null;
-  // 媒體資訊
+  // Media info
   display_url?: string | null;
   displayUrl?: string | null;
   video_url?: string | null;
@@ -56,7 +56,7 @@ export interface InstagramPost {
   dimensionsWidth?: number | null;
   dimensions_width?: number | null;
   dimensionsHeight?: number | null;
-  // 互動資料
+  // Engagement data
   likes_count?: number | null;
   likesCount?: number | null;
   comments_count?: number | null;
@@ -67,19 +67,19 @@ export interface InstagramPost {
   fb_like_count?: number | null;
   fb_play_count?: number | null;
   video_duration?: number | null;
-  // 使用者資訊
+  // User info
   owner_full_name?: string | null;
   ownerFullName?: string | null;
   owner_username?: string | null;
   ownerUsername?: string | null;
   owner_id?: string | null;
   ownerId?: string | null;
-  // 其他資訊
+  // Other info
   first_comment?: string | null;
   location_name?: string | null;
   product_type?: string | null;
   productType?: string | null;
-  // 陣列和複雜物件
+  // Arrays and complex objects
   hashtags?: string[] | null;
   mentions?: string[] | null;
   latest_comments?: unknown[] | null;

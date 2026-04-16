@@ -75,7 +75,7 @@ const LEGEND_ITEMS = [
 
 const LEGEND_STORE_KEY = "store";
 
-// Default center: Taitung (台東)
+// Default center: Taitung
 const TAITUNG_CENTER: [number, number] = [22.7583, 121.1444];
 const DEFAULT_ZOOM = 12;
 

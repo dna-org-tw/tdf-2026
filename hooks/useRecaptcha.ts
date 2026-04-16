@@ -16,12 +16,12 @@ export function useRecaptcha(action: string = 'subscribe') {
     }
 
     try {
-      // 檢查 grecaptcha 是否已載入
+      // Check if grecaptcha is loaded
       if (typeof window === 'undefined' || !window.grecaptcha?.enterprise) {
         throw new Error('reCAPTCHA is not loaded. Please refresh the page.');
       }
 
-      // 執行 reCAPTCHA 驗證
+      // Execute reCAPTCHA verification
       const token = await window.grecaptcha.enterprise.execute(recaptchaSiteKey, {
         action,
       });

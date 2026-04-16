@@ -2,8 +2,8 @@ import { Suspense } from 'react';
 import HomeContent from '@/components/HomeContent';
 import PageSkeleton from '@/components/PageSkeleton';
 
-// 啟用 ISR (Incremental Static Regeneration) 以優化效能
-export const revalidate = 3600; // 每小時重新驗證一次
+// Enable ISR (Incremental Static Regeneration) for performance optimization
+export const revalidate = 3600; // Revalidate every hour
 
 export default function Home() {
   return (

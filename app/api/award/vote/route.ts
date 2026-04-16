@@ -7,11 +7,11 @@ import { verifyRecaptcha } from '@/lib/recaptcha';
 
 const voteSecret = process.env.VOTE_SECRET;
 
-// 投票截止時間：2026年4月30日 12:00（台灣時間）
+// Voting deadline: 2026-04-30 12:00 (Taiwan time)
 const VOTING_DEADLINE = new Date('2026-04-30T12:00:00+08:00');
 
 /**
- * 產生投票確認 token
+ * Generate a vote confirmation token
  */
 function generateVoteToken(postId: string, email: string): string {
   if (!voteSecret) {
@@ -27,7 +27,7 @@ function generateVoteToken(postId: string, email: string): string {
 }
 
 /**
- * 驗證並解析投票 token
+ * Verify and parse a vote token
  */
 function verifyVoteToken(token: string): { postId: string; email: string } | null {
   if (!voteSecret) {
@@ -43,7 +43,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
     
     const [postId, email, timestamp, hash] = parts;
     
-    // 驗證 hash
+    // Verify hash
     const expectedHash = crypto
       .createHmac('sha256', voteSecret)
       .update(`${postId}:${email}:${timestamp}`)
@@ -68,7 +68,7 @@ function verifyVoteToken(token: string): { postId: string; email: string } | nul
 }
 
 /**
- * 檢查使用者今天是否已經投票
+ * Check if user has already voted today
  */
 async function hasVotedToday(email: string): Promise<boolean> {
   if (!supabaseServer) {
@@ -101,19 +101,19 @@ async function hasVotedToday(email: string): Promise<boolean> {
 }
 
 /**
- * 檢查使用者是否已關注 Instagram 帳號
- * 注意：這需要 Instagram API 來驗證，這裡提供一個基礎結構
+ * Check if user follows the Instagram account
+ * Note: this requires the Instagram API to verify; this provides a basic scaffold
  */
 async function checkIfFollowing(email: string, username: string): Promise<boolean> {
-  // TODO: 整合 Instagram API 來檢查使用者是否已關注
-  // 這裡暫時回傳 true，實際應該呼叫 Instagram API
-  // 或透過其他方式驗證（如要求使用者提供 Instagram 使用者名）
+  // TODO: Integrate Instagram API to check if user follows the account
+  // Returning true for now; should call the Instagram API
+  // or verify via other means (e.g. require Instagram username)
   return true;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    // 檢查投票是否已截止
+    // Check if voting has ended
     if (new Date() > VOTING_DEADLINE) {
       return NextResponse.json(
         { error: 'Voting has ended' },
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
     const { postId, email, recaptchaToken } = body;
     const emailLower = email.trim().toLowerCase();
 
-    // 驗證 Email 格式
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailLower)) {
       return NextResponse.json(
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 驗證 reCAPTCHA
+    // Verify reCAPTCHA
     const rc = await verifyRecaptcha(recaptchaToken, 'vote');
     if (!rc.ok) {
       if (rc.reason === 'not_configured') {
@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 檢查今天是否已經投票
+    // Check if already voted today
     const alreadyVoted = await hasVotedToday(emailLower);
     if (alreadyVoted) {
       return NextResponse.json(
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 檢查 post_id 是否存在於 ig_posts 表
+    // Check if post_id exists in the ig_posts table
     const { data: postExists, error: postCheckError } = await supabaseServer
       .from('ig_posts')
       .select('id')
@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 檢查是否已關注（檢查 newsletter_subscriptions 表）
+    // Check subscription status (newsletter_subscriptions table)
     const { data: subscription, error: subscriptionError } = await supabaseServer
       .from('newsletter_subscriptions')
       .select('email')
@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
       );
     }
     if (!subscription || subscription.length === 0) {
-      // 使用者未訂閱，回傳需要關注的錯誤
+      // User not subscribed; return follow-required error
       return NextResponse.json(
         { 
           error: 'Please follow us first to vote. Subscribe to our newsletter to continue.',
@@ -227,7 +227,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 檢查是否已有未確認的投票
+    // Check for existing unconfirmed vote
     const { data: existingVote, error: existingVoteError } = await supabaseServer
       .from('award_votes')
       .select('id')
@@ -247,15 +247,15 @@ export async function POST(req: NextRequest) {
     let voteId: string;
 
     if (existingVote && existingVote.length > 0) {
-      // 更新現有未確認的投票
+      // Reuse existing unconfirmed vote
       voteId = existingVote[0].id;
     } else {
-      // 建立新的投票記錄（不設定 created_at，讓資料庫使用預設值）
+      // Create a new vote record (omit created_at so the DB uses its default)
       const voteData = {
         post_id: postId,
         email: emailLower,
         confirmed: false,
-        // created_at 由資料庫自動設定（DEFAULT NOW()）
+        // created_at is set automatically by the DB (DEFAULT NOW())
       };
       
       const { data: newVote, error: insertError } = await supabaseServer
@@ -307,15 +307,15 @@ export async function POST(req: NextRequest) {
       voteId = newVote.id;
     }
 
-    // 產生確認 token
+    // Generate confirmation token
     const confirmToken = generateVoteToken(postId, emailLower);
 
-    // 發送確認郵件
+    // Send confirmation email
     try {
       await sendVoteConfirmationEmail(emailLower, postId, confirmToken);
     } catch (emailError) {
       console.error('[Award Vote API] Failed to send confirmation email:', emailError);
-      // 郵件發送失敗不影響投票記錄的建立
+      // Email failure should not block vote creation
     }
 
     return NextResponse.json(

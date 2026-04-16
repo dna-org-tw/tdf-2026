@@ -15,7 +15,7 @@ import AwardError from '@/components/award/AwardError';
 import AwardPostsGrid from '@/components/award/AwardPostsGrid';
 import { InstagramPost } from '@/components/award/types';
 
-// 動態導入 Footer 以優化性能
+// Dynamically import Footer for performance optimization
 const Footer = dynamic(() => import('@/components/Footer'), {
   ssr: false,
   loading: () => null,
@@ -37,11 +37,11 @@ export default function AwardPage() {
       content_category: 'Award',
     });
 
-    // 每次載入頁面時都抓取 Instagram Reels
-    // 先抓取 Reels，抓取完成後再載入貼文列表
+    // Fetch Instagram Reels on every page load
+    // Fetch Reels first, then load the posts list after completion
     const initializePage = async () => {
       await fetchReels();
-      // 抓取完成後載入貼文（fetchReels 內部也會調用 loadPosts，這裡作為備用）
+      // Load posts after fetching (fetchReels also calls loadPosts internally; this is a fallback)
       loadPosts();
     };
 
@@ -50,23 +50,23 @@ export default function AwardPage() {
 
   const fetchReels = async () => {
     try {
-      // 調用 API 來抓取 Instagram Reels（每次都會執行，無緩存）
+      // Call API to fetch Instagram Reels (runs every time, no cache)
       const response = await fetch('/api/award/fetch-reels', {
         method: 'GET',
-        cache: 'no-store', // 確保不使用緩存
+        cache: 'no-store', // Ensure no caching
       });
 
       if (response.ok) {
-        // 抓取完成後重新載入貼文列表以顯示最新內容
+        // Reload posts list after fetching to display the latest content
         await loadPosts();
       } else {
         const errorText = await response.text();
         console.warn('[Award Page] Failed to fetch reels:', response.status, errorText);
-        // 即使抓取失敗，也繼續載入現有貼文
+        // Continue loading existing posts even if fetching fails
       }
     } catch (err) {
       console.error('[Award Page] Error fetching reels:', err);
-      // 即使抓取失敗，也繼續載入現有貼文
+      // Continue loading existing posts even if fetching fails
     }
   };
 
@@ -85,43 +85,43 @@ export default function AwardPage() {
         console.warn('[Award Page] No posts in response data:', data);
       }
 
-      // 處理所有貼文資料，統一格式並計算投票數（不進行任何過濾）
+      // Process all post data, unify format, and calculate vote counts (no filtering)
       const processedPosts = (data.posts || []).map((post: InstagramPost) => {
-        // 統一欄位名稱（處理不同的命名風格）
+        // Unify field names (handle different naming conventions)
         const processedPost: InstagramPost = {
           ...post,
-          // 统一 permalink/url
+          // Unify permalink/url
           permalink: post.permalink || post.url || `https://www.instagram.com/p/${post.short_code || ''}/`,
-          // 统一 media_url/display_url
+          // Unify media_url/display_url
           media_url: post.media_url || post.display_url || post.displayUrl || (post.images && post.images[0]) || '',
-          // 统一 username
+          // Unify username
           username: post.username || post.owner_username || post.ownerUsername || '',
-          // 统一 caption
+          // Unify caption
           caption: post.caption || '',
-          // 统一 timestamp
+          // Unify timestamp
           timestamp: post.timestamp || new Date().toISOString(),
-          // 统一类型
+          // Unify type
           type: post.type || post.post_type || 'Image',
-          // 統一互動資料
+          // Unify engagement data
           likes_count: post.likes_count ?? post.likesCount ?? 0,
           comments_count: post.comments_count ?? post.commentsCount ?? 0,
           video_play_count: post.video_play_count ?? post.videoPlayCount ?? 0,
-          // 統一使用者資訊
+          // Unify user info
           owner_username: post.owner_username || post.ownerUsername || post.username || '',
           owner_full_name: post.owner_full_name || post.ownerFullName || '',
-          // 统一 childPosts
+          // Unify childPosts
           child_posts: post.child_posts || post.childPosts || [],
-          // 统一 taggedUsers
+          // Unify taggedUsers
           tagged_users: post.tagged_users || post.taggedUsers || [],
-          // 统一 coauthorProducers
+          // Unify coauthorProducers
           coauthor_producers: post.coauthor_producers || post.coauthorProducers || [],
-          // 投票數（從 vote_count 獲取，如果沒有則預設為 0）
+          // Vote count (from vote_count, defaults to 0 if absent)
           vote_count: post.vote_count || 0,
         };
         return processedPost;
       });
 
-      // 確保顯示所有貼文，不做任何過濾
+      // Ensure all posts are displayed without any filtering
       if (processedPosts.length === 0) {
         console.warn('[Award Page] No posts to display. Check if ig_posts table has data.');
       }
@@ -166,7 +166,7 @@ export default function AwardPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // 檢查是否需要先關注
+        // Check if follow is required first
         if (data.requiresFollow) {
           setPendingVote({ postId, email: email.trim() });
           setShowFollowModal(true);
@@ -174,7 +174,7 @@ export default function AwardPage() {
           return;
         }
 
-        // 顯示詳細的錯誤資訊
+        // Display detailed error information
         const errorMessage = data.details
           ? `${data.error || 'Failed to submit vote'}: ${data.details}`
           : data.error || t.award?.posts?.voteError || 'Failed to submit vote';
@@ -208,17 +208,17 @@ export default function AwardPage() {
     }
   };
 
-  // 處理關注成功後的回調
+  // Handle callback after successful follow
   const handleFollowSuccess = async (email: string) => {
     if (!pendingVote) return;
 
-    // 關閉 modal
+    // Close modal
     setShowFollowModal(false);
 
-    // 自動重新發送投票請求
+    // Automatically resend the vote request
     await handleVote(pendingVote.postId, email);
 
-    // 清除待處理的投票
+    // Clear the pending vote
     setPendingVote(null);
   };
 

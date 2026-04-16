@@ -6,7 +6,7 @@ export default function HashNavigationHandler() {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      // 使用 requestAnimationFrame 確保 DOM 已渲染
+      // Use requestAnimationFrame to ensure DOM has rendered
       requestAnimationFrame(() => {
         setTimeout(() => {
           const element = document.getElementById(hash.replace('#', ''));

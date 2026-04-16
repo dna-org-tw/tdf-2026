@@ -14,7 +14,7 @@ export default function AwardHeader() {
   } | null>(null);
 
   useEffect(() => {
-    // 截止時間：2026年4月30日 12:00 台灣時間 (UTC+8)
+    // Deadline: April 30, 2026, 12:00 Taiwan time (UTC+8)
     const deadline = new Date('2026-04-30T12:00:00+08:00');
 
     const updateCountdown = () => {

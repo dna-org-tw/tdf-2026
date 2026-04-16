@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-    // 從 cookie 讀取折扣碼，自動帶入 Stripe promotion code
+    // Read discount code from cookie and auto-apply Stripe promotion code
     const discountCode = req.cookies.get('discount_code')?.value;
     let stripePromotionCodeId: string | undefined;
 
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
 
     const visitorFingerprint = body?.visitor_fingerprint ?? null;
 
-    // 在 Supabase 中建立訂單記錄（金額先存 0，待 webhook/sync 用 Stripe 實際金額更新）
+    // Create order record in Supabase (amounts set to 0; updated later by webhook/sync with actual Stripe amounts)
     const order = await createOrder({
       stripe_session_id: session.id,
       ticket_tier: tier,
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
 
     if (!order) {
       console.warn('[Checkout] Failed to create order in Supabase, but Stripe session was created:', session.id);
-      // 不阻止返回，因為 Stripe session 已建立成功
+      // Don't block the response since the Stripe session was created successfully
     } else {
       console.log('[Checkout] Order created in Supabase:', order.id);
     }

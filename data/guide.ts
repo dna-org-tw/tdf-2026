@@ -52,7 +52,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
     homeFaqTitle: '常見問題',
     homeFaqCta: '查看完整指南',
     tabs: [
-      // --- Tab: 票券與參與 ---
+      // --- Tab: Tickets & Access ---
       {
         id: 'tickets',
         label: '票券與參與',
@@ -85,7 +85,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         ],
         guideBlocks: [],
       },
-      // --- Tab: 活動報名 ---
+      // --- Tab: Registration ---
       {
         id: 'registration',
         label: '活動報名',
@@ -113,7 +113,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         ],
         guideBlocks: [],
       },
-      // --- Tab: 住宿與生活費 ---
+      // --- Tab: Accommodation & Cost ---
       {
         id: 'accommodation',
         label: '住宿與生活費',
@@ -149,7 +149,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           },
         ],
       },
-      // --- Tab: 交通 ---
+      // --- Tab: Transportation ---
       {
         id: 'transportation',
         label: '交通',
@@ -176,7 +176,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           },
         ],
       },
-      // --- Tab: 花蓮旅行 ---
+      // --- Tab: Hualien Tour ---
       {
         id: 'hualien',
         label: '花蓮旅行',
@@ -199,7 +199,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         ],
         guideBlocks: [],
       },
-      // --- Tab: 講者與協辦 ---
+      // --- Tab: Speakers & Partners ---
       {
         id: 'speakers',
         label: '講者與協辦',
@@ -232,7 +232,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         ],
         guideBlocks: [],
       },
-      // --- Tab: 簽證與聯絡 ---
+      // --- Tab: Visa & Contact ---
       {
         id: 'visa',
         label: '簽證與聯絡',
@@ -268,7 +268,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           },
         ],
       },
-      // --- Tab: 台東生活 ---
+      // --- Tab: Living in Taitung ---
       {
         id: 'living',
         label: '台東生活',

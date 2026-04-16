@@ -4,35 +4,35 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { content, Language, Content } from '@/data/content';
 
-// 偵測瀏覽器語系並回傳對應的語言碼（僅在客戶端使用）
+// Detect browser language and return the corresponding language code (client-side only)
 function getBrowserLanguage(): Language {
   if (typeof window === 'undefined') {
-    return 'zh'; // 服務端渲染時使用預設值
+    return 'zh'; // Default value for server-side rendering
   }
   
   const browserLang = navigator.language || (navigator as { userLanguage?: string }).userLanguage || 'en';
   
-  // 檢查是否為中文語系（包含 zh, zh-TW, zh-CN, zh-HK 等）
+  // Check if it is a Chinese locale (including zh, zh-TW, zh-CN, zh-HK, etc.)
   if (browserLang.toLowerCase().startsWith('zh')) {
     return 'zh';
   }
   
-  // 其他語系預設為英文
+  // Default to English for all other locales
   return 'en';
 }
 
-// 從 URL 參數取得語言，若沒有則回傳預設值（伺服端和客戶端皆可用）
+// Get language from URL params, or return default (works on both server and client)
 function getInitialLanguage(searchParams: URLSearchParams | null): Language {
   if (!searchParams) {
-    return 'zh'; // 如果 searchParams 不可用，使用預設值
+    return 'zh'; // Use default if searchParams is unavailable
   }
   
   const langParam = searchParams.get('lang');
   if (langParam === 'en' || langParam === 'zh') {
-    return langParam as Language; // 類型斷言：已經確認是有效的語言碼
+    return langParam as Language; // Type assertion: already validated as a valid language code
   }
   
-  return 'zh'; // 預設為中文，確保服務端和客戶端一致
+  return 'zh'; // Default to Chinese to ensure server-client consistency
 }
 
 export function useTranslation() {
@@ -40,42 +40,42 @@ export function useTranslation() {
   const router = useRouter();
   const pathname = usePathname();
   
-  // 初始值從 URL 參數獲取，確保服務端和客戶端一致
+  // Initial value from URL params to ensure server-client consistency
   const [lang, setLang] = useState<Language>(() => {
     try {
       return getInitialLanguage(searchParams);
     } catch (error) {
-      return 'zh'; // 如果出錯，使用預設值
+      return 'zh'; // Use default on error
     }
   });
   const [mounted, setMounted] = useState(false);
 
-  // 標記組件已掛載（hydration 完成）
+  // Mark component as mounted (hydration complete)
   useEffect(() => {
-    // 使用 setTimeout 來避免在 effect 中直接調用 setState
+    // Use setTimeout to avoid calling setState directly inside an effect
     setTimeout(() => {
       setMounted(true);
     }, 0);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return; // 等待 hydration 完成
+    if (!mounted) return; // Wait for hydration to complete
     
     try {
       const langParam = searchParams?.get('lang');
       if (langParam === 'en' || langParam === 'zh') {
-        // 使用 setTimeout 來避免在 effect 中直接調用 setState
+        // Use setTimeout to avoid calling setState directly inside an effect
         setTimeout(() => {
-          setLang(langParam as Language); // 類型斷言：已經確認是有效的語言碼
+          setLang(langParam as Language); // Type assertion: already validated as a valid language code
         }, 0);
       } else {
-        // 如果 URL 參數中沒有指定語系，使用瀏覽器語系（僅在客戶端）
+        // If no language specified in URL params, use browser language (client-side only)
         setTimeout(() => {
           setLang(getBrowserLanguage());
         }, 0);
       }
     } catch (error) {
-      // 如果出錯，保持當前語言或使用預設值
+      // On error, keep the current language or use default
       console.error('Error updating language:', error);
     }
   }, [searchParams, mounted]);
@@ -101,9 +101,9 @@ export function useTranslation() {
     }
   }
 
-  // 確保 lang 是有效的語言碼，並確保 content[lang] 存在
+  // Ensure lang is a valid language code and content[lang] exists
   const safeLang: Language = (lang === 'en' || lang === 'zh') ? lang : 'zh';
-  const safeContent: Content = content[safeLang] || content.zh; // 如果找不到對應的翻譯，使用中文作為後備
+  const safeContent: Content = content[safeLang] || content.zh; // Fall back to Chinese if translation not found
 
   return {
     lang: safeLang,

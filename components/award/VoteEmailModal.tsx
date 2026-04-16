@@ -33,7 +33,7 @@ export default function VoteEmailModal({
   const [canVote, setCanVote] = useState(false);
   const [isFollowingNow, setIsFollowingNow] = useState(false);
 
-  // 當 modal 關閉時重置狀態
+  // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setEmail('');
@@ -75,17 +75,17 @@ export default function VoteEmailModal({
         throw new Error(data.error || 'Failed to check follow status');
       }
 
-      // API 呼叫成功，設定 follow 狀態
+      // API call succeeded, set follow status
       setIsFollowing(data.isFollowing);
       setCanVote(data.isFollowing);
       
-      // 如果使用者沒有 follow，不設定錯誤資訊，只顯示友善的提示（在 Follow Status 部分顯示）
-      // 只有當 API 呼叫真正失敗時才顯示錯誤資訊
+      // If user is not following, don't set error — show a friendly hint in the Follow Status section
+      // Only show error messages when the API call actually fails
     } catch (err) {
       console.error('Failed to check follow status:', err);
-      // 只有真正的 API 錯誤才顯示錯誤資訊
+      // Only show error for actual API failures
       setError(err instanceof Error ? err.message : 'Failed to check follow status');
-      setIsFollowing(null); // 設為 null，表示檢查失敗，不顯示 follow 狀態
+      setIsFollowing(null); // Set to null to indicate check failed, don't show follow status
       setCanVote(false);
     } finally {
       setIsChecking(false);
@@ -101,22 +101,22 @@ export default function VoteEmailModal({
       return;
     }
 
-    // 驗證 Email 格式
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmedEmail)) {
       setError(lang === 'en' ? 'Invalid email format' : '無效的電子郵件格式');
       return;
     }
 
-    // 檢查 follow 狀態
+    // Check follow status
     await checkFollowStatus(trimmedEmail);
   };
 
   const handleVote = () => {
     if (!canVote || !email.trim()) return;
 
-    // 呼叫父元件的 onEmailSubmit，傳遞信箱
-    // recaptcha 驗證會在 page.tsx 的 handleVote 中執行
+    // Call parent's onEmailSubmit with the email
+    // reCAPTCHA verification is handled in page.tsx's handleVote
     onEmailSubmit(email.trim());
     onClose();
   };
@@ -131,7 +131,7 @@ export default function VoteEmailModal({
     setError(null);
 
     try {
-      // 執行 reCAPTCHA 驗證
+      // Execute reCAPTCHA verification
       let recaptchaToken: string | null = null;
       try {
         recaptchaToken = await executeRecaptcha();
@@ -141,10 +141,10 @@ export default function VoteEmailModal({
         return;
       }
 
-      // 獲取使用者資訊
+      // Get user info
       const userInfo = getUserInfo();
 
-      // 呼叫訂閱 API
+      // Call subscribe API
       const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: {
@@ -163,9 +163,9 @@ export default function VoteEmailModal({
       const result = await response.json();
 
       if (!response.ok) {
-        // 處理重複訂閱的情況（視為成功）
+        // Handle duplicate subscription (treat as success)
         if (response.status === 409) {
-          // 即使重複訂閱，也視為成功，重新檢查 follow 狀態
+          // Even if duplicate, treat as success and re-check follow status
           await checkFollowStatus(email.trim());
           setIsFollowingNow(false);
           return;
@@ -176,7 +176,7 @@ export default function VoteEmailModal({
         return;
       }
 
-      // 訂閱成功，重新檢查 follow 狀態
+      // Subscription succeeded, re-check follow status
       await checkFollowStatus(email.trim());
       setIsFollowingNow(false);
     } catch (err) {

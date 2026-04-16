@@ -31,11 +31,11 @@ function getLangFromRequest(req: NextRequest): 'en' | 'zh' {
 // Helper function to get country from IP using ipapi.co (free tier)
 async function getCountryFromIP(ip: string | null): Promise<string | null> {
   if (!ip || ip === 'localhost' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
-    return null; // 本地IP或私有IP
+    return null; // Local or private IP
   }
 
   try {
-    // 使用 ipapi.co 免費 API（無需 API key，限制：1000 次/天）
+    // Use ipapi.co free API (no API key needed; limit: 1000 requests/day)
     const response = await fetch(`https://ipapi.co/${ip}/country/`, {
       headers: {
         'User-Agent': 'Taiwan-Digital-Fest-2026',
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
     const email = body.email.trim();
 
-    // 簡單的 Email 格式驗證
+    // Simple email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -100,11 +100,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: t.recaptchaFailed }, { status: 400 });
     }
 
-    // 取得 IP 位址與國家資訊
+    // Get IP address and country info
     const clientIP = getClientIP(req);
     const country = clientIP ? await getCountryFromIP(clientIP) : null;
     
-    // 獲取時區和語言區域（從前端發送）
+    // Get timezone and locale (sent from frontend)
     const timezone = body.timezone || null;
     const locale = body.locale || null;
 
@@ -183,14 +183,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 插入資料到 Supabase
+    // Insert data into Supabase
     const insertData: Record<string, unknown> = {
       email,
       source: body.source || 'hero_section',
       created_at: new Date().toISOString(),
     };
 
-    // 新增可選欄位
+    // Add optional fields
     if (timezone) insertData.timezone = timezone;
     if (clientIP) insertData.ip_address = clientIP;
     if (country) insertData.country = country;
@@ -219,10 +219,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 訂閱成功後，發送感謝郵件（非阻塞，不影響響應）
+    // After successful subscription, send thank-you email (non-blocking)
     sendSubscriptionThankYouEmail(email).catch((emailError) => {
       console.error('[Newsletter API] Failed to send thank you email:', emailError);
-      // 不影響訂閱成功的響應
+      // Don't affect the successful subscription response
     });
 
     return NextResponse.json(

@@ -6,7 +6,7 @@ if (!supabaseServer) {
 }
 
 /**
- * 在 Supabase 中建立訂單
+ * Create an order in Supabase
  */
 export async function createOrder(input: CreateOrderInput): Promise<Order | null> {
   if (!supabaseServer) {
@@ -48,7 +48,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order | null
 }
 
 /**
- * 根据 Stripe session ID 查找订单
+ * Find an order by Stripe session ID
  */
 export async function getOrderBySessionId(sessionId: string): Promise<Order | null> {
   if (!supabaseServer) {
@@ -65,7 +65,7 @@ export async function getOrderBySessionId(sessionId: string): Promise<Order | nu
 
     if (error) {
       if (error.code === 'PGRST116') {
-        // 订单不存在
+        // Order not found
         return null;
       }
       console.error('[Orders] Error getting order:', error);
@@ -80,7 +80,7 @@ export async function getOrderBySessionId(sessionId: string): Promise<Order | nu
 }
 
 /**
- * 根據 email 查詢訂單列表
+ * Get a list of orders by email
  */
 export async function getOrdersByEmail(email: string): Promise<Order[]> {
   if (!supabaseServer) {
@@ -108,7 +108,7 @@ export async function getOrdersByEmail(email: string): Promise<Order[]> {
 }
 
 /**
- * 更新订单
+ * Update an order
  */
 export async function updateOrder(
   sessionId: string,
@@ -202,7 +202,7 @@ export async function updateOrder(
 }
 
 /**
- * 根据 Stripe session ID 更新订单状态
+ * Update order status by Stripe session ID
  */
 export async function updateOrderStatus(
   sessionId: string,

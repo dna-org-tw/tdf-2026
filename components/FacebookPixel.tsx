@@ -47,7 +47,7 @@ function createEventId() {
   return `evt_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-// 轉發事件至 webhook（與 Pixel 並行，不 await）
+// Forward event to webhook (runs in parallel with Pixel, no await)
 function forwardToWebhook(
   eventType: 'standard' | 'custom',
   eventName: string,
@@ -62,7 +62,7 @@ function forwardToWebhook(
   }).catch(() => {});
 }
 
-// 導出追蹤函數供其他組件使用
+// Export tracking function for use by other components
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
   const eventId = createEventId();
   if (typeof window !== 'undefined' && window.fbq) {
@@ -71,7 +71,7 @@ export const trackEvent = (eventName: string, parameters?: Record<string, any>) 
   forwardToWebhook('standard', eventName, parameters, eventId);
 };
 
-// 導出自定義事件追蹤函數
+// Export custom event tracking function
 export const trackCustomEvent = (eventName: string, parameters?: Record<string, any>) => {
   const eventId = createEventId();
   if (typeof window !== 'undefined' && window.fbq) {

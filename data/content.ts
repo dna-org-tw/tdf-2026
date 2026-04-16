@@ -42,7 +42,27 @@ export const content = {
       guide: "Guide",
       login: "Sign In",
       member: "My Account",
-      languageToggle: "中文"
+      languageToggle: "中文",
+      admin: "Admin"
+    },
+    members: {
+      title: "Community",
+      subtitle: "Meet the people joining TDF 2026",
+      search: "Search by name, location, or tag…",
+      noResults: "No members found",
+      loading: "Loading…",
+      prev: "Previous",
+      next: "Next",
+      total: "public members",
+      anonymous: "Anonymous",
+    },
+    memberDetail: {
+      notFoundTitle: "Card not found",
+      notFoundDesc: "This member card does not exist or is not public.",
+      backHome: "Back to Home",
+      languages: "Languages",
+      wantCard: "Want your own card?",
+      joinCta: "Join TDF 2026",
     },
     auth: {
       loginTitle: "Sign In",
@@ -1059,7 +1079,27 @@ export const content = {
       guide: "指南",
       login: "登入",
       member: "我的帳戶",
-      languageToggle: "中文"
+      languageToggle: "中文",
+      admin: "管理後台"
+    },
+    members: {
+      title: "社群夥伴",
+      subtitle: "認識一起參加 TDF 2026 的夥伴們",
+      search: "搜尋名稱、地點或標籤…",
+      noResults: "找不到符合的結果",
+      loading: "載入中…",
+      prev: "上一頁",
+      next: "下一頁",
+      total: "位公開夥伴",
+      anonymous: "匿名",
+    },
+    memberDetail: {
+      notFoundTitle: "找不到此名片",
+      notFoundDesc: "此會員名片不存在或尚未公開。",
+      backHome: "回首頁",
+      languages: "語言",
+      wantCard: "想要自己的名片？",
+      joinCta: "加入 TDF 2026",
     },
     auth: {
       loginTitle: "登入",

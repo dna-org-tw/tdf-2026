@@ -19,9 +19,9 @@ interface State {
 }
 
 /**
- * Error Boundary 組件
- * 用於捕獲子組件樹中的錯誤，提供優雅的降級方案
- * 特別針對地圖組件等可能失敗的第三方整合
+ * Error Boundary component
+ * Catches errors in child component tree and provides graceful degradation
+ * Especially useful for map components and other third-party integrations that may fail
  */
 class ErrorBoundaryInner extends Component<Props, State> {
   constructor(props: Props) {
@@ -40,7 +40,7 @@ class ErrorBoundaryInner extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // 記錄錯誤到監控服務（如 Sentry）
+    // Log error to monitoring service (e.g. Sentry)
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     if (this.props.onError) {
@@ -50,12 +50,12 @@ class ErrorBoundaryInner extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      // 如果有自定義 fallback，使用它
+      // If a custom fallback is provided, use it
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
-      // 預設降級 UI
+      // Default fallback UI
       return (
         <div className="flex flex-col items-center justify-center p-8 bg-stone-50 rounded-lg border border-stone-200">
           <AlertCircle className="w-12 h-12 text-amber-500 mb-4" />
@@ -83,7 +83,7 @@ class ErrorBoundaryInner extends Component<Props, State> {
 }
 
 /**
- * Error Boundary 包裝器組件，使用翻譯
+ * Error Boundary wrapper component with translation support
  */
 export function ErrorBoundary({ children, fallback, onError }: Omit<Props, 'errorTitle' | 'errorDescription' | 'reloadButton'>) {
   const { t } = useTranslation();

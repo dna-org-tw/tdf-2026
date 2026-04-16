@@ -123,13 +123,13 @@ async function persistEvent(evt: PersistedEvent) {
 }
 
 async function dispatchEventActions(_evt: PersistedEvent) {
-  // 觸發動作的骨架：未來若要在特定事件（例如 InitiateCheckout、CompleteRegistration）
-  // 觸發通知 / 外部整合，在這裡分派。目前為空實作。
+  // Action dispatch skeleton: if specific events (e.g. InitiateCheckout, CompleteRegistration)
+  // need to trigger notifications or external integrations, dispatch here. Currently a no-op.
 }
 
 /**
- * 接收前端追蹤事件，持久化至 Supabase tracking_events，
- * 並轉發至 Meta CAPI（若已設定）。與 Facebook Pixel 並行，不影響原有追蹤。
+ * Receive frontend tracking events, persist to Supabase tracking_events,
+ * and forward to Meta CAPI (if configured). Runs alongside Facebook Pixel without affecting existing tracking.
  */
 export async function POST(request: NextRequest) {
   const rl = await enforceRateLimit(request, { key: 'events-track', limit: 180, windowSeconds: 60 });

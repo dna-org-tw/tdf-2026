@@ -47,7 +47,7 @@ export default function LazyYouTubeEmbed({
     };
   }, []);
 
-  // 自動靜音播放：進入 viewport 後自動載入 iframe 並播放（符合瀏覽器自動播放需靜音的規則）
+  // Auto-play muted: load iframe and play when entering viewport (complies with browser autoplay-requires-mute policy)
   useEffect(() => {
     if (autoPlayMuted && isInView && !isLoaded) {
       setIsLoaded(true);

@@ -12,14 +12,14 @@ export interface TaitungAccommodation {
 
 // Column indices (0-based) from the CSV header
 const COL = {
-  NAME: 2,          // 業者名稱
-  TYPE: 3,          // 業者類型
-  ADDRESS: 7,       // 業者地址
-  WEBSITE: 8,       // 官方網站 / 社群連結
-  ADDRESS_EN: 22,   // 業者英文地址
-  NAME_EN: 23,      // 業者英文名稱
-  DESCRIPTION: 25,  // 官方介紹（100字以內）
-  PASS_DATE: 29,    // 通過日期
+  NAME: 2,          // Business name
+  TYPE: 3,          // Business type
+  ADDRESS: 7,       // Business address
+  WEBSITE: 8,       // Official website / social link
+  ADDRESS_EN: 22,   // Business English address
+  NAME_EN: 23,      // Business English name
+  DESCRIPTION: 25,  // Official description (100 chars max)
+  PASS_DATE: 29,    // Certification date
 } as const;
 
 function parseCsv(content: string): string[][] {

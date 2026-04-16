@@ -3,7 +3,7 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { verifyRecaptcha } from '@/lib/recaptcha';
 
 /**
- * 檢查使用者是否已關注（訂閱 newsletter）
+ * Check if user is following (subscribed to newsletter)
  */
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const email = body.email.trim().toLowerCase();
 
-    // 驗證 Email 格式
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 檢查是否已訂閱 newsletter
+    // Check if already subscribed to newsletter
     const { data: subscription, error: subscriptionError } = await supabaseServer
       .from('newsletter_subscriptions')
       .select('email')

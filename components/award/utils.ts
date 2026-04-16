@@ -1,6 +1,6 @@
 import { InstagramPost } from './types';
 
-// 獲取貼文主圖
+// Get post thumbnail image
 export const getPostImage = (post: InstagramPost): string => {
   if (post.media_url) return post.media_url;
   if (post.display_url) return post.display_url;
@@ -9,7 +9,7 @@ export const getPostImage = (post: InstagramPost): string => {
   return '';
 };
 
-// 獲取貼文連結
+// Get post permalink
 export const getPostLink = (post: InstagramPost): string => {
   if (post.permalink) return post.permalink;
   if (post.url) return post.url;
@@ -17,12 +17,12 @@ export const getPostLink = (post: InstagramPost): string => {
   return '#';
 };
 
-// 取得貼文使用者名稱
+// Get post username
 export const getPostUsername = (post: InstagramPost): string => {
   return post.username || post.owner_username || post.ownerUsername || '';
 };
 
-// 格式化数字
+// Format number
 export const formatNumber = (num: number | null | undefined): string => {
   if (!num && num !== 0) return '0';
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -30,7 +30,7 @@ export const formatNumber = (num: number | null | undefined): string => {
   return num.toString();
 };
 
-// 格式化日期
+// Format date
 export const formatDate = (timestamp: string, lang: string = 'en'): string => {
   try {
     const date = new Date(timestamp);

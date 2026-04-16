@@ -11,7 +11,7 @@ import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
-// 計數器動畫元件
+// Animated counter component
 function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
   const [displayValue, setDisplayValue] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -29,8 +29,8 @@ function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?:
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // 自定義緩動函數：前面快後面慢（更明顯的 ease-out）
-        // 使用更高次方的 ease-out，讓前面更快，後面更慢
+        // Custom easing: fast start, slow end (pronounced ease-out)
+        // Higher-order ease-out for faster acceleration and slower deceleration
         const easeOut = 1 - Math.pow(1 - progress, 5);
         const currentValue = Math.floor(startValue + (endValue - startValue) * easeOut);
         
@@ -49,7 +49,7 @@ function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?:
     }
   }, [value, duration]);
 
-  // 格式化數字，新增千位分隔符
+  // Format number with thousands separator
   const formatNumber = (num: number) => {
     return num.toLocaleString('en-US');
   };
@@ -83,7 +83,7 @@ export default function FollowUsSection() {
     message: '',
   });
 
-  // 獲取關注者數量
+  // Fetch follower count
   useEffect(() => {
     const fetchFollowerCount = async () => {
       try {
@@ -112,7 +112,7 @@ export default function FollowUsSection() {
     setIsSubmitting(true);
 
     try {
-      // 執行 reCAPTCHA 驗證
+      // Execute reCAPTCHA verification
       let recaptchaToken: string | null = null;
       try {
         recaptchaToken = await executeRecaptcha();
@@ -126,7 +126,7 @@ export default function FollowUsSection() {
         return;
       }
 
-      // 獲取使用者資訊
+      // Get user info
       const userInfo = getUserInfo();
 
       const response = await fetch('/api/newsletter/subscribe', {
@@ -154,7 +154,7 @@ export default function FollowUsSection() {
           message: data.message || t.followUs.successMessage,
         });
         setEmail('');
-        // 更新關注者數量
+        // Update follower count
         setFollowerCount((prev) => prev + 1);
         trackEvent('CompleteRegistration', {
           content_name: 'Follow Us Form',
