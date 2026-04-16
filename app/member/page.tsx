@@ -1,21 +1,20 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, useMemo, useSyncExternalStore, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import type { Order } from '@/lib/types/order';
-import {
-  TICKET_TIER_RANK,
-  TICKET_TIER_LABELS,
-  TICKET_TIER_BADGE_CLASSES,
-  type TicketTier,
-} from '@/lib/members';
-import LumaRegistrationsList from '@/components/admin/LumaRegistrationsList';
+import { TICKET_TIER_RANK, type TicketTier } from '@/lib/members';
 import type { Registration } from '@/lib/lumaSyncTypes';
 import EmailPreferences from '@/components/member/EmailPreferences';
+import MemberPassport, { type IdentityTier } from '@/components/member/MemberPassport';
+import UpgradeBanner from '@/components/member/UpgradeBanner';
+import FestivalCountdown from '@/components/member/FestivalCountdown';
+import UpcomingEvents from '@/components/member/UpcomingEvents';
+import CollapsibleSection from '@/components/member/CollapsibleSection';
 
 function LoginForm() {
   const { t } = useTranslation();
@@ -187,6 +186,15 @@ function LoginForm() {
   );
 }
 
+let cachedPageNow: number | null = null;
+const nextEventSubscribe = (cb: () => void) => {
+  cachedPageNow = Date.now();
+  cb();
+  return () => {};
+};
+const getNextEventNow = () => cachedPageNow;
+const getNextEventServer = () => null;
+
 function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTranslation>['t'] }) {
   const statusMap: Record<string, { label: string; color: string }> = {
     paid: { label: t.auth.statusPaid, color: 'bg-green-100 text-green-700' },
@@ -196,165 +204,169 @@ function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTr
     refunded: { label: t.auth.statusRefunded, color: 'bg-purple-100 text-purple-700' },
   };
   const { label, color } = statusMap[status] || { label: status, color: 'bg-slate-100 text-slate-600' };
-  return <span className={`px-2 py-1 rounded-full text-xs font-medium ${color}`}>{label}</span>;
+  return <span className={`px-2 py-[2px] rounded-full text-[10px] font-medium ${color}`}>{label}</span>;
 }
 
 function MemberDashboard() {
   const { user, signOut } = useAuth();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [lumaRegs, setLumaRegs] = useState<Registration[]>([]);
+  const [me, setMe] = useState<{ memberNo: string | null; firstSeenAt: string | null } | null>(null);
 
   useEffect(() => {
     if (!user?.email) return;
 
-    const fetchOrders = async () => {
-      try {
-        const res = await fetch(`/api/auth/orders?email=${encodeURIComponent(user.email!)}`);
-
-        if (res.ok) {
-          const data = await res.json();
-          setOrders(data.orders);
-        }
-      } catch (err) {
-        console.error('[Member] Failed to fetch orders:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
+    fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
+      .then((r) => r.ok ? r.json() : { orders: [] })
+      .then((d) => setOrders(d.orders ?? []))
+      .catch((err) => console.error('[Member] Failed to fetch orders:', err))
+      .finally(() => setLoading(false));
 
     fetch('/api/auth/luma-registrations')
       .then((r) => r.ok ? r.json() : { registrations: [] })
       .then((d) => setLumaRegs(d.registrations ?? []))
       .catch(() => setLumaRegs([]));
+
+    fetch('/api/auth/me')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => d && setMe({ memberNo: d.memberNo, firstSeenAt: d.firstSeenAt }))
+      .catch(() => {});
   }, [user?.email]);
 
-  const highestTier = useMemo<TicketTier | null>(() => {
+  const identityTier = useMemo<IdentityTier>(() => {
     const paidTiers = orders
       .filter((o) => o.status === 'paid')
       .map((o) => o.ticket_tier);
-    if (paidTiers.length === 0) return null;
-    return paidTiers.reduce((best, curr) =>
-      TICKET_TIER_RANK[curr] > TICKET_TIER_RANK[best] ? curr : best
+    if (paidTiers.length === 0) return 'follower';
+    return paidTiers.reduce<TicketTier>(
+      (best, curr) => (TICKET_TIER_RANK[curr] > TICKET_TIER_RANK[best] ? curr : best),
+      paidTiers[0],
     );
   }, [orders]);
 
-  const formatAmount = (amount: number, currency: string) => {
-    return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
-  };
+  const nowMs = useSyncExternalStore<number | null>(nextEventSubscribe, getNextEventNow, getNextEventServer);
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+  const nextEvent = useMemo(() => {
+    if (nowMs == null) return null;
+    const upcoming = lumaRegs
+      .filter((r) => r.startAt && new Date(r.startAt).getTime() >= nowMs)
+      .sort((a, b) => new Date(a.startAt!).getTime() - new Date(b.startAt!).getTime());
+    const first = upcoming[0];
+    if (!first) return null;
+    return { name: first.eventName, startAt: first.startAt!, url: first.url };
+  }, [lumaRegs, nowMs]);
+
+  const formatAmount = (amount: number, currency: string) =>
+    `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
+
+  const formatDate = (s: string) =>
+    new Date(s).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US', {
+      year: 'numeric', month: 'short', day: 'numeric',
     });
-  };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      {/* User Info */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t.auth.memberTitle}</h1>
-          <p className="text-slate-500 mt-1">{user?.email}</p>
+    <div className="w-full max-w-2xl mx-auto space-y-6">
+      {/* Greeting + sign out */}
+      <header className="flex items-center justify-between">
+        <div className="min-w-0">
+          <p className="text-[11px] font-mono tracking-[0.25em] uppercase text-slate-400">
+            {lang === 'zh' ? '嗨，部落成員' : 'Hello, nomad'}
+          </p>
+          <p className="font-display font-semibold text-slate-900 truncate text-base">
+            {user?.email}
+          </p>
         </div>
         <button
           onClick={signOut}
-          className="text-sm text-slate-500 hover:text-red-500 transition-colors font-medium"
+          className="shrink-0 text-[12px] font-mono tracking-[0.15em] uppercase text-slate-400 hover:text-red-500 transition-colors"
         >
           {t.auth.logout}
         </button>
-      </div>
+      </header>
 
-      {/* Current Ticket Tier */}
-      {!loading && (
-        <div className="mb-8 bg-white rounded-xl p-6 shadow-sm flex items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-sm text-slate-500 mb-1">{t.auth.yourTier}</p>
-            {highestTier ? (
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-base font-semibold ${TICKET_TIER_BADGE_CLASSES[highestTier]}`}
-              >
-                {TICKET_TIER_LABELS[highestTier]}
-              </span>
-            ) : (
-              <p className="text-slate-600">{t.auth.noPaidTier}</p>
-            )}
-          </div>
-        </div>
+      {/* Hero countdown */}
+      <FestivalCountdown lang={lang} nextEvent={nextEvent} />
+
+      {/* Identity card */}
+      {!loading && user?.email && (
+        <MemberPassport
+          email={user.email}
+          memberNo={me?.memberNo ?? null}
+          firstSeenAt={me?.firstSeenAt ?? null}
+          tier={identityTier}
+          lang={lang}
+        />
       )}
 
-      {/* Order History */}
-      <div>
-        <h2 className="text-xl font-bold text-slate-900 mb-4">{t.auth.orderHistory}</h2>
+      {/* Upgrade banner */}
+      {!loading && <UpgradeBanner currentTier={identityTier} lang={lang} />}
 
+      {/* Upcoming events */}
+      <UpcomingEvents registrations={lumaRegs} lang={lang} />
+
+      {/* Orders (collapsible) */}
+      <CollapsibleSection
+        title={t.auth.orderHistory}
+        count={loading ? '…' : orders.length}
+        defaultOpen={false}
+      >
         {loading ? (
-          <div className="space-y-3">
+          <div className="space-y-2 mt-2">
             {[1, 2].map((i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm animate-pulse">
-                <div className="h-4 bg-slate-200 rounded w-1/3 mb-3" />
-                <div className="h-3 bg-slate-200 rounded w-1/2" />
-              </div>
+              <div key={i} className="rounded-lg p-4 bg-stone-100 animate-pulse h-16" />
             ))}
           </div>
         ) : orders.length === 0 ? (
-          <div className="bg-white rounded-xl p-8 shadow-sm text-center">
-            <p className="text-slate-500">{t.auth.noOrders}</p>
+          <div className="text-center py-4">
+            <p className="text-sm text-slate-500 mb-3">{t.auth.noOrders}</p>
             <Link
               href="/#tickets"
-              className="inline-block mt-4 bg-[#10B8D9] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#0EA5C4] transition-colors"
+              className="inline-block bg-[#10B8D9] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#0EA5C4] transition-colors"
             >
               {t.nav.tickets}
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <ul className="mt-2 space-y-2">
             {orders.map((order) => (
-              <Link
-                key={order.id}
-                href={`/member/order/${order.id}`}
-                className="block bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-slate-900 capitalize">
-                        {order.ticket_tier}
-                      </span>
-                      <StatusBadge status={order.status} t={t} />
+              <li key={order.id}>
+                <Link
+                  href={`/member/order/${order.id}`}
+                  className="block rounded-lg p-3 bg-stone-50 hover:bg-stone-100 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="font-semibold text-slate-900 capitalize text-sm">
+                          {order.ticket_tier}
+                        </span>
+                        <StatusBadge status={order.status} t={t} />
+                      </div>
+                      <p className="text-[11px] text-slate-500">{formatDate(order.created_at)}</p>
                     </div>
-                    <p className="text-sm text-slate-500">
-                      {formatDate(order.created_at)}
-                    </p>
+                    <div className="text-right shrink-0">
+                      <p className="font-semibold text-slate-900 text-sm">
+                        {formatAmount(order.amount_total, order.currency)}
+                      </p>
+                      <p className="text-[10px] text-[#10B8D9] mt-0.5">{t.auth.viewDetails} →</p>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-semibold text-slate-900">
-                      {formatAmount(order.amount_total, order.currency)}
-                    </p>
-                    <p className="text-xs text-[#10B8D9] mt-1">{t.auth.viewDetails} →</p>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
-      </div>
+      </CollapsibleSection>
 
-      {lumaRegs.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">我的活動報名</h2>
-          <LumaRegistrationsList registrations={lumaRegs} />
-        </div>
-      )}
-
+      {/* Email preferences (collapsible) */}
       {user?.email && (
-        <div className="mt-8">
-          <EmailPreferences userEmail={user.email} />
-        </div>
+        <CollapsibleSection title={lang === 'zh' ? '信件偏好' : 'Email preferences'} defaultOpen={false}>
+          <div className="mt-2">
+            <EmailPreferences userEmail={user.email} />
+          </div>
+        </CollapsibleSection>
       )}
     </div>
   );
@@ -374,7 +386,7 @@ function MemberContent() {
   return (
     <div className="min-h-screen bg-stone-50">
       <Navbar />
-      <main className="pt-32 pb-16 px-6">
+      <main className="pt-24 pb-16 px-4 sm:px-6">
         {user ? <MemberDashboard /> : <LoginForm />}
       </main>
       <Footer />
