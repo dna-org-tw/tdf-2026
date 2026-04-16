@@ -10,6 +10,7 @@ import GoogleTag from '@/components/GoogleTag';
 import RecaptchaScript from '@/components/RecaptchaScript';
 import VisitorTracker from '@/components/VisitorTracker';
 import DiscountCodeCapture from '@/components/DiscountCodeCapture';
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({
@@ -140,6 +141,11 @@ export const metadata: Metadata = {
     description: 'Taiwan Digital Fest 2026 is a month-long digital nomad festival in Taitung & Hualien, Taiwan. Join workshops, networking events, cultural experiences, and a remote work summit. May 1–31, 2026.',
     images: ['/images/tdf2026_cover.webp'],
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'TDF 2026',
+  },
   robots: {
     index: true,
     follow: true,
@@ -171,6 +177,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} ${notoSansTC.variable} font-sans antialiased bg-stone-50 text-slate-900 selection:bg-teal-500 selection:text-white`}
       >
+        <ServiceWorkerRegistration />
         {/* Performance optimization: Preconnect to external domains - Next.js will move these to head */}
         <PreconnectLinks />
         {/* AEO 優化：新增結構化資料 - Next.js 會自動將其移到 head */}
