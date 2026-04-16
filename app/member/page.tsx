@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useSyncExternalStore, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
@@ -12,7 +12,6 @@ import type { Registration } from '@/lib/lumaSyncTypes';
 import EmailPreferences from '@/components/member/EmailPreferences';
 import MemberPassport, { type IdentityTier } from '@/components/member/MemberPassport';
 import UpgradeBanner from '@/components/member/UpgradeBanner';
-import FestivalCountdown from '@/components/member/FestivalCountdown';
 import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 
@@ -186,15 +185,6 @@ function LoginForm() {
   );
 }
 
-let cachedPageNow: number | null = null;
-const nextEventSubscribe = (cb: () => void) => {
-  cachedPageNow = Date.now();
-  cb();
-  return () => {};
-};
-const getNextEventNow = () => cachedPageNow;
-const getNextEventServer = () => null;
-
 function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTranslation>['t'] }) {
   const statusMap: Record<string, { label: string; color: string }> = {
     paid: { label: t.auth.statusPaid, color: 'bg-green-100 text-green-700' },
@@ -246,18 +236,6 @@ function MemberDashboard() {
     );
   }, [orders]);
 
-  const nowMs = useSyncExternalStore<number | null>(nextEventSubscribe, getNextEventNow, getNextEventServer);
-
-  const nextEvent = useMemo(() => {
-    if (nowMs == null) return null;
-    const upcoming = lumaRegs
-      .filter((r) => r.startAt && new Date(r.startAt).getTime() >= nowMs)
-      .sort((a, b) => new Date(a.startAt!).getTime() - new Date(b.startAt!).getTime());
-    const first = upcoming[0];
-    if (!first) return null;
-    return { name: first.eventName, startAt: first.startAt!, url: first.url };
-  }, [lumaRegs, nowMs]);
-
   const formatAmount = (amount: number, currency: string) =>
     `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
 
@@ -286,10 +264,7 @@ function MemberDashboard() {
         </button>
       </header>
 
-      {/* Hero countdown */}
-      <FestivalCountdown lang={lang} nextEvent={nextEvent} />
-
-      {/* Identity card */}
+      {/* Identity card (hero) */}
       {!loading && user?.email && (
         <MemberPassport
           email={user.email}
@@ -303,7 +278,7 @@ function MemberDashboard() {
       {/* Upgrade banner */}
       {!loading && <UpgradeBanner currentTier={identityTier} lang={lang} />}
 
-      {/* Upcoming events */}
+      {/* Upcoming events + festival countdown */}
       <UpcomingEvents registrations={lumaRegs} lang={lang} />
 
       {/* Orders (collapsible) */}

@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslation } from '@/hooks/useTranslation';
+import { getPricingByKey, isOnSale } from '@/lib/ticketPricing';
+import type { TicketTier } from '@/lib/members';
 import {
   TIER_NAMES,
-  TIER_PERKS,
   TIER_ACCENT,
   TIER_RANK,
   TIER_ORDER,
@@ -15,7 +17,13 @@ interface Props {
   lang: 'en' | 'zh';
 }
 
+function getTicketFeatures(t: ReturnType<typeof useTranslation>['t'], tier: string): string[] {
+  const section = t.tickets as Record<string, { features?: string[] }>;
+  return section[tier]?.features ?? [];
+}
+
 export default function UpgradeBanner({ currentTier, lang }: Props) {
+  const { t } = useTranslation();
   const currentRank = TIER_RANK[currentTier];
   const nextTier = TIER_ORDER.find((t) => TIER_RANK[t] === currentRank + 1) ?? null;
 
@@ -40,11 +48,25 @@ export default function UpgradeBanner({ currentTier, lang }: Props) {
 
   const accent = TIER_ACCENT[nextTier];
   const tierName = TIER_NAMES[nextTier][lang] || TIER_NAMES[nextTier].en;
-  const topPerk = TIER_PERKS[nextTier][lang][0];
+  const pricing = getPricingByKey(nextTier as TicketTier);
+  const onSale = isOnSale();
+
+  // Differential features: what the next tier has that current doesn't
+  const currentFeatures = currentTier === 'follower'
+    ? getTicketFeatures(t, 'follower')
+    : getTicketFeatures(t, currentTier);
+  const nextFeatures = getTicketFeatures(t, nextTier);
+  const currentSet = new Set(currentFeatures);
+  const diffFeatures = nextFeatures.filter((f) => !currentSet.has(f));
+  const displayFeatures = diffFeatures.length > 0 ? diffFeatures.slice(0, 3) : nextFeatures.slice(0, 3);
+
+  const price = pricing ? (onSale ? pricing.salePrice : pricing.originalPrice) : null;
+  const originalPrice = pricing?.originalPrice ?? null;
+  const hasDiscount = onSale && pricing && pricing.salePrice < pricing.originalPrice;
 
   return (
     <Link
-      href="/?lang=zh#tickets"
+      href={`/?lang=${lang}#tickets`}
       className="group relative block rounded-2xl overflow-hidden text-white"
       style={{ backgroundColor: '#0F0F0F' }}
     >
@@ -55,40 +77,76 @@ export default function UpgradeBanner({ currentTier, lang }: Props) {
         }}
         aria-hidden
       />
-      <div className="relative flex items-center gap-4 px-6 py-5 sm:px-7 sm:py-6">
-        {/* Left chevron stack */}
-        <div className="shrink-0 flex items-center gap-[2px]">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="block w-[3px] h-6 rounded-sm"
-              style={{
-                backgroundColor: accent,
-                opacity: 0.3 + i * 0.25,
-                transform: `skewX(-12deg)`,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="min-w-0 flex-1">
+      <div className="relative px-5 py-5 sm:px-7 sm:py-6">
+        {/* Top row: label + chevrons */}
+        <div className="flex items-center justify-between mb-1">
           <p className="text-[10px] font-mono tracking-[0.3em] uppercase" style={{ color: accent }}>
             {lang === 'zh' ? '升級到' : 'Upgrade to'}
           </p>
-          <p className="font-display font-black uppercase tracking-tight text-2xl leading-tight">
-            {tierName}
-          </p>
-          <p className="text-[12px] text-white/60 truncate mt-0.5">
-            {lang === 'zh' ? '解鎖' : 'Unlock'} · {topPerk}
-          </p>
+          <div className="flex items-center gap-[2px]">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="block w-[3px] h-5 rounded-sm"
+                style={{
+                  backgroundColor: accent,
+                  opacity: 0.3 + i * 0.25,
+                  transform: 'skewX(-12deg)',
+                }}
+              />
+            ))}
+          </div>
         </div>
 
-        <span
-          className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold transition-transform group-hover:translate-x-1"
+        {/* Tier name + price row */}
+        <div className="flex items-end justify-between gap-3">
+          <h3 className="font-display font-black uppercase tracking-tight text-2xl leading-tight">
+            {tierName}
+          </h3>
+          {price != null && (
+            <div className="text-right shrink-0">
+              {hasDiscount && (
+                <span className="text-[12px] text-white/40 line-through mr-1.5">
+                  ${originalPrice}
+                </span>
+              )}
+              <span className="font-display font-bold text-xl" style={{ color: accent }}>
+                ${price}
+              </span>
+              <span className="text-[11px] text-white/50 ml-1">USD</span>
+            </div>
+          )}
+        </div>
+
+        {/* Differential features */}
+        {displayFeatures.length > 0 && (
+          <ul className="mt-3 space-y-1.5">
+            {displayFeatures.map((feat) => (
+              <li key={feat} className="flex items-start gap-2 text-[13px] text-white/75">
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 mt-[3px] shrink-0" aria-hidden>
+                  <path
+                    d="M5 12.5l4 4 10-11"
+                    fill="none"
+                    stroke={accent}
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span>{feat}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* CTA */}
+        <div
+          className="mt-4 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] font-mono tracking-[0.15em] uppercase font-semibold transition-colors group-hover:brightness-110"
           style={{ backgroundColor: accent, color: '#0F0F0F' }}
         >
-          →
-        </span>
+          <span>{lang === 'zh' ? '立即升級' : 'Upgrade now'}</span>
+          <span className="transition-transform group-hover:translate-x-1">→</span>
+        </div>
       </div>
     </Link>
   );
