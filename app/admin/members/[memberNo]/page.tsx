@@ -11,6 +11,8 @@ import {
   TICKET_TIER_LABELS,
   TICKET_TIER_BADGE_CLASSES,
 } from '@/lib/members';
+import LumaRegistrationsList from '@/components/admin/LumaRegistrationsList';
+import type { Registration } from '@/lib/lumaSyncTypes';
 
 interface MemberRow {
   id: number;
@@ -205,6 +207,16 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [sendOpen, setSendOpen] = useState(false);
+  const [lumaRegs, setLumaRegs] = useState<Registration[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/admin/members/${encodeURIComponent(memberNo)}/luma-registrations`)
+      .then((r) => r.ok ? r.json() : { registrations: [] })
+      .then((d) => { if (!cancelled) setLumaRegs(d.registrations ?? []); })
+      .catch(() => { if (!cancelled) setLumaRegs([]); });
+    return () => { cancelled = true; };
+  }, [memberNo]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -528,6 +540,12 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
             </table>
           </div>
         )}
+      </Section>
+
+      <Section title="Luma 活動報名">
+        {lumaRegs === null
+          ? <p className="text-sm text-slate-500">載入中…</p>
+          : <LumaRegistrationsList registrations={lumaRegs} />}
       </Section>
 
       <Section title="Raw JSON">

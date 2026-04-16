@@ -13,6 +13,8 @@ import {
   TICKET_TIER_BADGE_CLASSES,
   type TicketTier,
 } from '@/lib/members';
+import LumaRegistrationsList from '@/components/admin/LumaRegistrationsList';
+import type { Registration } from '@/lib/lumaSyncTypes';
 import EmailPreferences from '@/components/member/EmailPreferences';
 
 function LoginForm() {
@@ -202,6 +204,7 @@ function MemberDashboard() {
   const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lumaRegs, setLumaRegs] = useState<Registration[]>([]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -222,6 +225,11 @@ function MemberDashboard() {
     };
 
     fetchOrders();
+
+    fetch('/api/auth/luma-registrations')
+      .then((r) => r.ok ? r.json() : { registrations: [] })
+      .then((d) => setLumaRegs(d.registrations ?? []))
+      .catch(() => setLumaRegs([]));
   }, [user?.email]);
 
   const highestTier = useMemo<TicketTier | null>(() => {
@@ -335,6 +343,13 @@ function MemberDashboard() {
           </div>
         )}
       </div>
+
+      {lumaRegs.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">我的活動報名</h2>
+          <LumaRegistrationsList registrations={lumaRegs} />
+        </div>
+      )}
 
       {user?.email && (
         <div className="mt-8">

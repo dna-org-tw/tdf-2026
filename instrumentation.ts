@@ -23,5 +23,12 @@ export async function register() {
         'Some features will fail at runtime. See docs/superpowers/specs/2026-04-12-security-fixes-design.md for details.'
       );
     }
+
+    try {
+      const { reconcileStuckJobs } = await import('@/lib/lumaSyncReconciler');
+      await reconcileStuckJobs();
+    } catch (e) {
+      console.error('[luma-sync] reconcile failed', e);
+    }
   }
 }

@@ -1,0 +1,327 @@
+'use client';
+
+import { useEffect, useState, useCallback, Fragment } from 'react';
+import type { SyncJob, SyncEventResult, SyncConfigPublic } from '@/lib/lumaSyncTypes';
+
+export default function LumaSyncPage() {
+  const [config, setConfig] = useState<SyncConfigPublic | null>(null);
+  const [current, setCurrent] = useState<SyncJob | null>(null);
+  const [recent, setRecent] = useState<SyncJob[]>([]);
+  const [results, setResults] = useState<SyncEventResult[]>([]);
+  const [expandedJobId, setExpandedJobId] = useState<number | null>(null);
+  const [expandedResults, setExpandedResults] = useState<SyncEventResult[]>([]);
+  const [editingCookie, setEditingCookie] = useState(false);
+  const [cookieDraft, setCookieDraft] = useState('');
+  const [scheduleDraft, setScheduleDraft] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchConfig = useCallback(async () => {
+    const r = await fetch('/api/admin/luma-sync/config');
+    if (r.ok) {
+      const c = (await r.json()) as SyncConfigPublic;
+      setConfig(c);
+      setScheduleDraft(c.cronSchedule);
+    }
+  }, []);
+
+  const fetchJobs = useCallback(async () => {
+    const r = await fetch('/api/admin/luma-sync/jobs');
+    if (r.ok) {
+      const data = (await r.json()) as { current: SyncJob | null; recent: SyncJob[] };
+      setCurrent(data.current);
+      setRecent(data.recent);
+    }
+  }, []);
+
+  const fetchCurrentResults = useCallback(async (jobId: number) => {
+    const r = await fetch(`/api/admin/luma-sync/jobs/${jobId}`);
+    if (r.ok) {
+      const data = (await r.json()) as { results: SyncEventResult[] };
+      setResults(data.results);
+    }
+  }, []);
+
+  const fetchExpanded = useCallback(async (jobId: number) => {
+    const r = await fetch(`/api/admin/luma-sync/jobs/${jobId}`);
+    if (r.ok) {
+      const data = (await r.json()) as { results: SyncEventResult[] };
+      setExpandedResults(data.results);
+      setExpandedJobId(jobId);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchConfig();
+    fetchJobs();
+  }, [fetchConfig, fetchJobs]);
+
+  useEffect(() => {
+    if (!current) return;
+    fetchCurrentResults(current.id);
+    const interval = setInterval(() => {
+      fetchJobs();
+      fetchCurrentResults(current.id);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [current, fetchCurrentResults, fetchJobs]);
+
+  const startSync = async () => {
+    setBusy(true); setError(null);
+    try {
+      const r = await fetch('/api/admin/luma-sync/start', { method: 'POST' });
+      const data = await r.json();
+      if (!r.ok) setError(data.error ?? 'failed');
+      await fetchJobs();
+    } finally { setBusy(false); }
+  };
+
+  const saveCookie = async () => {
+    setBusy(true); setError(null);
+    try {
+      const r = await fetch('/api/admin/luma-sync/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cookie: cookieDraft }),
+      });
+      if (!r.ok) {
+        const data = await r.json();
+        setError(data.error ?? 'failed');
+      } else {
+        setEditingCookie(false);
+        setCookieDraft('');
+        await fetchConfig();
+      }
+    } finally { setBusy(false); }
+  };
+
+  const toggleCron = async (enabled: boolean) => {
+    await fetch('/api/admin/luma-sync/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cronEnabled: enabled }),
+    });
+    fetchConfig();
+  };
+
+  const saveSchedule = async () => {
+    await fetch('/api/admin/luma-sync/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cronSchedule: scheduleDraft }),
+    });
+    fetchConfig();
+  };
+
+  const fmtDate = (iso: string | null) => iso ? new Date(iso).toLocaleString('zh-TW') : '—';
+  const fmtDuration = (start: string | null, end: string | null) => {
+    if (!start) return '—';
+    const e = end ? new Date(end).getTime() : Date.now();
+    const ms = e - new Date(start).getTime();
+    const s = Math.floor(ms / 1000);
+    return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`;
+  };
+
+  const statusColor = (s: string) => ({
+    queued: 'bg-slate-200 text-slate-700',
+    running: 'bg-blue-100 text-blue-800',
+    succeeded: 'bg-green-100 text-green-800',
+    partial: 'bg-amber-100 text-amber-800',
+    failed: 'bg-red-100 text-red-800',
+    pending: 'bg-slate-200 text-slate-700',
+    done: 'bg-green-100 text-green-800',
+  }[s] ?? 'bg-slate-200 text-slate-700');
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-slate-900">Luma 同步</h1>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5">
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">設定</h2>
+        {config && (
+          <div className="space-y-3 text-sm">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="w-28 shrink-0 text-slate-500">Session cookie</span>
+              <span className="font-mono text-slate-700">
+                {config.hasCookie ? `…${config.cookieLast4}` : '未設定'}
+              </span>
+              {config.cookieInvalid && (
+                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
+                  已失效，請重新設定
+                </span>
+              )}
+              <button
+                onClick={() => { setEditingCookie(true); setCookieDraft(''); }}
+                className="ml-auto rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
+              >
+                編輯
+              </button>
+            </div>
+            {editingCookie && (
+              <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs text-slate-600">
+                  從瀏覽器登入 lu.ma calendar admin 帳號後，DevTools → Network → 任一 api2.luma.com 請求 → 複製 Cookie header 整段貼上。
+                </p>
+                <textarea
+                  value={cookieDraft}
+                  onChange={(e) => setCookieDraft(e.target.value)}
+                  placeholder="luma.auth-session-key=...; ..."
+                  className="h-24 w-full rounded border border-slate-300 p-2 font-mono text-xs"
+                />
+                <div className="flex gap-2">
+                  <button
+                    disabled={busy || cookieDraft.trim().length < 10}
+                    onClick={saveCookie}
+                    className="rounded-md bg-[#10B8D9] px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                  >
+                    儲存
+                  </button>
+                  <button
+                    onClick={() => { setEditingCookie(false); setCookieDraft(''); }}
+                    className="rounded-md border border-slate-300 px-3 py-1 text-xs"
+                  >
+                    取消
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="w-28 shrink-0 text-slate-500">Cron</span>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={config.cronEnabled}
+                  onChange={(e) => toggleCron(e.target.checked)}
+                />
+                啟用排程
+              </label>
+              <input
+                value={scheduleDraft}
+                onChange={(e) => setScheduleDraft(e.target.value)}
+                className="ml-2 rounded border border-slate-300 px-2 py-1 font-mono text-xs"
+                placeholder="0 19 * * *"
+              />
+              <button
+                onClick={saveSchedule}
+                className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
+              >
+                儲存排程
+              </button>
+              <span className="text-xs text-slate-500">UTC（0 19 * * * = 03:00 台北）</span>
+            </div>
+            <div className="text-xs text-slate-500">
+              上次手動執行：{fmtDate(config.lastManualRunAt)} · 設定更新：{fmtDate(config.updatedAt)} ({config.updatedBy ?? '—'})
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section>
+        <button
+          onClick={startSync}
+          disabled={busy || !!current || !config?.hasCookie}
+          className="rounded-lg bg-[#10B8D9] px-6 py-3 font-semibold text-white disabled:opacity-50"
+        >
+          {current ? '同步進行中…' : '立即同步'}
+        </button>
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      </section>
+
+      {current && (
+        <section className="rounded-lg border border-blue-200 bg-blue-50 p-5">
+          <h2 className="mb-3 text-lg font-semibold text-slate-900">進行中 (job #{current.id})</h2>
+          <div className="mb-3">
+            <div className="mb-1 flex flex-wrap justify-between gap-2 text-sm">
+              <span>{current.processed_events} / {current.total_events || '?'} 活動</span>
+              <span className="text-slate-600">
+                失敗 {current.failed_events} · 已寫入 {current.total_guests_upserted} guests · {fmtDuration(current.started_at, null)}
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded bg-slate-200">
+              <div
+                className="h-full bg-[#10B8D9] transition-all"
+                style={{
+                  width: current.total_events > 0
+                    ? `${(current.processed_events / current.total_events) * 100}%`
+                    : '0%',
+                }}
+              />
+            </div>
+          </div>
+          <ul className="max-h-96 space-y-1 overflow-y-auto text-xs">
+            {results.map((r) => (
+              <li key={r.id} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-2 py-1">
+                <span className={`rounded-full px-2 py-0.5 font-medium ${statusColor(r.status)}`}>{r.status}</span>
+                <span className="flex-1 truncate text-slate-700">{r.event_name ?? r.event_api_id}</span>
+                <span className="text-slate-500">{r.guests_count}</span>
+                {r.error_message && <span className="max-w-xs truncate text-red-600">{r.error_message}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5">
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">最近 20 筆</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-slate-200 text-left text-slate-500">
+                <th className="py-2 pr-3">#</th>
+                <th className="pr-3">觸發</th>
+                <th className="pr-3">狀態</th>
+                <th className="pr-3">開始</th>
+                <th className="pr-3">耗時</th>
+                <th className="pr-3">進度</th>
+                <th className="pr-3">失敗</th>
+                <th className="pr-3">Guests</th>
+                <th>觸發者</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recent.map((j) => (
+                <Fragment key={j.id}>
+                  <tr
+                    className="cursor-pointer border-b border-slate-100 hover:bg-slate-50"
+                    onClick={() => expandedJobId === j.id ? setExpandedJobId(null) : fetchExpanded(j.id)}
+                  >
+                    <td className="py-2 pr-3">{j.id}</td>
+                    <td className="pr-3">{j.trigger}</td>
+                    <td className="pr-3">
+                      <span className={`rounded-full px-2 py-0.5 font-medium ${statusColor(j.status)}`}>{j.status}</span>
+                    </td>
+                    <td className="pr-3">{fmtDate(j.started_at)}</td>
+                    <td className="pr-3">{fmtDuration(j.started_at, j.finished_at)}</td>
+                    <td className="pr-3">{j.processed_events}/{j.total_events}</td>
+                    <td className="pr-3">{j.failed_events}</td>
+                    <td className="pr-3">{j.total_guests_upserted}</td>
+                    <td className="max-w-[160px] truncate">{j.triggered_by ?? '—'}</td>
+                  </tr>
+                  {expandedJobId === j.id && (
+                    <tr>
+                      <td colSpan={9} className="bg-slate-50 px-3 py-2">
+                        {j.error_summary && (
+                          <p className="mb-2 text-red-600">錯誤：{j.error_summary}</p>
+                        )}
+                        <ul className="max-h-72 space-y-1 overflow-y-auto">
+                          {expandedResults.map((r) => (
+                            <li key={r.id} className="flex items-center gap-2 rounded bg-white px-2 py-1">
+                              <span className={`rounded-full px-2 py-0.5 font-medium ${statusColor(r.status)}`}>{r.status}</span>
+                              <span className="flex-1 truncate">{r.event_name ?? r.event_api_id}</span>
+                              <span className="text-slate-500">{r.guests_count}</span>
+                              {r.error_message && <span className="max-w-xs truncate text-red-600">{r.error_message}</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
