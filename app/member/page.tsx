@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
@@ -11,10 +11,22 @@ import { TICKET_TIER_RANK, type TicketTier } from '@/lib/members';
 import { FESTIVAL_START, getValidityPeriod } from '@/lib/ticketPricing';
 import type { Registration } from '@/lib/lumaSyncTypes';
 import EmailPreferences from '@/components/member/EmailPreferences';
-import MemberPassport, { type IdentityTier } from '@/components/member/MemberPassport';
-import UpgradeBanner from '@/components/member/UpgradeBanner';
+import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
 import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
+import ProfileEditor from '@/components/member/ProfileEditor';
+
+const EMPTY_PROFILE: MemberProfile = {
+  displayName: null,
+  bio: null,
+  avatarUrl: null,
+  location: null,
+  timezone: null,
+  tags: [],
+  languages: [],
+  socialLinks: {},
+  isPublic: false,
+};
 
 function LoginForm() {
   const { t } = useTranslation();
@@ -204,7 +216,10 @@ function MemberDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [lumaRegs, setLumaRegs] = useState<Registration[]>([]);
+  const [noShowConsumedCount, setNoShowConsumedCount] = useState(0);
   const [me, setMe] = useState<{ memberNo: string | null; firstSeenAt: string | null } | null>(null);
+  const [profile, setProfile] = useState<MemberProfile>(EMPTY_PROFILE);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -217,26 +232,45 @@ function MemberDashboard() {
 
     fetch('/api/auth/luma-registrations')
       .then((r) => r.ok ? r.json() : { registrations: [] })
-      .then((d) => setLumaRegs(d.registrations ?? []))
+      .then((d) => {
+        setLumaRegs(d.registrations ?? []);
+        setNoShowConsumedCount(d.noShowConsumedCount ?? 0);
+      })
       .catch(() => setLumaRegs([]));
 
     fetch('/api/auth/me')
       .then((r) => r.ok ? r.json() : null)
       .then((d) => d && setMe({ memberNo: d.memberNo, firstSeenAt: d.firstSeenAt }))
       .catch(() => {});
+
+    fetch('/api/member/profile')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d) {
+          setProfile({
+            displayName: d.display_name ?? null,
+            bio: d.bio ?? null,
+            avatarUrl: d.avatar_url ?? null,
+            location: d.location ?? null,
+            timezone: d.timezone ?? null,
+            tags: d.tags ?? [],
+            languages: d.languages ?? [],
+            socialLinks: d.social_links ?? {},
+            isPublic: d.is_public ?? false,
+          });
+        }
+      })
+      .catch(() => {});
   }, [user?.email]);
 
-  // Resolve validity dates: use DB values, or compute from tier as fallback
   const resolveValidity = (order: Order) => {
     if (order.valid_from && order.valid_until) {
       return { validFrom: order.valid_from, validUntil: order.valid_until };
     }
-    // Fallback: compute from tier (week info not stored in orders, defaults to full month)
     const fallback = getValidityPeriod(order.ticket_tier);
     return { validFrom: fallback.valid_from, validUntil: fallback.valid_until };
   };
 
-  // Compute identity tier: during festival, only show tiers with active validity
   const { identityTier, validFrom, validUntil } = useMemo(() => {
     const paidOrders = orders.filter((o) => o.status === 'paid');
     if (paidOrders.length === 0) return { identityTier: 'follower' as IdentityTier, validFrom: null, validUntil: null };
@@ -245,7 +279,6 @@ function MemberDashboard() {
     const festivalStarted = today >= FESTIVAL_START;
 
     if (festivalStarted) {
-      // During/after festival: only consider orders with active validity
       const activeOrders = paidOrders.filter((o) => {
         const { validFrom: vf, validUntil: vu } = resolveValidity(o);
         return today >= vf && today <= vu;
@@ -262,12 +295,25 @@ function MemberDashboard() {
       return { identityTier: best.ticket_tier as IdentityTier, ...v };
     }
 
-    // Before festival: show highest purchased tier with its validity
     const best = paidOrders.reduce<Order>((a, b) =>
       TICKET_TIER_RANK[b.ticket_tier] > TICKET_TIER_RANK[a.ticket_tier] ? b : a, paidOrders[0]);
     const v = resolveValidity(best);
     return { identityTier: best.ticket_tier as IdentityTier, ...v };
   }, [orders]);
+
+  const handleTogglePublic = useCallback(async (isPublic: boolean) => {
+    setProfile((p) => ({ ...p, isPublic }));
+    await fetch('/api/member/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_public: isPublic }),
+    }).catch(() => setProfile((p) => ({ ...p, isPublic: !isPublic })));
+  }, []);
+
+  const handleProfileSave = useCallback((updated: MemberProfile) => {
+    setProfile(updated);
+    setEditing(false);
+  }, []);
 
   const formatAmount = (amount: number, currency: string) =>
     `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
@@ -279,42 +325,73 @@ function MemberDashboard() {
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      {/* Greeting + sign out */}
-      <header className="flex items-center justify-between">
-        <div className="min-w-0">
-          <p className="text-[11px] font-mono tracking-[0.25em] uppercase text-slate-400">
-            {lang === 'zh' ? '嗨，部落成員' : 'Hello, nomad'}
-          </p>
-          <p className="font-display font-semibold text-slate-900 truncate text-base">
-            {user?.email}
-          </p>
-        </div>
+      {/* Public toggle + sign out */}
+      <div className="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          onClick={() => handleTogglePublic(!profile.isPublic)}
+          className="flex items-center gap-3 group min-w-0"
+        >
+          <div
+            className="w-10 h-[22px] rounded-full relative transition-colors shrink-0"
+            style={{ backgroundColor: profile.isPublic ? 'rgba(82,212,114,0.3)' : 'rgba(0,0,0,0.1)' }}
+          >
+            <div
+              className="absolute top-[3px] w-4 h-4 rounded-full transition-all"
+              style={{
+                backgroundColor: profile.isPublic ? '#52D472' : '#aaa',
+                left: profile.isPublic ? '18px' : '3px',
+              }}
+            />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[13px] text-slate-600 group-hover:text-slate-800 transition-colors">
+              {profile.isPublic
+                ? (lang === 'zh' ? '名片已公開' : 'Card is public')
+                : (lang === 'zh' ? '名片未公開' : 'Card is private')}
+            </span>
+            {profile.isPublic && me?.memberNo && (
+              <span className="block text-[11px] text-[#10B8D9] truncate">
+                /member/{me.memberNo}
+              </span>
+            )}
+          </div>
+        </button>
         <button
           onClick={signOut}
           className="shrink-0 text-[12px] font-mono tracking-[0.15em] uppercase text-slate-400 hover:text-red-500 transition-colors"
         >
           {t.auth.logout}
         </button>
-      </header>
+      </div>
 
       {/* Identity card (hero) */}
-      {!loading && user?.email && (
+      {!loading && user?.email && !editing && (
         <MemberPassport
           email={user.email}
           memberNo={me?.memberNo ?? null}
-          firstSeenAt={me?.firstSeenAt ?? null}
           tier={identityTier}
           validFrom={validFrom}
           validUntil={validUntil}
+          profile={profile}
           lang={lang}
+          editable
+          onEdit={() => setEditing(true)}
         />
       )}
 
-      {/* Upgrade banner */}
-      {!loading && <UpgradeBanner currentTier={identityTier} lang={lang} />}
+      {/* Profile editor */}
+      {editing && user?.email && (
+        <ProfileEditor
+          profile={profile}
+          lang={lang}
+          onSave={handleProfileSave}
+          onCancel={() => setEditing(false)}
+        />
+      )}
 
       {/* Upcoming events + festival countdown */}
-      <UpcomingEvents registrations={lumaRegs} lang={lang} />
+      <UpcomingEvents registrations={lumaRegs} lang={lang} noShowConsumedCount={noShowConsumedCount} />
 
       {/* Orders (collapsible) */}
       <CollapsibleSection
