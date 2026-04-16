@@ -289,6 +289,91 @@ export const content = {
         cta: "Become our follower"
       }
     },
+    upgrade: {
+      title: "Upgrade Your Experience",
+      subtitle: "You've already started your journey. Now unlock the full festival with an upgrade.",
+      currentTier: "Your Current Tier",
+      upgradeTo: "Upgrade to",
+      priceDifference: "Pay the difference",
+      ctaUpgrade: "Upgrade Now",
+      processing: "Processing...",
+      successTitle: "Upgrade Initiated!",
+      successMessage: "You'll be redirected to complete payment. Once paid, your new tier activates instantly.",
+      errorGeneric: "Something went wrong. Please try again.",
+      loginRequired: "Please sign in from your member page first.",
+      loginCta: "Go to Member Page",
+      alreadyMaxTier: "You're already at the highest tier. Thank you for your support!",
+      noEligibleOrder: "No eligible order found for upgrade.",
+      whyUpgrade: "Why Upgrade?",
+      benefits: {
+        explore_to_contribute: {
+          headline: "From Explorer to Contributor",
+          pitch: "Go beyond exploration — become part of the story. As a Contributor, you don't just attend; you co-create the festival experience.",
+          highlights: [
+            "Unlimited drinks at Opening Marketplace (not just limited)",
+            "4 exclusive VIP Dinners with speakers & community leaders",
+            "1 Outdoor Nomad Buffet — farm-to-table dining under the stars",
+            "Access to 40+ activities (up from 30+)",
+            "Priority seating at keynotes and panels",
+          ],
+        },
+        explore_to_weekly_backer: {
+          headline: "From Explorer to Weekly Backer",
+          pitch: "A full week of immersive nomad living in Taitung. Work, eat, and explore alongside the tribe — this is what the festival was made for.",
+          highlights: [
+            "7 days of full festival access (your chosen week)",
+            "Unlimited food & drinks at Opening Marketplace",
+            "1 Outdoor Nomad Buffet + 1 VIP Dinner + 1 VIP Lunch",
+            "Access to 40+ activities (up from 30+)",
+            "Deep connections with a smaller weekly cohort",
+          ],
+        },
+        explore_to_backer: {
+          headline: "From Explorer to Backer",
+          pitch: "The ultimate nomad experience. Full month, full access, full immersion. Every dinner, every trip, every exclusive moment — you're in.",
+          highlights: [
+            "Full month of festival access (May 1-31)",
+            "4 VIP Dinners + 4 VIP Lunches + 4 VVIP Experiences",
+            "3-Day 2-Night Hualien Digital Nomad Trip",
+            "50+ activities — the complete festival catalogue",
+            "Unlimited food & drinks at every event",
+            "Honorary nomad status — the highest clearance",
+          ],
+        },
+        contribute_to_weekly_backer: {
+          headline: "From Contributor to Weekly Backer",
+          pitch: "You've been co-creating the festival. Now live it for a full week — deeper connections, more meals, and the weekly rhythm of nomad life.",
+          highlights: [
+            "7 days of focused access (your chosen week)",
+            "VIP Lunch added to your week",
+            "Unlimited food (not just drinks) at marketplace",
+            "A tight-knit weekly cohort experience",
+          ],
+        },
+        contribute_to_backer: {
+          headline: "From Contributor to Backer",
+          pitch: "You're already part of the story — now own the entire chapter. Full month, all meals, the Hualien trip, and VVIP access to everything.",
+          highlights: [
+            "Full month access (May 1-31) instead of event-based",
+            "4 VIP Lunches + 4 VVIP Experiences added",
+            "3-Day 2-Night Hualien Digital Nomad Trip",
+            "50+ activities (up from 40+)",
+            "Honorary nomad — full clearance to every moment",
+          ],
+        },
+        weekly_backer_to_backer: {
+          headline: "From Weekly Backer to Backer",
+          pitch: "Why stop at one week? The full month unlocks the complete arc of the festival — every dinner, every trip, every VVIP moment across all four weeks.",
+          highlights: [
+            "Full month access — all 4 weeks, not just one",
+            "4 VIP Dinners (up from 1) + 4 VIP Lunches (up from 1)",
+            "4 VVIP Experiences — exclusive to Backers",
+            "3-Day 2-Night Hualien Digital Nomad Trip",
+            "50+ activities (up from 40+)",
+          ],
+        },
+      },
+    },
     gallery: {
       title: "Highlights",
       subtitle: "Capture every precious moment from the 2025 event, witness how digital nomads from around the world create connections and memories between mountains and sea",
@@ -1220,6 +1305,91 @@ export const content = {
         price: "免費",
         cta: "成為我們的 follower"
       }
+    },
+    upgrade: {
+      title: "升級你的體驗",
+      subtitle: "旅程已經開始，現在就升級解鎖完整的活動體驗。",
+      currentTier: "你目前的票種",
+      upgradeTo: "升級至",
+      priceDifference: "補差額",
+      ctaUpgrade: "立即升級",
+      processing: "處理中...",
+      successTitle: "升級已發起！",
+      successMessage: "即將導向付款頁面。付款完成後，新票種立即生效。",
+      errorGeneric: "發生錯誤，請重試。",
+      loginRequired: "請先從會員頁面登入。",
+      loginCta: "前往會員頁面",
+      alreadyMaxTier: "你已經是最高票種了，感謝你的支持！",
+      noEligibleOrder: "找不到可升級的訂單。",
+      whyUpgrade: "為什麼要升級？",
+      benefits: {
+        explore_to_contribute: {
+          headline: "從 Explorer 升級到 Contributor",
+          pitch: "不只是參與——成為共創者。Contributor 讓你真正融入這場節慶。",
+          highlights: [
+            "開幕市集無限暢飲（不再限量）",
+            "4 場專屬 VIP 晚餐，與講者和社群領袖面對面",
+            "1 場戶外 Nomad Buffet——星空下的產地餐桌",
+            "可參加 40+ 場活動（原 30+）",
+            "主題演講優先入座",
+          ],
+        },
+        explore_to_weekly_backer: {
+          headline: "從 Explorer 升級到 Weekly Backer",
+          pitch: "在台東沉浸一整週的遊牧生活。工作、用餐、探索，與部落同行——這就是活動的精髓。",
+          highlights: [
+            "完整 7 天活動通行（你選擇的週次）",
+            "開幕市集無限暢飲暢食",
+            "1 場戶外 Nomad Buffet + 1 場 VIP 晚餐 + 1 場 VIP 午餐",
+            "可參加 40+ 場活動（原 30+）",
+            "與週次小群深度交流",
+          ],
+        },
+        explore_to_backer: {
+          headline: "從 Explorer 升級到 Backer",
+          pitch: "終極遊牧體驗。整個月、全通行、全沉浸。每場晚餐、每趟旅行、每個專屬時刻——你都在。",
+          highlights: [
+            "整月活動通行（5/1-5/31）",
+            "4 場 VIP 晚餐 + 4 場 VIP 午餐 + 4 場 VVIP 體驗",
+            "三天兩夜花蓮數位遊牧旅行",
+            "50+ 場活動——完整活動目錄",
+            "每場活動無限暢飲暢食",
+            "榮譽遊牧身分——最高通行權限",
+          ],
+        },
+        contribute_to_weekly_backer: {
+          headline: "從 Contributor 升級到 Weekly Backer",
+          pitch: "你已經在共創這場節慶。現在用一整週的時間去深度體驗——更多美食、更深的連結。",
+          highlights: [
+            "完整 7 天深度通行（你選擇的週次）",
+            "新增 VIP 午餐",
+            "開幕市集無限暢食（不只暢飲）",
+            "週次小群的深度社群體驗",
+          ],
+        },
+        contribute_to_backer: {
+          headline: "從 Contributor 升級到 Backer",
+          pitch: "你已是故事的一部分——現在擁有完整篇章。整月通行、所有餐會、花蓮旅行、VVIP 專屬體驗。",
+          highlights: [
+            "整月通行（5/1-5/31），不再只是單場",
+            "新增 4 場 VIP 午餐 + 4 場 VVIP 體驗",
+            "三天兩夜花蓮數位遊牧旅行",
+            "50+ 場活動（原 40+）",
+            "榮譽遊牧——每個時刻的完整通行",
+          ],
+        },
+        weekly_backer_to_backer: {
+          headline: "從 Weekly Backer 升級到 Backer",
+          pitch: "何必只待一週？整月通行解鎖活動的完整弧線——每場晚餐、每趟旅行、四週的每個 VVIP 時刻。",
+          highlights: [
+            "整月通行——四週全開，不只一週",
+            "4 場 VIP 晚餐（原 1 場）+ 4 場 VIP 午餐（原 1 場）",
+            "4 場 VVIP 體驗——Backer 專屬",
+            "三天兩夜花蓮數位遊牧旅行",
+            "50+ 場活動（原 40+）",
+          ],
+        },
+      },
     },
     gallery: {
       title: "精彩瞬間",
