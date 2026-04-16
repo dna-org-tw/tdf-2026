@@ -47,6 +47,11 @@ const FAQSection = dynamic(() => import('@/components/sections/FAQSection'), {
   loading: () => <div className="h-96 bg-stone-50 animate-pulse" />,
 });
 
+const CommunitySection = dynamic(() => import('@/components/sections/CommunitySection'), {
+  ssr: false,
+  loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
+});
+
 const FollowUsSection = dynamic(() => import('@/components/sections/FollowUsSection'), {
   ssr: true, // AEO 優化：啟用 SSR
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
@@ -68,6 +73,7 @@ export default function HomeContent() {
       <AccommodationSection />
       <FAQSection />
       <TeamSection />
+      <CommunitySection />
       <FollowUsSection />
       <Footer />
     </LumaDataProvider>
