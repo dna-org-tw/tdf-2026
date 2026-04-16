@@ -136,7 +136,10 @@ export interface LumaGuestRow {
   } | null;
 }
 
-export async function shapeRegistrations(rows: LumaGuestRow[]): Promise<Registration[]> {
+export async function shapeRegistrations(
+  rows: LumaGuestRow[],
+  reviewReasons?: Map<string, string>,
+): Promise<Registration[]> {
   let staleCutoff: number | null = null;
   if (supabaseServer) {
     const { data: lastJob } = await supabaseServer
@@ -163,5 +166,6 @@ export async function shapeRegistrations(rows: LumaGuestRow[]): Promise<Registra
     amountCents: r.amount_cents,
     currency: r.currency,
     stale: staleCutoff !== null && new Date(r.last_synced_at).getTime() < staleCutoff,
+    reviewReason: reviewReasons?.get(r.event_api_id) ?? null,
   }));
 }

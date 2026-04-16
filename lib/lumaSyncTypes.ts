@@ -14,6 +14,10 @@ export interface SyncJob {
   error_summary: string | null;
   triggered_by: string | null;
   created_at: string;
+  review_approved: number;
+  review_declined: number;
+  review_waitlisted: number;
+  review_skipped: number;
 }
 
 export interface SyncEventResult {
@@ -53,4 +57,5 @@ export interface Registration {
   amountCents: number | null;
   currency: string | null;
   stale: boolean;
+  reviewReason: string | null;
 }
