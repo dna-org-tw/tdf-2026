@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@source "../components/member";
 
 @theme {
   --font-sans: var(--font-inter), var(--font-noto-sans-tc), system-ui, sans-serif;
