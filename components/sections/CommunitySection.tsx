@@ -1,17 +1,64 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, FormEvent } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import Link from 'next/link';
-import { X, CheckCircle2, AlertCircle, Info, Mail } from 'lucide-react';
+import { Mail, CheckCircle2, Zap, Users } from 'lucide-react';
 import { TIER_ACCENT, type IdentityTier } from '@/components/member/MemberPassport';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
+import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
+import FollowModal from '@/components/FollowModal';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
 import { pickRandomAnimals, type AnonymousAnimal } from '@/lib/anonymousAnimals';
 
 const ANIMAL_SLOT_COUNT = 6;
+
+function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const prevValueRef = useRef(0);
+
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      setIsAnimating(true);
+      const startValue = prevValueRef.current;
+      const endValue = value;
+      const startTime = Date.now();
+
+      const animate = () => {
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 5);
+        const currentValue = Math.floor(startValue + (endValue - startValue) * easeOut);
+        setDisplayValue(currentValue);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setDisplayValue(endValue);
+          setIsAnimating(false);
+        }
+      };
+
+      requestAnimationFrame(animate);
+      prevValueRef.current = value;
+    }
+  }, [value, duration]);
+
+  return (
+    <motion.span
+      className="inline-block"
+      animate={isAnimating ? { scale: [1, 1.1, 1] } : {}}
+      transition={{ duration: 0.3 }}
+    >
+      {displayValue.toLocaleString('en-US')}
+    </motion.span>
+  );
+}
 
 function AnonymousAnimalBadge({ animal, label }: { animal: AnonymousAnimal; label: string }) {
   return (
@@ -101,62 +148,56 @@ function MemberBadge({ member }: { member: PublicMember }) {
 export default function CommunitySection() {
   const { t, lang } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
+  useSectionTracking({ sectionId: 'community', sectionName: 'Community Section', category: 'Engagement' });
+
   const [members, setMembers] = useState<PublicMember[]>([]);
   const [total, setTotal] = useState(0);
   const [anonymousCount, setAnonymousCount] = useState(0);
   const [animals, setAnimals] = useState<AnonymousAnimal[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [isLoadingCount, setIsLoadingCount] = useState(true);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState<'success' | 'duplicate' | 'error' | null>(null);
-  const [resultMsg, setResultMsg] = useState('');
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'duplicate' | null;
+    message: string;
+  }>({ isOpen: false, type: null, message: '' });
 
   const labels = lang === 'zh' ? {
-    title: '社群夥伴',
-    subtitle: '來自世界各地的數位遊牧者，即將在台灣相聚',
     cta: '查看所有夥伴',
-    join: '加入我們',
     empty: '成為第一位公開名片的夥伴',
     anonymousLabel: '匿名夥伴',
     moreMembers: '位夥伴',
-    modalTitle: '加入我們的社群',
-    modalDesc: '訂閱電子報，獲取最新活動資訊與社群動態',
-    emailPlaceholder: '請輸入電子郵件',
-    submit: '訂閱',
-    submitting: '訂閱中...',
-    successTitle: '訂閱成功',
-    duplicateTitle: '已經訂閱',
-    errorTitle: '發生錯誤',
-    tryAgain: '重試',
-    whatsapp: '加入專屬數位遊牧社群',
   } : {
-    title: 'Community',
-    subtitle: 'Digital nomads from around the world, coming together in Taiwan',
     cta: 'View all members',
-    join: 'Join us',
     empty: 'Be the first to share your card',
     anonymousLabel: 'Anonymous',
     moreMembers: 'more',
-    modalTitle: 'Join Our Community',
-    modalDesc: 'Subscribe to our newsletter for the latest events and community updates',
-    emailPlaceholder: 'Enter your email',
-    submit: 'Subscribe',
-    submitting: 'Subscribing...',
-    successTitle: 'Subscribed!',
-    duplicateTitle: 'Already Subscribed',
-    errorTitle: 'Error',
-    tryAgain: 'Try Again',
-    whatsapp: 'Join our exclusive Digital Nomad community',
   };
 
-  const openModal = () => {
-    setShowModal(true);
-    setResult(null);
-    setResultMsg('');
-    setEmail('');
-  };
+  useEffect(() => {
+    fetch('/api/members?page=1')
+      .then((r) => r.ok ? r.json() : { members: [], total: 0, anonymousCount: 0 })
+      .then((d) => {
+        setMembers(d.members ?? []);
+        setTotal(d.total ?? 0);
+        const anon = d.anonymousCount ?? 0;
+        setAnonymousCount(anon);
+        setAnimals(pickRandomAnimals(Math.min(ANIMAL_SLOT_COUNT, anon)));
+      })
+      .catch(() => {});
+  }, []);
 
-  const closeModal = () => setShowModal(false);
+  useEffect(() => {
+    fetch('/api/newsletter/count')
+      .then((r) => r.json())
+      .then((d) => {
+        if (typeof d?.count === 'number') setFollowerCount(d.count);
+      })
+      .catch(() => {})
+      .finally(() => setIsLoadingCount(false));
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -169,8 +210,7 @@ export default function CommunitySection() {
       try {
         recaptchaToken = await executeRecaptcha();
       } catch {
-        setResult('error');
-        setResultMsg(t.hero.followForm.recaptchaError);
+        setModalState({ isOpen: true, type: 'error', message: t.hero.followForm.recaptchaError });
         setIsSubmitting(false);
         return;
       }
@@ -191,233 +231,226 @@ export default function CommunitySection() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        if (response.status === 409) {
-          setResult('duplicate');
-          setResultMsg(data.error || t.hero.followForm.duplicateMessage);
-          return;
-        }
-        setResult('error');
-        setResultMsg(data.error || t.hero.followForm.errorMessage);
-        return;
+      if (response.ok) {
+        setModalState({ isOpen: true, type: 'success', message: data.message || t.followUs.successMessage });
+        setEmail('');
+        setFollowerCount((prev) => prev + 1);
+        trackEvent('CompleteRegistration', {
+          content_name: 'Community Section Form',
+          content_category: 'Newsletter Subscription',
+          email: trimmed,
+          location: 'community_section',
+        });
+      } else if (response.status === 409) {
+        setModalState({ isOpen: true, type: 'duplicate', message: data.error || t.followUs.duplicateMessage });
+        trackCustomEvent('NewsletterSubmitResult', { result: 'duplicate', location: 'community_section', email: trimmed });
+      } else {
+        setModalState({ isOpen: true, type: 'error', message: data.error || t.followUs.errorMessage });
+        trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'community_section', email: trimmed });
       }
-
-      setResult('success');
-      setResultMsg(data.message || t.hero.followForm.successMessage);
     } catch {
-      setResult('error');
-      setResultMsg(t.hero.followForm.errorMessage);
+      setModalState({ isOpen: true, type: 'error', message: t.followUs.errorMessage });
+      trackCustomEvent('NewsletterSubmitResult', { result: 'error', location: 'community_section', email: trimmed });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    fetch('/api/members?page=1')
-      .then((r) => r.ok ? r.json() : { members: [], total: 0, anonymousCount: 0 })
-      .then((d) => {
-        setMembers(d.members ?? []);
-        setTotal(d.total ?? 0);
-        const anon = d.anonymousCount ?? 0;
-        setAnonymousCount(anon);
-        setAnimals(pickRandomAnimals(Math.min(ANIMAL_SLOT_COUNT, anon)));
-      })
-      .catch(() => {});
-  }, []);
-
   return (
-    <section id="community" className="relative bg-[#1E1F1C] py-20 sm:py-28 overflow-hidden">
-      {/* Subtle glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 0%, rgba(16,184,217,0.08), transparent 60%)',
-        }}
-      />
+    <>
+      <section
+        id="community"
+        className="relative bg-gradient-to-b from-[#1E1F1C] to-[#0F0F0E] py-20 md:py-28 px-4 sm:px-6 overflow-hidden"
+      >
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#10B8D9] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#00993E] rounded-full blur-3xl" />
+        </div>
 
-      <div className="container mx-auto px-6 relative">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mb-3">
-            {labels.title}
-          </h2>
-          <p className="text-white/60 text-lg max-w-xl mx-auto">
-            {labels.subtitle}
-          </p>
-        </motion.div>
-
-        {/* Member grid */}
-        {members.length > 0 || animals.length > 0 ? (
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-8 sm:gap-10 mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10"
           >
-            {members.slice(0, 12).map((m) => (
-              <MemberBadge key={m.member_no} member={m} />
-            ))}
-            {animals.map((a) => (
-              <AnonymousAnimalBadge
-                key={a.name}
-                animal={a}
-                label={labels.anonymousLabel}
-              />
-            ))}
-            {anonymousCount > ANIMAL_SLOT_COUNT && (
-              <MoreMembersBadge
-                count={anonymousCount - ANIMAL_SLOT_COUNT}
-                label={labels.moreMembers}
-              />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6">
+              {t.followUs.title}
+            </h2>
+            <p className="text-lg sm:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+              {t.followUs.subtitle}
+            </p>
+
+            {!isLoadingCount && followerCount > 0 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.15, duration: 0.5 }}
+                className="mb-2"
+              >
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#10B8D9]/20 to-[#00993E]/20 backdrop-blur-sm px-6 py-3 rounded-full border border-[#10B8D9]/30 shadow-lg">
+                  <Users className="w-5 h-5 text-[#10B8D9]" />
+                  <span className="text-white/90 text-sm sm:text-base font-medium">
+                    <span className="text-white/70">{t.followUs.followerCountPrefix}</span>{' '}
+                    <span className="text-[#10B8D9] font-bold text-lg sm:text-xl">
+                      <AnimatedCounter value={followerCount} />
+                    </span>{' '}
+                    <span className="text-white/70">{t.followUs.followerCountSuffix}</span>
+                  </span>
+                </div>
+              </motion.div>
             )}
           </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center py-12 mb-8"
-          >
-            <p className="text-white/40 text-sm">{labels.empty}</p>
-          </motion.div>
-        )}
 
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          {total > 0 && (
-            <Link
-              href="/members"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/15 transition-colors text-sm"
-            >
-              {labels.cta}
-              {total > 12 && (
-                <span className="text-[#10B8D9] text-[12px]">+{total - 12}</span>
-              )}
-              <span aria-hidden>→</span>
-            </Link>
-          )}
-          <button
-            onClick={openModal}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#10B8D9] text-white font-semibold hover:bg-[#0EA5C4] transition-colors text-sm"
-          >
-            {labels.join}
-          </button>
-        </motion.div>
-      </div>
-
-      {/* Join modal */}
-      <AnimatePresence>
-        {showModal && (
-          <>
+          {/* Member grid */}
+          {members.length > 0 || animals.length > 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-              onClick={closeModal}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              onClick={(e) => e.stopPropagation()}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-wrap justify-center gap-8 sm:gap-10 mb-10"
             >
-              <div className="bg-[#1E1F1C] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-white/10">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
-                  <h3 className="text-2xl font-display font-bold text-white">
-                    {result === 'success' ? labels.successTitle : result === 'duplicate' ? labels.duplicateTitle : result === 'error' ? labels.errorTitle : labels.modalTitle}
-                  </h3>
-                  <button
-                    onClick={closeModal}
-                    className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/60 hover:text-white"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  {result ? (
-                    <div className="text-center">
-                      <div className="flex justify-center mb-4">
-                        {result === 'success' && <CheckCircle2 className="w-16 h-16 text-[#10B8D9]" />}
-                        {result === 'duplicate' && <Info className="w-16 h-16 text-[#10B8D9]" />}
-                        {result === 'error' && <AlertCircle className="w-16 h-16 text-red-500" />}
-                      </div>
-                      <p className="text-base text-white/90 leading-relaxed mb-4">{resultMsg}</p>
-                      {(result === 'success' || result === 'duplicate') && (
-                        <a
-                          href="https://chat.whatsapp.com/KZsFo7oNvZVCPIF86imk0E"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mb-4 w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#25D366]/90 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md shadow-[#25D366]/40"
-                        >
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                          </svg>
-                          <span>{labels.whatsapp}</span>
-                        </a>
-                      )}
-                      {result === 'error' && (
-                        <button
-                          onClick={() => { setResult(null); setResultMsg(''); }}
-                          className="w-full bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md shadow-[#10B8D9]/40"
-                        >
-                          {labels.tryAgain}
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-base text-white/90 leading-relaxed mb-6 text-center">
-                        {labels.modalDesc}
-                      </p>
-                      <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                          <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder={labels.emailPlaceholder}
-                            required
-                            className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:border-transparent transition-all"
-                            disabled={isSubmitting}
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={isSubmitting || !email.trim()}
-                          className="w-full bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md shadow-[#10B8D9]/40 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isSubmitting ? labels.submitting : labels.submit}
-                        </button>
-                      </form>
-                    </>
-                  )}
-                </div>
-              </div>
+              {members.slice(0, 12).map((m) => (
+                <MemberBadge key={m.member_no} member={m} />
+              ))}
+              {animals.map((a) => (
+                <AnonymousAnimalBadge
+                  key={a.name}
+                  animal={a}
+                  label={labels.anonymousLabel}
+                />
+              ))}
+              {anonymousCount > ANIMAL_SLOT_COUNT && (
+                <MoreMembersBadge
+                  count={anonymousCount - ANIMAL_SLOT_COUNT}
+                  label={labels.moreMembers}
+                />
+              )}
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </section>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-center py-12 mb-8"
+            >
+              <p className="text-white/40 text-sm">{labels.empty}</p>
+            </motion.div>
+          )}
+
+          {total > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex justify-center mb-12"
+            >
+              <Link
+                href="/members"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/15 transition-colors text-sm"
+              >
+                {labels.cta}
+                {total > 12 && (
+                  <span className="text-[#10B8D9] text-[12px]">+{total - 12}</span>
+                )}
+                <span aria-hidden>→</span>
+              </Link>
+            </motion.div>
+          )}
+
+          {/* Benefits chips */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"
+            >
+              <CheckCircle2 className="w-5 h-5 text-[#10B8D9]" />
+              <span className="text-white/90 text-sm sm:text-base font-medium">
+                {t.followUs.benefits.free}
+              </span>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"
+            >
+              <Zap className="w-5 h-5 text-[#10B8D9]" />
+              <span className="text-white/90 text-sm sm:text-base font-medium">
+                {t.followUs.benefits.realTime}
+              </span>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"
+            >
+              <Users className="w-5 h-5 text-[#10B8D9]" />
+              <span className="text-white/90 text-sm sm:text-base font-medium">
+                {t.followUs.benefits.community}
+              </span>
+            </motion.div>
+          </div>
+
+          {/* Email subscribe form */}
+          <div id="follow-us">
+            <motion.form
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              onSubmit={handleSubmit}
+              className="max-w-2xl mx-auto"
+            >
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative" suppressHydrationWarning>
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                  <input
+                    id="follow-us-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t.followUs.emailPlaceholder}
+                    required
+                    className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#10B8D9] focus:border-transparent transition-all"
+                    disabled={isSubmitting}
+                    suppressHydrationWarning
+                  />
+                </div>
+                <motion.button
+                  type="submit"
+                  disabled={isSubmitting || !email.trim()}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white font-semibold rounded-xl transition-all shadow-lg shadow-[#10B8D9]/40 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {isSubmitting ? t.followUs.submitting : t.followUs.submitButton}
+                </motion.button>
+              </div>
+              <p className="text-center text-white/60 text-sm mt-4">
+                {t.followUs.privacyNote}
+              </p>
+            </motion.form>
+          </div>
+        </div>
+      </section>
+
+      <FollowModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        type={modalState.type}
+        message={modalState.message}
+      />
+    </>
   );
 }

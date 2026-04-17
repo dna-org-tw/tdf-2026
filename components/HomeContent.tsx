@@ -52,11 +52,6 @@ const CommunitySection = dynamic(() => import('@/components/sections/CommunitySe
   loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
 });
 
-const FollowUsSection = dynamic(() => import('@/components/sections/FollowUsSection'), {
-  ssr: true, // AEO optimization: enable SSR
-  loading: () => <div className="h-96 bg-[#1E1F1C] animate-pulse" />,
-});
-
 export default function HomeContent() {
   // Track scroll depth
   useScrollDepth();
@@ -74,7 +69,6 @@ export default function HomeContent() {
       <FAQSection />
       <TeamSection />
       <CommunitySection />
-      <FollowUsSection />
       <Footer />
     </LumaDataProvider>
   );
