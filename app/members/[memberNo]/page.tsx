@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
+import CollectButton from '@/components/member/CollectButton';
 import Link from 'next/link';
 
 interface PublicProfile {
@@ -27,6 +28,8 @@ interface PublicProfile {
 function PublicMemberCard() {
   const params = useParams();
   const memberNo = params.memberNo as string;
+  const searchParams = useSearchParams();
+  const token = searchParams.get('t');
   const { t, lang } = useTranslation();
   const [data, setData] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +37,10 @@ function PublicMemberCard() {
 
   useEffect(() => {
     if (!memberNo) return;
-    fetch(`/api/members/${encodeURIComponent(memberNo)}`)
+    const url = token
+      ? `/api/members/${encodeURIComponent(memberNo)}?t=${encodeURIComponent(token)}`
+      : `/api/members/${encodeURIComponent(memberNo)}`;
+    fetch(url)
       .then((r) => {
         if (r.status === 404) { setNotFound(true); return null; }
         if (!r.ok) throw new Error();
@@ -43,7 +49,7 @@ function PublicMemberCard() {
       .then((d) => d && setData(d))
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-  }, [memberNo]);
+  }, [memberNo, token]);
 
   if (loading) {
     return (
@@ -125,6 +131,23 @@ function PublicMemberCard() {
               {data.timezone}
             </div>
           )}
+
+          {/* Collect button */}
+          <div className="pt-2">
+            <CollectButton
+              memberNo={data.member_no}
+              token={token}
+              lang={lang}
+              labels={{
+                collect: t.collections.collect,
+                collected: t.collections.collected,
+                collecting: t.collections.collecting,
+                loginToCollect: t.collections.loginToCollect,
+                privacyHint: t.collections.privacyHint,
+                qrError: t.collections.qrError,
+              }}
+            />
+          </div>
 
           {/* CTA: get your own card */}
           <div className="text-center pt-4">
