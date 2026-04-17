@@ -369,8 +369,12 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
                 {orders.map((o) => {
                   const tier = o.ticket_tier as keyof typeof TICKET_TIER_LABELS;
                   return (
-                    <tr key={o.id} className="border-b border-slate-100">
-                      <td className="px-3 py-2 font-mono text-xs text-slate-500">{o.id.slice(0, 8)}</td>
+                    <tr key={o.id} className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="px-3 py-2 font-mono text-xs">
+                        <Link href={`/admin/orders/${o.id}`} className="text-[#10B8D9] hover:underline">
+                          {o.id.slice(0, 8)}
+                        </Link>
+                      </td>
                       <td className="px-3 py-2">
                         <span className={`px-2 py-0.5 rounded-full text-xs ${TICKET_TIER_BADGE_CLASSES[tier] || 'bg-slate-100 text-slate-600'}`}>
                           {TICKET_TIER_LABELS[tier] || o.ticket_tier}
