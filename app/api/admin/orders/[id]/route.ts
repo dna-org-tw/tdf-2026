@@ -23,10 +23,20 @@ export async function GET(
     return NextResponse.json({ error: 'Order not found' }, { status: 404 });
   }
 
+  // Pull transfer history for this order and its upgrade children, so admins see the full trail.
+  const upgrades = upgradesRes.data ?? [];
+  const orderIds = [id, ...upgrades.map((u) => u.id as string)];
+  const { data: transfers } = await supabaseServer
+    .from('order_transfers')
+    .select('*')
+    .in('order_id', orderIds)
+    .order('transferred_at', { ascending: false });
+
   return NextResponse.json({
     order: orderRes.data,
     actions: actionsRes.data ?? [],
-    upgrades: upgradesRes.data ?? [],
+    upgrades,
+    transfers: transfers ?? [],
   });
 }
 

@@ -35,7 +35,20 @@ export async function GET(
 
     const transfer = await checkUserTransferEligibility(order);
 
-    return NextResponse.json({ order, transfer });
+    // History rows the signed-in user is a party to (sender or recipient).
+    const sessionEmail = session.email.toLowerCase();
+    const { data: transfersRaw } = await supabaseServer
+      .from('order_transfers')
+      .select('id, from_email, to_email, initiated_by, transferred_at, parent_transfer_id')
+      .eq('order_id', id)
+      .order('transferred_at', { ascending: false });
+    const transfers = (transfersRaw ?? []).filter(
+      (t) =>
+        t.from_email?.toLowerCase() === sessionEmail ||
+        t.to_email?.toLowerCase() === sessionEmail,
+    );
+
+    return NextResponse.json({ order, transfer, transfers });
   } catch (error) {
     console.error('[Auth/Orders] Error fetching order detail:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -36,6 +36,20 @@ interface OrderAction {
   created_at: string;
 }
 
+interface OrderTransferRow {
+  id: string;
+  order_id: string;
+  parent_transfer_id: string | null;
+  from_email: string;
+  to_email: string;
+  initiated_by: 'user' | 'admin';
+  actor_admin_email: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  notes: string | null;
+  transferred_at: string;
+}
+
 const STATUS_STYLES: Record<string, string> = {
   paid: 'bg-green-100 text-green-700',
   pending: 'bg-yellow-100 text-yellow-700',
@@ -87,6 +101,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [actions, setActions] = useState<OrderAction[]>([]);
   const [upgrades, setUpgrades] = useState<Order[]>([]);
+  const [transfers, setTransfers] = useState<OrderTransferRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string>('');
   const [notes, setNotes] = useState('');
@@ -98,6 +113,7 @@ export default function OrderDetailPage() {
       setOrder(data.order);
       setActions(data.actions);
       setUpgrades(data.upgrades ?? []);
+      setTransfers(data.transfers ?? []);
       setNotes(data.order.internal_notes ?? '');
     } else if (res.status === 404) {
       router.replace('/admin/orders');
@@ -411,6 +427,55 @@ export default function OrderDetailPage() {
                 <span className="ml-auto text-slate-400 text-xs">{formatDate(u.created_at)}</span>
               </li>
             ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Transfers */}
+      {transfers.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <h2 className="font-semibold text-slate-900 mb-3">轉讓記錄（{transfers.length}）</h2>
+          <ul className="space-y-3">
+            {transfers.map((t) => {
+              const isChild = !!t.parent_transfer_id;
+              const isThisOrder = t.order_id === order.id;
+              return (
+                <li key={t.id} className="border-l-2 border-amber-400 pl-3 space-y-1 text-sm">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-1.5 py-0.5 text-xs rounded bg-amber-50 text-amber-800 border border-amber-200">
+                      {t.initiated_by === 'admin' ? '管理員轉讓' : '會員自助轉讓'}
+                    </span>
+                    {!isThisOrder && (
+                      <a href={`/admin/orders/${t.order_id}`} className="text-xs font-mono text-[#10B8D9] hover:underline">
+                        {t.order_id.slice(0, 8)}（子訂單）
+                      </a>
+                    )}
+                    {isChild && (
+                      <span className="text-[10px] text-slate-500 bg-stone-100 px-1.5 py-0.5 rounded">連帶轉讓</span>
+                    )}
+                    <span className="ml-auto text-xs text-slate-400">{formatDate(t.transferred_at)}</span>
+                  </div>
+                  <div className="text-xs font-mono text-slate-700 break-all">
+                    <span className="text-slate-500">從</span> {t.from_email}{' '}
+                    <span className="text-slate-400">→</span>{' '}
+                    <span className="text-slate-500">至</span> {t.to_email}
+                  </div>
+                  {t.actor_admin_email && (
+                    <div className="text-xs text-slate-500">執行者：{t.actor_admin_email}</div>
+                  )}
+                  {t.notes && (
+                    <div className="text-xs text-slate-600 bg-stone-50 p-2 rounded">{t.notes}</div>
+                  )}
+                  {(t.ip_address || t.user_agent) && (
+                    <div className="text-[10px] text-slate-400 font-mono truncate" title={t.user_agent ?? ''}>
+                      {t.ip_address ? `IP ${t.ip_address}` : ''}
+                      {t.ip_address && t.user_agent ? ' · ' : ''}
+                      {t.user_agent ?? ''}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

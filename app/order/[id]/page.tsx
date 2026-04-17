@@ -49,6 +49,15 @@ interface TransferInfo {
   deadline: string | null;
 }
 
+interface TransferHistoryRow {
+  id: string;
+  from_email: string;
+  to_email: string;
+  initiated_by: 'user' | 'admin';
+  transferred_at: string;
+  parent_transfer_id: string | null;
+}
+
 function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTranslation>['t'] }) {
   const statusMap: Record<string, { label: string; color: string }> = {
     paid: { label: t.auth.statusPaid, color: 'bg-green-100 text-green-700' },
@@ -71,6 +80,7 @@ function MemberOrderDetail() {
 
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [transfer, setTransfer] = useState<TransferInfo | null>(null);
+  const [transfers, setTransfers] = useState<TransferHistoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [transferOpen, setTransferOpen] = useState(false);
@@ -90,6 +100,7 @@ function MemberOrderDetail() {
       const data = await res.json();
       setOrder(data.order);
       setTransfer(data.transfer ?? null);
+      setTransfers(data.transfers ?? []);
     } catch {
       setError(t.auth.errorMessage);
     } finally {
@@ -248,6 +259,54 @@ function MemberOrderDetail() {
                   </p>
                 </div>
               )}
+            </div>
+          )}
+
+          {order && transfers.length > 0 && (
+            <div className="mt-4 bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-base font-bold text-slate-900 mb-3">
+                {lang === 'zh' ? '轉讓紀錄' : 'Transfer history'}
+              </h2>
+              <ul className="space-y-3">
+                {transfers.map((t) => {
+                  const userEmail = user?.email?.toLowerCase() ?? '';
+                  const isOutgoing = t.from_email.toLowerCase() === userEmail;
+                  return (
+                    <li key={t.id} className="border-l-2 border-amber-400 pl-3 space-y-1 text-sm">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-1.5 py-0.5 text-xs rounded border ${
+                          isOutgoing
+                            ? 'bg-red-50 text-red-700 border-red-200'
+                            : 'bg-green-50 text-green-700 border-green-200'
+                        }`}>
+                          {isOutgoing
+                            ? (lang === 'zh' ? '您轉出' : 'You transferred out')
+                            : (lang === 'zh' ? '您收到' : 'You received')}
+                        </span>
+                        {t.initiated_by === 'admin' && (
+                          <span className="px-1.5 py-0.5 text-xs rounded bg-amber-50 text-amber-800 border border-amber-200">
+                            {lang === 'zh' ? '管理員執行' : 'by admin'}
+                          </span>
+                        )}
+                        {t.parent_transfer_id && (
+                          <span className="text-[10px] text-slate-500 bg-stone-100 px-1.5 py-0.5 rounded">
+                            {lang === 'zh' ? '連帶轉讓' : 'with parent'}
+                          </span>
+                        )}
+                        <span className="ml-auto text-xs text-slate-400">
+                          {new Date(t.transferred_at).toLocaleString(lang === 'zh' ? 'zh-TW' : 'en-US', {
+                            year: 'numeric', month: 'short', day: 'numeric',
+                            hour: '2-digit', minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                      <div className="text-xs font-mono text-slate-600 break-all">
+                        {t.from_email} <span className="text-slate-400">→</span> {t.to_email}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           )}
 

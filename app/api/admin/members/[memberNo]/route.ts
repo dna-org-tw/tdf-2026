@@ -24,12 +24,18 @@ export async function GET(
       newsletterRes,
       emailLogsRes,
       awardVotesRes,
+      transfersRes,
     ] = await Promise.all([
       supabaseServer.from('members_enriched').select('*').eq('email', email).maybeSingle(),
       supabaseServer.from('orders').select('*').ilike('customer_email', email).order('created_at', { ascending: false }),
       supabaseServer.from('newsletter_subscriptions').select('*').ilike('email', email).maybeSingle(),
       supabaseServer.from('email_logs').select('*').ilike('to_email', email).order('created_at', { ascending: false }).limit(200),
       supabaseServer.from('award_votes').select('*').ilike('email', email).order('created_at', { ascending: false }),
+      supabaseServer
+        .from('order_transfers')
+        .select('*')
+        .or(`from_email.ilike.${email},to_email.ilike.${email}`)
+        .order('transferred_at', { ascending: false }),
     ]);
 
     const orders = (ordersRes.data ?? []) as Array<{ visitor_id?: string | null }>;
@@ -93,6 +99,7 @@ export async function GET(
       award_votes: awardVotesRes.data ?? [],
       visitors,
       tracking_events: trackingEvents,
+      order_transfers: transfersRes.data ?? [],
     });
   } catch (err) {
     console.error('[Admin Member Detail]', err);

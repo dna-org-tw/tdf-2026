@@ -107,6 +107,18 @@ interface TrackingEvent {
   created_at: string;
 }
 
+interface OrderTransferRow {
+  id: string;
+  order_id: string;
+  parent_transfer_id: string | null;
+  from_email: string;
+  to_email: string;
+  initiated_by: 'user' | 'admin';
+  actor_admin_email: string | null;
+  notes: string | null;
+  transferred_at: string;
+}
+
 interface MemberDetail {
   member: MemberRow;
   enriched: EnrichedMember | null;
@@ -117,6 +129,7 @@ interface MemberDetail {
   award_votes: AwardVote[];
   visitors: Visitor[];
   tracking_events: TrackingEvent[];
+  order_transfers: OrderTransferRow[];
 }
 
 function formatAmount(cents: number, currency: string) {
@@ -289,7 +302,8 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
     );
   }
 
-  const { member, enriched, orders, newsletter, email_logs, notification_campaigns, award_votes, visitors, tracking_events } = data;
+  const { member, enriched, orders, newsletter, email_logs, notification_campaigns, award_votes, visitors, tracking_events, order_transfers } = data;
+  const memberEmailLower = member.email.toLowerCase();
 
   return (
     <div className="space-y-4">
@@ -415,6 +429,55 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
               </tbody>
             </table>
           </div>
+        )}
+      </Section>
+
+      <Section title={`訂單轉讓紀錄 (${order_transfers?.length ?? 0})`}>
+        {(order_transfers?.length ?? 0) === 0 ? (
+          <p className="text-sm text-slate-400">無轉讓紀錄</p>
+        ) : (
+          <ul className="space-y-3">
+            {(order_transfers ?? []).map((t) => {
+              const direction = t.from_email.toLowerCase() === memberEmailLower ? 'out' : 'in';
+              return (
+                <li key={t.id} className="border-l-2 border-amber-400 pl-3 space-y-1 text-sm">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`px-1.5 py-0.5 text-xs rounded border ${
+                      direction === 'out'
+                        ? 'bg-red-50 text-red-700 border-red-200'
+                        : 'bg-green-50 text-green-700 border-green-200'
+                    }`}>
+                      {direction === 'out' ? '轉出' : '轉入'}
+                    </span>
+                    <span className="px-1.5 py-0.5 text-xs rounded bg-amber-50 text-amber-800 border border-amber-200">
+                      {t.initiated_by === 'admin' ? '管理員執行' : '會員自助'}
+                    </span>
+                    {t.parent_transfer_id && (
+                      <span className="text-[10px] text-slate-500 bg-stone-100 px-1.5 py-0.5 rounded">連帶轉讓</span>
+                    )}
+                    <Link
+                      href={`/admin/orders/${t.order_id}`}
+                      className="text-xs font-mono text-[#10B8D9] hover:underline"
+                    >
+                      {t.order_id.slice(0, 8)}
+                    </Link>
+                    <span className="ml-auto text-xs text-slate-400">{formatDateTime(t.transferred_at)}</span>
+                  </div>
+                  <div className="text-xs font-mono text-slate-700 break-all">
+                    <span className="text-slate-500">從</span> {t.from_email}{' '}
+                    <span className="text-slate-400">→</span>{' '}
+                    <span className="text-slate-500">至</span> {t.to_email}
+                  </div>
+                  {t.actor_admin_email && (
+                    <div className="text-xs text-slate-500">執行者：{t.actor_admin_email}</div>
+                  )}
+                  {t.notes && (
+                    <div className="text-xs text-slate-600 bg-stone-50 p-2 rounded">{t.notes}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         )}
       </Section>
 
