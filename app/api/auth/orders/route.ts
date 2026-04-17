@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { getSessionFromRequest } from '@/lib/auth';
+import { getTransferDeadlineRaw } from '@/lib/orderTransfer';
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,7 +31,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
     }
 
-    return NextResponse.json({ orders: orders ?? [] });
+    const transferDeadline = await getTransferDeadlineRaw();
+    let deadlinePassed = false;
+    if (transferDeadline) {
+      const d = new Date(transferDeadline);
+      if (!isNaN(d.getTime())) deadlinePassed = Date.now() > d.getTime();
+    }
+
+    return NextResponse.json({
+      orders: orders ?? [],
+      transfer_deadline: transferDeadline,
+      deadline_passed: deadlinePassed,
+    });
   } catch (error) {
     console.error('[Auth/Orders] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

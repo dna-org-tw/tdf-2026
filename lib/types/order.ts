@@ -16,7 +16,23 @@ export type OrderActionType =
   | 'resend_receipt'
   | 'note'
   | 'manual_create'
-  | 'upgrade';
+  | 'upgrade'
+  | 'transfer';
+
+export interface OrderTransfer {
+  id: string;
+  order_id: string;
+  parent_transfer_id: string | null;
+  from_email: string;
+  to_email: string;
+  initiated_by: 'user' | 'admin';
+  actor_user_id: string | null;
+  actor_admin_email: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  notes: string | null;
+  transferred_at: string;
+}
 
 export interface Order {
   id: string;

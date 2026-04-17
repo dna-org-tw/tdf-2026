@@ -30,6 +30,9 @@ function AdminNav() {
           <Link href="/admin/luma-sync" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             Luma 同步
           </Link>
+          <Link href="/admin/settings" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
+            設定
+          </Link>
         </div>
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
           <span className="hidden md:inline text-sm text-slate-400 truncate max-w-[200px]">{user?.email}</span>

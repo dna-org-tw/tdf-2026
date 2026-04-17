@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import TransferOrderModal from '@/components/order/TransferOrderModal';
 
 interface OrderDetail {
   id: string;
@@ -33,6 +34,19 @@ interface OrderDetail {
   payment_method_last4: string | null;
   payment_method_type: string | null;
   created_at: string;
+  parent_order_id: string | null;
+}
+
+interface TransferInfo {
+  canTransfer: boolean;
+  reasonCode:
+    | 'ok'
+    | 'not_paid'
+    | 'is_child_order'
+    | 'no_email'
+    | 'deadline_passed'
+    | 'pending_child';
+  deadline: string | null;
 }
 
 function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTranslation>['t'] }) {
@@ -52,12 +66,36 @@ function MemberOrderDetail() {
   const params = useParams();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const orderId = params?.id as string;
 
   const [order, setOrder] = useState<OrderDetail | null>(null);
+  const [transfer, setTransfer] = useState<TransferInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [transferToast, setTransferToast] = useState('');
+
+  const fetchOrder = async () => {
+    try {
+      setError(null);
+      const res = await fetch(`/api/auth/orders/${encodeURIComponent(orderId)}`);
+      if (res.status === 401) {
+        router.push('/me');
+        return;
+      }
+      if (!res.ok) {
+        throw new Error('Failed to load order');
+      }
+      const data = await res.json();
+      setOrder(data.order);
+      setTransfer(data.transfer ?? null);
+    } catch {
+      setError(t.auth.errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -66,30 +104,10 @@ function MemberOrderDetail() {
       return;
     }
     if (!orderId) return;
-
-    const fetchOrder = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(`/api/auth/orders/${encodeURIComponent(orderId)}`);
-        if (res.status === 401) {
-          router.push('/me');
-          return;
-        }
-        if (!res.ok) {
-          throw new Error('Failed to load order');
-        }
-        const data = await res.json();
-        setOrder(data.order);
-      } catch {
-        setError(t.auth.errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    setLoading(true);
     fetchOrder();
-  }, [orderId, user, authLoading, router, t.auth.errorMessage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, user, authLoading, router]);
 
   const formatAmount = (amount: number, currency: string) => {
     return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
@@ -232,7 +250,100 @@ function MemberOrderDetail() {
               )}
             </div>
           )}
+
+          {order && (
+            <div className="mt-4 bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-base font-bold text-slate-900 mb-1">
+                {lang === 'zh' ? '轉讓訂單' : 'Transfer order'}
+              </h2>
+              <p className="text-xs text-slate-500 mb-3">
+                {lang === 'zh'
+                  ? '把此訂單的所有權轉給另一位朋友。此操作無法復原。'
+                  : 'Hand this order over to a friend. This action cannot be undone.'}
+                {transfer?.deadline && (
+                  <>
+                    {' '}
+                    {lang === 'zh' ? '截止：' : 'Closes on '}
+                    <span className="font-mono text-slate-700">
+                      {new Date(transfer.deadline).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US', {
+                        year: 'numeric', month: 'long', day: 'numeric',
+                      })}
+                    </span>
+                    {' '}
+                    <span className="font-mono text-slate-500">
+                      ({new Date(transfer.deadline).toLocaleTimeString(lang === 'zh' ? 'zh-TW' : 'en-US', {
+                        hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short',
+                      })})
+                    </span>
+                    {'.'}
+                  </>
+                )}
+              </p>
+
+              {transfer?.canTransfer ? (
+                <button
+                  type="button"
+                  onClick={() => setTransferOpen(true)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] hover:bg-[#0EA5C4] rounded-lg transition-colors"
+                >
+                  {lang === 'zh' ? '轉讓訂單' : 'Transfer this order'}
+                </button>
+              ) : (
+                <div className="text-xs text-slate-500 bg-slate-50 rounded-lg p-3 border border-slate-200">
+                  {transfer?.reasonCode === 'is_child_order' && (
+                    <>
+                      {lang === 'zh'
+                        ? '這是升級訂單（子訂單），無法單獨轉讓。請到母訂單頁面進行轉讓，升級部分會一併轉移。'
+                        : 'This is an upgrade (child) order and cannot be transferred alone. Transfer the parent order — the upgrade follows automatically.'}
+                      {order.parent_order_id && (
+                        <>
+                          {' '}
+                          <Link href={`/order/${order.parent_order_id}`} className="text-[#10B8D9] hover:underline">
+                            {lang === 'zh' ? '前往母訂單 →' : 'Go to parent order →'}
+                          </Link>
+                        </>
+                      )}
+                    </>
+                  )}
+                  {transfer?.reasonCode === 'not_paid' && (lang === 'zh' ? '僅已付款訂單可轉讓。' : 'Only paid orders can be transferred.')}
+                  {transfer?.reasonCode === 'no_email' && (lang === 'zh' ? '訂單缺少 email 資訊，無法轉讓。' : 'Order has no email — cannot transfer.')}
+                  {transfer?.reasonCode === 'deadline_passed' && (lang === 'zh' ? '轉讓已截止，如需協助請聯絡客服。' : 'Transfer deadline has passed. Please contact support for assistance.')}
+                  {transfer?.reasonCode === 'pending_child' && (lang === 'zh' ? '有升級訂單尚未完成，請先處理後再轉讓。' : 'There is a pending upgrade on this order; resolve it first.')}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
+        {order && transferOpen && (
+          <TransferOrderModal
+            open={transferOpen}
+            onClose={() => setTransferOpen(false)}
+            onSuccess={(result) => {
+              setTransferOpen(false);
+              setTransferToast(
+                lang === 'zh'
+                  ? `已轉讓至 ${result.to_email}，3 秒後返回。`
+                  : `Transferred to ${result.to_email}. Returning to orders…`,
+              );
+              setTimeout(() => router.push('/me'), 3000);
+            }}
+            order={{
+              id: order.id,
+              ticket_tier: order.ticket_tier,
+              customer_email: order.customer_email,
+            }}
+            endpoint="/api/order/transfer"
+            mode="user"
+            hasChildOrders={false}
+          />
+        )}
+
+        {transferToast && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2 rounded-lg shadow-lg text-sm">
+            {transferToast}
+          </div>
+        )}
       </main>
       <Footer />
     </div>

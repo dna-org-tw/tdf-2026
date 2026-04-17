@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import TransferOrderModal from '@/components/order/TransferOrderModal';
 
 interface Order {
   id: string;
@@ -52,7 +53,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 const ACTION_LABELS: Record<string, string> = {
   refund: '退款', cancel: '取消', edit: '編輯顧客', resend_receipt: '重寄收據',
-  note: '備註', manual_create: '手動建單', upgrade: '升級票種',
+  note: '備註', manual_create: '手動建單', upgrade: '升級票種', transfer: '轉讓訂單',
 };
 
 const TIER_OPTIONS = [
@@ -262,6 +263,9 @@ export default function OrderDetailPage() {
     }
   };
 
+  // --- Transfer modal (admin) ---
+  const [transferOpen, setTransferOpen] = useState(false);
+
   if (loading) return <div className="text-slate-500">載入中…</div>;
   if (!order) return <div className="text-slate-500">找不到訂單</div>;
 
@@ -269,6 +273,8 @@ export default function OrderDetailPage() {
   const canCancel = order.status === 'pending';
   const canResend = (order.status === 'paid' || order.status === 'partially_refunded') && order.source === 'stripe_checkout';
   const canUpgrade = !order.parent_order_id && (order.status === 'paid' || order.status === 'partially_refunded');
+  const canTransfer = !order.parent_order_id && order.status === 'paid' && !!order.customer_email;
+  const hasChildUpgrades = upgrades.length > 0;
   const remaining = order.amount_total - order.amount_refunded;
 
   return (
@@ -375,6 +381,12 @@ export default function OrderDetailPage() {
           {canCancel && <button onClick={doCancel} className="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">取消訂單</button>}
           {canResend && <button onClick={doResend} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200">重寄收據</button>}
           {canUpgrade && <button onClick={openUpgrade} className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4]">升級票種</button>}
+          {canTransfer && <button onClick={() => setTransferOpen(true)} className="px-4 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-[#10B8D9] hover:border-[#10B8D9]">轉讓訂單</button>}
+          {order.parent_order_id && (
+            <span className="px-4 py-2 text-sm text-slate-400 border border-dashed border-slate-200 rounded-lg" title="子訂單不能單獨轉讓，請從母訂單轉讓">
+              轉讓（由母訂單處理）
+            </span>
+          )}
         </div>
         <div className="pt-3 border-t border-slate-100">
           <label className="text-sm text-slate-700 font-medium">內部備註</label>
@@ -570,6 +582,27 @@ export default function OrderDetailPage() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Transfer modal (admin) */}
+      {transferOpen && order && (
+        <TransferOrderModal
+          open={transferOpen}
+          onClose={() => setTransferOpen(false)}
+          onSuccess={(result) => {
+            setTransferOpen(false);
+            showToast(`已轉讓給 ${result.to_email}`);
+            load();
+          }}
+          order={{
+            id: order.id,
+            ticket_tier: order.ticket_tier,
+            customer_email: order.customer_email,
+          }}
+          endpoint={`/api/admin/orders/${params.id}/transfer`}
+          mode="admin"
+          hasChildOrders={hasChildUpgrades}
+        />
       )}
 
       {toast && (

@@ -7,13 +7,14 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import type { Order } from '@/lib/types/order';
-import { TICKET_TIER_RANK, type TicketTier } from '@/lib/members';
+import { TICKET_TIER_RANK } from '@/lib/members';
 import { FESTIVAL_START, getValidityPeriod } from '@/lib/ticketPricing';
 import type { Registration } from '@/lib/lumaSyncTypes';
 import EmailPreferences from '@/components/member/EmailPreferences';
 import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
 import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
+import TransferOrderModal from '@/components/order/TransferOrderModal';
 
 const EMPTY_PROFILE: MemberProfile = {
   displayName: null,
@@ -213,19 +214,39 @@ function MemberDashboard() {
   const { user, signOut } = useAuth();
   const { t, lang } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [transferDeadline, setTransferDeadline] = useState<string | null>(null);
+  const [deadlinePassed, setDeadlinePassed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lumaRegs, setLumaRegs] = useState<Registration[]>([]);
   const [noShowConsumedCount, setNoShowConsumedCount] = useState(0);
   const [me, setMe] = useState<{ memberNo: string | null; firstSeenAt: string | null } | null>(null);
   const [profile, setProfile] = useState<MemberProfile>(EMPTY_PROFILE);
+  const [transferTarget, setTransferTarget] = useState<{ parent: Order; hasChildren: boolean } | null>(null);
+  const [transferToast, setTransferToast] = useState('');
+
+  const reloadOrders = () => {
+    if (!user?.email) return;
+    fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
+      .then((r) => (r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false }))
+      .then((d) => {
+        setOrders(d.orders ?? []);
+        setTransferDeadline(d.transfer_deadline ?? null);
+        setDeadlinePassed(!!d.deadline_passed);
+      })
+      .catch((err) => console.error('[Member] Failed to fetch orders:', err));
+  };
 
 
   useEffect(() => {
     if (!user?.email) return;
 
     fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
-      .then((r) => r.ok ? r.json() : { orders: [] })
-      .then((d) => setOrders(d.orders ?? []))
+      .then((r) => r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false })
+      .then((d) => {
+        setOrders(d.orders ?? []);
+        setTransferDeadline(d.transfer_deadline ?? null);
+        setDeadlinePassed(!!d.deadline_passed);
+      })
       .catch((err) => console.error('[Member] Failed to fetch orders:', err))
       .finally(() => setLoading(false));
 
@@ -316,6 +337,34 @@ function MemberDashboard() {
     new Date(s).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US', {
       year: 'numeric', month: 'short', day: 'numeric',
     });
+
+  const orderGroups = useMemo(() => {
+    const parents = orders.filter((o) => !o.parent_order_id);
+    const childrenByParent = new Map<string, Order[]>();
+    for (const c of orders.filter((o) => o.parent_order_id)) {
+      const key = c.parent_order_id as string;
+      const arr = childrenByParent.get(key) ?? [];
+      arr.push(c);
+      childrenByParent.set(key, arr);
+    }
+    return parents.map((parent) => ({
+      parent,
+      children: (childrenByParent.get(parent.id) ?? []).sort((a, b) =>
+        a.created_at.localeCompare(b.created_at),
+      ),
+    }));
+  }, [orders]);
+
+  const canTransferGroup = useCallback(
+    (group: { parent: Order; children: Order[] }) => {
+      if (group.parent.status !== 'paid') return false;
+      if (!group.parent.customer_email) return false;
+      if (deadlinePassed) return false;
+      if (group.children.some((c) => c.status !== 'paid')) return false;
+      return true;
+    },
+    [deadlinePassed],
+  );
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
@@ -411,34 +460,103 @@ function MemberDashboard() {
             </Link>
           </div>
         ) : (
-          <ul className="mt-2 space-y-2">
-            {orders.map((order) => (
-              <li key={order.id}>
-                <Link
-                  href={`/order/${order.id}`}
-                  className="block rounded-lg p-3 bg-stone-50 hover:bg-stone-100 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-semibold text-slate-900 capitalize text-sm">
-                          {order.ticket_tier}
-                        </span>
-                        <StatusBadge status={order.status} t={t} />
+          <>
+            {transferDeadline && !deadlinePassed && (
+              <p className="mt-2 text-[11px] text-slate-500">
+                {lang === 'zh'
+                  ? `訂單轉讓功能於 ${new Date(transferDeadline).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })} 截止`
+                  : `Self-service order transfer closes on ${new Date(transferDeadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`}
+              </p>
+            )}
+            {deadlinePassed && (
+              <p className="mt-2 text-[11px] text-amber-700">
+                {lang === 'zh'
+                  ? '訂單轉讓已截止，如需協助請聯絡客服。'
+                  : 'Self-service transfer is closed. Please contact support for assistance.'}
+              </p>
+            )}
+            <ul className="mt-2 space-y-2">
+              {orderGroups.map(({ parent, children }) => {
+                const eligible = canTransferGroup({ parent, children });
+                return (
+                  <li key={parent.id} className="rounded-lg bg-stone-50 overflow-hidden">
+                    <Link
+                      href={`/order/${parent.id}`}
+                      className="block p-3 hover:bg-stone-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="font-semibold text-slate-900 capitalize text-sm">
+                              {parent.ticket_tier}
+                            </span>
+                            <StatusBadge status={parent.status} t={t} />
+                            {children.length > 0 && (
+                              <span className="text-[10px] text-slate-500 bg-stone-200 px-1.5 py-[1px] rounded">
+                                {lang === 'zh' ? `含升級 ×${children.length}` : `+ ${children.length} upgrade`}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-500">{formatDate(parent.created_at)}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-semibold text-slate-900 text-sm">
+                            {formatAmount(parent.amount_total, parent.currency)}
+                          </p>
+                          <p className="text-[10px] text-[#10B8D9] mt-0.5">{t.auth.viewDetails} →</p>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-500">{formatDate(order.created_at)}</p>
+                    </Link>
+
+                    {children.length > 0 && (
+                      <ul className="px-3 pb-2 space-y-1 bg-stone-50">
+                        {children.map((c) => (
+                          <li key={c.id} className="flex items-center gap-2 text-[11px] text-slate-600 pl-3 border-l-2 border-[#10B8D9]/40">
+                            <span className="text-slate-400">↳</span>
+                            <span className="capitalize font-medium">{c.ticket_tier}</span>
+                            <StatusBadge status={c.status} t={t} />
+                            <span className="font-mono text-slate-500">
+                              {formatAmount(c.amount_total, c.currency)}
+                            </span>
+                            <Link href={`/order/${c.id}`} className="ml-auto text-[10px] text-[#10B8D9] hover:underline">
+                              {t.auth.viewDetails} →
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    <div className="px-3 pb-3 pt-1 flex items-center justify-end gap-2">
+                      {eligible ? (
+                        <button
+                          type="button"
+                          onClick={() => setTransferTarget({ parent, hasChildren: children.length > 0 })}
+                          className="text-[11px] font-medium text-slate-700 bg-white border border-slate-300 px-3 py-1 rounded-md hover:bg-slate-50 hover:text-[#10B8D9] hover:border-[#10B8D9]"
+                        >
+                          {lang === 'zh' ? '轉讓訂單' : 'Transfer'}
+                        </button>
+                      ) : (
+                        <span
+                          className="text-[10px] text-slate-400 cursor-help"
+                          title={
+                            deadlinePassed
+                              ? (lang === 'zh' ? '轉讓已截止' : 'Transfer deadline has passed')
+                              : parent.status !== 'paid'
+                                ? (lang === 'zh' ? '僅已付款訂單可轉讓' : 'Only paid orders can be transferred')
+                                : children.some((c) => c.status !== 'paid')
+                                  ? (lang === 'zh' ? '有升級訂單待處理，請先完成' : 'Pending upgrade — resolve first')
+                                  : ''
+                          }
+                        >
+                          {lang === 'zh' ? '無法轉讓' : 'Transfer unavailable'}
+                        </span>
+                      )}
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-semibold text-slate-900 text-sm">
-                        {formatAmount(order.amount_total, order.currency)}
-                      </p>
-                      <p className="text-[10px] text-[#10B8D9] mt-0.5">{t.auth.viewDetails} →</p>
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
         )}
       </CollapsibleSection>
 
@@ -449,6 +567,37 @@ function MemberDashboard() {
             <EmailPreferences userEmail={user.email} />
           </div>
         </CollapsibleSection>
+      )}
+
+      {transferTarget && (
+        <TransferOrderModal
+          open={!!transferTarget}
+          onClose={() => setTransferTarget(null)}
+          onSuccess={(result) => {
+            setTransferTarget(null);
+            setTransferToast(
+              lang === 'zh'
+                ? `已轉讓至 ${result.to_email}`
+                : `Transferred to ${result.to_email}`,
+            );
+            setTimeout(() => setTransferToast(''), 5000);
+            reloadOrders();
+          }}
+          order={{
+            id: transferTarget.parent.id,
+            ticket_tier: transferTarget.parent.ticket_tier,
+            customer_email: transferTarget.parent.customer_email,
+          }}
+          endpoint="/api/order/transfer"
+          mode="user"
+          hasChildOrders={transferTarget.hasChildren}
+        />
+      )}
+
+      {transferToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2 rounded-lg shadow-lg text-sm">
+          {transferToast}
+        </div>
       )}
     </div>
   );

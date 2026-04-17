@@ -5,6 +5,8 @@ export type EmailType =
   | 'vote_confirmation'
   | 'order_success'
   | 'order_cancelled'
+  | 'order_transferred_from'
+  | 'order_transferred_to'
   | 'magic_link'
   | 'unsubscribe_confirmation'
   | 'notification'
