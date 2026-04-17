@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { QRCodeSVG } from 'qrcode.react';
 import type { TicketTier } from '@/lib/members';
+import MemberQrPanel from './MemberQrPanel';
 
 export type IdentityTier = 'follower' | TicketTier;
 
@@ -19,6 +20,13 @@ export interface MemberProfile {
   isPublic: boolean;
 }
 
+interface QrLabels {
+  qrHelper: string;
+  qrExpiresIn: string;
+  qrExpired: string;
+  qrRegenerate: string;
+}
+
 interface PassportProps {
   email: string;
   memberNo: string | null;
@@ -31,6 +39,9 @@ interface PassportProps {
   editable?: boolean;
   onEdit?: () => void;
   onProfileChange?: (profile: MemberProfile) => void;
+  qrLabels?: QrLabels;
+  collectionsLabel?: string;
+  collectionsUnread?: number;
 }
 
 export const TIER_ORDER: IdentityTier[] = ['follower', 'explore', 'contribute', 'weekly_backer', 'backer'];
@@ -681,7 +692,7 @@ function ValidityBadge({ validFrom, validUntil, lang }: { validFrom: string; val
   );
 }
 
-export default function MemberPassport({ email, memberNo, tier, validFrom, validUntil, profile, lang, editable, onEdit, onProfileChange }: PassportProps) {
+export default function MemberPassport({ email, memberNo, tier, validFrom, validUntil, profile, lang, editable, onEdit, onProfileChange, qrLabels, collectionsLabel, collectionsUnread = 0 }: PassportProps) {
   const accent = TIER_ACCENT[tier];
   const rank = TIER_RANK[tier];
   const surface = TIER_SURFACE[tier];
@@ -700,14 +711,6 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
       body: JSON.stringify(payload),
     }).catch(() => onProfileChange(profile)); // rollback on error
   }, [profile, onProfileChange]);
-
-  const publicUrl = useMemo(() => {
-    if (!memberNo) return null;
-    if (typeof window !== 'undefined') {
-      return `${window.location.origin}/members/${memberNo}`;
-    }
-    return `/members/${memberNo}`;
-  }, [memberNo]);
 
   const labels = {
     title: lang === 'zh' ? '後台通行證' : 'Backstage Credential',
@@ -904,21 +907,31 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
             </div>
           )}
 
-          {/* QR Code */}
-          {publicUrl && profile?.isPublic && (
-            <div className="pt-3 flex flex-col items-center gap-3">
-              <div className="bg-white p-3 rounded-xl">
-                <QRCodeSVG
-                  value={publicUrl}
-                  size={160}
-                  level="M"
-                  bgColor="#FFFFFF"
-                  fgColor={surface}
-                />
-              </div>
-              <p className="text-[11px] text-white/40 font-mono text-center break-all">
-                {publicUrl}
-              </p>
+          {/* Tokenized share QR + collections entry */}
+          {memberNo && qrLabels && (
+            <MemberQrPanel
+              memberNo={memberNo}
+              accent={accent}
+              surface={surface}
+              lang={lang}
+              labels={qrLabels}
+            />
+          )}
+
+          {memberNo && collectionsLabel && (
+            <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-center">
+              <Link
+                href="/me/collections"
+                className="inline-flex items-center gap-2 text-[13px] text-white/65 hover:text-white transition-colors"
+              >
+                <span>{collectionsLabel}</span>
+                {collectionsUnread > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
+                    {collectionsUnread}
+                  </span>
+                )}
+                <span aria-hidden>→</span>
+              </Link>
             </div>
           )}
         </div>

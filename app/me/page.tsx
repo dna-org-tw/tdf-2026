@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
@@ -16,8 +15,6 @@ import MemberPassport, { type IdentityTier, type MemberProfile } from '@/compone
 import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
-
-const QrShareModal = dynamic(() => import('@/components/member/QrShareModal'), { ssr: false });
 
 const EMPTY_PROFILE: MemberProfile = {
   displayName: null,
@@ -237,7 +234,6 @@ function MemberDashboard() {
   const [transferTarget, setTransferTarget] = useState<{ parent: Order; hasChildren: boolean } | null>(null);
   const [transferToast, setTransferToast] = useState('');
   const [collectionsUnread, setCollectionsUnread] = useState(0);
-  const [qrOpen, setQrOpen] = useState(false);
 
   const reloadOrders = () => {
     if (!user?.email) return;
@@ -460,40 +456,19 @@ function MemberDashboard() {
           lang={lang}
           editable
           onProfileChange={setProfile}
+          qrLabels={{
+            qrHelper: t.collections.qrHelper,
+            qrExpiresIn: t.collections.qrExpiresIn,
+            qrExpired: t.collections.qrExpired,
+            qrRegenerate: t.collections.qrRegenerate,
+          }}
+          collectionsLabel={t.collections.entryLabel}
+          collectionsUnread={collectionsUnread}
         />
       )}
 
       {/* Upcoming events + festival countdown */}
       <UpcomingEvents registrations={lumaRegs} lang={lang} noShowConsumedCount={noShowConsumedCount} />
-
-      {/* Card collections entry */}
-      {me?.memberNo && (
-        <div className="flex items-center gap-2">
-          <Link
-            href="/me/collections"
-            className="flex-1 flex items-center justify-between bg-white rounded-xl border border-slate-200 px-4 py-3 hover:border-slate-300 hover:shadow-sm transition-all group"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-slate-900 group-hover:text-[#10B8D9] transition-colors">
-                {t.collections.entryLabel}
-              </span>
-              {collectionsUnread > 0 && (
-                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
-                  {collectionsUnread}
-                </span>
-              )}
-            </span>
-            <span className="text-slate-400 group-hover:text-[#10B8D9]">→</span>
-          </Link>
-          <button
-            type="button"
-            onClick={() => setQrOpen(true)}
-            className="shrink-0 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:text-[#10B8D9] hover:border-[#10B8D9] transition-colors"
-          >
-            {t.collections.qrShow}
-          </button>
-        </div>
-      )}
 
       {/* Orders (collapsible) */}
       <CollapsibleSection
@@ -716,21 +691,6 @@ function MemberDashboard() {
         </div>
       )}
 
-      {me?.memberNo && (
-        <QrShareModal
-          open={qrOpen}
-          onClose={() => setQrOpen(false)}
-          memberNo={me.memberNo}
-          lang={lang}
-          labels={{
-            qrTitle: t.collections.qrTitle,
-            qrHelper: t.collections.qrHelper,
-            qrExpiresIn: t.collections.qrExpiresIn,
-            qrExpired: t.collections.qrExpired,
-            qrRegenerate: t.collections.qrRegenerate,
-          }}
-        />
-      )}
     </div>
   );
 }
