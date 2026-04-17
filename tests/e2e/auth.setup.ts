@@ -19,7 +19,7 @@ setup('authenticate via dev-signin', async ({ page }) => {
 
   // Confirm the cookie authenticates us before saving state.
   await page.goto('/me');
-  await expect(page.getByRole('button', { name: /logout|登出/i })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('button', { name: /sign out|登出/i })).toBeVisible({ timeout: 15_000 });
 
   await page.context().storageState({ path: STORAGE_PATH });
 });
