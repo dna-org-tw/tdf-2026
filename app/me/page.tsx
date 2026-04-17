@@ -216,6 +216,16 @@ function MemberDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [transferDeadline, setTransferDeadline] = useState<string | null>(null);
   const [deadlinePassed, setDeadlinePassed] = useState(false);
+  const [outgoingTransfers, setOutgoingTransfers] = useState<Array<{
+    id: string;
+    order_id: string;
+    to_email: string;
+    initiated_by: 'user' | 'admin';
+    transferred_at: string;
+    ticket_tier: string | null;
+    amount_total: number | null;
+    currency: string | null;
+  }>>([]);
   const [loading, setLoading] = useState(true);
   const [lumaRegs, setLumaRegs] = useState<Registration[]>([]);
   const [noShowConsumedCount, setNoShowConsumedCount] = useState(0);
@@ -227,11 +237,12 @@ function MemberDashboard() {
   const reloadOrders = () => {
     if (!user?.email) return;
     fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
-      .then((r) => (r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false }))
+      .then((r) => (r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false, outgoing_transfers: [] }))
       .then((d) => {
         setOrders(d.orders ?? []);
         setTransferDeadline(d.transfer_deadline ?? null);
         setDeadlinePassed(!!d.deadline_passed);
+        setOutgoingTransfers(d.outgoing_transfers ?? []);
       })
       .catch((err) => console.error('[Member] Failed to fetch orders:', err));
   };
@@ -241,11 +252,12 @@ function MemberDashboard() {
     if (!user?.email) return;
 
     fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
-      .then((r) => r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false })
+      .then((r) => r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false, outgoing_transfers: [] })
       .then((d) => {
         setOrders(d.orders ?? []);
         setTransferDeadline(d.transfer_deadline ?? null);
         setDeadlinePassed(!!d.deadline_passed);
+        setOutgoingTransfers(d.outgoing_transfers ?? []);
       })
       .catch((err) => console.error('[Member] Failed to fetch orders:', err))
       .finally(() => setLoading(false));
@@ -570,6 +582,60 @@ function MemberDashboard() {
           </>
         )}
       </CollapsibleSection>
+
+      {/* Outgoing transfers (orders you used to own) */}
+      {outgoingTransfers.length > 0 && (
+        <CollapsibleSection
+          title={lang === 'zh' ? '已轉出訂單' : 'Transferred out'}
+          count={outgoingTransfers.length}
+          defaultOpen={false}
+        >
+          <ul className="mt-2 space-y-2">
+            {outgoingTransfers.map((t) => (
+              <li key={t.id} className="rounded-lg p-3 bg-stone-50">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="font-semibold text-slate-900 capitalize text-sm">
+                        {t.ticket_tier ?? '-'}
+                      </span>
+                      <span className="px-1.5 py-0.5 text-[10px] rounded bg-red-50 text-red-700 border border-red-200">
+                        {lang === 'zh' ? '已轉出' : 'transferred out'}
+                      </span>
+                      {t.initiated_by === 'admin' && (
+                        <span className="px-1.5 py-0.5 text-[10px] rounded bg-amber-50 text-amber-800 border border-amber-200">
+                          {lang === 'zh' ? '管理員執行' : 'by admin'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-mono break-all">
+                      {lang === 'zh' ? '至 ' : 'to '}{t.to_email}
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      {new Date(t.transferred_at).toLocaleString(lang === 'zh' ? 'zh-TW' : 'en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                  {t.amount_total != null && t.currency && (
+                    <div className="text-right shrink-0">
+                      <p className="text-xs text-slate-500">
+                        {`${(t.amount_total / 100).toFixed(2)} ${t.currency.toUpperCase()}`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-[11px] text-slate-400">
+            {lang === 'zh'
+              ? '這些訂單已轉讓給他人，您不再擁有。若有錯誤請聯絡客服。'
+              : 'These orders have been transferred to someone else and are no longer yours. Contact support if anything looks wrong.'}
+          </p>
+        </CollapsibleSection>
+      )}
 
       {/* Email preferences (collapsible) */}
       {user?.email && (
