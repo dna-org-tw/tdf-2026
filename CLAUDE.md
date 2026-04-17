@@ -12,8 +12,43 @@ Taiwan Digital Fest 2026 (TDF 2026) — official website for a month-long digita
 - `npm run build` — Production build
 - `npm run lint` — ESLint (flat config, Next.js core-web-vitals + TypeScript rules)
 - `npm run analyze` — Bundle analysis (`ANALYZE=true next build`)
+- `npm run e2e` — Playwright end-to-end tests (auto-starts dev server on `$PLAYWRIGHT_PORT`, default 3100)
+- `npm run e2e:ui` — Playwright UI mode
 
-No test framework is configured.
+## Development workflow
+
+### Worktrees
+
+Feature work happens in `.worktrees/<name>/` (gitignored). Use `scripts/worktree-dev.sh <name> [base-branch]` to create a new worktree with `.env.local` copied and deps installed:
+
+```bash
+scripts/worktree-dev.sh avatar-hero           # branches from main
+scripts/worktree-dev.sh fix-foo origin/develop
+```
+
+### UI verification rules (strict)
+
+UI changes need a human-in-the-loop check, but not every route can be driven by a bot.
+
+- **Public routes** (`/`, `/award`, `/members/[memberNo]`, etc.): Claude may run Playwright, take screenshots, and self-verify design, RWD, JS console errors.
+- **Authenticated routes** (`/me`, `/admin`, `/order/[id]`): **Claude must not** insert Supabase auth tokens, mock sessions, or mutate prod DB rows to bypass auth. The only path is `/api/auth/dev-signin` (see below). If that isn't wired up for the current task, hand off: run `tsc --noEmit`, `npm run lint`, start the dev server, give the user the URL to open in their own Chrome where they're already logged in.
+- **5-step circuit breaker**: If live-preview verification takes more than 5 tool calls from "start dev server" to "see the change", stop. Commit what's ready, surface the blocker, let the user choose: test in their own Chrome, or debug root cause.
+
+### E2E auth (Playwright)
+
+Playwright's `auth.setup.ts` project logs in once via `POST /api/auth/dev-signin` and saves cookies to `.auth/session.json` (gitignored). All authenticated specs reuse that storage state.
+
+`/api/auth/dev-signin` is triple-gated:
+1. Returns 404 if `NODE_ENV === 'production'`
+2. Returns 404 if `DEV_SIGNIN_SECRET` env var is unset
+3. Returns 404 unless request header `x-dev-signin-secret` matches
+4. Email must be in the in-code allowlist (`ALLOWED_EMAILS` in the route file)
+
+To run E2E locally: set `DEV_SIGNIN_SECRET=<anything>` in `.env.local`, then `npm run e2e`. Never set this var in `.env.production*`.
+
+### Test data
+
+For manual dev, the only Supabase-facing test account is `kk@dna.org.tw`. Don't modify other users' rows, don't insert rows to bypass auth (use `dev-signin` instead), and clean up anything you do create.
 
 ## Screenshots
 
