@@ -769,7 +769,7 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
 
           {/* Profile: avatar + name + bio + tags + social links (inline editable) */}
           <div className="mt-5 flex items-start gap-4">
-            <MemberAvatar name={profile?.displayName ?? null} email={email} accent={accent} avatarUrl={profile?.avatarUrl} size={52} />
+            <MemberAvatar name={profile?.displayName ?? null} email={email} accent={accent} avatarUrl={profile?.avatarUrl} size={72} />
             <div className="min-w-0 flex-1 space-y-1">
               {editable && profile ? (
                 <>
