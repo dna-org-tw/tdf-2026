@@ -30,11 +30,24 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { data: profiles, count, error: pErr } = await profileQuery
+    const { data: profiles, count: publicCount, error: pErr } = await profileQuery
       .range(offset, offset + PAGE_SIZE - 1);
     if (pErr) throw pErr;
+
+    const { count: totalMembers } = await supabaseServer
+      .from('members')
+      .select('id', { count: 'exact', head: true });
+
+    const anonymousCount = Math.max(0, (totalMembers ?? 0) - (publicCount ?? 0));
+
     if (!profiles?.length) {
-      return NextResponse.json({ members: [], total: 0, page, pageSize: PAGE_SIZE });
+      return NextResponse.json({
+        members: [],
+        total: publicCount ?? 0,
+        anonymousCount,
+        page,
+        pageSize: PAGE_SIZE,
+      });
     }
 
     // Fetch member_no for these profiles
@@ -74,9 +87,20 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    result.sort((a, b) => {
+      const aAvatar = a.avatar_url ? 1 : 0;
+      const bAvatar = b.avatar_url ? 1 : 0;
+      if (aAvatar !== bAvatar) return bAvatar - aAvatar;
+      const aBio = a.bio ? 1 : 0;
+      const bBio = b.bio ? 1 : 0;
+      if (aBio !== bBio) return bBio - aBio;
+      return 0;
+    });
+
     return NextResponse.json({
       members: result,
-      total: count ?? 0,
+      total: publicCount ?? 0,
+      anonymousCount,
       page,
       pageSize: PAGE_SIZE,
     });
