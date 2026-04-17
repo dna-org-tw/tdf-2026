@@ -347,12 +347,19 @@ function MemberDashboard() {
       arr.push(c);
       childrenByParent.set(key, arr);
     }
-    return parents.map((parent) => ({
-      parent,
-      children: (childrenByParent.get(parent.id) ?? []).sort((a, b) =>
+    return parents.map((parent) => {
+      const children = (childrenByParent.get(parent.id) ?? []).sort((a, b) =>
         a.created_at.localeCompare(b.created_at),
-      ),
-    }));
+      );
+      // Effective display = latest paid order in the group (child takes over after upgrade).
+      // Falls back to parent if no paid child yet.
+      const paidChildren = children.filter((c) => c.status === 'paid');
+      const effective = paidChildren.length > 0
+        ? paidChildren.reduce((latest, c) =>
+            c.created_at > latest.created_at ? c : latest, paidChildren[0])
+        : parent;
+      return { parent, children, effective };
+    });
   }, [orders]);
 
   const canTransferGroup = useCallback(
@@ -476,8 +483,12 @@ function MemberDashboard() {
               </p>
             )}
             <ul className="mt-2 space-y-2">
-              {orderGroups.map(({ parent, children }) => {
+              {orderGroups.map(({ parent, children, effective }) => {
                 const eligible = canTransferGroup({ parent, children });
+                const upgraded = effective.id !== parent.id;
+                const totalPaid =
+                  parent.amount_total +
+                  children.filter((c) => c.status === 'paid').reduce((s, c) => s + c.amount_total, 0);
                 return (
                   <li key={parent.id} className="rounded-lg bg-stone-50 overflow-hidden">
                     <Link
@@ -488,12 +499,12 @@ function MemberDashboard() {
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <span className="font-semibold text-slate-900 capitalize text-sm">
-                              {parent.ticket_tier}
+                              {effective.ticket_tier}
                             </span>
-                            <StatusBadge status={parent.status} t={t} />
-                            {children.length > 0 && (
-                              <span className="text-[10px] text-slate-500 bg-stone-200 px-1.5 py-[1px] rounded">
-                                {lang === 'zh' ? `含升級 ×${children.length}` : `+ ${children.length} upgrade`}
+                            <StatusBadge status={effective.status} t={t} />
+                            {upgraded && (
+                              <span className="text-[10px] text-slate-500 bg-stone-200 px-1.5 py-[1px] rounded capitalize">
+                                {lang === 'zh' ? `由 ${parent.ticket_tier} 升級` : `upgraded from ${parent.ticket_tier}`}
                               </span>
                             )}
                           </div>
@@ -501,7 +512,7 @@ function MemberDashboard() {
                         </div>
                         <div className="text-right shrink-0">
                           <p className="font-semibold text-slate-900 text-sm">
-                            {formatAmount(parent.amount_total, parent.currency)}
+                            {formatAmount(totalPaid, parent.currency)}
                           </p>
                           <p className="text-[10px] text-[#10B8D9] mt-0.5">{t.auth.viewDetails} →</p>
                         </div>
