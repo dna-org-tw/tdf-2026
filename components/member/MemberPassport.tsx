@@ -116,7 +116,21 @@ function getInitials(name: string | null, email: string): string {
   return '??';
 }
 
-function MemberAvatar({ name, email, accent, avatarUrl, size = 48 }: { name: string | null; email: string; accent: string; avatarUrl?: string | null; size?: number }) {
+function AvatarHero({
+  name,
+  email,
+  accent,
+  avatarUrl,
+  glow,
+  surface,
+}: {
+  name: string | null;
+  email: string;
+  accent: string;
+  avatarUrl?: string | null;
+  glow: string;
+  surface: string;
+}) {
   const [imgError, setImgError] = useState(false);
   const initials = getInitials(name, email);
 
@@ -125,10 +139,7 @@ function MemberAvatar({ name, email, accent, avatarUrl, size = 48 }: { name: str
       <img
         src={avatarUrl}
         alt={name || email || 'Avatar'}
-        width={size}
-        height={size}
-        className="rounded-full object-cover shrink-0"
-        style={{ width: size, height: size }}
+        className="absolute inset-0 w-full h-full object-cover"
         onError={() => setImgError(true)}
       />
     );
@@ -136,18 +147,21 @@ function MemberAvatar({ name, email, accent, avatarUrl, size = 48 }: { name: str
 
   return (
     <div
-      className="rounded-full flex items-center justify-center font-bold shrink-0"
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: `${accent}25`,
-        color: accent,
-        fontSize: size * 0.38,
-        letterSpacing: '0.05em',
-      }}
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ backgroundColor: surface, background: glow }}
       aria-label={name || email}
     >
-      {initials}
+      <span
+        className="font-black leading-none select-none"
+        style={{
+          color: accent,
+          fontSize: 'clamp(96px, 22vw, 180px)',
+          letterSpacing: '-0.02em',
+          opacity: 0.9,
+        }}
+      >
+        {initials}
+      </span>
     </div>
   );
 }
@@ -719,149 +733,180 @@ export default function MemberPassport({ email, memberNo, tier, validFrom, valid
         style={{ backgroundColor: surface }}
       >
         {/* Top accent bar */}
-        <div className="h-1 w-full" style={{ backgroundColor: accent }} />
+        <div className="h-1 w-full relative z-20" style={{ backgroundColor: accent }} />
 
-        {/* Glow + grain */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: glow }} />
+        {/* Avatar hero — takes the top half of the card */}
         <div
-          className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
-          }}
-          aria-hidden
-        />
+          className="relative overflow-hidden"
+          style={{ aspectRatio: '4 / 5' }}
+        >
+          <AvatarHero
+            name={profile?.displayName ?? null}
+            email={email}
+            accent={accent}
+            avatarUrl={profile?.avatarUrl}
+            glow={glow}
+            surface={surface}
+          />
 
-        <div className="relative px-5 py-6 sm:px-8 sm:py-8">
-          {/* Top row: member no + stars */}
-          <div className="flex items-center justify-between mb-5">
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/65">
+          {/* Grain overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-[0.08]"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+            }}
+            aria-hidden
+          />
+
+          {/* Top gradient — readability for memberNo + stars */}
+          <div
+            className="absolute inset-x-0 top-0 h-24 pointer-events-none"
+            style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.55), transparent)' }}
+            aria-hidden
+          />
+
+          {/* Bottom gradient — readability for tier name + display name */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 40%, transparent 100%)',
+            }}
+            aria-hidden
+          />
+
+          {/* Top row overlay: member no + stars */}
+          <div className="absolute top-0 inset-x-0 flex items-center justify-between px-5 sm:px-8 pt-4">
+            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/90 drop-shadow">
               {memberNo ?? 'M-———'} · TDF 2026
             </p>
             <ClearanceStars rank={rank} accent={accent} />
           </div>
 
-          {/* Hero tier name */}
-          <h2
-            className="break-words"
-            style={{
-              fontFamily: 'var(--font-display), var(--font-noto-sans-tc), system-ui, sans-serif',
-              fontWeight: 900,
-              fontStyle: isFoil ? 'italic' : 'normal',
-              fontSize: 'clamp(44px, 11vw, 76px)',
-              lineHeight: 0.9,
-              letterSpacing: '-0.02em',
-              textTransform: 'uppercase',
-              ...(isFoil
-                ? {
-                    backgroundImage:
-                      'linear-gradient(96deg,#FFD028 0%,#FFFFFF 38%,#C54090 70%,#FFD028 100%)',
-                    backgroundSize: '200% 100%',
-                    WebkitBackgroundClip: 'text',
-                    backgroundClip: 'text',
-                    color: 'transparent',
-                  }
-                : { color: '#fff' }),
-            }}
-          >
-            {tierName}
-          </h2>
-
-          {/* Profile: avatar + name + bio + tags + social links (inline editable) */}
-          <div className="mt-5 flex items-start gap-4">
-            <MemberAvatar name={profile?.displayName ?? null} email={email} accent={accent} avatarUrl={profile?.avatarUrl} size={72} />
-            <div className="min-w-0 flex-1 space-y-1">
+          {/* Bottom overlay: tier name + display name */}
+          <div className="absolute bottom-0 inset-x-0 px-5 sm:px-8 pb-5">
+            <h2
+              className="break-words"
+              style={{
+                fontFamily: 'var(--font-display), var(--font-noto-sans-tc), system-ui, sans-serif',
+                fontWeight: 900,
+                fontStyle: isFoil ? 'italic' : 'normal',
+                fontSize: 'clamp(44px, 11vw, 76px)',
+                lineHeight: 0.9,
+                letterSpacing: '-0.02em',
+                textTransform: 'uppercase',
+                ...(isFoil
+                  ? {
+                      backgroundImage:
+                        'linear-gradient(96deg,#FFD028 0%,#FFFFFF 38%,#C54090 70%,#FFD028 100%)',
+                      backgroundSize: '200% 100%',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      color: 'transparent',
+                    }
+                  : { color: '#fff' }),
+              }}
+            >
+              {tierName}
+            </h2>
+            <div className="mt-2 max-w-full">
               {editable && profile ? (
-                <>
-                  <InlineField
-                    value={profile.displayName ?? ''}
-                    placeholder={lang === 'zh' ? '顯示名稱' : 'Display name'}
-                    onSave={(v) => saveField('displayName', v || null)}
-                    maxLength={50}
-                    className="text-[16px] font-bold text-white"
-                  />
-                  <InlineLocationField
-                    value={profile.location ?? ''}
-                    placeholder={lang === 'zh' ? '所在地' : 'Location'}
-                    onSave={(v) => saveField('location', v || null)}
-                    lang={lang}
-                  />
-                  <InlineField
-                    value={profile.bio ?? ''}
-                    placeholder={lang === 'zh' ? '自我介紹' : 'Bio'}
-                    onSave={(v) => saveField('bio', v || null)}
-                    multiline
-                    maxLength={280}
-                    className="text-[13px] text-white/75"
-                  />
-                  <InlineTagsField
-                    tags={profile.tags}
-                    accent={accent}
-                    onSave={(v) => saveField('tags', v)}
-                    placeholder={lang === 'zh' ? '新增標籤' : 'Add tags'}
-                  />
-                  <InlineSocialLinks
-                    links={profile.socialLinks}
-                    onSave={(v) => saveField('socialLinks', v)}
-                    lang={lang}
-                  />
-                </>
+                <InlineField
+                  value={profile.displayName ?? ''}
+                  placeholder={lang === 'zh' ? '顯示名稱' : 'Display name'}
+                  onSave={(v) => saveField('displayName', v || null)}
+                  maxLength={50}
+                  className="text-[17px] font-bold text-white"
+                />
               ) : (
-                <>
-                  <p className="text-[16px] font-bold text-white truncate">
-                    {profile?.displayName || email.split('@')[0]}
-                  </p>
-                  {profile?.location && (
-                    <p className="text-[12px] text-white/70 truncate">{profile.location}</p>
-                  )}
-                  {profile?.bio && (
-                    <p className="text-[13px] text-white/75 line-clamp-2">{profile.bio}</p>
-                  )}
-                  {profile && profile.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-1">
-                      {profile.tags.slice(0, 5).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-                          style={{ backgroundColor: `${accent}20`, color: accent }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {profile && Object.keys(profile.socialLinks).length > 0 && (
-                    <div className="flex flex-wrap gap-3 mt-1">
-                      {Object.entries(profile.socialLinks).map(([platform, url]) => (
-                        <a
-                          key={platform}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
-                        >
-                          {platform}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </>
+                <p className="text-[17px] font-bold text-white truncate drop-shadow">
+                  {profile?.displayName || email.split('@')[0]}
+                </p>
               )}
             </div>
           </div>
+        </div>
 
-          {/* Validity period — primary secondary info */}
+        {/* Info panel */}
+        <div className="relative px-5 py-5 sm:px-8 sm:py-6 space-y-3">
+          {/* Validity or tagline */}
           {tier !== 'follower' && validFrom && validUntil ? (
-            <div className="mt-4">
-              <ValidityBadge validFrom={validFrom} validUntil={validUntil} lang={lang} />
+            <ValidityBadge validFrom={validFrom} validUntil={validUntil} lang={lang} />
+          ) : (
+            <p className="text-[13px] text-white/55 italic">{tagline}</p>
+          )}
+
+          {editable && profile ? (
+            <div className="space-y-2">
+              <InlineLocationField
+                value={profile.location ?? ''}
+                placeholder={lang === 'zh' ? '所在地' : 'Location'}
+                onSave={(v) => saveField('location', v || null)}
+                lang={lang}
+              />
+              <InlineField
+                value={profile.bio ?? ''}
+                placeholder={lang === 'zh' ? '自我介紹' : 'Bio'}
+                onSave={(v) => saveField('bio', v || null)}
+                multiline
+                maxLength={280}
+                className="text-[13px] text-white/80"
+              />
+              <InlineTagsField
+                tags={profile.tags}
+                accent={accent}
+                onSave={(v) => saveField('tags', v)}
+                placeholder={lang === 'zh' ? '新增標籤' : 'Add tags'}
+              />
+              <InlineSocialLinks
+                links={profile.socialLinks}
+                onSave={(v) => saveField('socialLinks', v)}
+                lang={lang}
+              />
             </div>
           ) : (
-            <p className="mt-3 text-[13px] text-white/50 italic">{tagline}</p>
+            <div className="space-y-2">
+              {profile?.location && (
+                <p className="text-[12px] text-white/70">{profile.location}</p>
+              )}
+              {profile?.bio && (
+                <p className="text-[13px] text-white/80">{profile.bio}</p>
+              )}
+              {profile && profile.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {profile.tags.slice(0, 5).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                      style={{ backgroundColor: `${accent}20`, color: accent }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {profile && Object.keys(profile.socialLinks).length > 0 && (
+                <div className="flex flex-wrap gap-3">
+                  {Object.entries(profile.socialLinks).map(([platform, url]) => (
+                    <a
+                      key={platform}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
+                    >
+                      {platform}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
 
           {/* QR Code */}
           {publicUrl && profile?.isPublic && (
-            <div className="mt-5 flex flex-col items-center gap-3">
+            <div className="pt-3 flex flex-col items-center gap-3">
               <div className="bg-white p-3 rounded-xl">
                 <QRCodeSVG
                   value={publicUrl}
