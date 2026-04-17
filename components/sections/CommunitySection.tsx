@@ -9,6 +9,46 @@ import { TIER_ACCENT, type IdentityTier } from '@/components/member/MemberPasspo
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
+import { pickRandomAnimals, type AnonymousAnimal } from '@/lib/anonymousAnimals';
+
+const ANIMAL_SLOT_COUNT = 6;
+
+function AnonymousAnimalBadge({ animal, label }: { animal: AnonymousAnimal; label: string }) {
+  return (
+    <div
+      className="flex flex-col items-center gap-2"
+      title={`Anonymous ${animal.name}`}
+      aria-label={`Anonymous ${animal.name}`}
+    >
+      <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-white/5 border-2 border-white/10 select-none">
+        <span aria-hidden>{animal.emoji}</span>
+      </div>
+      <div className="text-center min-w-0 max-w-[100px]">
+        <p className="text-[13px] font-medium text-white/40 truncate">
+          {label}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MoreMembersBadge({ count, label }: { count: number; label: string }) {
+  return (
+    <div
+      className="flex flex-col items-center gap-2"
+      aria-label={label}
+    >
+      <div className="w-16 h-16 rounded-full flex items-center justify-center bg-white/5 border-2 border-dashed border-white/20 select-none">
+        <span className="text-sm font-bold text-white/70">+{count}</span>
+      </div>
+      <div className="text-center min-w-0 max-w-[100px]">
+        <p className="text-[13px] font-medium text-white/40 truncate">
+          {label}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 interface PublicMember {
   member_no: string | null;
@@ -63,6 +103,8 @@ export default function CommunitySection() {
   const { executeRecaptcha } = useRecaptcha('subscribe');
   const [members, setMembers] = useState<PublicMember[]>([]);
   const [total, setTotal] = useState(0);
+  const [anonymousCount, setAnonymousCount] = useState(0);
+  const [animals, setAnimals] = useState<AnonymousAnimal[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,6 +117,8 @@ export default function CommunitySection() {
     cta: '查看所有夥伴',
     join: '加入我們',
     empty: '成為第一位公開名片的夥伴',
+    anonymousLabel: '匿名夥伴',
+    moreMembers: '位夥伴',
     modalTitle: '加入我們的社群',
     modalDesc: '訂閱電子報，獲取最新活動資訊與社群動態',
     emailPlaceholder: '請輸入電子郵件',
@@ -91,6 +135,8 @@ export default function CommunitySection() {
     cta: 'View all members',
     join: 'Join us',
     empty: 'Be the first to share your card',
+    anonymousLabel: 'Anonymous',
+    moreMembers: 'more',
     modalTitle: 'Join Our Community',
     modalDesc: 'Subscribe to our newsletter for the latest events and community updates',
     emailPlaceholder: 'Enter your email',
@@ -168,10 +214,13 @@ export default function CommunitySection() {
 
   useEffect(() => {
     fetch('/api/members?page=1')
-      .then((r) => r.ok ? r.json() : { members: [], total: 0 })
+      .then((r) => r.ok ? r.json() : { members: [], total: 0, anonymousCount: 0 })
       .then((d) => {
         setMembers(d.members ?? []);
         setTotal(d.total ?? 0);
+        const anon = d.anonymousCount ?? 0;
+        setAnonymousCount(anon);
+        setAnimals(pickRandomAnimals(Math.min(ANIMAL_SLOT_COUNT, anon)));
       })
       .catch(() => {});
   }, []);
@@ -204,7 +253,7 @@ export default function CommunitySection() {
         </motion.div>
 
         {/* Member grid */}
-        {members.length > 0 ? (
+        {members.length > 0 || animals.length > 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -215,6 +264,19 @@ export default function CommunitySection() {
             {members.slice(0, 12).map((m) => (
               <MemberBadge key={m.member_no} member={m} />
             ))}
+            {animals.map((a) => (
+              <AnonymousAnimalBadge
+                key={a.name}
+                animal={a}
+                label={labels.anonymousLabel}
+              />
+            ))}
+            {anonymousCount > ANIMAL_SLOT_COUNT && (
+              <MoreMembersBadge
+                count={anonymousCount - ANIMAL_SLOT_COUNT}
+                label={labels.moreMembers}
+              />
+            )}
           </motion.div>
         ) : (
           <motion.div
