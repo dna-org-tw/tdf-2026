@@ -358,7 +358,7 @@ function InlineField({
       className={'text-left group inline-flex items-center gap-1 ' + (className ?? '')}
     >
       <span>{value}</span>
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
       </svg>
     </button>
@@ -498,7 +498,7 @@ function InlineLocationField({
       className="text-left group inline-flex items-center gap-1 text-[12px] text-white/70"
     >
       <span>{value}</span>
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
       </svg>
     </button>
@@ -574,7 +574,7 @@ function InlineTagsField({
           {tag}
         </span>
       ))}
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
       </svg>
     </button>
@@ -702,7 +702,7 @@ function InlineSocialLinks({
           {platform}
         </a>
       ))}
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
       </svg>
     </button>

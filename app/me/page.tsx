@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
+import { useState, useEffect, useMemo, useCallback, useSyncExternalStore, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
@@ -17,6 +17,9 @@ import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 import StaySummaryCard from '@/components/member/StaySummaryCard';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
+import ActionHero from '@/components/member/ActionHero';
+import ProfileVisibility from '@/components/member/ProfileVisibility';
+import { formatOrderAmount } from '@/lib/orderDisplay';
 
 const EMPTY_PROFILE: MemberProfile = {
   displayName: null,
@@ -212,9 +215,19 @@ function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTr
   return <span className={`px-2 py-[2px] rounded-full text-[10px] font-medium ${color}`}>{label}</span>;
 }
 
+let cachedNow: number | null = null;
+const nowSubscribe = (cb: () => void) => {
+  cachedNow = Date.now();
+  cb();
+  return () => {};
+};
+const nowGetClientSnapshot = () => cachedNow;
+const nowGetServerSnapshot = () => null;
+
 function MemberDashboard() {
   const { user, signOut } = useAuth();
   const { t, lang } = useTranslation();
+  const nowMs = useSyncExternalStore<number | null>(nowSubscribe, nowGetClientSnapshot, nowGetServerSnapshot);
   const [orders, setOrders] = useState<Order[]>([]);
   const [transferDeadline, setTransferDeadline] = useState<string | null>(null);
   const [deadlinePassed, setDeadlinePassed] = useState(false);
@@ -361,7 +374,7 @@ function MemberDashboard() {
   }, []);
 
   const formatAmount = (amount: number, currency: string) =>
-    `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
+    formatOrderAmount(amount, currency, { lang });
 
   const formatDate = (s: string) =>
     new Date(s).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US', {
@@ -403,58 +416,50 @@ function MemberDashboard() {
     [deadlinePassed],
   );
 
+  // Derive Action Hero inputs.
+  const heroInputs = useMemo(() => {
+    if (nowMs == null) {
+      return {
+        daysUntilFestival: null as number | null,
+        daysSinceFestivalStart: null as number | null,
+        visaRequired: false,
+        firstUpcomingEventName: null as string | null,
+      };
+    }
+    const festivalStart = new Date(`${FESTIVAL_START}T00:00:00+08:00`).getTime();
+    const festivalEnd = new Date('2026-05-31T23:59:59+08:00').getTime();
+    const dayMs = 24 * 60 * 60 * 1000;
+    const daysUntilFestival = nowMs < festivalStart
+      ? Math.ceil((festivalStart - nowMs) / dayMs)
+      : null;
+    const daysSinceFestivalStart = nowMs >= festivalStart && nowMs <= festivalEnd
+      ? Math.floor((nowMs - festivalStart) / dayMs)
+      : null;
+    const hasPaidOrder = orders.some((o) => o.status === 'paid');
+    const locString = (profile.location ?? '').toLowerCase();
+    const locationLooksTaiwanese = locString.includes('taiwan')
+      || (profile.location ?? '').includes('台灣');
+    const visaRequired = hasPaidOrder && profile.location != null && !locationLooksTaiwanese;
+    const firstUpcomingEventName = lumaRegs
+      .filter((r) => r.startAt && new Date(r.startAt).getTime() >= nowMs)
+      .sort((a, b) => new Date(a.startAt!).getTime() - new Date(b.startAt!).getTime())[0]?.eventName
+      ?? null;
+    return { daysUntilFestival, daysSinceFestivalStart, visaRequired, firstUpcomingEventName };
+  }, [nowMs, orders, profile.location, lumaRegs]);
+
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      {/* Public toggle + sign out */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <button
-            type="button"
-            onClick={() => handleTogglePublic(!profile.isPublic)}
-            className="flex items-center gap-2.5 group shrink-0"
-          >
-            <div
-              className="rounded-full relative transition-colors"
-              style={{
-                width: 40,
-                height: 22,
-                minHeight: 22,
-                backgroundColor: profile.isPublic ? 'rgba(82,212,114,0.3)' : 'rgba(0,0,0,0.12)',
-              }}
-            >
-              <div
-                className="absolute rounded-full transition-all"
-                style={{
-                  width: 16,
-                  height: 16,
-                  top: 3,
-                  backgroundColor: profile.isPublic ? '#52D472' : '#aaa',
-                  left: profile.isPublic ? 21 : 3,
-                }}
-              />
-            </div>
-            <span className="text-[13px] leading-5 text-slate-600 group-hover:text-slate-800 transition-colors">
-              {profile.isPublic
-                ? (lang === 'zh' ? '身份卡已公開' : 'Card is public')
-                : (lang === 'zh' ? '身份卡未公開' : 'Card is private')}
-            </span>
-          </button>
-          {profile.isPublic && me?.memberNo && (
-            <Link
-              href={`/members/${me.memberNo}`}
-              className="text-[11px] text-[#10B8D9] hover:underline truncate"
-            >
-              /members/{me.memberNo}
-            </Link>
-          )}
-        </div>
-        <button
-          onClick={signOut}
-          className="shrink-0 text-[12px] font-mono tracking-[0.15em] uppercase text-slate-400 hover:text-red-500 transition-colors"
-        >
-          {t.auth.logout}
-        </button>
-      </div>
+      {/* Action Hero — priority-aware banner (payment-pending > visa > countdown/live) */}
+      {!loading && nowMs != null && (
+        <ActionHero
+          lang={lang}
+          orders={orders}
+          daysUntilFestival={heroInputs.daysUntilFestival}
+          daysSinceFestivalStart={heroInputs.daysSinceFestivalStart}
+          visaRequired={heroInputs.visaRequired}
+          firstUpcomingEventName={heroInputs.firstUpcomingEventName}
+        />
+      )}
 
       {/* Identity card (hero) */}
       {!loading && user?.email && (
@@ -478,6 +483,16 @@ function MemberDashboard() {
           collectionsUnread={collectionsUnread}
         />
       )}
+
+      {/* Privacy controls + sign out */}
+      <ProfileVisibility
+        isPublic={profile.isPublic}
+        memberNo={me?.memberNo ?? null}
+        lang={lang}
+        onChange={handleTogglePublic}
+        onSignOut={signOut}
+        signOutLabel={t.auth.logout}
+      />
 
       {/* Upcoming events + festival countdown */}
       <UpcomingEvents registrations={lumaRegs} lang={lang} noShowConsumedCount={noShowConsumedCount} />
@@ -551,9 +566,20 @@ function MemberDashboard() {
                           <p className="text-[11px] text-slate-500">{formatDate(parent.created_at)}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="font-semibold text-slate-900 text-sm">
-                            {formatAmount(totalPaid, parent.currency)}
-                          </p>
+                          {(() => {
+                            const { label, tone } = formatAmount(totalPaid, parent.currency);
+                            return (
+                              <p
+                                className={
+                                  tone === 'paid'
+                                    ? 'font-semibold text-slate-900 text-sm'
+                                    : 'text-[11px] font-medium uppercase tracking-wider text-slate-400'
+                                }
+                              >
+                                {label}
+                              </p>
+                            );
+                          })()}
                           <p className="text-[10px] text-[#10B8D9] mt-0.5">{t.auth.viewDetails} →</p>
                         </div>
                       </div>
@@ -566,9 +592,20 @@ function MemberDashboard() {
                             <span className="text-slate-400">↳</span>
                             <span className="capitalize font-medium">{c.ticket_tier}</span>
                             <StatusBadge status={c.status} t={t} />
-                            <span className="font-mono text-slate-500">
-                              {formatAmount(c.amount_total, c.currency)}
-                            </span>
+                            {(() => {
+                              const { label, tone } = formatAmount(c.amount_total, c.currency);
+                              return (
+                                <span
+                                  className={
+                                    tone === 'paid'
+                                      ? 'font-mono text-slate-500'
+                                      : 'text-[10px] font-medium uppercase tracking-wider text-slate-400'
+                                  }
+                                >
+                                  {label}
+                                </span>
+                              );
+                            })()}
                             <Link href={`/order/${c.id}`} className="ml-auto text-[10px] text-[#10B8D9] hover:underline">
                               {t.auth.viewDetails} →
                             </Link>
@@ -648,9 +685,20 @@ function MemberDashboard() {
                   </div>
                   {t.amount_total != null && t.currency && (
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-slate-500">
-                        {`${(t.amount_total / 100).toFixed(2)} ${t.currency.toUpperCase()}`}
-                      </p>
+                      {(() => {
+                        const { label, tone } = formatOrderAmount(t.amount_total, t.currency, { lang });
+                        return (
+                          <p
+                            className={
+                              tone === 'paid'
+                                ? 'text-xs text-slate-500'
+                                : 'text-[10px] font-medium uppercase tracking-wider text-slate-400'
+                            }
+                          >
+                            {label}
+                          </p>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -667,7 +715,7 @@ function MemberDashboard() {
 
       {/* Visa support documents */}
       {user?.email && (
-        <VisaSupportSection orders={orders} labels={t.auth.visaSupport} />
+        <VisaSupportSection orders={orders} lang={lang} labels={t.auth.visaSupport} />
       )}
 
       {/* Email preferences (collapsible) */}

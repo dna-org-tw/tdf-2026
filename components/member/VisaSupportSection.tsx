@@ -8,6 +8,7 @@ import VisaLetterSummary from './VisaLetterSummary';
 
 interface VisaSupportSectionProps {
   orders: Order[];
+  lang?: 'en' | 'zh';
   labels: {
     title: string;
     intro: string;
@@ -67,7 +68,7 @@ const DEFAULT_VALUES: Record<string, string> = {
   destination_mission: '',
 };
 
-export default function VisaSupportSection({ orders, labels }: VisaSupportSectionProps) {
+export default function VisaSupportSection({ orders, lang = 'en', labels }: VisaSupportSectionProps) {
   const [values, setValues] = useState<Record<string, string>>(DEFAULT_VALUES);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -170,50 +171,72 @@ export default function VisaSupportSection({ orders, labels }: VisaSupportSectio
     }
   }
 
+  const formLabels = {
+    ...labels,
+    showSensitive: lang === 'zh' ? '顯示' : 'Show',
+    hideSensitive: lang === 'zh' ? '遮蔽' : 'Hide',
+    sensitiveHint: lang === 'zh'
+      ? '敏感欄位預設遮蔽，以保護您的隱私'
+      : 'Masked by default for privacy',
+  };
+
+  const privacyBlurb = lang === 'zh'
+    ? '敏感欄位（護照號碼、出生日期）預設遮蔽；資料加密儲存，活動結束後 60 天自動刪除，僅於產生邀請函時由系統讀取。'
+    : 'Sensitive fields (passport, DOB) are masked by default. Data is encrypted at rest and auto-deleted 60 days after the festival — the TDF team only accesses it to generate your letter.';
+
   return (
-    <CollapsibleSection title={labels.title} count={loading ? '…' : 'PDF'} defaultOpen={false}>
-      <div className="mt-2 space-y-4">
-        <p className="text-sm text-slate-600">{labels.intro}</p>
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{labels.disclaimer}</p>
-        <VisaSupportForm
-          values={values}
-          errors={errors}
-          labels={labels}
-          onChange={(field, value) => {
-            dirtyRef.current = true;
-            setValues((prev) => ({ ...prev, [field]: value }));
-            setSaved(false);
-          }}
-        />
-        <VisaLetterSummary
-          title={labels.summaryTitle}
-          englishHint={labels.summaryEnglish}
-          paidLabel={labels.summaryPaid}
-          unpaidLabel={labels.summaryUnpaid}
-          hasPaidOrder={hasPaidOrder}
-          values={values}
-        />
-        {error ? <p className="text-sm text-red-500">{error}</p> : null}
-        {saved && !error ? <p className="text-sm text-green-600">{labels.saved}</p> : null}
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            disabled={saving || Object.keys(errors).length > 0}
-            onClick={saveDetails}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-50"
-          >
-            {saving ? labels.saving : labels.save}
-          </button>
-          <button
-            type="button"
-            disabled={!canDownload}
-            onClick={downloadLetter}
-            className="rounded-lg bg-[#10B8D9] px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-50"
-          >
-            {downloading ? labels.downloading : labels.download}
-          </button>
+    <div id="visa-support">
+      <CollapsibleSection title={labels.title} count={loading ? '…' : 'PDF'} defaultOpen={false}>
+        <div className="mt-2 space-y-4">
+          <p className="text-sm text-slate-600">{labels.intro}</p>
+          <div className="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 flex items-start gap-3 text-sm text-slate-600 leading-relaxed">
+            <svg viewBox="0 0 20 20" className="w-4 h-4 mt-0.5 shrink-0 text-slate-500" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+              <rect x="4" y="9" width="12" height="7" rx="1.5" />
+              <path d="M7 9V6a3 3 0 016 0v3" />
+            </svg>
+            <span>{privacyBlurb}</span>
+          </div>
+          <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{labels.disclaimer}</p>
+          <VisaSupportForm
+            values={values}
+            errors={errors}
+            labels={formLabels}
+            onChange={(field, value) => {
+              dirtyRef.current = true;
+              setValues((prev) => ({ ...prev, [field]: value }));
+              setSaved(false);
+            }}
+          />
+          <VisaLetterSummary
+            title={labels.summaryTitle}
+            englishHint={labels.summaryEnglish}
+            paidLabel={labels.summaryPaid}
+            unpaidLabel={labels.summaryUnpaid}
+            hasPaidOrder={hasPaidOrder}
+            values={values}
+          />
+          {error ? <p className="text-sm text-red-500">{error}</p> : null}
+          {saved && !error ? <p className="text-sm text-green-600">{labels.saved}</p> : null}
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={saving || Object.keys(errors).length > 0}
+              onClick={saveDetails}
+              className="rounded-lg bg-[#0E0E10] hover:bg-[#2A2A2E] disabled:bg-stone-300 disabled:text-stone-500 text-white text-sm font-semibold px-4 py-2.5 transition-colors"
+            >
+              {saving ? labels.saving : labels.save}
+            </button>
+            <button
+              type="button"
+              disabled={!canDownload}
+              onClick={downloadLetter}
+              className="rounded-lg bg-[#10B8D9] hover:bg-[#0EA5C4] disabled:bg-stone-300 disabled:text-stone-500 text-white text-sm font-semibold px-4 py-2.5 transition-colors"
+            >
+              {downloading ? labels.downloading : labels.download}
+            </button>
+          </div>
         </div>
-      </div>
-    </CollapsibleSection>
+      </CollapsibleSection>
+    </div>
   );
 }

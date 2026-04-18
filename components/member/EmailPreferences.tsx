@@ -125,7 +125,7 @@ export default function EmailPreferences({ userEmail }: Props) {
           type="button"
           disabled={saving}
           onClick={() => submit(false)}
-          className="bg-[#10B8D9] hover:bg-[#0EA5C4] disabled:opacity-50 text-white font-semibold px-5 py-2 rounded-lg transition-colors"
+          className="bg-[#0E0E10] hover:bg-[#2A2A2E] disabled:bg-stone-300 disabled:text-stone-500 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors"
         >
           {saving ? tp.saving : tp.save}
         </button>
