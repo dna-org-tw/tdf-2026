@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^5.0.1",
+    "@react-pdf/renderer": "^4.5.1",
     "@supabase/supabase-js": "^2.93.2",
     "@tailwindcss/typography": "^0.5.19",
     "clsx": "^2.1.1",
