@@ -62,11 +62,10 @@ export async function acceptStayTransfer(input: {
     .maybeSingle();
   if (!bookingWeek) throw new Error('booking_week_not_found');
 
-  await supabaseServer
-    .from('stay_booking_weeks')
-    .update({ member_id: recipient.id, status: 'transferred', hold_expires_at: null })
-    .eq('id', transfer.booking_week_id);
-
+  // Validate SetupIntent BEFORE any writes so a failed validation leaves the
+  // booking_week untouched (otherwise the original owner loses the week and
+  // the reconcile cron can't revert it).
+  let validatedSetupIntent: Awaited<ReturnType<NonNullable<typeof stayStripe>['setupIntents']['retrieve']>> | null = null;
   if (transfer.booking_type === 'guaranteed') {
     if (!stayStripe) throw new Error('stripe_not_configured');
     const setupIntent = await stayStripe.setupIntents.retrieve(input.setupIntentId!, { expand: ['payment_method'] });
@@ -78,7 +77,21 @@ export async function acceptStayTransfer(input: {
     ) {
       throw new Error('setup_intent_not_ready');
     }
+    validatedSetupIntent = setupIntent;
+  }
 
+  await supabaseServer
+    .from('stay_booking_weeks')
+    .update({ member_id: recipient.id, status: 'transferred', hold_expires_at: null })
+    .eq('id', transfer.booking_week_id);
+
+  if (validatedSetupIntent) {
+    const setupIntent = validatedSetupIntent;
+    // The guards in the validation block above ensure payment_method is an
+    // expanded object; narrow again here for the type-checker.
+    if (typeof setupIntent.payment_method === 'string' || !setupIntent.payment_method) {
+      throw new Error('setup_intent_not_ready');
+    }
     await supabaseServer
       .from('stay_guarantees')
       .update({
