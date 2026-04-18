@@ -698,7 +698,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             type: 'callout',
             tone: 'info',
-            title: '描述請保守',
+            title: '升級路徑仍有缺口',
             body: '一般升級流程已上線，但部分升級路徑仍有缺口，尤其是 `weekly_backer` 相關條件，詳見頁尾限制。',
           },
         ],
@@ -756,7 +756,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         group: 'stay',
         label: '預訂後能做什麼',
         title: 'Member 端已經接上摘要、候補與轉讓資料流，但前台管理介面仍偏第一版',
-        intro: '這一區應如實描述已存在的 booking / waitlist / transfer / reconcile 流程，但不要把 member UI 寫成比實際更完整。',
+        intro: '預訂後的 booking、候補與轉讓流程已接上 `/me` 摘要，但前台自助管理與接受轉讓頁面目前仍較精簡。',
         blocks: [
           {
             type: 'feature-list',
@@ -769,10 +769,6 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
                 title: '系統已接好的流程',
                 body: '後端已有 modify week、transfer initiate、transfer accept、waitlist join/leave、waitlist offer、以及 reconcile cron 流程。',
               },
-              {
-                title: '描述時的保守原則',
-                body: '前台管理與接受轉讓頁面目前仍較精簡，因此指南應寫成「已有流程基礎」而不是「完整自助住宿後台」。',
-              },
             ],
           },
         ],
@@ -782,7 +778,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         group: 'stay',
         label: '規則與注意事項',
         title: '合作住宿有自己的扣款、候補與轉讓規則',
-        intro: '這些規則應在指南中明確告知，避免使用者以為住宿系統只是一般住宿推薦。',
+        intro: '合作住宿有自己的扣款、候補與轉讓規則，和一般住宿推薦不同。',
         blocks: [
           {
             type: 'checklist',
@@ -1525,7 +1521,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           {
             type: 'callout',
             tone: 'info',
-            title: 'Describe this conservatively',
+            title: 'Some upgrade paths still have gaps',
             body: 'The general upgrade flow is live, but some upgrade paths still have gaps — especially around `weekly_backer` requirements. See the limitations at the end.',
           },
         ],
@@ -1583,7 +1579,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         group: 'stay',
         label: 'After Booking',
         title: 'The member side already wires up summaries, waitlists, and transfers, but the management UI is still first-generation',
-        intro: 'This area should faithfully describe the existing booking / waitlist / transfer / reconcile flows without overselling the member UI.',
+        intro: 'After booking, the reservation, waitlist, and transfer flows are wired into your `/me` summary, though the member-facing management and accept-transfer pages are still minimal.',
         blocks: [
           {
             type: 'feature-list',
@@ -1596,10 +1592,6 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
                 title: 'Flows that are wired up',
                 body: 'The backend already supports modify week, transfer initiate, transfer accept, waitlist join/leave, waitlist offer, and the reconcile cron.',
               },
-              {
-                title: 'Stay conservative in wording',
-                body: 'The member-side management and accept-transfer pages are still minimal, so the guide should say "flow foundations exist" rather than "a complete self-service stay dashboard".',
-              },
             ],
           },
         ],
@@ -1609,7 +1601,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         group: 'stay',
         label: 'Rules & Notes',
         title: 'Partner stay has its own charge, waitlist, and transfer rules',
-        intro: 'These rules should be communicated clearly in the guide so users do not mistake the stay system for a generic accommodation recommendation.',
+        intro: 'Partner stay has its own charging, waitlist, and transfer rules that differ from a generic accommodation recommendation.',
         blocks: [
           {
             type: 'checklist',
