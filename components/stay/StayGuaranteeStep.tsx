@@ -3,9 +3,18 @@
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 
 export default function StayGuaranteeStep({ clientSecret, onConfirmed }: { clientSecret: string; onConfirmed: (setupIntentId: string) => void }) {
+  if (!stripePromise) {
+    return (
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        Stripe is not configured. Set <code className="font-mono">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code> in <code className="font-mono">.env.local</code> to enable card verification.
+      </div>
+    );
+  }
+
   return (
     <Elements stripe={stripePromise} options={{ clientSecret }}>
       <StayGuaranteeForm onConfirmed={onConfirmed} />
