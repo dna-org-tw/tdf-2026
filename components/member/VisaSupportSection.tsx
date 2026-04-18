@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Order } from '@/lib/types/order';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 import VisaSupportForm from './VisaSupportForm';
@@ -74,27 +74,36 @@ export default function VisaSupportSection({ orders, labels }: VisaSupportSectio
   const [downloading, setDownloading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  // Track whether the user has started editing to avoid overwriting on late fetch response
+  const dirtyRef = useRef(false);
 
   useEffect(() => {
+    let cancelled = false;
     fetch('/api/member/visa-profile')
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error())))
       .then((data) => {
-        setValues({
-          legal_name_en: data.legal_name_en ?? '',
-          nationality: data.nationality ?? '',
-          date_of_birth: data.date_of_birth ?? '',
-          passport_number: data.passport_number ?? '',
-          passport_country: data.passport_country ?? '',
-          passport_expiry_date: data.passport_expiry_date ?? '',
-          planned_arrival_date: data.planned_arrival_date ?? '',
-          planned_departure_date: data.planned_departure_date ?? '',
-          taiwan_stay_address: data.taiwan_stay_address ?? '',
-          destination_mission: data.destination_mission ?? '',
+        if (cancelled) return;
+        setValues((prev) => {
+          // Merge: keep any values the user has already typed (non-empty prev wins)
+          const merged: Record<string, string> = {
+            legal_name_en: prev.legal_name_en || (data.legal_name_en ?? ''),
+            nationality: prev.nationality || (data.nationality ?? ''),
+            date_of_birth: prev.date_of_birth || (data.date_of_birth ?? ''),
+            passport_number: prev.passport_number || (data.passport_number ?? ''),
+            passport_country: prev.passport_country || (data.passport_country ?? ''),
+            passport_expiry_date: prev.passport_expiry_date || (data.passport_expiry_date ?? ''),
+            planned_arrival_date: prev.planned_arrival_date || (data.planned_arrival_date ?? ''),
+            planned_departure_date: prev.planned_departure_date || (data.planned_departure_date ?? ''),
+            taiwan_stay_address: prev.taiwan_stay_address || (data.taiwan_stay_address ?? ''),
+            destination_mission: prev.destination_mission || (data.destination_mission ?? ''),
+          };
+          return merged;
         });
-        setSaved(Boolean(data.updated_at));
+        if (!cancelled && !dirtyRef.current) setSaved(Boolean(data.updated_at));
       })
-      .catch(() => setError(labels.loadError))
-      .finally(() => setLoading(false));
+      .catch(() => { if (!cancelled) setError(labels.loadError); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [labels.loadError]);
 
   const errors = useMemo(() => {
@@ -115,7 +124,7 @@ export default function VisaSupportSection({ orders, labels }: VisaSupportSectio
   }, [values, labels]);
 
   const hasPaidOrder = orders.some((order) => order.status === 'paid');
-  const canDownload = saved && Object.keys(errors).length === 0 && !downloading && !loading;
+  const canDownload = saved && Object.keys(errors).length === 0 && !downloading;
 
   async function saveDetails() {
     setSaving(true);
@@ -171,6 +180,7 @@ export default function VisaSupportSection({ orders, labels }: VisaSupportSectio
           errors={errors}
           labels={labels}
           onChange={(field, value) => {
+            dirtyRef.current = true;
             setValues((prev) => ({ ...prev, [field]: value }));
             setSaved(false);
           }}
