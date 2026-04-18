@@ -11,6 +11,7 @@ import { TICKET_TIER_RANK } from '@/lib/members';
 import { FESTIVAL_START, getValidityPeriod } from '@/lib/ticketPricing';
 import type { Registration } from '@/lib/lumaSyncTypes';
 import EmailPreferences from '@/components/member/EmailPreferences';
+import VisaSupportSection from '@/components/member/VisaSupportSection';
 import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
 import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
@@ -649,6 +650,11 @@ function MemberDashboard() {
               : 'These orders have been transferred to someone else and are no longer yours. Contact support if anything looks wrong.'}
           </p>
         </CollapsibleSection>
+      )}
+
+      {/* Visa support documents */}
+      {user?.email && (
+        <VisaSupportSection orders={orders} labels={t.auth.visaSupport} />
       )}
 
       {/* Email preferences (collapsible) */}
