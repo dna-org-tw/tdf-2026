@@ -98,7 +98,7 @@ function PublicMemberCard() {
     <div className="min-h-screen bg-stone-50">
       <Navbar />
       <main className="pt-24 pb-16 px-4 sm:px-6">
-        <div className="w-full max-w-md mx-auto space-y-6">
+        <div className="w-full max-w-2xl mx-auto space-y-6">
           <MemberPassport
             email=""
             memberNo={data.member_no}
