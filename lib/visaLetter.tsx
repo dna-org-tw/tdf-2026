@@ -39,47 +39,47 @@ function ensurePdfAssets() {
 const styles = StyleSheet.create({
   page: {
     fontFamily: 'NotoSansCJKtc',
-    fontSize: 10.5,
-    paddingTop: 36,
-    paddingBottom: 40,
+    fontSize: 10,
+    paddingTop: 30,
+    paddingBottom: 34,
     paddingHorizontal: 44,
     color: '#111827',
-    lineHeight: 1.45,
+    lineHeight: 1.35,
   },
-  header: { marginBottom: 18, borderBottomWidth: 1, borderBottomColor: '#D1D5DB', paddingBottom: 10 },
-  titleCn: { fontSize: 13, fontWeight: 700, marginBottom: 2 },
-  titleEn: { fontSize: 12, fontWeight: 700, marginBottom: 6 },
-  metaLine: { marginBottom: 2 },
-  subject: { fontSize: 12, fontWeight: 700, marginBottom: 12 },
-  section: { marginBottom: 14 },
-  sectionTitle: { fontSize: 10, fontWeight: 700, marginBottom: 5, textTransform: 'uppercase', letterSpacing: 0.6 },
-  row: { flexDirection: 'row', marginBottom: 3 },
+  header: { marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#D1D5DB', paddingBottom: 8 },
+  titleCn: { fontSize: 12.5, fontWeight: 700, marginBottom: 2 },
+  titleEn: { fontSize: 11.5, fontWeight: 700, marginBottom: 5 },
+  metaLine: { marginBottom: 1 },
+  subject: { fontSize: 11.5, fontWeight: 700, marginBottom: 9 },
+  section: { marginBottom: 10 },
+  sectionTitle: { fontSize: 9.5, fontWeight: 700, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.6 },
+  row: { flexDirection: 'row', marginBottom: 2 },
   label: { width: 130, color: '#4B5563' },
   value: { flex: 1 },
-  body: { marginTop: 8 },
+  body: { marginTop: 6 },
   disclaimer: {
-    marginTop: 18,
-    paddingTop: 10,
+    marginTop: 14,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: '#D1D5DB',
-    fontSize: 9,
+    fontSize: 8.5,
     color: '#4B5563',
   },
   signatureWrap: {
-    marginTop: 18,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-  seal: {
-    width: 128,
-    height: 96,
-    objectFit: 'contain',
+    marginTop: 14,
+    alignItems: 'flex-start',
   },
   signatureText: {
-    width: 220,
-    alignItems: 'flex-start',
     gap: 2,
+  },
+  seal: {
+    position: 'absolute',
+    right: -75,
+    bottom: 130,
+    width: 384,
+    height: 288,
+    objectFit: 'contain',
+    opacity: 0.9,
   },
 });
 
@@ -156,7 +156,6 @@ function VisaLetterDocument({ data }: { data: VisaLetterPdfData }) {
         ) : null}
 
         <View style={styles.signatureWrap}>
-          <Image src={sealDataUri ?? ''} style={styles.seal} />
           <View style={styles.signatureText}>
             <Text>Contact Person: Kai Hsu</Text>
             <Text>Email: kk@dna.org.tw</Text>
@@ -172,6 +171,8 @@ function VisaLetterDocument({ data }: { data: VisaLetterPdfData }) {
           <Text>Visa approval remains subject to the decision of the relevant Republic of China (Taiwan) overseas mission.</Text>
           <Text>This letter is issued based on the information provided by the member and the records available in our system as of the issue date.</Text>
         </View>
+
+        <Image src={sealDataUri ?? ''} style={styles.seal} />
       </Page>
     </Document>
   );
