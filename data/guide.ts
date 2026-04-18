@@ -1,39 +1,49 @@
 // data/guide.ts
 
-export interface FAQItem {
-  id: string;
-  question: string;
-  answer: string;
-}
-
-export interface FAQSection {
+export interface GuideEntryCard {
   id: string;
   label: string;
-  items: FAQItem[];
+  description: string;
+  targetId: string;
 }
 
-export interface GuideBlock {
-  title: string;
-  content: string; // Static HTML string from source code (tables, lists) — not user input
+export interface GuideNavItem {
+  id: string;
+  label: string;
 }
+
+export interface GuideNavGroup {
+  id: string;
+  label: string;
+  items: GuideNavItem[];
+}
+
+export type GuideBlock =
+  | { type: 'faq'; items: Array<{ question: string; answer: string }> }
+  | { type: 'feature-list'; items: Array<{ title: string; body: string }> }
+  | { type: 'steps'; items: Array<{ title: string; body: string }> }
+  | { type: 'table'; columns: string[]; rows: string[][] }
+  | { type: 'callout'; tone: 'info' | 'warning'; title?: string; body: string }
+  | { type: 'checklist'; items: string[] };
 
 export interface GuideSection {
   id: string;
+  group: 'event' | 'member' | 'stay' | 'visa';
   label: string;
+  title: string;
+  intro?: string;
   blocks: GuideBlock[];
 }
 
-export interface TabSection {
-  id: string;
-  label: string;
-  faqItems: FAQItem[];
-  guideBlocks: GuideBlock[];
+export interface GuideLimitationItem {
+  title: string;
+  body: string;
 }
 
 export interface HomeFAQItem {
   question: string;
   summary: string;
-  guideTab: string; // tab id to link to
+  guideSection: string;
 }
 
 export interface GuideContent {
@@ -41,541 +51,993 @@ export interface GuideContent {
   pageDescription: string;
   homeFaqTitle: string;
   homeFaqCta: string;
-  tabs: TabSection[];
+  entryCards: GuideEntryCard[];
+  navGroups: GuideNavGroup[];
+  sections: GuideSection[];
+  limitations: {
+    title: string;
+    items: GuideLimitationItem[];
+  };
   homeFaq: HomeFAQItem[];
 }
 
 export const guideContent: { en: GuideContent; zh: GuideContent } = {
   zh: {
-    pageTitle: '活動指南',
-    pageDescription: '關於 Taiwan Digital Fest 2026 的常見問題與台東生活指南',
+    pageTitle: '完整指南',
+    pageDescription: '活動參與、會員系統、合作住宿與簽證輔助文件的完整導覽。',
     homeFaqTitle: '常見問題',
     homeFaqCta: '查看完整指南',
-    tabs: [
-      // --- Tab: Tickets & Access ---
+    entryCards: [
       {
-        id: 'tickets',
-        label: '票券與參與',
-        faqItems: [
-          {
-            id: 'q1',
-            question: '票券分幾個等級？各自可以參加哪些活動？',
-            answer: 'TDF 2026 票券分為四個等級：PURPLE（免費，官網訂閱 + IG 追蹤可參加紫色活動）、BLUE（$30 USD，藍＋紫色活動）、GREEN（$300 USD，綠＋藍＋紫色活動）、YELLOW（$600 USD，全部活動＋花蓮三天兩夜旅行）。另有 Weekly Backer 票種，適合只能參加單週活動的人。',
-          },
-          {
-            id: 'q2',
-            question: '我可以不買嘉年華門票，只買單場活動嗎？',
-            answer: '可以。白色（Side Event）活動可單獨付費報名，不需要購買嘉年華門票。其他顏色的活動也有單場付費選項。',
-          },
-          {
-            id: 'q3',
-            question: '購票後要怎麼確認訂單？',
-            answer: '購票成功後系統會自動寄送確認信。若未收到，可能是被信箱攔截。可至官網會員後台登入查詢訂單。',
-          },
-          {
-            id: 'q3b',
-            question: '我購買/兌換了票券，但是沒有收到任何信件，要怎麼確認？',
-            answer: '請到官網右上角使用 email 登入，即可查看你的票券。如果還是找不到票券，請聯繫我們 IG @taiwandigitalfest，或來信至 registration@taiwandigitalfest.com。',
-          },
-          {
-            id: 'q4',
-            question: '可以退票嗎？',
-            answer: '票券條款預設不可退款，但可以轉讓給其他人。',
-          },
-        ],
-        guideBlocks: [],
+        id: 'event-guide',
+        label: '活動指南',
+        description: '先看票券、報名、住宿、交通與講者合作資訊。',
+        targetId: 'event-guide',
       },
-      // --- Tab: Registration ---
       {
-        id: 'registration',
-        label: '活動報名',
-        faqItems: [
-          {
-            id: 'q5',
-            question: '活動怎麼報名？',
-            answer: '1. 先購買嘉年華票券取得參與資格\n2. 前往該場活動的 Luma 頁面，點擊完成預約申請\n3. TDF 工作人員會於後台核對票券資訊，確認後發送核可通知\n4. 活動當日出示 Luma 預約紀錄報到',
-          },
-          {
-            id: 'q6',
-            question: '報名後什麼時候會收到確認（Approve）？',
-            answer: '預計在 4/20–4/30 期間逐步確認（approve）報名申請。',
-          },
-          {
-            id: 'q7',
-            question: '報名了但沒到會怎樣？（No-Show Policy）',
-            answer: '未準時出席者，名額將直接釋放給現場候補人員。無故缺席者，下次活動的預約權限將降為「候補」（再下一次即可恢復正常預約）。',
-          },
-          {
-            id: 'q7b',
-            question: '活動是否有限制名額？',
-            answer: '是的，為了提供好的活動品質，活動將會限制參加名額。我們將會依照票券等級以及報名順序來放行。',
-          },
-        ],
-        guideBlocks: [],
+        id: 'member-guide',
+        label: '會員指南',
+        description: '了解登入、身份卡、名片、收藏、訂單、住宿與簽證工具。',
+        targetId: 'member-guide',
       },
-      // --- Tab: Accommodation & Cost ---
+    ],
+    navGroups: [
       {
-        id: 'accommodation',
-        label: '住宿與生活費',
-        faqItems: [
-          {
-            id: 'q8',
-            question: '在台東住一個月大概要花多少錢？',
-            answer: '飯店約 25,000–40,000 TWD/月，民宿/Airbnb 約 15,000–30,000 TWD/月。三餐方面，早餐 60–150、午餐 90–180、晚餐 90–240 TWD。整體一個月含住宿、三餐約 25,000–40,000 TWD，依個人生活型態而定。',
-          },
-          {
-            id: 'q9',
-            question: '主辦方會安排住宿嗎？',
-            answer: '住宿不由主辦方統一安排，參與者需自行預訂。官網會提供台東住宿推薦資訊。如果需要協助訂房，可以到 WhatsApp 社群群組與我們聯繫，我們有保留住宿給需要協助訂房的會眾。',
-          },
-          {
-            id: 'q9b',
-            question: '想要找 TDF 合作住宿？',
-            answer: '我們提供限量優惠合作住宿——路得行旅一館（https://taitung.nordenruder.com/），每晚 25 USD。如有需要，請來信至 accommodation@taiwandigitalfest.com。',
-          },
-        ],
-        guideBlocks: [
-          {
-            title: '住宿選擇',
-            content: '<table><thead><tr><th>住宿類型</th><th>月租費 (TWD)</th><th>月租費 (USD)</th></tr></thead><tbody><tr><td>背包客棧／青旅（床位）</td><td>12,000–18,000</td><td>~400–600</td></tr><tr><td>Airbnb 雅房／套房</td><td>15,000–30,000</td><td>~500–1,000</td></tr><tr><td>飯店（經濟型）</td><td>25,000–40,000</td><td>~830–1,330</td></tr><tr><td>整層公寓</td><td>12,000–20,000</td><td>~400–660</td></tr></tbody></table>',
-          },
-          {
-            title: '找房管道',
-            content: '<ul><li><strong>Airbnb</strong>：搜尋「Taitung City」篩選月租方案，通常有長住折扣</li><li><strong>591 租屋網</strong>：台灣最大租屋平台，中文介面為主</li><li><strong>Facebook 社團</strong>：搜尋「台東租屋」相關社團</li><li><strong>TDF WhatsApp 群組</strong>：可詢問其他參與者合租資訊</li></ul>',
-          },
-          {
-            title: '住宿區域建議',
-            content: '<ul><li><strong>台東市區（轉運站／鐵花村周邊）</strong>：生活機能最佳，離多數活動場地近</li><li><strong>都蘭</strong>：海岸線氣氛，適合衝浪與慢活，到市區需 30 分鐘車程</li><li><strong>池上／關山</strong>：縱谷稻田風光，適合第二週活動期間入住</li></ul><p><strong>依參與週數建議：</strong></p><ul><li>參與整個月的會眾：建議住在<strong>市區</strong>，生活機能最佳</li><li>僅參與一週：第一週建議住<strong>南迴（金崙）</strong>、第二週建議住<strong>縱谷（池上、關山）</strong>、第三週建議住<strong>海岸（都蘭）</strong>、第四週建議住<strong>市區</strong></li></ul>',
-          },
+        id: 'event',
+        label: '活動',
+        items: [
+          { id: 'event-guide', label: '總覽' },
+          { id: 'event-tickets', label: '票券與參與' },
+          { id: 'event-registration', label: '活動報名' },
+          { id: 'event-accommodation', label: '住宿與生活費' },
+          { id: 'event-transportation', label: '交通' },
+          { id: 'event-hualien', label: '花蓮旅行' },
+          { id: 'event-speakers', label: '講者與協辦' },
+          { id: 'event-visa-contact', label: '簽證與聯絡' },
         ],
       },
-      // --- Tab: Transportation ---
       {
-        id: 'transportation',
-        label: '交通',
-        faqItems: [
-          {
-            id: 'q10',
-            question: '各場活動之間怎麼移動？',
-            answer: '各場活動需自行前往集合地點。可以搭乘台鐵、客運前往，也可以租車、租機車或使用 YouBike。建議參與者善用 WhatsApp 群組進行 Car Share（共乘）。',
-          },
-          {
-            id: 'q11',
-            question: '花蓮三天兩夜旅行的交通怎麼安排？',
-            answer: '集合地點為花蓮火車站，上午 10:00。前往花蓮需自行搭乘火車（約 90 分鐘），不包含在行程內。行程期間主辦方會安排 30 人座巴士，三天全程包車。',
-          },
-        ],
-        guideBlocks: [
-          {
-            title: '從台灣各地前往台東',
-            content: '<h4>台北 → 台東</h4><table><thead><tr><th>交通方式</th><th>時間</th><th>費用 (TWD)</th><th>備註</th></tr></thead><tbody><tr><td>火車（普悠瑪／太魯閣）</td><td>3.5–4.5 小時</td><td>~935</td><td>最推薦，假日票難搶，建議提前 28 天訂票</td></tr><tr><td>火車（莒光號）</td><td>5–5.5 小時</td><td>~603</td><td>班次較多</td></tr><tr><td>飛機（松山→台東）</td><td>50 分鐘</td><td>~3,500</td><td>每日約 6 班</td></tr></tbody></table><h4>高雄 → 台東</h4><table><thead><tr><th>交通方式</th><th>時間</th><th>費用 (TWD)</th></tr></thead><tbody><tr><td>火車（自強號）</td><td>2–2.5 小時</td><td>~486</td></tr><tr><td>自駕（南迴公路）</td><td>~3 小時</td><td>油資</td></tr></tbody></table>',
-          },
-          {
-            title: '台東在地交通',
-            content: '<h4>租機車（最推薦）</h4><p>火車站周邊有多家租車行。125cc 機車 200–500 TWD/日，月租約 180–300 TWD/日。外籍人士需持國際駕照 (IDP) 並攜帶本國駕照。台東科技執法嚴格，務必遵守交通規則、佩戴安全帽。</p><h4>YouBike</h4><p>台東市區設有 YouBike 站點，適合短程移動。使用悠遊卡或一卡通即可租借，前 30 分鐘 5 TWD。</p><h4>計程車</h4><p>可使用 LINE Taxi 或 55688 APP 叫車，方便快捷。</p><h4>公車系統</h4><ul><li>普悠瑪客運 101 市區循環線：繞行台東市區一圈約 1 小時，每段票 25 元</li><li>台灣好行 東部海岸線：台東轉運站 → 小野柳 → 加路蘭 → 三仙台</li><li>台灣好行 縱谷鹿野線：台東轉運站 → 初鹿牧場 → 鹿野高台</li></ul><h4>共乘</h4><p>TDF 活動期間，WhatsApp 社群群組內會有 Car Share 功能，方便參與者互相搭便車。</p>',
-          },
+        id: 'member',
+        label: '會員',
+        items: [
+          { id: 'member-guide', label: '總覽' },
+          { id: 'member-basics', label: '會員是什麼' },
+          { id: 'member-auth-passport', label: '登入與身份卡' },
+          { id: 'member-profile-card', label: '名片與公開頁' },
+          { id: 'member-collections', label: '收藏' },
+          { id: 'member-activity-orders', label: '活動與訂單' },
+          { id: 'member-transfers', label: '轉讓' },
+          { id: 'member-preferences', label: '信件偏好' },
+          { id: 'member-upgrade', label: '升級' },
         ],
       },
-      // --- Tab: Hualien Tour ---
       {
-        id: 'hualien',
-        label: '花蓮旅行',
-        faqItems: [
-          {
-            id: 'q12',
-            question: '花蓮旅行費用是多少？包含什麼？',
-            answer: '費用統一為 $200 USD。包含花蓮區域三天交通（30 人座巴士全程包車）、5/29 午晚餐＋住宿、5/30 三餐＋住宿、5/31 早午餐。不包含前往花蓮的交通與個人紀念品。',
-          },
-          {
-            id: 'q13',
-            question: '花蓮住宿是什麼房型？',
-            answer: '單人房（private room），附獨立衛浴。住宿地點為木棧花蓮館。',
-          },
-          {
-            id: 'q14',
-            question: '非 Backer 可以參加花蓮旅行嗎？',
-            answer: '可以，費用統一為 $200 USD，不分票種。',
-          },
+        id: 'stay',
+        label: '住宿',
+        items: [
+          { id: 'stay-overview', label: '合作住宿' },
+          { id: 'stay-booking', label: '如何預訂' },
+          { id: 'stay-after-booking', label: '預訂後能做什麼' },
+          { id: 'stay-rules', label: '規則與注意事項' },
         ],
-        guideBlocks: [],
       },
-      // --- Tab: Speakers & Partners ---
-      {
-        id: 'speakers',
-        label: '講者與協辦',
-        faqItems: [
-          {
-            id: 'q15',
-            question: '我想當講者，怎麼申請？',
-            answer: '請至官網填寫「Call for Speaker」表單。團隊會依據主題，將您安排到合適的週次。若有特別期望的時間，可在備註中說明。',
-          },
-          {
-            id: 'q16',
-            question: '講者有什麼回饋？',
-            answer: '經審核通過的講者會獲得對應等級的免費票券兌換碼。無另外支付薪酬。',
-          },
-          {
-            id: 'q17',
-            question: '講者需要提供什麼資料？',
-            answer: '1. 確認可出席的日期與時間\n2. 確認演講題目\n3. 一張高解析度個人照片（用於宣傳）\n4. 單位名稱與職稱\n5. 50 字以內英文個人簡介\n6. 200 字以內英文主題摘要',
-          },
-          {
-            id: 'q18',
-            question: '我想辦 Side Event，怎麼申請？',
-            answer: '請至官網填寫「Call for Side Event」表單，並寄信至 fest@dna.org.tw。',
-          },
-          {
-            id: 'q19',
-            question: 'Side Event 的合作模式是什麼？',
-            answer: '主辦方以協辦單位身分參與。可優先使用主辦方媒合的合作場地（免費），自行找場地者經確認可獲最高 NT$3,000 場地費補貼。活動頁面需使用 Luma 系統建立。若有收費，由主辦方協助代收，酌收 10% 手續費。',
-          },
-        ],
-        guideBlocks: [],
-      },
-      // --- Tab: Visa & Contact ---
       {
         id: 'visa',
-        label: '簽證與聯絡',
-        faqItems: [
+        label: '簽證',
+        items: [{ id: 'visa-support', label: '簽證輔助文件' }],
+      },
+    ],
+    sections: [
+      {
+        id: 'event-guide',
+        group: 'event',
+        label: '活動指南',
+        title: '先確認怎麼參與這場節慶',
+        intro: '如果你是第一次來到 TDF，先從票券、報名、住宿、交通與講者合作資訊開始看。',
+        blocks: [
           {
-            id: 'q20',
-            question: '我需要簽證才能來台灣，主辦方可以協助嗎？',
-            answer: '主辦方無法代辦簽證申請。建議至各國的中華民國外交部網站查詢簽證資訊。',
-          },
-          {
-            id: 'q21',
-            question: '可以提供參與證明或邀請函嗎？',
-            answer: '可以。購票完成後，請寄信至 fest@dna.org.tw，附上購票證明，主辦方會開立參與證明文件，可作為簽證申請的輔助文件。',
-          },
-          {
-            id: 'q25',
-            question: '怎麼成為 TDF 志工？',
-            answer: '可填寫志工申請表單。主辦方會舉辦線上志工說明會，依不同志工角色分組面談。',
-          },
-        ],
-        guideBlocks: [
-          {
-            title: '簽證資訊',
-            content: '<p>台灣已於 2025 年正式推出<strong>數位遊牧簽證（Digital Nomad Visa）</strong>，允許遠端工作者停留最長 6 個月。多數國家（含美、日、歐盟、英、澳、紐、韓等）享有 90 天免簽待遇。</p>',
-          },
-          {
-            title: '醫療與保險',
-            content: '<p>台東市區有馬偕醫院、基督教醫院、聖母醫院等醫療機構。建議國際旅客出發前投保旅遊平安險與醫療險。外籍人士若無健保，門診費用約 500–1,500 TWD。</p>',
-          },
-          {
-            title: '聯絡方式',
-            content: '<ul><li>官方信箱：fest@dna.org.tw</li><li>Instagram：@taiwandigitalfest</li><li>WhatsApp 社群群組：由 Community Manager Maria 管理</li></ul>',
+            type: 'feature-list',
+            items: [
+              {
+                title: '你會在這一區看到什麼',
+                body: '這一區整合票券與參與方式、Luma 報名流程、台東生活成本、交通安排、花蓮旅行、講者與 Side Event 合作，以及簽證與聯絡資訊。',
+              },
+            ],
           },
         ],
       },
-      // --- Tab: Living in Taitung ---
       {
-        id: 'living',
-        label: '台東生活',
-        faqItems: [],
-        guideBlocks: [
+        id: 'event-tickets',
+        group: 'event',
+        label: '票券與參與',
+        title: '票券、單場參與與訂單確認',
+        intro: '先理解票券等級和你能參加哪些活動，再決定是否需要登入會員頁查訂單。',
+        blocks: [
           {
-            title: '網路與通訊',
-            content: '<p>抵達機場後可在入境大廳辦理預付卡。推薦<strong>中華電信</strong>，在台東山區、海岸線的訊號涵蓋率最佳，30 天吃到飽約 899–1,000 TWD。若手機支援 eSIM，可事先在 KKday、Klook 預購。多數咖啡廳和共創空間提供免費 Wi-Fi。</p>',
+            type: 'faq',
+            items: [
+              {
+                question: '票券分幾個等級？各自可以參加哪些活動？',
+                answer: 'TDF 2026 票券分為四個等級：PURPLE（免費，官網訂閱 + IG 追蹤可參加紫色活動）、BLUE（30 USD，藍＋紫色活動）、GREEN（300 USD，綠＋藍＋紫色活動）、YELLOW（600 USD，全部活動＋花蓮三天兩夜旅行）。另有 Weekly Backer 票種，適合只能參加單週活動的人。',
+              },
+              {
+                question: '我可以不買嘉年華門票，只買單場活動嗎？',
+                answer: '可以。白色 Side Event 可單獨付費報名，不需要先買嘉年華門票；其他顏色活動也可能提供單場付費選項。',
+              },
+              {
+                question: '購票後要怎麼確認訂單？',
+                answer: '購票成功後系統會寄送確認信。若沒有收到，請先到官網右上角用 email 登入查看 `/me` 與訂單中心；仍找不到再聯繫 registration@taiwandigitalfest.com 或 IG。',
+              },
+              {
+                question: '可以退票嗎？',
+                answer: '票券條款預設不可退款，但已付款母訂單支援在截止日前自助轉讓。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-registration',
+        group: 'event',
+        label: '活動報名',
+        title: '如何用票券去預約各場活動',
+        intro: 'TDF 的活動報名與票券是分開處理：先拿到參與資格，再去 Luma 頁面送出預約。',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: '先取得參與資格',
+                body: '先購買嘉年華票券，或持有對應活動可接受的身份與權限。',
+              },
+              {
+                title: '到 Luma 頁面送出預約',
+                body: '前往各場活動的 Luma 頁面提出申請，工作人員會在後台依票券等級與順序核對。',
+              },
+              {
+                title: '等待審核結果',
+                body: '核可後會收到 Luma 的批准狀態；活動當天以 Luma 預約紀錄完成報到。',
+              },
+            ],
           },
           {
-            title: '飲食費用',
-            content: '<table><thead><tr><th>餐別</th><th>費用 (TWD)</th><th>說明</th></tr></thead><tbody><tr><td>早餐</td><td>40–80</td><td>早餐店、豆漿店</td></tr><tr><td>午餐</td><td>80–150</td><td>便當、麵店、自助餐</td></tr><tr><td>晚餐</td><td>100–250</td><td>小吃、餐廳</td></tr><tr><td>咖啡</td><td>60–150</td><td>咖啡廳一杯</td></tr><tr><td>自炊</td><td>每日 150–250</td><td>全聯超市採買</td></tr></tbody></table><p>台東特色食材包括池上米、鳳梨釋迦、紅烏龍茶、洛神花、原住民風味料理等。夜市與在地小吃是最經濟的用餐方式。</p>',
+            type: 'faq',
+            items: [
+              {
+                question: '報名後什麼時候會收到確認？',
+                answer: '系統會依主辦方審核節奏逐步核可。請以 Luma 狀態與通知信為準。',
+              },
+              {
+                question: '報名了但沒到會怎樣？',
+                answer: '未準時出席的名額會釋出給現場候補。無故缺席會讓你下次活動的預約權限降為候補，再下一次才恢復正常。',
+              },
+              {
+                question: '活動是否有限制名額？',
+                answer: '有。活動會依票券等級與報名順序放行，以維持活動品質。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-accommodation',
+        group: 'event',
+        label: '住宿與生活費',
+        title: '台東住宿選擇與一個月花費',
+        intro: '住宿由你自行預訂。先掌握費用區間與區域特性，再挑選適合的住法。',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: '在台東住一個月大概要花多少錢？',
+                answer: '飯店約 25,000–40,000 TWD/月，民宿/Airbnb 約 15,000–30,000 TWD/月。三餐方面，早餐 60–150、午餐 90–180、晚餐 90–240 TWD。整體一個月含住宿、三餐約 25,000–40,000 TWD，依個人生活型態而定。',
+              },
+              {
+                question: '主辦方會安排住宿嗎？',
+                answer: '住宿不由主辦方統一安排，參與者需自行預訂。官網會提供台東住宿推薦資訊。如果需要協助訂房，可以到 WhatsApp 社群群組與我們聯繫，我們有保留住宿給需要協助訂房的會眾。',
+              },
+              {
+                question: '想要找 TDF 合作住宿？',
+                answer: '我們提供限量優惠合作住宿——路得行旅一館（https://taitung.nordenruder.com/），每晚 25 USD。如有需要，請來信至 accommodation@taiwandigitalfest.com。',
+              },
+            ],
           },
           {
-            title: '整月預算總覽',
-            content: '<table><thead><tr><th>項目</th><th>經濟型 (TWD)</th><th>舒適型 (TWD)</th><th>經濟型 (USD)</th><th>舒適型 (USD)</th></tr></thead><tbody><tr><td>住宿</td><td>12,000</td><td>30,000</td><td>400</td><td>1,000</td></tr><tr><td>餐飲</td><td>6,000</td><td>12,000</td><td>200</td><td>400</td></tr><tr><td>交通（機車月租）</td><td>5,400</td><td>9,000</td><td>180</td><td>300</td></tr><tr><td>網路（SIM 卡）</td><td>900</td><td>900</td><td>30</td><td>30</td></tr><tr><td>活動體驗</td><td>3,000</td><td>10,000</td><td>100</td><td>330</td></tr><tr><td>雜費</td><td>2,000</td><td>5,000</td><td>65</td><td>165</td></tr><tr><td><strong>合計</strong></td><td><strong>~29,300</strong></td><td><strong>~66,900</strong></td><td><strong>~975</strong></td><td><strong>~2,225</strong></td></tr></tbody></table>',
+            type: 'table',
+            columns: ['住宿類型', '月租費 (TWD)', '月租費 (USD)'],
+            rows: [
+              ['背包客棧／青旅（床位）', '12,000–18,000', '~400–600'],
+              ['Airbnb 雅房／套房', '15,000–30,000', '~500–1,000'],
+              ['飯店（經濟型）', '25,000–40,000', '~830–1,330'],
+              ['整層公寓', '12,000–20,000', '~400–660'],
+            ],
           },
           {
-            title: '共創空間',
-            content: '<ul><li><strong>邸 Tai Dang 創生基地</strong>：台東市區，一日辦公 250 TWD/人，有投影機</li><li><strong>旅蒔（Roots Coworking）</strong>：池上，3 日票 560 TWD/人，有瑜珈墊、頂樓空間</li><li><strong>合流生活提案所</strong>：都蘭，三層樓空間，適合共同工作與交流</li><li><strong>野室珈琲</strong>：台東市區，低消一杯飲料可使用座位</li></ul><p>TDF 活動期間也會推廣「數位遊牧友善商家」標章店家，這些店家經過測速認證，適合遠端工作。</p>',
+            type: 'feature-list',
+            items: [
+              {
+                title: '找房管道',
+                body: 'Airbnb：搜尋「Taitung City」篩選月租方案，通常有長住折扣。591 租屋網：台灣最大租屋平台，中文介面為主。Facebook 社團：搜尋「台東租屋」相關社團。TDF WhatsApp 群組：可詢問其他參與者合租資訊。',
+              },
+              {
+                title: '住宿區域建議',
+                body: '台東市區（轉運站／鐵花村周邊）生活機能最佳，離多數活動場地近。都蘭有海岸線氣氛，適合衝浪與慢活，到市區需 30 分鐘車程。池上／關山有縱谷稻田風光，適合第二週活動期間入住。',
+              },
+              {
+                title: '依參與週數建議',
+                body: '參與整個月的會眾：建議住在市區，生活機能最佳。僅參與一週：第一週建議住南迴（金崙）、第二週建議住縱谷（池上、關山）、第三週建議住海岸（都蘭）、第四週建議住市區。',
+              },
+            ],
           },
           {
-            title: '天氣與穿著',
-            content: '<p>5 月的台東平均溫度 25–32°C（77–90°F），偶有午後雷陣雨，紫外線強。建議攜帶：輕便透氣衣物、防曬乳、帽子、太陽眼鏡、輕便雨具、泳衣、防蚊液。</p>',
+            type: 'table',
+            columns: ['餐別', '費用 (TWD)', '說明'],
+            rows: [
+              ['早餐', '40–80', '早餐店、豆漿店'],
+              ['午餐', '80–150', '便當、麵店、自助餐'],
+              ['晚餐', '100–250', '小吃、餐廳'],
+              ['咖啡', '60–150', '咖啡廳一杯'],
+              ['自炊', '每日 150–250', '全聯超市採買'],
+            ],
           },
           {
-            title: '實用生活資訊',
-            content: '<table><thead><tr><th>項目</th><th>說明</th></tr></thead><tbody><tr><td>電壓</td><td>110V / 60Hz（與美國、日本相同）</td></tr><tr><td>插座</td><td>美規兩孔扁平型 (Type A/B)</td></tr><tr><td>貨幣</td><td>新台幣 (TWD)，1 USD ≈ 30 TWD</td></tr><tr><td>付款方式</td><td>現金為主，便利商店和大型餐廳可刷卡</td></tr><tr><td>自來水</td><td>不可直接飲用，建議購買瓶裝水</td></tr><tr><td>時區</td><td>UTC+8</td></tr></tbody></table>',
+            type: 'callout',
+            tone: 'info',
+            title: '台東特色飲食',
+            body: '台東特色食材包括池上米、鳳梨釋迦、紅烏龍茶、洛神花、原住民風味料理等。夜市與在地小吃是最經濟的用餐方式。',
           },
           {
-            title: '推薦 APP',
-            content: '<table><thead><tr><th>APP</th><th>用途</th></tr></thead><tbody><tr><td>Google Maps</td><td>導航、查公車路線</td></tr><tr><td>台鐵 e 訂通</td><td>訂火車票</td></tr><tr><td>Uber / LINE TAXI</td><td>叫計程車</td></tr><tr><td>LINE</td><td>台灣最普及的通訊軟體</td></tr><tr><td>7-ELEVEN / 全家 APP</td><td>集點、行動支付</td></tr></tbody></table>',
+            type: 'table',
+            columns: ['項目', '經濟型 (TWD)', '舒適型 (TWD)', '經濟型 (USD)', '舒適型 (USD)'],
+            rows: [
+              ['住宿', '12,000', '30,000', '400', '1,000'],
+              ['餐飲', '6,000', '12,000', '200', '400'],
+              ['交通（機車月租）', '5,400', '9,000', '180', '300'],
+              ['網路（SIM 卡）', '900', '900', '30', '30'],
+              ['活動體驗', '3,000', '10,000', '100', '330'],
+              ['雜費', '2,000', '5,000', '65', '165'],
+              ['合計', '~29,300', '~66,900', '~975', '~2,225'],
+            ],
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '共創空間',
+                body: '邸 Tai Dang 創生基地（台東市區，一日辦公 250 TWD/人，有投影機）、旅蒔 Roots Coworking（池上，3 日票 560 TWD/人，有瑜珈墊、頂樓空間）、合流生活提案所（都蘭，三層樓空間，適合共同工作與交流）、野室珈琲（台東市區，低消一杯飲料可使用座位）。TDF 活動期間也會推廣「數位遊牧友善商家」標章店家，這些店家經過測速認證，適合遠端工作。',
+              },
+              {
+                title: '天氣與穿著',
+                body: '5 月的台東平均溫度 25–32°C（77–90°F），偶有午後雷陣雨，紫外線強。建議攜帶：輕便透氣衣物、防曬乳、帽子、太陽眼鏡、輕便雨具、泳衣、防蚊液。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-transportation',
+        group: 'event',
+        label: '交通',
+        title: '前往台東與在地移動',
+        intro: '活動場地分散在台東各地；先規劃從外地進台東的交通，再安排每天在台東的移動方式。',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: '各場活動之間怎麼移動？',
+                answer: '各場活動需自行前往集合地點。可以搭乘台鐵、客運前往，也可以租車、租機車或使用 YouBike。建議參與者善用 WhatsApp 群組進行 Car Share（共乘）。',
+              },
+              {
+                question: '花蓮三天兩夜旅行的交通怎麼安排？',
+                answer: '集合地點為花蓮火車站，上午 10:00。前往花蓮需自行搭乘火車（約 90 分鐘），不包含在行程內。行程期間主辦方會安排 30 人座巴士，三天全程包車。',
+              },
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['台北 → 台東', '時間', '費用 (TWD)', '備註'],
+            rows: [
+              ['火車（普悠瑪／太魯閣）', '3.5–4.5 小時', '~935', '最推薦，假日票難搶，建議提前 28 天訂票'],
+              ['火車（莒光號）', '5–5.5 小時', '~603', '班次較多'],
+              ['飛機（松山→台東）', '50 分鐘', '~3,500', '每日約 6 班'],
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['高雄 → 台東', '時間', '費用 (TWD)'],
+            rows: [
+              ['火車（自強號）', '2–2.5 小時', '~486'],
+              ['自駕（南迴公路）', '~3 小時', '油資'],
+            ],
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '租機車（最推薦）',
+                body: '火車站周邊有多家租車行。125cc 機車 200–500 TWD/日，月租約 180–300 TWD/日。外籍人士需持國際駕照 (IDP) 並攜帶本國駕照。台東科技執法嚴格，務必遵守交通規則、佩戴安全帽。',
+              },
+              {
+                title: 'YouBike',
+                body: '台東市區設有 YouBike 站點，適合短程移動。使用悠遊卡或一卡通即可租借，前 30 分鐘 5 TWD。',
+              },
+              {
+                title: '計程車',
+                body: '可使用 LINE Taxi 或 55688 APP 叫車，方便快捷。',
+              },
+              {
+                title: '公車系統',
+                body: '普悠瑪客運 101 市區循環線：繞行台東市區一圈約 1 小時，每段票 25 元。台灣好行 東部海岸線：台東轉運站 → 小野柳 → 加路蘭 → 三仙台。台灣好行 縱谷鹿野線：台東轉運站 → 初鹿牧場 → 鹿野高台。',
+              },
+              {
+                title: '共乘',
+                body: 'TDF 活動期間，WhatsApp 社群群組內會有 Car Share 功能，方便參與者互相搭便車。',
+              },
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['APP', '用途'],
+            rows: [
+              ['Google Maps', '導航、查公車路線'],
+              ['台鐵 e 訂通', '訂火車票'],
+              ['Uber / LINE TAXI', '叫計程車'],
+              ['LINE', '台灣最普及的通訊軟體'],
+              ['7-ELEVEN / 全家 APP', '集點、行動支付'],
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-hualien',
+        group: 'event',
+        label: '花蓮旅行',
+        title: '花蓮三天兩夜旅行',
+        intro: '為期三天的花蓮旅程，可讓所有票種會眾加價參加。',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: '花蓮旅行費用是多少？包含什麼？',
+                answer: '費用統一為 200 USD。包含花蓮區域三天交通（30 人座巴士全程包車）、5/29 午晚餐＋住宿、5/30 三餐＋住宿、5/31 早午餐。不包含前往花蓮的交通與個人紀念品。',
+              },
+              {
+                question: '花蓮住宿是什麼房型？',
+                answer: '單人房（private room），附獨立衛浴。住宿地點為木棧花蓮館。',
+              },
+              {
+                question: '非 Backer 可以參加花蓮旅行嗎？',
+                answer: '可以，費用統一為 200 USD，不分票種。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-speakers',
+        group: 'event',
+        label: '講者與協辦',
+        title: '成為講者或協辦單位',
+        intro: '如果你想在 TDF 分享內容或辦一場 Side Event，這裡是申請流程與合作模式。',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: '我想當講者，怎麼申請？',
+                answer: '請至官網填寫「Call for Speaker」表單。團隊會依據主題，將您安排到合適的週次。若有特別期望的時間，可在備註中說明。',
+              },
+              {
+                question: '講者有什麼回饋？',
+                answer: '經審核通過的講者會獲得對應等級的免費票券兌換碼。無另外支付薪酬。',
+              },
+              {
+                question: '講者需要提供什麼資料？',
+                answer: '1. 確認可出席的日期與時間\n2. 確認演講題目\n3. 一張高解析度個人照片（用於宣傳）\n4. 單位名稱與職稱\n5. 50 字以內英文個人簡介\n6. 200 字以內英文主題摘要',
+              },
+              {
+                question: '我想辦 Side Event，怎麼申請？',
+                answer: '請至官網填寫「Call for Side Event」表單，並寄信至 fest@dna.org.tw。',
+              },
+              {
+                question: 'Side Event 的合作模式是什麼？',
+                answer: '主辦方以協辦單位身分參與。可優先使用主辦方媒合的合作場地（免費），自行找場地者經確認可獲最高 NT$3,000 場地費補貼。活動頁面需使用 Luma 系統建立。若有收費，由主辦方協助代收，酌收 10% 手續費。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-visa-contact',
+        group: 'event',
+        label: '簽證與聯絡',
+        title: '簽證、醫療、聯絡與志工',
+        intro: '來台前需要確認的事情，以及活動期間可以怎麼找到團隊。',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: '我需要簽證才能來台灣，主辦方可以協助嗎？',
+                answer: '主辦方無法代辦簽證申請。建議至各國的中華民國外交部網站查詢簽證資訊。',
+              },
+              {
+                question: '可以提供參與證明或邀請函嗎？',
+                answer: '可以。購票完成後，請寄信至 fest@dna.org.tw，附上購票證明，主辦方會開立參與證明文件，可作為簽證申請的輔助文件。',
+              },
+              {
+                question: '怎麼成為 TDF 志工？',
+                answer: '可填寫志工申請表單。主辦方會舉辦線上志工說明會，依不同志工角色分組面談。',
+              },
+            ],
+          },
+          {
+            type: 'callout',
+            tone: 'info',
+            title: '簽證資訊',
+            body: '台灣已於 2025 年正式推出數位遊牧簽證（Digital Nomad Visa），允許遠端工作者停留最長 6 個月。多數國家（含美、日、歐盟、英、澳、紐、韓等）享有 90 天免簽待遇。',
+          },
+          {
+            type: 'callout',
+            tone: 'info',
+            title: '醫療與保險',
+            body: '台東市區有馬偕醫院、基督教醫院、聖母醫院等醫療機構。建議國際旅客出發前投保旅遊平安險與醫療險。外籍人士若無健保，門診費用約 500–1,500 TWD。',
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '聯絡方式',
+                body: '官方信箱：fest@dna.org.tw。Instagram：@taiwandigitalfest。WhatsApp 社群群組：由 Community Manager Maria 管理。',
+              },
+              {
+                title: '網路與通訊',
+                body: '抵達機場後可在入境大廳辦理預付卡。推薦中華電信，在台東山區、海岸線的訊號涵蓋率最佳，30 天吃到飽約 899–1,000 TWD。若手機支援 eSIM，可事先在 KKday、Klook 預購。多數咖啡廳和共創空間提供免費 Wi-Fi。',
+              },
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['項目', '說明'],
+            rows: [
+              ['電壓', '110V / 60Hz（與美國、日本相同）'],
+              ['插座', '美規兩孔扁平型 (Type A/B)'],
+              ['貨幣', '新台幣 (TWD)，1 USD ≈ 30 TWD'],
+              ['付款方式', '現金為主，便利商店和大型餐廳可刷卡'],
+              ['自來水', '不可直接飲用，建議購買瓶裝水'],
+              ['時區', 'UTC+8'],
+            ],
           },
         ],
       },
     ],
+    limitations: {
+      title: '',
+      items: [],
+    },
     homeFaq: [
-      { question: '票券分幾個等級？', summary: '四個等級：PURPLE 免費 → YELLOW VIP，含不同活動權限', guideTab: 'tickets' },
-      { question: '活動怎麼報名？', summary: '購票後到 Luma 頁面預約，工作人員核對後發送確認', guideTab: 'registration' },
-      { question: '購買/兌換票券後沒收到信，要怎麼確認？', summary: '官網右上角用 email 登入即可查看票券，仍找不到請聯繫 IG 或 registration@taiwandigitalfest.com', guideTab: 'tickets' },
-      { question: '在台東住一個月大概花多少？', summary: '整體約 25,000–40,000 TWD，依生活型態而定', guideTab: 'accommodation' },
-      { question: '有沒有 TDF 合作住宿？', summary: '路得行旅一館每晚 25 USD，來信 accommodation@taiwandigitalfest.com', guideTab: 'accommodation' },
-      { question: '各場活動之間怎麼移動？', summary: '自行前往，建議用 WhatsApp 群組共乘', guideTab: 'transportation' },
-      { question: '我想當講者，怎麼申請？', summary: '填寫 Call for Speaker 表單，通過審核可獲免費票券', guideTab: 'speakers' },
-      { question: '活動場地有哪些？', summary: '邸 Tai Dang、旅蒔 Roots Coworking、合流生活提案所、野室珈琲等', guideTab: 'living' },
+      {
+        question: '票券分幾個等級？',
+        summary: '四個主要等級加上 Weekly Backer，活動權限不同。',
+        guideSection: 'event-tickets',
+      },
+      {
+        question: '活動怎麼報名？',
+        summary: '先取得票券資格，再到 Luma 頁面送出預約。',
+        guideSection: 'event-registration',
+      },
+      {
+        question: '在台東住一個月大概花多少？',
+        summary: '整體約 25,000–40,000 TWD，依生活型態與住宿類型而定。',
+        guideSection: 'event-accommodation',
+      },
+      {
+        question: '各場活動之間怎麼移動？',
+        summary: '自行前往，建議善用火車、租車與社群共乘。',
+        guideSection: 'event-transportation',
+      },
+      {
+        question: '我想當講者，怎麼申請？',
+        summary: '填寫 Call for Speaker 表單，通過審核後可獲免費票券。',
+        guideSection: 'event-speakers',
+      },
+      {
+        question: '活動場地有哪些？',
+        summary: '主要會場、共創空間與花蓮旅行安排都整理在完整指南裡。',
+        guideSection: 'event-guide',
+      },
     ],
   },
   en: {
-    pageTitle: 'Event Guide',
-    pageDescription: 'Frequently asked questions and living guide for Taiwan Digital Fest 2026',
+    pageTitle: 'Complete Guide',
+    pageDescription: 'A unified guide to festival participation, member tools, partner stay booking, and visa support documents.',
     homeFaqTitle: 'FAQ',
     homeFaqCta: 'View Full Guide',
-    tabs: [
+    entryCards: [
       {
-        id: 'tickets',
-        label: 'Tickets & Access',
-        faqItems: [
-          {
-            id: 'q1',
-            question: 'What ticket tiers are available?',
-            answer: 'TDF 2026 has four tiers: PURPLE (free — subscribe + follow on IG for purple events), BLUE ($30 — blue + purple events), GREEN ($300 — green + blue + purple events), YELLOW ($600 VIP — all events + Hualien 3-day tour). Weekly Backer tickets are also available for single-week attendance.',
-          },
-          {
-            id: 'q2',
-            question: 'Can I buy a single event without a festival pass?',
-            answer: 'Yes. White (Side Event) activities can be registered and paid for individually without a festival pass. Other colored events also have single-event payment options.',
-          },
-          {
-            id: 'q3',
-            question: 'How do I confirm my order after purchasing?',
-            answer: 'A confirmation email is sent automatically after purchase. If you didn\'t receive it, check your spam folder. You can also log in to your account on the website to check order status.',
-          },
-          {
-            id: 'q3b',
-            question: 'I purchased/redeemed a ticket but didn\'t receive any email. How can I check it?',
-            answer: 'Log in with your email via the top-right of the website to view your tickets. If you still can\'t find them, contact us on Instagram @taiwandigitalfest or email registration@taiwandigitalfest.com.',
-          },
-          {
-            id: 'q4',
-            question: 'Can I get a refund?',
-            answer: 'Tickets are non-refundable by default, but can be transferred to another person.',
-          },
-        ],
-        guideBlocks: [],
+        id: 'event-guide',
+        label: 'Event Guide',
+        description: 'Start with tickets, registration, accommodation, transportation, and speaker info.',
+        targetId: 'event-guide',
       },
       {
-        id: 'registration',
-        label: 'Registration',
-        faqItems: [
-          {
-            id: 'q5',
-            question: 'How do I register for events?',
-            answer: '1. Purchase a festival pass to gain access\n2. Visit the event\'s Luma page and submit a reservation request\n3. TDF staff will verify your ticket and send approval\n4. Show your Luma reservation at check-in on event day',
-          },
-          {
-            id: 'q6',
-            question: 'When will my registration be approved?',
-            answer: 'Registrations will be gradually approved between 4/20–4/30.',
-          },
-          {
-            id: 'q7',
-            question: 'What happens if I don\'t show up? (No-Show Policy)',
-            answer: 'No-shows will have their spot released to waitlisted attendees on-site. Repeat no-shows will be moved to waitlist status for their next event (normal reservation restored after that).',
-          },
-          {
-            id: 'q7b',
-            question: 'Are events limited in capacity?',
-            answer: 'Yes, to ensure quality experiences, events have limited capacity. We will approve registrations based on ticket tier and registration order.',
-          },
-        ],
-        guideBlocks: [],
+        id: 'member-guide',
+        label: 'Member Guide',
+        description: 'Learn how login, identity cards, profiles, collections, orders, stay, and visa tools work.',
+        targetId: 'member-guide',
       },
+    ],
+    navGroups: [
       {
-        id: 'accommodation',
-        label: 'Accommodation & Cost',
-        faqItems: [
-          {
-            id: 'q8',
-            question: 'How much does it cost to live in Taitung for a month?',
-            answer: 'Hotels: 25,000–40,000 TWD/month. Guesthouses/Airbnb: 15,000–30,000 TWD/month. Meals: breakfast 60–150, lunch 90–180, dinner 90–240 TWD. Overall about 25,000–40,000 TWD/month including accommodation and meals, depending on lifestyle.',
-          },
-          {
-            id: 'q9',
-            question: 'Does the organizer arrange accommodation?',
-            answer: 'Accommodation is not centrally arranged — participants book their own. The website provides recommended lodging options in Taitung. If you need help booking, reach out to us on the WhatsApp community group. We have reserved accommodation for attendees who need booking assistance.',
-          },
-          {
-            id: 'q9b',
-            question: 'Is there a TDF partner accommodation?',
-            answer: 'We offer a limited number of partner stays at Norden Ruder Hotel I (https://taitung.nordenruder.com/) for $25 USD per night. If interested, please email accommodation@taiwandigitalfest.com.',
-          },
-        ],
-        guideBlocks: [
-          {
-            title: 'Accommodation Options',
-            content: '<table><thead><tr><th>Type</th><th>Monthly (TWD)</th><th>Monthly (USD)</th></tr></thead><tbody><tr><td>Hostel (bed)</td><td>12,000–18,000</td><td>~400–600</td></tr><tr><td>Airbnb room</td><td>15,000–30,000</td><td>~500–1,000</td></tr><tr><td>Budget hotel</td><td>25,000–40,000</td><td>~830–1,330</td></tr><tr><td>Full apartment</td><td>12,000–20,000</td><td>~400–660</td></tr></tbody></table>',
-          },
-          {
-            title: 'Where to Find Housing',
-            content: '<ul><li><strong>Airbnb</strong>: Search "Taitung City" and filter for monthly stays</li><li><strong>591.com.tw</strong>: Taiwan\'s largest rental platform (mostly Chinese)</li><li><strong>Facebook Groups</strong>: Search for Taitung rental groups</li><li><strong>TDF WhatsApp Group</strong>: Ask other participants about shared housing</li></ul>',
-          },
-          {
-            title: 'Recommended Areas',
-            content: '<ul><li><strong>Taitung City Center</strong>: Best amenities, close to most venues</li><li><strong>Dulan</strong>: Coastal vibe, great for surfing, 30 min to city center</li><li><strong>Chishang / Guanshan</strong>: Rice paddy scenery, ideal for Week 2 events</li></ul><p><strong>Recommendations by attendance duration:</strong></p><ul><li>Full month: Stay in <strong>Taitung City</strong> for best convenience</li><li>Single week: Week 1 — <strong>South Link (Jinlun)</strong>, Week 2 — <strong>East Rift Valley (Chishang, Guanshan)</strong>, Week 3 — <strong>Coast (Dulan)</strong>, Week 4 — <strong>City Center</strong></li></ul>',
-          },
+        id: 'event',
+        label: 'Event',
+        items: [
+          { id: 'event-guide', label: 'Overview' },
+          { id: 'event-tickets', label: 'Tickets & Access' },
+          { id: 'event-registration', label: 'Registration' },
+          { id: 'event-accommodation', label: 'Accommodation & Cost' },
+          { id: 'event-transportation', label: 'Transportation' },
+          { id: 'event-hualien', label: 'Hualien Tour' },
+          { id: 'event-speakers', label: 'Speakers & Partners' },
+          { id: 'event-visa-contact', label: 'Visa & Contact' },
         ],
       },
       {
-        id: 'transportation',
-        label: 'Transportation',
-        faqItems: [
-          {
-            id: 'q10',
-            question: 'How do I get between event venues?',
-            answer: 'You need to make your own way to each venue. You can take the train (TRA), intercity bus, rent a car, rent a scooter, or use YouBike. We also recommend using the WhatsApp group for Car Share (carpooling).',
-          },
-          {
-            id: 'q11',
-            question: 'How is transportation arranged for the Hualien tour?',
-            answer: 'Meeting point: Hualien Train Station at 10:00 AM. Getting to Hualien (about 90 min by train) is not included. During the tour, a 30-seat bus is provided for all three days.',
-          },
-        ],
-        guideBlocks: [
-          {
-            title: 'Getting to Taitung',
-            content: '<h4>Taipei → Taitung</h4><table><thead><tr><th>Transport</th><th>Duration</th><th>Cost (TWD)</th><th>Notes</th></tr></thead><tbody><tr><td>Train (Puyuma/Taroko)</td><td>3.5–4.5 hrs</td><td>~935</td><td>Best option, book 28 days ahead</td></tr><tr><td>Train (Chu-Kuang)</td><td>5–5.5 hrs</td><td>~603</td><td>More available seats</td></tr><tr><td>Flight (Songshan→Taitung)</td><td>50 min</td><td>~3,500</td><td>~6 flights daily</td></tr></tbody></table><h4>Kaohsiung → Taitung</h4><table><thead><tr><th>Transport</th><th>Duration</th><th>Cost (TWD)</th></tr></thead><tbody><tr><td>Train (Tze-Chiang)</td><td>2–2.5 hrs</td><td>~486</td></tr><tr><td>Drive (South Link Highway)</td><td>~3 hrs</td><td>Gas</td></tr></tbody></table>',
-          },
-          {
-            title: 'Getting Around Taitung',
-            content: '<h4>Scooter Rental (Recommended)</h4><p>Rental shops near the train station. 125cc: 200–500 TWD/day, monthly: ~180–300 TWD/day. International visitors need an International Driving Permit (IDP) plus home license. Traffic enforcement is strict — always wear a helmet.</p><h4>YouBike</h4><p>YouBike stations are available around Taitung City, great for short trips. Use an EasyCard or iPASS to rent. First 30 minutes: 5 TWD.</p><h4>Taxi</h4><p>Use LINE Taxi or 55688 app for convenient ride-hailing.</p><h4>Bus System</h4><ul><li>Puyuma Bus Route 101: City loop, ~1 hour, 25 TWD per section</li><li>Taiwan Tourist Shuttle - East Coast: Taitung → Xiaoyeliu → Jialulan → Sanxiantai</li><li>Taiwan Tourist Shuttle - East Rift Valley: Taitung → Chulu Ranch → Luye Terrace</li></ul><h4>Carpooling</h4><p>Use the TDF WhatsApp group\'s Car Share feature to coordinate rides with other participants.</p>',
-          },
+        id: 'member',
+        label: 'Member',
+        items: [
+          { id: 'member-guide', label: 'Overview' },
+          { id: 'member-basics', label: 'What Counts as a Member' },
+          { id: 'member-auth-passport', label: 'Login & Identity Card' },
+          { id: 'member-profile-card', label: 'Profile Card & Public Page' },
+          { id: 'member-collections', label: 'Collections' },
+          { id: 'member-activity-orders', label: 'Events & Orders' },
+          { id: 'member-transfers', label: 'Transfers' },
+          { id: 'member-preferences', label: 'Email Preferences' },
+          { id: 'member-upgrade', label: 'Upgrade' },
         ],
       },
       {
-        id: 'hualien',
-        label: 'Hualien Tour',
-        faqItems: [
-          {
-            id: 'q12',
-            question: 'How much is the Hualien tour and what\'s included?',
-            answer: '$200 USD. Includes: 3-day bus transport in Hualien, 5/29 lunch + dinner + accommodation, 5/30 all meals + accommodation, 5/31 breakfast + lunch. Not included: transport to Hualien, personal souvenirs.',
-          },
-          {
-            id: 'q13',
-            question: 'What\'s the room type for the Hualien stay?',
-            answer: 'Private room with en-suite bathroom at Muzhan Hualien Hotel.',
-          },
-          {
-            id: 'q14',
-            question: 'Can non-Backers join the Hualien tour?',
-            answer: 'Yes, the Hualien tour is $200 USD for all ticket tiers.',
-          },
+        id: 'stay',
+        label: 'Stay',
+        items: [
+          { id: 'stay-overview', label: 'Partner Stay' },
+          { id: 'stay-booking', label: 'How Booking Works' },
+          { id: 'stay-after-booking', label: 'After Booking' },
+          { id: 'stay-rules', label: 'Rules & Notes' },
         ],
-        guideBlocks: [],
-      },
-      {
-        id: 'speakers',
-        label: 'Speakers & Partners',
-        faqItems: [
-          {
-            id: 'q15',
-            question: 'How do I apply to be a speaker?',
-            answer: 'Fill out the "Call for Speaker" form on the website. The team will assign you to an appropriate week based on your topic. You can note preferred dates.',
-          },
-          {
-            id: 'q16',
-            question: 'What do speakers receive?',
-            answer: 'Approved speakers receive a complimentary ticket code for the corresponding tier. No speaker fees are paid.',
-          },
-          {
-            id: 'q17',
-            question: 'What information do speakers need to provide?',
-            answer: '1. Available dates and times\n2. Talk title\n3. High-resolution headshot (for promotion)\n4. Organization and title\n5. English bio (under 50 words)\n6. English talk summary (under 200 words)',
-          },
-          {
-            id: 'q18',
-            question: 'How do I apply to host a Side Event?',
-            answer: 'Fill out the "Call for Side Event" form on the website and email fest@dna.org.tw.',
-          },
-          {
-            id: 'q19',
-            question: 'What\'s the Side Event partnership model?',
-            answer: 'The organizer participates as a co-organizer. You can use partner venues (free) or find your own (up to NT$3,000 subsidy after approval). Event pages must use the Luma system. For paid events, the organizer handles payment collection with a 10% service fee.',
-          },
-        ],
-        guideBlocks: [],
       },
       {
         id: 'visa',
-        label: 'Visa & Contact',
-        faqItems: [
+        label: 'Visa',
+        items: [{ id: 'visa-support', label: 'Visa Support Documents' }],
+      },
+    ],
+    sections: [
+      {
+        id: 'event-guide',
+        group: 'event',
+        label: 'Event Guide',
+        title: 'First, figure out how to join the festival',
+        intro: 'If this is your first time at TDF, start with tickets, registration, accommodation, transportation, and speaker info.',
+        blocks: [
           {
-            id: 'q20',
-            question: 'I need a visa to enter Taiwan. Can the organizer help?',
-            answer: 'The organizer cannot process visa applications. Please check the Republic of China (Taiwan) Ministry of Foreign Affairs website for your country\'s visa requirements.',
-          },
-          {
-            id: 'q21',
-            question: 'Can you provide a participation certificate or invitation letter?',
-            answer: 'Yes. After purchasing a ticket, email fest@dna.org.tw with proof of purchase. The organizer will issue a participation certificate that can support visa applications.',
-          },
-          {
-            id: 'q25',
-            question: 'How do I become a TDF volunteer?',
-            answer: 'Fill out the volunteer application form. The organizer holds an online volunteer orientation with group interviews by role.',
-          },
-        ],
-        guideBlocks: [
-          {
-            title: 'Visa Information',
-            content: '<p>Taiwan launched its <strong>Digital Nomad Visa</strong> in 2025, allowing remote workers to stay up to 6 months. Most countries (US, Japan, EU, UK, Australia, NZ, Korea, etc.) enjoy 90-day visa-free entry.</p>',
-          },
-          {
-            title: 'Medical & Insurance',
-            content: '<p>Taitung has Mackay Memorial Hospital, Christian Hospital, and St. Mary\'s Hospital. International visitors should purchase travel and medical insurance before departure. Without National Health Insurance, clinic visits cost about 500–1,500 TWD.</p>',
-          },
-          {
-            title: 'Contact',
-            content: '<ul><li>Email: fest@dna.org.tw</li><li>Instagram: @taiwandigitalfest</li><li>WhatsApp Community: managed by Community Manager Maria</li></ul>',
+            type: 'feature-list',
+            items: [
+              {
+                title: 'What you will find in this area',
+                body: 'This area covers tickets and access modes, the Luma registration flow, cost of living in Taitung, transportation, the Hualien tour, speaker and Side Event partnerships, and visa + contact info.',
+              },
+            ],
           },
         ],
       },
       {
-        id: 'living',
-        label: 'Living in Taitung',
-        faqItems: [],
-        guideBlocks: [
+        id: 'event-tickets',
+        group: 'event',
+        label: 'Tickets & Access',
+        title: 'Ticket tiers, single events, and order confirmation',
+        intro: 'Understand the tiers and which events they unlock before worrying about logging in to view your order.',
+        blocks: [
           {
-            title: 'Internet & Connectivity',
-            content: '<p>Get a prepaid SIM at the airport arrivals hall. <strong>Chunghwa Telecom</strong> is recommended for Taitung — best coverage in mountain and coastal areas. 30-day unlimited data: ~899–1,000 TWD. eSIM available via KKday or Klook. Most cafes and coworking spaces offer free Wi-Fi.</p>',
+            type: 'faq',
+            items: [
+              {
+                question: 'What ticket tiers are available?',
+                answer: 'TDF 2026 has four tiers: PURPLE (free — subscribe + follow on IG for purple events), BLUE ($30 — blue + purple events), GREEN ($300 — green + blue + purple events), YELLOW ($600 VIP — all events + Hualien 3-day tour). Weekly Backer tickets are also available for single-week attendance.',
+              },
+              {
+                question: 'Can I buy a single event without a festival pass?',
+                answer: 'Yes. White (Side Event) activities can be registered and paid for individually without a festival pass. Other colored events may also offer single-event payment options.',
+              },
+              {
+                question: 'How do I confirm my order after purchasing?',
+                answer: 'A confirmation email is sent automatically after purchase. If you didn\'t receive it, log in with your email via the top-right of the website to view `/me` and your orders. Still missing? Contact registration@taiwandigitalfest.com or DM us on Instagram.',
+              },
+              {
+                question: 'Can I get a refund?',
+                answer: 'Tickets are non-refundable by default, but paid parent orders support self-service transfer before the cutoff date.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-registration',
+        group: 'event',
+        label: 'Registration',
+        title: 'Using your ticket to reserve individual events',
+        intro: 'At TDF, buying a ticket and reserving a seat are separate steps: get access first, then book each event via its Luma page.',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: 'Get access first',
+                body: 'Purchase a festival pass, or hold an identity/role that the event accepts.',
+              },
+              {
+                title: 'Reserve on Luma',
+                body: 'Go to each event\'s Luma page and submit a reservation. Staff verify tier and order in the background.',
+              },
+              {
+                title: 'Wait for approval',
+                body: 'Once approved you\'ll see the Luma approval status; on the day of the event, check in with your Luma reservation.',
+              },
+            ],
           },
           {
-            title: 'Food Costs',
-            content: '<table><thead><tr><th>Meal</th><th>Cost (TWD)</th><th>Notes</th></tr></thead><tbody><tr><td>Breakfast</td><td>40–80</td><td>Breakfast shops, soy milk shops</td></tr><tr><td>Lunch</td><td>80–150</td><td>Bento, noodle shops, buffets</td></tr><tr><td>Dinner</td><td>100–250</td><td>Street food, restaurants</td></tr><tr><td>Coffee</td><td>60–150</td><td>Per cup at cafes</td></tr><tr><td>Self-catering</td><td>150–250/day</td><td>PX Mart groceries</td></tr></tbody></table><p>Taitung specialties include Chishang rice, sugar apples, red oolong tea, roselle, and indigenous cuisine. Night markets and local eateries offer the best value.</p>',
+            type: 'faq',
+            items: [
+              {
+                question: 'When will I get my registration confirmation?',
+                answer: 'Organizers approve registrations in batches. Check your Luma status and notification emails for the latest state.',
+              },
+              {
+                question: 'What happens if I don\'t show up?',
+                answer: 'No-shows will have their spot released to waitlisted attendees on-site. Repeat no-shows will be moved to waitlist status for their next event (normal reservation restored after that).',
+              },
+              {
+                question: 'Are events limited in capacity?',
+                answer: 'Yes. To ensure quality, events have limited capacity. Approvals are based on ticket tier and registration order.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-accommodation',
+        group: 'event',
+        label: 'Accommodation & Cost',
+        title: 'Where to stay and what a month in Taitung costs',
+        intro: 'You book your own stay. Know the cost range and neighborhood trade-offs before you choose.',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: 'How much does it cost to live in Taitung for a month?',
+                answer: 'Hotels: 25,000–40,000 TWD/month. Guesthouses/Airbnb: 15,000–30,000 TWD/month. Meals: breakfast 60–150, lunch 90–180, dinner 90–240 TWD. Overall about 25,000–40,000 TWD/month including accommodation and meals, depending on lifestyle.',
+              },
+              {
+                question: 'Does the organizer arrange accommodation?',
+                answer: 'Accommodation is not centrally arranged — participants book their own. The website provides recommended lodging options in Taitung. If you need help booking, reach out to us on the WhatsApp community group. We have reserved accommodation for attendees who need booking assistance.',
+              },
+              {
+                question: 'Is there a TDF partner accommodation?',
+                answer: 'We offer a limited number of partner stays at Norden Ruder Hotel I (https://taitung.nordenruder.com/) for $25 USD per night. If interested, please email accommodation@taiwandigitalfest.com.',
+              },
+            ],
           },
           {
-            title: 'Monthly Budget Overview',
-            content: '<table><thead><tr><th>Item</th><th>Budget (TWD)</th><th>Comfort (TWD)</th><th>Budget (USD)</th><th>Comfort (USD)</th></tr></thead><tbody><tr><td>Accommodation</td><td>12,000</td><td>30,000</td><td>400</td><td>1,000</td></tr><tr><td>Food</td><td>6,000</td><td>12,000</td><td>200</td><td>400</td></tr><tr><td>Transport (scooter)</td><td>5,400</td><td>9,000</td><td>180</td><td>300</td></tr><tr><td>Internet (SIM)</td><td>900</td><td>900</td><td>30</td><td>30</td></tr><tr><td>Activities</td><td>3,000</td><td>10,000</td><td>100</td><td>330</td></tr><tr><td>Misc.</td><td>2,000</td><td>5,000</td><td>65</td><td>165</td></tr><tr><td><strong>Total</strong></td><td><strong>~29,300</strong></td><td><strong>~66,900</strong></td><td><strong>~975</strong></td><td><strong>~2,225</strong></td></tr></tbody></table>',
+            type: 'table',
+            columns: ['Type', 'Monthly (TWD)', 'Monthly (USD)'],
+            rows: [
+              ['Hostel (bed)', '12,000–18,000', '~400–600'],
+              ['Airbnb room', '15,000–30,000', '~500–1,000'],
+              ['Budget hotel', '25,000–40,000', '~830–1,330'],
+              ['Full apartment', '12,000–20,000', '~400–660'],
+            ],
           },
           {
-            title: 'Coworking Spaces',
-            content: '<ul><li><strong>Tai Dang Creative Base</strong>: Taitung City, 250 TWD/day, has projector</li><li><strong>Roots Coworking</strong>: Chishang, 560 TWD/3-day pass, yoga mats, rooftop</li><li><strong>Heliu Living Lab</strong>: Dulan, 3-story space for coworking and socializing</li><li><strong>Yeshi Coffee</strong>: Taitung City, minimum one drink order</li></ul><p>During TDF, "Digital Nomad Friendly" certified shops will be promoted — speed-tested venues ideal for remote work.</p>',
+            type: 'feature-list',
+            items: [
+              {
+                title: 'Where to find housing',
+                body: 'Airbnb: search "Taitung City" and filter for monthly stays (long-stay discounts common). 591.com.tw: Taiwan\'s largest rental platform (mostly Chinese). Facebook Groups: search for Taitung rental groups. TDF WhatsApp Group: ask other participants about shared housing.',
+              },
+              {
+                title: 'Recommended areas',
+                body: 'Taitung City Center (near the bus terminal / Tiehua Village): best amenities, close to most venues. Dulan: coastal vibe, great for surfing and slow living, 30 min to the city center. Chishang / Guanshan: rice paddy scenery, ideal for Week 2 events.',
+              },
+              {
+                title: 'Recommendations by attendance duration',
+                body: 'Full month attendees: stay in Taitung City for best convenience. Single week: Week 1 — South Link (Jinlun); Week 2 — East Rift Valley (Chishang, Guanshan); Week 3 — Coast (Dulan); Week 4 — City Center.',
+              },
+            ],
           },
           {
-            title: 'Weather & Clothing',
-            content: '<p>May in Taitung averages 25–32°C (77–90°F) with occasional afternoon thundershowers and strong UV. Pack: light breathable clothing, sunscreen, hat, sunglasses, light rain gear, swimwear, mosquito repellent.</p>',
+            type: 'table',
+            columns: ['Meal', 'Cost (TWD)', 'Notes'],
+            rows: [
+              ['Breakfast', '40–80', 'Breakfast shops, soy milk shops'],
+              ['Lunch', '80–150', 'Bento, noodle shops, buffets'],
+              ['Dinner', '100–250', 'Street food, restaurants'],
+              ['Coffee', '60–150', 'Per cup at cafes'],
+              ['Self-catering', '150–250/day', 'PX Mart groceries'],
+            ],
           },
           {
-            title: 'Practical Info',
-            content: '<table><thead><tr><th>Item</th><th>Details</th></tr></thead><tbody><tr><td>Voltage</td><td>110V / 60Hz (same as US & Japan)</td></tr><tr><td>Outlets</td><td>Type A/B (US-style flat prongs)</td></tr><tr><td>Currency</td><td>TWD, 1 USD ≈ 30 TWD</td></tr><tr><td>Payment</td><td>Cash preferred; cards accepted at convenience stores and larger restaurants</td></tr><tr><td>Tap water</td><td>Not drinkable — buy bottled water</td></tr><tr><td>Timezone</td><td>UTC+8</td></tr></tbody></table>',
+            type: 'callout',
+            tone: 'info',
+            title: 'Local flavors',
+            body: 'Taitung specialties include Chishang rice, sugar apples, red oolong tea, roselle, and indigenous cuisine. Night markets and local eateries offer the best value.',
           },
           {
-            title: 'Recommended Apps',
-            content: '<table><thead><tr><th>App</th><th>Use</th></tr></thead><tbody><tr><td>Google Maps</td><td>Navigation, bus routes</td></tr><tr><td>TRA e-Booking</td><td>Train tickets</td></tr><tr><td>Uber / LINE TAXI</td><td>Ride-hailing</td></tr><tr><td>LINE</td><td>Taiwan\'s most popular messaging app</td></tr><tr><td>7-ELEVEN / FamilyMart App</td><td>Loyalty points, mobile payments</td></tr></tbody></table>',
+            type: 'table',
+            columns: ['Item', 'Budget (TWD)', 'Comfort (TWD)', 'Budget (USD)', 'Comfort (USD)'],
+            rows: [
+              ['Accommodation', '12,000', '30,000', '400', '1,000'],
+              ['Food', '6,000', '12,000', '200', '400'],
+              ['Transport (scooter)', '5,400', '9,000', '180', '300'],
+              ['Internet (SIM)', '900', '900', '30', '30'],
+              ['Activities', '3,000', '10,000', '100', '330'],
+              ['Misc.', '2,000', '5,000', '65', '165'],
+              ['Total', '~29,300', '~66,900', '~975', '~2,225'],
+            ],
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'Coworking spaces',
+                body: 'Tai Dang Creative Base (Taitung City, 250 TWD/day, has projector), Roots Coworking (Chishang, 560 TWD/3-day pass, yoga mats, rooftop), Heliu Living Lab (Dulan, 3-story space for coworking and socializing), Yeshi Coffee (Taitung City, minimum one drink order). During TDF, "Digital Nomad Friendly" certified shops will be promoted — speed-tested venues ideal for remote work.',
+              },
+              {
+                title: 'Weather & clothing',
+                body: 'May in Taitung averages 25–32°C (77–90°F) with occasional afternoon thundershowers and strong UV. Pack: light breathable clothing, sunscreen, hat, sunglasses, light rain gear, swimwear, mosquito repellent.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-transportation',
+        group: 'event',
+        label: 'Transportation',
+        title: 'Getting to Taitung and getting around',
+        intro: 'Venues are spread across Taitung. Plan your journey in, then pick a daily transport mode.',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: 'How do I get between event venues?',
+                answer: 'You need to make your own way to each venue. You can take the train (TRA), intercity bus, rent a car, rent a scooter, or use YouBike. We also recommend using the WhatsApp group for Car Share (carpooling).',
+              },
+              {
+                question: 'How is transportation arranged for the Hualien tour?',
+                answer: 'Meeting point: Hualien Train Station at 10:00 AM. Getting to Hualien (about 90 min by train) is not included. During the tour, a 30-seat bus is provided for all three days.',
+              },
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['Taipei → Taitung', 'Duration', 'Cost (TWD)', 'Notes'],
+            rows: [
+              ['Train (Puyuma/Taroko)', '3.5–4.5 hrs', '~935', 'Best option, book 28 days ahead'],
+              ['Train (Chu-Kuang)', '5–5.5 hrs', '~603', 'More available seats'],
+              ['Flight (Songshan→Taitung)', '50 min', '~3,500', '~6 flights daily'],
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['Kaohsiung → Taitung', 'Duration', 'Cost (TWD)'],
+            rows: [
+              ['Train (Tze-Chiang)', '2–2.5 hrs', '~486'],
+              ['Drive (South Link Highway)', '~3 hrs', 'Gas'],
+            ],
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'Scooter rental (recommended)',
+                body: 'Rental shops near the train station. 125cc: 200–500 TWD/day, monthly: ~180–300 TWD/day. International visitors need an International Driving Permit (IDP) plus home license. Traffic enforcement is strict — always wear a helmet.',
+              },
+              {
+                title: 'YouBike',
+                body: 'YouBike stations are available around Taitung City, great for short trips. Use an EasyCard or iPASS to rent. First 30 minutes: 5 TWD.',
+              },
+              {
+                title: 'Taxi',
+                body: 'Use LINE Taxi or 55688 app for convenient ride-hailing.',
+              },
+              {
+                title: 'Bus system',
+                body: 'Puyuma Bus Route 101: city loop, ~1 hour, 25 TWD per section. Taiwan Tourist Shuttle — East Coast: Taitung → Xiaoyeliu → Jialulan → Sanxiantai. Taiwan Tourist Shuttle — East Rift Valley: Taitung → Chulu Ranch → Luye Terrace.',
+              },
+              {
+                title: 'Carpooling',
+                body: 'During TDF, use the WhatsApp group\'s Car Share feature to coordinate rides with other participants.',
+              },
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['App', 'Use'],
+            rows: [
+              ['Google Maps', 'Navigation, bus routes'],
+              ['TRA e-Booking', 'Train tickets'],
+              ['Uber / LINE TAXI', 'Ride-hailing'],
+              ['LINE', 'Taiwan\'s most popular messaging app'],
+              ['7-ELEVEN / FamilyMart App', 'Loyalty points, mobile payments'],
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-hualien',
+        group: 'event',
+        label: 'Hualien Tour',
+        title: 'The Hualien 3-day, 2-night tour',
+        intro: 'A three-day Hualien trip available as an add-on to every ticket tier.',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: 'How much is the Hualien tour and what\'s included?',
+                answer: '$200 USD. Includes: 3-day bus transport in Hualien, 5/29 lunch + dinner + accommodation, 5/30 all meals + accommodation, 5/31 breakfast + lunch. Not included: transport to Hualien, personal souvenirs.',
+              },
+              {
+                question: 'What\'s the room type for the Hualien stay?',
+                answer: 'Private room with en-suite bathroom at Muzhan Hualien Hotel.',
+              },
+              {
+                question: 'Can non-Backers join the Hualien tour?',
+                answer: 'Yes, the Hualien tour is $200 USD for all ticket tiers.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-speakers',
+        group: 'event',
+        label: 'Speakers & Partners',
+        title: 'Becoming a speaker or co-organizer',
+        intro: 'If you want to share a talk at TDF or host a Side Event, here are the application flow and partnership model.',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: 'How do I apply to be a speaker?',
+                answer: 'Fill out the "Call for Speaker" form on the website. The team will assign you to an appropriate week based on your topic. You can note preferred dates.',
+              },
+              {
+                question: 'What do speakers receive?',
+                answer: 'Approved speakers receive a complimentary ticket code for the corresponding tier. No speaker fees are paid.',
+              },
+              {
+                question: 'What information do speakers need to provide?',
+                answer: '1. Available dates and times\n2. Talk title\n3. High-resolution headshot (for promotion)\n4. Organization and title\n5. English bio (under 50 words)\n6. English talk summary (under 200 words)',
+              },
+              {
+                question: 'How do I apply to host a Side Event?',
+                answer: 'Fill out the "Call for Side Event" form on the website and email fest@dna.org.tw.',
+              },
+              {
+                question: 'What\'s the Side Event partnership model?',
+                answer: 'The organizer participates as a co-organizer. You can use partner venues (free) or find your own (up to NT$3,000 subsidy after approval). Event pages must use the Luma system. For paid events, the organizer handles payment collection with a 10% service fee.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'event-visa-contact',
+        group: 'event',
+        label: 'Visa & Contact',
+        title: 'Visa, medical, contact, and volunteering',
+        intro: 'What to sort out before you arrive, and how to reach the team on the ground.',
+        blocks: [
+          {
+            type: 'faq',
+            items: [
+              {
+                question: 'I need a visa to enter Taiwan. Can the organizer help?',
+                answer: 'The organizer cannot process visa applications. Please check the Republic of China (Taiwan) Ministry of Foreign Affairs website for your country\'s visa requirements.',
+              },
+              {
+                question: 'Can you provide a participation certificate or invitation letter?',
+                answer: 'Yes. After purchasing a ticket, email fest@dna.org.tw with proof of purchase. The organizer will issue a participation certificate that can support visa applications.',
+              },
+              {
+                question: 'How do I become a TDF volunteer?',
+                answer: 'Fill out the volunteer application form. The organizer holds an online volunteer orientation with group interviews by role.',
+              },
+            ],
+          },
+          {
+            type: 'callout',
+            tone: 'info',
+            title: 'Visa information',
+            body: 'Taiwan launched its Digital Nomad Visa in 2025, allowing remote workers to stay up to 6 months. Most countries (US, Japan, EU, UK, Australia, NZ, Korea, etc.) enjoy 90-day visa-free entry.',
+          },
+          {
+            type: 'callout',
+            tone: 'info',
+            title: 'Medical & insurance',
+            body: 'Taitung has Mackay Memorial Hospital, Christian Hospital, and St. Mary\'s Hospital. International visitors should purchase travel and medical insurance before departure. Without National Health Insurance, clinic visits cost about 500–1,500 TWD.',
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'Contact',
+                body: 'Email: fest@dna.org.tw. Instagram: @taiwandigitalfest. WhatsApp Community: managed by Community Manager Maria.',
+              },
+              {
+                title: 'Internet & connectivity',
+                body: 'Get a prepaid SIM at the airport arrivals hall. Chunghwa Telecom is recommended for Taitung — best coverage in mountain and coastal areas. 30-day unlimited data: ~899–1,000 TWD. eSIM available via KKday or Klook. Most cafes and coworking spaces offer free Wi-Fi.',
+              },
+            ],
+          },
+          {
+            type: 'table',
+            columns: ['Item', 'Details'],
+            rows: [
+              ['Voltage', '110V / 60Hz (same as US & Japan)'],
+              ['Outlets', 'Type A/B (US-style flat prongs)'],
+              ['Currency', 'TWD, 1 USD ≈ 30 TWD'],
+              ['Payment', 'Cash preferred; cards accepted at convenience stores and larger restaurants'],
+              ['Tap water', 'Not drinkable — buy bottled water'],
+              ['Timezone', 'UTC+8'],
+            ],
           },
         ],
       },
     ],
+    limitations: {
+      title: '',
+      items: [],
+    },
     homeFaq: [
-      { question: 'What ticket tiers are available?', summary: 'Four tiers: PURPLE (free) → YELLOW (VIP), each with different event access', guideTab: 'tickets' },
-      { question: 'How do I register for events?', summary: 'Purchase a pass, then reserve on Luma. Staff will verify and approve.', guideTab: 'registration' },
-      { question: 'Purchased/redeemed a ticket but got no email — how do I check?', summary: 'Log in with your email via the top-right of the site. Still missing? Contact IG or registration@taiwandigitalfest.com', guideTab: 'tickets' },
-      { question: 'How much does a month in Taitung cost?', summary: 'Around 25,000–40,000 TWD/month including accommodation and meals', guideTab: 'accommodation' },
-      { question: 'Is there a TDF partner accommodation?', summary: 'Norden Ruder Hotel I at $25 USD/night — email accommodation@taiwandigitalfest.com', guideTab: 'accommodation' },
-      { question: 'How do I get between venues?', summary: 'Self-arranged. Use WhatsApp group for carpooling.', guideTab: 'transportation' },
-      { question: 'How do I apply to speak?', summary: 'Fill out the Call for Speaker form. Approved speakers get a free ticket.', guideTab: 'speakers' },
-      { question: 'Where are the event venues?', summary: 'Tai Dang, Roots Coworking, Heliu Living Lab, Yeshi Coffee, and more', guideTab: 'living' },
+      {
+        question: 'What ticket tiers are available?',
+        summary: 'Four main tiers plus Weekly Backer — each with different event access.',
+        guideSection: 'event-tickets',
+      },
+      {
+        question: 'How do I register for events?',
+        summary: 'Buy a ticket first, then reserve each event on its Luma page.',
+        guideSection: 'event-registration',
+      },
+      {
+        question: 'How much does a month in Taitung cost?',
+        summary: 'Roughly 25,000–40,000 TWD, depending on lifestyle and stay type.',
+        guideSection: 'event-accommodation',
+      },
+      {
+        question: 'How do I get between venues?',
+        summary: 'Self-arranged — use trains, rentals, and community carpools.',
+        guideSection: 'event-transportation',
+      },
+      {
+        question: 'How do I apply to speak?',
+        summary: 'Fill out the Call for Speaker form — approved speakers get a free ticket.',
+        guideSection: 'event-speakers',
+      },
+      {
+        question: 'Where are the event venues?',
+        summary: 'Main venues, coworking spaces, and the Hualien tour are all in the full guide.',
+        guideSection: 'event-guide',
+      },
     ],
   },
 };
