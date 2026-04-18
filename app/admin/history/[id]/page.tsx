@@ -8,6 +8,7 @@ interface NotificationDetail {
   id: string;
   subject: string;
   body: string;
+  body_format?: 'plain' | 'html';
   recipient_groups: string[];
   recipient_tiers: string[] | null;
   recipient_count: number;
@@ -268,10 +269,21 @@ export default function NotificationDetailPage() {
         <details className="mt-4">
           <summary className="text-sm text-slate-500 cursor-pointer hover:text-slate-700">
             查看信件內容
+            {notification.body_format === 'html' && (
+              <span className="ml-2 text-xs text-slate-400">（HTML）</span>
+            )}
           </summary>
-          <pre className="mt-2 bg-slate-50 rounded-lg p-4 text-sm text-slate-700 whitespace-pre-wrap font-sans">
-            {notification.body}
-          </pre>
+          {notification.body_format === 'html' ? (
+            <iframe
+              className="mt-2 w-full h-[60vh] border border-slate-200 rounded"
+              srcDoc={notification.body}
+              title="email body preview"
+            />
+          ) : (
+            <pre className="mt-2 bg-slate-50 rounded-lg p-4 text-sm text-slate-700 whitespace-pre-wrap font-sans">
+              {notification.body}
+            </pre>
+          )}
         </details>
       </div>
 

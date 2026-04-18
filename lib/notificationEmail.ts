@@ -18,6 +18,8 @@ const mailgunClient = mailgunApiKey && mailgunDomain
   ? new Mailgun(formData).client({ username: 'api', key: mailgunApiKey })
   : null;
 
+export type BodyFormat = 'plain' | 'html';
+
 function buildHtml(body: string, subject: string, recipientEmail: string): string {
   const bodyHtml = body
     .replace(/&/g, '&amp;')
@@ -49,8 +51,57 @@ function buildHtml(body: string, subject: string, recipientEmail: string): strin
 </html>`;
 }
 
+/**
+ * For raw-HTML sends: append the compliance footer (unsubscribe + physical
+ * address — required by Gmail/Yahoo bulk-sender rules + CAN-SPAM) immediately
+ * before the closing </body> tag. Falls back to bare append if the body has
+ * no </body> (still produces a deliverable email).
+ */
+function injectComplianceFooter(rawHtml: string, recipientEmail: string): string {
+  const footer = buildComplianceFooterHtml({ email: recipientEmail });
+  const closingBody = /<\/body\s*>/i;
+  if (closingBody.test(rawHtml)) {
+    return rawHtml.replace(closingBody, `${footer}\n</body>`);
+  }
+  return `${rawHtml}\n${footer}`;
+}
+
+/**
+ * Best-effort HTML → plain-text conversion for the multipart `text/plain`
+ * fallback. Mailgun deliverability scoring rewards multipart messages, so we
+ * always include some plain text even for HTML sends. This is intentionally
+ * simple — admins shouldn't rely on this for content fidelity.
+ */
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<(br|hr)\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|tr|h[1-6]|section|article|header|footer)>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&hellip;/g, '…')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 function buildPlainText(body: string, recipientEmail: string): string {
   return `Taiwan Digital Fest 2026\n\n${body}\n\nBest regards,\nTaiwan Digital Fest 2026 Team\n\n${buildComplianceFooterText({ email: recipientEmail })}`;
+}
+
+function buildPlainTextFromHtml(rawHtml: string, recipientEmail: string): string {
+  const stripped = htmlToPlainText(rawHtml);
+  return `${stripped}\n\n${buildComplianceFooterText({ email: recipientEmail })}`;
 }
 
 // Mailgun Basic 10k plan: ~1 msg/sec is safe; back off on 429 with exponential retry.
@@ -155,15 +206,16 @@ export async function processQueueBatch(
     .update({ status: 'processing' })
     .in('id', ids);
 
-  // Get notification body for HTML building
+  // Get notification body + format for HTML building
   const { data: notif } = await supabaseServer
     .from('notification_logs')
-    .select('subject, body')
+    .select('subject, body, body_format')
     .eq('id', notificationId)
     .single();
 
   const subject = notif?.subject ?? pending[0].subject ?? '';
   const body = notif?.body ?? '';
+  const bodyFormat: BodyFormat = notif?.body_format === 'html' ? 'html' : 'plain';
 
   let sent = 0;
   let failed = 0;
@@ -176,8 +228,12 @@ export async function processQueueBatch(
     if (idx > 0) await sleep(SEND_INTERVAL_MS);
 
     // Per-recipient body so each email gets its own unsubscribe link.
-    const html = buildHtml(body, subject, email.to_email);
-    const text = buildPlainText(body, email.to_email);
+    const html = bodyFormat === 'html'
+      ? injectComplianceFooter(body, email.to_email)
+      : buildHtml(body, subject, email.to_email);
+    const text = bodyFormat === 'html'
+      ? buildPlainTextFromHtml(body, email.to_email)
+      : buildPlainText(body, email.to_email);
 
     try {
       const response = await mailgunClient.messages.create(mailgunDomain, {

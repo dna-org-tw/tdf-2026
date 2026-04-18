@@ -59,6 +59,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const bodyFormat: 'plain' | 'html' = body.bodyFormat === 'html' ? 'html' : 'plain';
+
   const rawGroups = Array.isArray(body.groups) ? (body.groups as string[]) : undefined;
   const groups = rawGroups
     ? rawGroups.filter((g): g is RecipientGroup => VALID_GROUPS.includes(g as RecipientGroup))
@@ -99,6 +101,7 @@ export async function POST(req: NextRequest) {
       .insert({
         subject,
         body: emailBody,
+        body_format: bodyFormat,
         recipient_groups: groups ?? [],
         recipient_tiers: legacyTicketTiers ?? ticketTiers ?? null,
         recipient_count: count,

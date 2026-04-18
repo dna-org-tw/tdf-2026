@@ -33,7 +33,9 @@ const PRESETS: Preset[] = [
   { id: 'wake', label: '冷名單喚醒 (未開始 B/C)', displayStatuses: ['not_started'], memberTiers: ['B', 'C'] },
 ];
 
-function buildPreviewHtml(body: string, subject: string): string {
+type BodyFormat = 'plain' | 'html';
+
+function buildPlainPreviewHtml(body: string, subject: string): string {
   const bodyHtml = body
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -58,6 +60,10 @@ function buildPreviewHtml(body: string, subject: string): string {
 </html>`;
 }
 
+function buildPreviewHtml(body: string, subject: string, format: BodyFormat): string {
+  return format === 'html' ? body : buildPlainPreviewHtml(body, subject);
+}
+
 export default function SendNotificationPage() {
   const router = useRouter();
   const [testOnly, setTestOnly] = useState(false);
@@ -66,6 +72,7 @@ export default function SendNotificationPage() {
   const [identities, setIdentities] = useState<MemberIdentity[]>([]);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [bodyFormat, setBodyFormat] = useState<BodyFormat>('plain');
   type Category = 'newsletter' | 'events' | 'award';
   const [category, setCategory] = useState<Category>('newsletter');
   const [recipientCount, setRecipientCount] = useState<number | null>(null);
@@ -159,7 +166,7 @@ export default function SendNotificationPage() {
     setSuccessMessage('');
     setSending(true);
     try {
-      const payload: Record<string, unknown> = { subject, body, category };
+      const payload: Record<string, unknown> = { subject, body, category, bodyFormat };
       if (testOnly) {
         payload.groups = ['test'];
       } else {
@@ -328,11 +335,44 @@ export default function SendNotificationPage() {
           placeholder="主旨"
           className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm"
         />
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500">內容格式</span>
+          {([
+            { value: 'plain' as const, label: '純文字' },
+            { value: 'html' as const, label: 'HTML（原始）' },
+          ]).map((opt) => (
+            <label
+              key={opt.value}
+              className={`px-3 py-1 text-xs rounded-lg border cursor-pointer ${
+                bodyFormat === opt.value
+                  ? 'border-[#10B8D9] bg-[#10B8D9]/10 text-[#10B8D9]'
+                  : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <input
+                type="radio"
+                name="bodyFormat"
+                value={opt.value}
+                checked={bodyFormat === opt.value}
+                onChange={() => setBodyFormat(opt.value)}
+                className="hidden"
+              />
+              {opt.label}
+            </label>
+          ))}
+          <span className="text-xs text-slate-400">
+            {bodyFormat === 'html'
+              ? '（系統會在 </body> 前自動追加退訂連結與寄件人地址）'
+              : '（純文字會自動套用品牌外框）'}
+          </span>
+        </div>
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="內文（支援換行）"
-          rows={12}
+          placeholder={bodyFormat === 'html'
+            ? '貼上完整 HTML（含 <html><body>…）'
+            : '內文（支援換行）'}
+          rows={bodyFormat === 'html' ? 18 : 12}
           className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm font-mono"
         />
         <div className="flex gap-2">
@@ -363,7 +403,7 @@ export default function SendNotificationPage() {
             <h3 className="text-lg font-semibold mb-3">預覽</h3>
             <iframe
               className="w-full h-[60vh] border border-slate-200 rounded"
-              srcDoc={buildPreviewHtml(body, subject)}
+              srcDoc={buildPreviewHtml(body, subject, bodyFormat)}
             />
           </div>
         </div>
