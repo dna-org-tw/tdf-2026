@@ -78,6 +78,17 @@ html {
   -ms-overflow-style: none; /* IE and Edge */
 }
 
+/* VIP card tier text animations */
+@keyframes foil {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
 /* Hide reCAPTCHA badge and footer elements (required by Google guidelines when hiding badge) */
 .grecaptcha-badge {
   visibility: hidden;
