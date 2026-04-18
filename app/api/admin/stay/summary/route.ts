@@ -14,6 +14,12 @@ export async function GET(req: NextRequest) {
     supabaseServer.from('stay_transfers').select('status'),
   ]);
 
+  if (weeks.error || bookings.error || waitlist.error || transfers.error) {
+    return NextResponse.json({
+      error: weeks.error?.message ?? bookings.error?.message ?? waitlist.error?.message ?? transfers.error?.message,
+    }, { status: 500 });
+  }
+
   return NextResponse.json({
     weeks: weeks.data ?? [],
     bookingWeeks: bookings.data ?? [],
