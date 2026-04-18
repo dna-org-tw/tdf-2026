@@ -81,7 +81,7 @@ export default function SendNotificationPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
   const [emailConfig, setEmailConfig] = useState<{ from: string; replyTo: string | null; domain: string | null } | null>(null);
 
   useEffect(() => {
@@ -197,7 +197,7 @@ export default function SendNotificationPage() {
   };
 
   return (
-    <div className={`flex gap-6 items-start ${showPreview ? 'max-w-[1400px]' : 'max-w-4xl'}`}>
+    <div className={`flex gap-8 items-start ${showPreview ? '' : 'max-w-4xl'}`}>
       <div className="flex-1 min-w-0">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">發送通知</h1>
 
@@ -400,9 +400,9 @@ export default function SendNotificationPage() {
       </div>
 
       {showPreview && (
-        <aside className="w-[680px] shrink-0 sticky top-4">
-          <div className="bg-white rounded-xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
+        <aside className="flex-1 min-w-0 sticky top-4 h-[calc(100vh-2rem)]">
+          <div className="bg-white rounded-xl p-4 shadow-sm h-full flex flex-col">
+            <div className="flex items-center justify-between mb-3 shrink-0">
               <h3 className="text-sm font-semibold text-slate-700">
                 預覽
                 <span className="ml-2 text-xs text-slate-400">
@@ -419,13 +419,10 @@ export default function SendNotificationPage() {
               </button>
             </div>
             <iframe
-              className="w-full h-[calc(100vh-160px)] border border-slate-200 rounded bg-white"
+              className="w-full flex-1 min-h-0 border border-slate-200 rounded bg-white"
               srcDoc={buildPreviewHtml(body, subject, bodyFormat)}
               title="email preview"
             />
-            <p className="mt-2 text-xs text-slate-400">
-              確認無誤後，點左側「發送」即可寄出。
-            </p>
           </div>
         </aside>
       )}
