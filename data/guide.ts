@@ -513,10 +513,348 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           },
         ],
       },
+      {
+        id: 'member-guide',
+        group: 'member',
+        label: '會員指南',
+        title: '這不只是查訂單，而是一套獨立會員系統',
+        intro: 'TDF 的會員能力包含登入、身份卡、公開或私密名片、收藏、活動與訂單、自助轉讓、信件偏好，以及已上線但仍有缺口的自助升級流程。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '你會在這一區看到什麼',
+                body: '這一區會先講什麼是 member，再說明登入與身份卡、名片與公開頁、收藏、活動與訂單、轉讓、信件偏好、升級，以及目前限制。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-basics',
+        group: 'member',
+        label: '會員是什麼',
+        title: '登入帳號和會員身份是兩層不同資料',
+        intro: '系統中的 `users` 是登入帳號，`members` 才是實際會員身份。只有進到 `members` 的 email 才會拿到 `member_no`，並啟用完整會員能力。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '什麼情況會成為 member',
+                body: '`members` 不只來自付費訂單，也會從 newsletter 訂閱與系統寄信紀錄建立，所以 follower 也可能是 member。',
+              },
+              {
+                title: '沒有 member row 會發生什麼事',
+                body: '你仍然可以登入 `/me`，但若 email 尚未對應到 `members` row，`member_no`、公開卡、收藏等能力會受限或空白。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-auth-passport',
+        group: 'member',
+        label: '登入與身份卡',
+        title: '用 email 驗證碼登入，再由系統判斷你的身份卡等級',
+        intro: '會員登入走 email + 6 碼驗證碼，可重寄，session cookie 保留 7 天；登入後 `/me` 會集中顯示會員身份卡、活動、訂單、收藏提醒與設定。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '會員首頁是整合式 dashboard',
+                body: '登入後會集中讀取 member 編號、身份等級、名片資料、活動、訂單、轉讓紀錄、收藏提醒、住宿摘要與信件偏好。',
+              },
+              {
+                title: '身份卡等級如何決定',
+                body: '系統會依已付款訂單決定 `follower / explore / contribute / weekly_backer / backer` 身份與有效期間；沒有付費單就回到 follower。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-profile-card',
+        group: 'member',
+        label: '名片與公開頁',
+        title: '你的會員卡可以公開，也可以保持私密後用 QR 分享',
+        intro: '目前可編輯顯示名稱、頭像、所在地、自介、標籤與社群連結，並在公開與私密之間切換。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '可編輯欄位',
+                body: '顯示名稱、頭像、所在地、自介、標籤與社群連結都寫入 `member_profiles`；頭像支援 JPEG / PNG / WebP，大小上限 2MB。',
+              },
+              {
+                title: '公開名片與目錄',
+                body: '公開後會擁有 `/members/{memberNo}` 個人頁，也會出現在 `/members` 公開目錄中，支援搜尋與分頁。',
+              },
+              {
+                title: '私密分享',
+                body: '即使名片保持私密，仍可透過有效期 5 分鐘的 QR token 在現場分享。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-collections',
+        group: 'member',
+        label: '收藏',
+        title: '你可以收藏其他會員，也能知道誰收藏了你',
+        intro: '公開卡可以直接收藏；私密卡需帶有效 QR token。系統會阻擋收藏自己。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '怎麼收藏',
+                body: '登入會員後，可在公開會員頁直接收藏；若對方是私密卡，需透過 QR token 驗證後才能收藏。',
+              },
+              {
+                title: '在哪裡查看收藏',
+                body: '`/me/collections` 會顯示你收藏的人、誰收藏了你、未讀數，以及移除自己已收藏對象的操作。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-activity-orders',
+        group: 'member',
+        label: '活動與訂單',
+        title: '會員頁同時是你的 participation center',
+        intro: '這裡同時整合了活動報名狀態與訂單紀錄，而不是只有單純查票。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '我的活動',
+                body: 'Dashboard 會從 Luma 同步 upcoming / past events、核准或候補狀態、是否簽到，以及 no-show penalty 是否已被消化。',
+              },
+              {
+                title: '訂單中心',
+                body: '`/me` 會列出所有訂單，父訂單與升級子訂單分組展示；單筆詳情頁會顯示金額、折扣、稅、付款方式、聯絡資訊與轉讓紀錄。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-transfers',
+        group: 'member',
+        label: '轉讓',
+        title: '已付款的母訂單可以在截止日前自助轉讓',
+        intro: '若該訂單下已有已付款升級子單，系統會一起轉讓，並留下 audit trail 與通知信。',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: '從 dashboard 發起轉讓',
+                body: '只有符合條件的已付款母訂單會出現轉讓操作；若截止日已過，按鈕會變成不可用。',
+              },
+              {
+                title: '系統一起處理升級子單',
+                body: '若該母訂單底下已有已付款升級子單，轉讓時會一起搬移，避免票種與 ownership 分離。',
+              },
+              {
+                title: '追蹤轉讓結果',
+                body: 'Dashboard 會列出已轉出訂單，轉出與接收雙方都會收到通知信。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-preferences',
+        group: 'member',
+        label: '信件偏好',
+        title: '三類通知都能自助管理',
+        intro: '會員可以調整 `newsletter / events / award` 三類通知，也可以一鍵全部退訂。',
+        blocks: [
+          {
+            type: 'checklist',
+            items: [
+              'newsletter：電子報與內容更新',
+              'events：活動相關通知',
+              'award：Nomad Award 相關信件',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-upgrade',
+        group: 'member',
+        label: '升級',
+        title: '會員可從 `/upgrade` 走自助升級流程',
+        intro: '升級頁會找出目前最高等的可升級母訂單、計算價差，並透過 Stripe hosted invoice 補差價。',
+        blocks: [
+          {
+            type: 'callout',
+            tone: 'info',
+            title: '描述請保守',
+            body: '一般升級流程已上線，但部分升級路徑仍有缺口，尤其是 `weekly_backer` 相關條件，詳見頁尾限制。',
+          },
+        ],
+      },
+      {
+        id: 'stay-overview',
+        group: 'stay',
+        label: '合作住宿',
+        title: 'Partner Stay 不是推薦住宿清單，而是一套獨立預訂流程',
+        intro: '`/stay` 是已上線的合作住宿系統，提供 Norden Ruder 的週次房況、房型細節、預訂與後續管理流程。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '公開可見的資訊',
+                body: '任何人都可以進 `/stay` 查看房型、每週價格、剩餘房數與住宿規則。',
+              },
+              {
+                title: '只有會員可預訂',
+                body: '真正送出 booking 仍需要會員登入與 member 身份，未登入會看到 sign-in gate。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'stay-booking',
+        group: 'stay',
+        label: '如何預訂',
+        title: '合作住宿目前支援一般擔保與 invite code 兩條路徑',
+        intro: '使用者可選擇週次、填主住客資料；目前為單人入住 only，沒有雙人同住預訂流程。',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: '查看週次與房況',
+                body: '公開 `/stay` 頁會顯示每週日期、價格、實際房型資訊與剩餘房數。',
+              },
+              {
+                title: '登入會員後選週次',
+                body: '會員在右側 booking panel 勾選欲入住週次，填寫主住客姓名與電話，系統固定用單人入住規則建立 booking。',
+              },
+              {
+                title: '完成擔保或輸入 invite code',
+                body: '一般 booking 需先完成 Stripe SetupIntent card guarantee；若持有有效 invite code，則可走 complimentary path。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'stay-after-booking',
+        group: 'stay',
+        label: '預訂後能做什麼',
+        title: 'Member 端已經接上摘要、候補與轉讓資料流，但前台管理介面仍偏第一版',
+        intro: '這一區應如實描述已存在的 booking / waitlist / transfer / reconcile 流程，但不要把 member UI 寫成比實際更完整。',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '在 `/me` 看到什麼',
+                body: '會員頁已有 Partner Stay summary card，能依目前 summary 狀態顯示 Book stay、Manage stay 或 Accept transfer 的入口。',
+              },
+              {
+                title: '系統已接好的流程',
+                body: '後端已有 modify week、transfer initiate、transfer accept、waitlist join/leave、waitlist offer、以及 reconcile cron 流程。',
+              },
+              {
+                title: '描述時的保守原則',
+                body: '前台管理與接受轉讓頁面目前仍較精簡，因此指南應寫成「已有流程基礎」而不是「完整自助住宿後台」。',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'stay-rules',
+        group: 'stay',
+        label: '規則與注意事項',
+        title: '合作住宿有自己的扣款、候補與轉讓規則',
+        intro: '這些規則應在指南中明確告知，避免使用者以為住宿系統只是一般住宿推薦。',
+        blocks: [
+          {
+            type: 'checklist',
+            items: [
+              'No-show 可能會收取整週房費，admin 端已有 no-show charge flow。',
+              '候補 offer 與轉讓接受都有時效，過期後 reconcile 會回收狀態並釋出名額。',
+              '剩餘房數與候補釋出會隨 waitlist / transfer / reconcile 流程更新。',
+              '部分補救與後續操作目前由 `/admin/stay` tooling 支援。',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'visa-support',
+        group: 'visa',
+        label: '簽證輔助文件',
+        title: '會員現在可以在 `/me` 自助儲存資料並下載 PDF support letter',
+        intro: '這不是公開 FAQ，而是會員後台的新工具：填好簽證資料後即可產出正式 PDF 輔助文件。',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: '先儲存簽證資料',
+                body: '填寫護照英文姓名、國籍、生日、護照號碼、核發國家、到期日、預計入離境日、在台地址與申請館處後，先儲存資料。',
+              },
+              {
+                title: '再下載 PDF',
+                body: '系統會驗證 member 身份、讀取已儲存資料、挑選最佳 paid order snapshot，然後產生正式 PDF 下載。',
+              },
+            ],
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: '這份文件的性質',
+                body: '它是簽證 support letter，不等同官方簽證核發保證。',
+              },
+              {
+                title: '其他限制',
+                body: '下載有 rate limit，且文件內容會依會員當下儲存的資料與最佳 paid order 狀態生成。',
+              },
+            ],
+          },
+        ],
+      },
     ],
     limitations: {
-      title: '',
-      items: [],
+      title: '目前限制與注意事項',
+      items: [
+        {
+          title: '會員資料編輯仍有缺口',
+          body: '`languages` 與 `timezone` 已存在於資料表與 API，也會顯示在公開會員頁，但 `/me` 前台目前沒有編輯介面。',
+        },
+        {
+          title: 'Weekly Backer 自助升級未完整',
+          body: '`/upgrade` 前台目前沒有收集 `target_week`，但後端升級到 `weekly_backer` 時需要這個欄位，因此這條升級路徑要保守描述。',
+        },
+        {
+          title: 'Nomad Award 不是會員專屬功能',
+          body: 'Nomad Award 走的是 email + newsletter + reCAPTCHA，不依賴 `/me` session，不應寫成會員能力。',
+        },
+        {
+          title: 'Partner Stay 的前台管理仍偏第一版',
+          body: '住宿系統的 booking、waitlist、transfer、admin tooling 都已存在，但 member 前台管理與接受轉讓頁仍較精簡。',
+        },
+        {
+          title: '簽證文件屬於 support letter',
+          body: '文件可作為輔助申請資料，但不構成官方簽證結果保證。',
+        },
+      ],
     },
     homeFaq: [
       {
@@ -1002,10 +1340,348 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
           },
         ],
       },
+      {
+        id: 'member-guide',
+        group: 'member',
+        label: 'Member Guide',
+        title: 'More than a place to check your order — a full member system',
+        intro: 'TDF members get login, identity cards, public or private profile cards, collections, events and orders, self-service transfers, email preferences, and a self-service upgrade flow that is live but still has gaps.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'What you will find in this area',
+                body: 'This area first explains what a member is, then walks through login and identity cards, profile cards and public pages, collections, events and orders, transfers, email preferences, upgrades, and current limitations.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-basics',
+        group: 'member',
+        label: 'What Counts as a Member',
+        title: 'A login account and a member identity are not the same record',
+        intro: '`users` is the sign-in account layer, while `members` is the actual member identity. Only emails that have a `members` row receive a `member_no` and unlock the full card, public page, and collection features.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'How someone becomes a member',
+                body: '`members` is populated not only from paid orders, but also from newsletter subscriptions and system email logs, so a follower can still count as a member.',
+              },
+              {
+                title: 'What happens without a member row',
+                body: 'A user can still sign in to `/me`, but if the email has no matching `members` row yet, `member_no`, public-card, and collection capabilities remain limited or blank.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-auth-passport',
+        group: 'member',
+        label: 'Login & Identity Card',
+        title: 'Sign in with an email code, then the system determines your identity card tier',
+        intro: 'Member login uses email + a 6-digit code with resend support, and the session cookie lasts 7 days. Once signed in, `/me` presents the identity card, events, orders, collection alerts, and settings in one place.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'The member home is an integrated dashboard',
+                body: 'After signing in, the dashboard loads the member number, identity tier, profile card data, events, orders, transfer history, collection alerts, stay summary, and email preferences together.',
+              },
+              {
+                title: 'How the identity tier is decided',
+                body: 'Tier (`follower / explore / contribute / weekly_backer / backer`) and its valid period are derived from paid orders. Without any paid order, the tier falls back to follower.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-profile-card',
+        group: 'member',
+        label: 'Profile Card & Public Page',
+        title: 'Your member card can be public or kept private and shared via QR',
+        intro: 'You can currently edit display name, avatar, location, bio, tags, and social links, and toggle between public and private visibility.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'Editable fields',
+                body: 'Display name, avatar, location, bio, tags, and social links are stored in `member_profiles`. Avatars accept JPEG / PNG / WebP, up to 2MB.',
+              },
+              {
+                title: 'Public card and directory',
+                body: 'Once public, you get a `/members/{memberNo}` personal page and appear in the `/members` public directory with search and pagination.',
+              },
+              {
+                title: 'Private sharing',
+                body: 'Even if the card stays private, it can still be shared on-site through a QR token that is valid for 5 minutes.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-collections',
+        group: 'member',
+        label: 'Collections',
+        title: 'You can collect other members, and see who has collected you',
+        intro: 'Public cards can be collected directly; private cards require a valid QR token. The system blocks self-collection.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'How to collect',
+                body: 'After signing in, you can collect directly from a public member page. For private cards, a QR token must be validated first.',
+              },
+              {
+                title: 'Where to review collections',
+                body: '`/me/collections` shows who you have collected, who has collected you, unread counts, and lets you remove people you have collected.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-activity-orders',
+        group: 'member',
+        label: 'Events & Orders',
+        title: 'The member page is also your participation center',
+        intro: 'This area combines event registration status with order history, rather than being a simple ticket lookup.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'My events',
+                body: 'The dashboard syncs upcoming / past events, approval or waitlist status, check-in state, and whether a no-show penalty has been resolved — all from Luma.',
+              },
+              {
+                title: 'Order center',
+                body: '`/me` lists every order, grouping parent orders with their upgrade child orders. The detail page shows amount, discount, tax, payment method, contact info, and transfer history.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-transfers',
+        group: 'member',
+        label: 'Transfers',
+        title: 'Paid parent orders can be transferred before the cutoff date',
+        intro: 'If the parent order has paid upgrade child orders, the system transfers them together, leaving an audit trail and sending notification emails.',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: 'Initiate transfer from the dashboard',
+                body: 'Only eligible paid parent orders show the transfer action. After the cutoff date, the button becomes unavailable.',
+              },
+              {
+                title: 'Upgrade child orders move together',
+                body: 'If the parent order has paid upgrade child orders, they are transferred together so that ticket tier and ownership stay aligned.',
+              },
+              {
+                title: 'Track the transfer outcome',
+                body: 'The dashboard lists transferred-out orders, and both the sender and recipient receive notification emails.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-preferences',
+        group: 'member',
+        label: 'Email Preferences',
+        title: 'All three notification categories are self-managed',
+        intro: 'Members can adjust `newsletter / events / award` notifications individually, or unsubscribe from all of them at once.',
+        blocks: [
+          {
+            type: 'checklist',
+            items: [
+              'newsletter: newsletter and content updates',
+              'events: event-related notifications',
+              'award: Nomad Award emails',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'member-upgrade',
+        group: 'member',
+        label: 'Upgrade',
+        title: 'Members can self-upgrade through `/upgrade`',
+        intro: 'The upgrade page finds your highest eligible parent order, calculates the price delta, and charges the difference via a Stripe hosted invoice.',
+        blocks: [
+          {
+            type: 'callout',
+            tone: 'info',
+            title: 'Describe this conservatively',
+            body: 'The general upgrade flow is live, but some upgrade paths still have gaps — especially around `weekly_backer` requirements. See the limitations at the end.',
+          },
+        ],
+      },
+      {
+        id: 'stay-overview',
+        group: 'stay',
+        label: 'Partner Stay',
+        title: 'Partner Stay is not a list of recommendations — it is a standalone booking flow',
+        intro: '`/stay` is the live partner-stay system that surfaces weekly Norden Ruder inventory, real room details, booking, and post-booking management.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'Publicly visible information',
+                body: 'Anyone can visit `/stay` to see room types, weekly prices, remaining rooms, and stay rules.',
+              },
+              {
+                title: 'Only members can book',
+                body: 'Actually submitting a booking still requires a signed-in member; unauthenticated visitors see a sign-in gate.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'stay-booking',
+        group: 'stay',
+        label: 'How Booking Works',
+        title: 'Partner stay currently supports a guaranteed path and an invite-code path',
+        intro: 'Members can choose weeks and fill in primary guest details. The current booking flow is single-occupancy only.',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: 'Review weekly inventory and room details',
+                body: 'The public `/stay` page shows weekly dates, prices, real room details, and remaining-room visibility.',
+              },
+              {
+                title: 'Choose weeks after signing in',
+                body: 'Signed-in members use the booking panel to pick weeks and submit primary guest details; the system always builds the booking under single-occupancy rules.',
+              },
+              {
+                title: 'Either verify a card or use an invite code',
+                body: 'Regular bookings require a Stripe SetupIntent card guarantee, while a valid invite code enables the complimentary path.',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'stay-after-booking',
+        group: 'stay',
+        label: 'After Booking',
+        title: 'The member side already wires up summaries, waitlists, and transfers, but the management UI is still first-generation',
+        intro: 'This area should faithfully describe the existing booking / waitlist / transfer / reconcile flows without overselling the member UI.',
+        blocks: [
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'What `/me` shows',
+                body: 'The member page already has a Partner Stay summary card that surfaces Book stay, Manage stay, or Accept transfer entry points based on the current summary state.',
+              },
+              {
+                title: 'Flows that are wired up',
+                body: 'The backend already supports modify week, transfer initiate, transfer accept, waitlist join/leave, waitlist offer, and the reconcile cron.',
+              },
+              {
+                title: 'Stay conservative in wording',
+                body: 'The member-side management and accept-transfer pages are still minimal, so the guide should say "flow foundations exist" rather than "a complete self-service stay dashboard".',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'stay-rules',
+        group: 'stay',
+        label: 'Rules & Notes',
+        title: 'Partner stay has its own charge, waitlist, and transfer rules',
+        intro: 'These rules should be communicated clearly in the guide so users do not mistake the stay system for a generic accommodation recommendation.',
+        blocks: [
+          {
+            type: 'checklist',
+            items: [
+              'No-shows may be charged for the full week; the admin side already has a no-show charge flow.',
+              'Waitlist offers and transfer acceptance have expirations — after they expire, reconcile releases the slot.',
+              'Remaining room counts and waitlist releases update as waitlist / transfer / reconcile flows run.',
+              'Some remediation and follow-up actions are currently handled by `/admin/stay` tooling.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'visa-support',
+        group: 'visa',
+        label: 'Visa Support Documents',
+        title: 'Members can now save visa details and download a PDF support letter from `/me`',
+        intro: 'This is a member tool rather than a public visa FAQ. Save your details first, then download a formal PDF document.',
+        blocks: [
+          {
+            type: 'steps',
+            items: [
+              {
+                title: 'Save your visa profile',
+                body: 'Enter your passport English name, nationality, birth date, passport number, issuing country, expiry date, planned arrival and departure dates, Taiwan stay address, and destination mission, then save the form.',
+              },
+              {
+                title: 'Download the PDF support letter',
+                body: 'The server validates the member, reads the saved profile, picks the best paid-order snapshot, and then generates a PDF download.',
+              },
+            ],
+          },
+          {
+            type: 'feature-list',
+            items: [
+              {
+                title: 'What this document is',
+                body: 'It is a visa support letter, not a guarantee that an official visa will be issued.',
+              },
+              {
+                title: 'Other limitations',
+                body: 'Downloads are rate-limited, and the document content reflects the member\'s currently saved profile and the best available paid-order state.',
+              },
+            ],
+          },
+        ],
+      },
     ],
     limitations: {
-      title: '',
-      items: [],
+      title: 'Current Limitations & Notes',
+      items: [
+        {
+          title: 'Member profile editing still has gaps',
+          body: '`languages` and `timezone` already exist in the database and API, and they render on the public member page, but `/me` does not yet offer an editing UI for them.',
+        },
+        {
+          title: 'Weekly Backer self-upgrade is incomplete',
+          body: '`/upgrade` does not currently collect `target_week` in the UI, but the backend requires that field when upgrading to `weekly_backer`, so this upgrade path should be described conservatively.',
+        },
+        {
+          title: 'Nomad Award is not a member-only feature',
+          body: 'Nomad Award runs on email + newsletter + reCAPTCHA and does not depend on the `/me` session, so it should not be described as a member capability.',
+        },
+        {
+          title: 'Partner Stay member UI is still first-generation',
+          body: 'The booking, waitlist, transfer, and admin tooling all exist, but the member-side management and accept-transfer pages are still minimal.',
+        },
+        {
+          title: 'Visa document is a support letter',
+          body: 'The document can support a visa application but does not guarantee the official visa outcome.',
+        },
+      ],
     },
     homeFaq: [
       {
