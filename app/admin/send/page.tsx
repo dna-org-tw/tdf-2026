@@ -197,7 +197,8 @@ export default function SendNotificationPage() {
   };
 
   return (
-    <div className="max-w-4xl">
+    <div className={`flex gap-6 items-start ${showPreview ? 'max-w-[1400px]' : 'max-w-4xl'}`}>
+      <div className="flex-1 min-w-0">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">發送通知</h1>
 
       <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
@@ -379,10 +380,10 @@ export default function SendNotificationPage() {
           <button
             type="button"
             disabled={!canSubmit}
-            onClick={() => setShowPreview(true)}
+            onClick={() => setShowPreview((v) => !v)}
             className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50"
           >
-            預覽
+            {showPreview ? '關閉預覽' : '預覽'}
           </button>
           <button
             type="button"
@@ -396,17 +397,37 @@ export default function SendNotificationPage() {
         {error && <div className="text-sm text-red-600">{error}</div>}
         {successMessage && <div className="text-sm text-green-700">{successMessage}</div>}
       </div>
+      </div>
 
       {showPreview && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowPreview(false)}>
-          <div className="bg-white rounded-xl p-4 max-w-xl w-full max-h-[80vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-3">預覽</h3>
+        <aside className="w-[680px] shrink-0 sticky top-4">
+          <div className="bg-white rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-slate-700">
+                預覽
+                <span className="ml-2 text-xs text-slate-400">
+                  {bodyFormat === 'html' ? 'HTML（不含系統 footer）' : '純文字 + 品牌外框'}
+                </span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowPreview(false)}
+                className="text-slate-400 hover:text-slate-600 text-sm"
+                aria-label="關閉預覽"
+              >
+                ✕
+              </button>
+            </div>
             <iframe
-              className="w-full h-[60vh] border border-slate-200 rounded"
+              className="w-full h-[calc(100vh-160px)] border border-slate-200 rounded bg-white"
               srcDoc={buildPreviewHtml(body, subject, bodyFormat)}
+              title="email preview"
             />
+            <p className="mt-2 text-xs text-slate-400">
+              確認無誤後，點左側「發送」即可寄出。
+            </p>
           </div>
-        </div>
+        </aside>
       )}
 
       {showConfirm && (
