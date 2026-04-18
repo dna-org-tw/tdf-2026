@@ -15,6 +15,7 @@ import VisaSupportSection from '@/components/member/VisaSupportSection';
 import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
 import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
+import StaySummaryCard from '@/components/member/StaySummaryCard';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
 
 const EMPTY_PROFILE: MemberProfile = {
@@ -235,6 +236,8 @@ function MemberDashboard() {
   const [transferTarget, setTransferTarget] = useState<{ parent: Order; hasChildren: boolean } | null>(null);
   const [transferToast, setTransferToast] = useState('');
   const [collectionsUnread, setCollectionsUnread] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [staySummary, setStaySummary] = useState<{ bookings: any[]; waitlist: any[]; transfers: any[] } | null>(null);
 
   const reloadOrders = () => {
     if (!user?.email) return;
@@ -300,6 +303,14 @@ function MemberDashboard() {
       .then((r) => r.ok ? r.json() : null)
       .then((d) => d && setCollectionsUnread(d.unreadCount ?? 0))
       .catch(() => {});
+  }, [user?.email]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    fetch('/api/stay/bookings')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setStaySummary(d))
+      .catch(() => setStaySummary(null));
   }, [user?.email]);
 
   const resolveValidity = (order: Order) => {
@@ -470,6 +481,8 @@ function MemberDashboard() {
 
       {/* Upcoming events + festival countdown */}
       <UpcomingEvents registrations={lumaRegs} lang={lang} noShowConsumedCount={noShowConsumedCount} />
+
+      {staySummary && <StaySummaryCard summary={staySummary} />}
 
       {/* Orders (collapsible) */}
       <CollapsibleSection
