@@ -4,6 +4,8 @@ import {
   getStayWeeksByCodes,
   getWeekOccupancy,
   getPendingWaitlistHoldCount,
+  getStayBookingForEmail,
+  getStayWeekByCode,
 } from '@/lib/stayQueries';
 import { stayStripe } from '@/lib/stayStripe';
 import type { StayBookingType } from '@/lib/stayTypes';
@@ -113,4 +115,42 @@ export async function createStayBooking(input: CreateStayBookingInput) {
   });
 
   return booking;
+}
+
+export async function modifyStayWeek(input: {
+  bookingId: string;
+  bookingWeekId: string;
+  targetWeekCode: string;
+  ownerEmail: string;
+}) {
+  if (!supabaseServer) throw new Error('db_not_configured');
+
+  const booking = await getStayBookingForEmail(input.bookingId, input.ownerEmail);
+  if (!booking) throw new Error('booking_not_found');
+
+  const targetWeek = await getStayWeekByCode(input.targetWeekCode);
+  if (!targetWeek || !isStayBookable(targetWeek.starts_on)) throw new Error('target_week_closed');
+
+  const occupancy = await getWeekOccupancy(targetWeek.id);
+  if (occupancy >= targetWeek.room_capacity) throw new Error('target_week_full');
+
+  const { error: outErr } = await supabaseServer
+    .from('stay_booking_weeks')
+    .update({ status: 'modified_out', updated_at: new Date().toISOString() })
+    .eq('id', input.bookingWeekId)
+    .eq('booking_id', input.bookingId);
+  if (outErr) throw outErr;
+
+  const { error: inErr } = await supabaseServer
+    .from('stay_booking_weeks')
+    .insert({
+      booking_id: input.bookingId,
+      member_id: booking.member_id,
+      week_id: targetWeek.id,
+      status: 'modified_in',
+      booked_price_twd: targetWeek.price_twd,
+    });
+  if (inErr) throw inErr;
+
+  return getStayBookingForEmail(input.bookingId, input.ownerEmail);
 }

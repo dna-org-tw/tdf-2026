@@ -9,16 +9,31 @@ import StayHero from './StayHero';
 import StayInventoryGrid from './StayInventoryGrid';
 import StayPolicyNotice from './StayPolicyNotice';
 import StayBookingPanel from './StayBookingPanel';
+import StayManagementPanel from './StayManagementPanel';
 
 export default function StayPageContent() {
   const { t, lang } = useTranslation();
   const { user } = useAuth();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [weeks, setWeeks] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [summary, setSummary] = useState<{ bookings: any[]; waitlist: any[]; transfers: any[] } | null>(null);
 
   useEffect(() => {
     fetch('/api/stay/weeks').then((r) => r.json()).then((d) => setWeeks(d.weeks ?? []));
   }, []);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    fetch('/api/stay/bookings')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setSummary(d))
+      .catch(() => setSummary(null));
+  }, [user?.email]);
+
+  const activeBooking = summary?.bookings.find((b) =>
+    ['confirmed', 'partially_transferred'].includes(b.status),
+  );
 
   return (
     <div className="min-h-screen bg-stone-50 text-slate-900">
@@ -31,7 +46,11 @@ export default function StayPageContent() {
             <StayInventoryGrid weeks={weeks} stay={t.stay} />
           </section>
           <aside className="lg:sticky lg:top-24 h-fit">
-            <StayBookingPanel weeks={weeks} memberEmail={user?.email ?? null} />
+            {activeBooking ? (
+              <StayManagementPanel booking={activeBooking} />
+            ) : (
+              <StayBookingPanel weeks={weeks} memberEmail={user?.email ?? null} />
+            )}
           </aside>
         </div>
       </main>

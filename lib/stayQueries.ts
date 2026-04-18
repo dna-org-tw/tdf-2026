@@ -80,3 +80,13 @@ export async function getPendingTransferForRecipient(transferId: string, recipie
   if (error) throw error;
   return data;
 }
+
+export async function getMemberStaySummary(memberId: number, email: string) {
+  const sb = requireSupabase();
+  const [{ data: bookings }, { data: waitlist }, { data: transfers }] = await Promise.all([
+    sb.from('stay_bookings').select('*, stay_booking_weeks(*, stay_weeks(*))').eq('member_id', memberId).order('created_at', { ascending: false }),
+    sb.from('stay_waitlist_entries').select('*, stay_weeks(*)').eq('member_id', memberId).in('status', ['active', 'offered']),
+    sb.from('stay_transfers').select('*').ilike('to_email', email).eq('status', 'pending_acceptance'),
+  ]);
+  return { bookings: bookings ?? [], waitlist: waitlist ?? [], transfers: transfers ?? [] };
+}
