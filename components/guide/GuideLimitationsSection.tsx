@@ -6,7 +6,7 @@ export default function GuideLimitationsSection({
   limitations: GuideContent['limitations'];
 }) {
   return (
-    <section id="limitations" className="scroll-mt-32 rounded-[28px] border border-stone-200 bg-[#1E1F1C] p-6 text-white sm:p-8">
+    <section id="limitations" className="scroll-mt-44 rounded-[28px] border border-stone-200 bg-[#1E1F1C] p-6 text-white sm:p-8">
       <div className="max-w-3xl">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">Notes</p>
         <h2 className="mt-2 text-2xl font-bold sm:text-3xl">{limitations.title}</h2>

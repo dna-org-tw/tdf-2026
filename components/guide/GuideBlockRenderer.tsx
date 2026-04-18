@@ -38,7 +38,7 @@ export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
           <thead className="bg-stone-50 text-stone-600">
             <tr>
               {block.columns.map((column) => (
-                <th key={column} className="border-b border-stone-200 px-4 py-3 text-left font-semibold">
+                <th key={column} scope="col" className="border-b border-stone-200 px-4 py-3 text-left font-semibold">
                   {column}
                 </th>
               ))}

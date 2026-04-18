@@ -3,7 +3,7 @@ import GuideBlockRenderer from './GuideBlockRenderer';
 
 export default function GuideSectionRenderer({ section }: { section: GuideSection }) {
   return (
-    <section id={section.id} className="scroll-mt-32 space-y-5 rounded-[28px] border border-stone-200 bg-stone-50 p-6 sm:p-8">
+    <section id={section.id} className="scroll-mt-44 space-y-5 rounded-[28px] border border-stone-200 bg-stone-50 p-6 sm:p-8">
       <div className="max-w-3xl">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-400">
           {section.label}
