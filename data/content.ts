@@ -1060,6 +1060,23 @@ export const content = {
         }
       ]
     },
+    stay: {
+      title: 'Partner Stay',
+      subtitle: 'Book Norden Ruder at the partner rate for TDF 2026.',
+      badges: {
+        memberOnly: 'Members only',
+        weeklyOnly: 'Weekly booking only',
+        singleProperty: 'Single partner stay',
+      },
+      policyTitle: 'Important booking rule',
+      policyBody: 'Any cancellation or no-show will be charged for the full booked week.',
+      cutoffNote: 'Booking closes at 23:59 (Taiwan time), 3 calendar days before check-in.',
+      complimentaryNote: 'Invitation code bookings are complimentary and do not require card binding.',
+      usdApproxNote: 'USD is approximate only. Final settlement follows bank FX rates.',
+      ctaBook: 'Book stay',
+      ctaWaitlist: 'Join waitlist',
+      ctaManage: 'Manage stay',
+    },
   },
   zh: {
     hero: {
@@ -2117,6 +2134,23 @@ export const content = {
           answer: "2026 台灣數位嘉年華設計為整合式節慶體驗。雖然部分 Side Event 可能對公眾開放，但大多數活動需要購買票券。我們建議購買符合您興趣和期望參與程度的票種。"
         }
       ]
+    },
+    stay: {
+      title: '合作住宿',
+      subtitle: '以 TDF 2026 合作價入住 Norden Ruder。',
+      badges: {
+        memberOnly: '僅限會員',
+        weeklyOnly: '僅支援整週訂房',
+        singleProperty: '單一合作住宿',
+      },
+      policyTitle: '重要訂房規則',
+      policyBody: '任何取消或未到都收整週房費。',
+      cutoffNote: '入住前三個日曆日晚間 23:59（台灣時間）截止訂房。',
+      complimentaryNote: '招待碼訂房為免費住宿，不需綁卡。',
+      usdApproxNote: '美金為概估；實際結算以銀行匯率為準。',
+      ctaBook: '訂房',
+      ctaWaitlist: '加入候補',
+      ctaManage: '管理訂房',
     },
   }
 };
