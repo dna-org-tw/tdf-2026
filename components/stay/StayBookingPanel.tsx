@@ -8,8 +8,6 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
   const [weekCodes, setWeekCodes] = useState<string[]>([]);
   const [primaryGuestName, setPrimaryGuestName] = useState('');
   const [primaryGuestPhone, setPrimaryGuestPhone] = useState('');
-  const [guestCount, setGuestCount] = useState<1 | 2>(1);
-  const [secondGuestName, setSecondGuestName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [setupIntentId, setSetupIntentId] = useState<string | null>(null);
@@ -60,8 +58,8 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
         body: JSON.stringify({
           primaryGuestName,
           primaryGuestPhone,
-          guestCount,
-          secondGuestName: guestCount === 2 ? secondGuestName : null,
+          guestCount: 1,
+          secondGuestName: null,
           weekCodes,
           inviteCode: inviteCode.trim() || null,
           setupIntentId,
@@ -124,41 +122,9 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
           />
         </div>
 
-        <div>
-          <p className="text-sm font-medium text-slate-700">Guests</p>
-          <div className="mt-1 flex gap-4 text-sm text-slate-700">
-            <label className="flex items-center gap-1">
-              <input
-                type="radio"
-                name="guestCount"
-                checked={guestCount === 1}
-                onChange={() => setGuestCount(1)}
-              />
-              1
-            </label>
-            <label className="flex items-center gap-1">
-              <input
-                type="radio"
-                name="guestCount"
-                checked={guestCount === 2}
-                onChange={() => setGuestCount(2)}
-              />
-              2
-            </label>
-          </div>
-        </div>
-
-        {guestCount === 2 && (
-          <div>
-            <label className="block text-sm font-medium text-slate-700">Second guest name</label>
-            <input
-              type="text"
-              value={secondGuestName}
-              onChange={(e) => setSecondGuestName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
-            />
-          </div>
-        )}
+        <p className="rounded-lg bg-stone-50 px-3 py-2 text-xs text-slate-500">
+          Single occupancy only — one guest per room.
+        </p>
 
         <div>
           <label className="block text-sm font-medium text-slate-700">Invite code (optional)</label>

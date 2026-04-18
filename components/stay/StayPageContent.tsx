@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
 import StayHero from './StayHero';
+import StayRoomDetails from './StayRoomDetails';
 import StayInventoryGrid from './StayInventoryGrid';
 import StayPolicyNotice from './StayPolicyNotice';
 import StayBookingPanel from './StayBookingPanel';
@@ -42,15 +43,16 @@ export default function StayPageContent() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(340px,0.9fr)]">
           <section className="space-y-6">
             <StayHero stay={t.stay} lang={lang} />
-            <StayPolicyNotice stay={t.stay} />
+            <StayRoomDetails stay={t.stay} />
             <StayInventoryGrid weeks={weeks} stay={t.stay} />
           </section>
-          <aside className="lg:sticky lg:top-24 h-fit">
+          <aside className="space-y-6 lg:sticky lg:top-24 h-fit">
             {activeBooking ? (
               <StayManagementPanel booking={activeBooking} />
             ) : (
               <StayBookingPanel weeks={weeks} memberEmail={user?.email ?? null} />
             )}
+            <StayPolicyNotice stay={t.stay} />
           </aside>
         </div>
       </main>
