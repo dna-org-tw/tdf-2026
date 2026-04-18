@@ -10,7 +10,15 @@ export type EmailType =
   | 'magic_link'
   | 'unsubscribe_confirmation'
   | 'notification'
-  | 'admin_one_off';
+  | 'admin_one_off'
+  | 'stay_booking_confirmed'
+  | 'stay_booking_complimentary_confirmed'
+  | 'stay_transfer_requested'
+  | 'stay_transfer_accepted'
+  | 'stay_waitlist_offer'
+  | 'stay_waitlist_expired'
+  | 'stay_modification_confirmed'
+  | 'stay_no_show_charged';
 
 interface EmailLogEntry {
   to_email: string;

@@ -1,5 +1,7 @@
 import { supabaseServer } from '@/lib/supabaseServer';
-import { getStayBookingForEmail } from '@/lib/stayQueries';
+import { getStayBookingForEmail, getPendingTransferForRecipient } from '@/lib/stayQueries';
+import { stayStripe } from '@/lib/stayStripe';
+import { resolveMember } from '@/lib/adminMembers';
 
 export async function createStayTransfer(input: {
   bookingId: string;
@@ -37,4 +39,69 @@ export async function createStayTransfer(input: {
     .eq('id', bookingWeek.id);
 
   return data;
+}
+
+export async function acceptStayTransfer(input: {
+  transferId: string;
+  recipientEmail: string;
+  setupIntentId: string | null;
+}) {
+  if (!supabaseServer) throw new Error('db_not_configured');
+
+  const transfer = await getPendingTransferForRecipient(input.transferId, input.recipientEmail);
+  if (!transfer) throw new Error('transfer_not_found');
+  if (transfer.booking_type === 'guaranteed' && !input.setupIntentId) throw new Error('setup_intent_required');
+
+  const recipient = await resolveMember(encodeURIComponent(input.recipientEmail));
+  if (!recipient) throw new Error('recipient_member_not_found');
+
+  const { data: bookingWeek } = await supabaseServer
+    .from('stay_booking_weeks')
+    .select('booking_id')
+    .eq('id', transfer.booking_week_id)
+    .maybeSingle();
+  if (!bookingWeek) throw new Error('booking_week_not_found');
+
+  await supabaseServer
+    .from('stay_booking_weeks')
+    .update({ member_id: recipient.id, status: 'transferred', hold_expires_at: null })
+    .eq('id', transfer.booking_week_id);
+
+  if (transfer.booking_type === 'guaranteed') {
+    if (!stayStripe) throw new Error('stripe_not_configured');
+    const setupIntent = await stayStripe.setupIntents.retrieve(input.setupIntentId!, { expand: ['payment_method'] });
+    if (
+      setupIntent.status !== 'succeeded' ||
+      typeof setupIntent.payment_method === 'string' ||
+      !setupIntent.payment_method ||
+      !setupIntent.customer
+    ) {
+      throw new Error('setup_intent_not_ready');
+    }
+
+    await supabaseServer
+      .from('stay_guarantees')
+      .update({
+        stripe_customer_id: String(setupIntent.customer),
+        stripe_setup_intent_id: setupIntent.id,
+        stripe_payment_method_id: setupIntent.payment_method.id,
+        card_brand: setupIntent.payment_method.card?.brand ?? null,
+        card_last4: setupIntent.payment_method.card?.last4 ?? null,
+        replaced_at: new Date().toISOString(),
+      })
+      .eq('booking_id', bookingWeek.booking_id);
+  }
+
+  const { data: updated, error: tErr } = await supabaseServer
+    .from('stay_transfers')
+    .update({
+      to_member_id: recipient.id,
+      status: 'accepted',
+      accepted_at: new Date().toISOString(),
+    })
+    .eq('id', transfer.id)
+    .select('*')
+    .single();
+  if (tErr) throw tErr;
+  return updated;
 }
