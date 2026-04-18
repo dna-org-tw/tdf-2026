@@ -7,10 +7,10 @@ test('member can save visa details and download a visa support letter', async ({
   await page.getByRole('button', { name: /visa support documents|簽證輔助文件/i }).click();
 
   await page.getByLabel(/legal name|護照英文姓名/i).fill('KAI HSU');
-  await page.getByLabel(/nationality|國籍/i).fill('Taiwan');
+  await page.getByLabel(/nationality|國籍/i).selectOption('Taiwan');
   await page.getByLabel(/date of birth|出生日期/i).fill('1990-01-01');
   await page.getByLabel(/passport number|護照號碼/i).fill('A12345678');
-  await page.getByLabel(/passport issuing country|護照核發國家/i).fill('Taiwan');
+  await page.getByLabel(/passport issuing country|護照核發國家/i).selectOption('Taiwan');
   await page.getByLabel(/passport expiry date|護照到期日/i).fill('2027-12-31');
   await page.getByLabel(/planned arrival date|預計入境日/i).fill('2026-05-01');
   await page.getByLabel(/planned departure date|預計離境日/i).fill('2026-05-31');
