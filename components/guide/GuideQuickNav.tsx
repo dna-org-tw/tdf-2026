@@ -2,10 +2,7 @@ import type { GuideNavGroup } from '@/data/guide';
 
 export default function GuideQuickNav({ navGroups }: { navGroups: GuideNavGroup[] }) {
   return (
-    <div
-      style={{ top: '5rem' }}
-      className="sticky z-30 -mx-4 border-y border-stone-200 bg-stone-50/95 backdrop-blur sm:-mx-6"
-    >
+    <div className="-mx-4 border-y border-stone-200 bg-stone-50/95 sm:-mx-6">
       <div className="overflow-x-auto px-4 py-3 sm:px-6">
         <div className="flex min-w-max gap-6">
           {navGroups.map((group) => (

@@ -6,8 +6,20 @@ export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
       <div className="space-y-3">
         {block.items.map((item) => (
           <details key={item.question} className="group rounded-2xl border border-stone-200 bg-white">
-            <summary className="cursor-pointer list-none px-5 py-4 text-base font-semibold text-stone-900">
-              {item.question}
+            <summary className="flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4 text-base font-semibold text-stone-900">
+              <span>{item.question}</span>
+              <svg
+                className="mt-1 h-5 w-5 shrink-0 text-stone-400 transition-transform duration-200 group-open:rotate-180"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </summary>
             <p className="px-5 pb-5 whitespace-pre-line text-sm leading-7 text-stone-600">
               {item.answer}

@@ -54,8 +54,13 @@ export default function GuidePage() {
       <div className="container mx-auto px-4 sm:px-6 pt-28 pb-16">
         <div className="mx-auto max-w-6xl space-y-8">
           <GuideHero guide={guide} />
-          <GuideSearch sections={guide.sections} lang={lang} />
-          <GuideQuickNav navGroups={guide.navGroups} />
+          <div
+            style={{ top: '5rem' }}
+            className="sticky z-30 -mx-4 space-y-3 bg-white/95 px-4 pt-3 pb-0 backdrop-blur sm:-mx-6 sm:px-6"
+          >
+            <GuideSearch sections={guide.sections} lang={lang} />
+            <GuideQuickNav navGroups={guide.navGroups} />
+          </div>
           {guide.sections.map((section) => (
             <GuideSectionRenderer key={section.id} section={section} />
           ))}
