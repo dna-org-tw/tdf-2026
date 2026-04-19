@@ -239,7 +239,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '想要找 TDF 合作住宿？',
-                answer: '我們提供限量優惠合作住宿——路得行旅一館（https://taitung.nordenruder.com/），每晚 25 USD。如有需要，請來信至 accommodation@taiwandigitalfest.com。',
+                answer: '我們有找了在地合作商家，每晚約 25–30 USD，詳情請洽 `/stay`。',
               },
             ],
           },
@@ -1062,7 +1062,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'Is there a TDF partner accommodation?',
-                answer: 'We offer a limited number of partner stays at Norden Ruder Hotel I (https://taitung.nordenruder.com/) for $25 USD per night. If interested, please email accommodation@taiwandigitalfest.com.',
+                answer: 'We have local partner venues at around $25–30 USD per night. See `/stay` for details.',
               },
             ],
           },
