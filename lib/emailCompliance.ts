@@ -28,9 +28,17 @@ const PHYSICAL_ADDRESS =
 const SENDER_ORG =
   process.env.EMAIL_SENDER_ORG?.trim() || 'Taiwan Digital Fest 2026';
 
+const CUSTOMER_SUPPORT_EMAIL =
+  process.env.CUSTOMER_SUPPORT_EMAIL?.trim() || 'info@dna.org.tw';
+
 export interface ComplianceFooterOptions {
   email?: string;
   includeUnsubscribe?: boolean;
+  /**
+   * When true, render a "履約必要通知，無法取消訂閱" notice and force
+   * includeUnsubscribe=false. Used for `critical`-category broadcasts.
+   */
+  criticalNotice?: boolean;
 }
 
 /** User-facing unsubscribe URL (renders a confirmation page). */
@@ -51,7 +59,8 @@ export function getOneClickUnsubscribeUrl(email: string): string {
 }
 
 export function buildComplianceFooterHtml(opts: ComplianceFooterOptions): string {
-  const { email, includeUnsubscribe = true } = opts;
+  const { email, criticalNotice = false } = opts;
+  const includeUnsubscribe = criticalNotice ? false : (opts.includeUnsubscribe ?? true);
 
   let unsubscribeLine = '';
   if (includeUnsubscribe && email) {
@@ -62,8 +71,16 @@ export function buildComplianceFooterHtml(opts: ComplianceFooterOptions): string
     </p>`;
   }
 
+  const criticalBlock = criticalNotice
+    ? `
+    <p style="margin: 8px 0; color: #b45309; line-height: 1.5;">
+      此為 TDF 2026 履約必要通知（重大變更／權益異動／安全），無法取消訂閱。<br>
+      有任何疑問請聯絡 <a href="mailto:${CUSTOMER_SUPPORT_EMAIL}" style="color: #b45309; text-decoration: underline;">${CUSTOMER_SUPPORT_EMAIL}</a>。
+    </p>`
+    : '';
+
   return `
-  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 24px; padding: 16px; border-top: 1px solid #eee;">
+  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 24px; padding: 16px; border-top: 1px solid #eee;">${criticalBlock}
     <p style="margin: 8px 0;">This is an automated email. Please do not reply directly to this message.</p>${unsubscribeLine}
     <p style="margin: 8px 0; line-height: 1.5;">
       <strong>${SENDER_ORG}</strong><br>
@@ -73,8 +90,18 @@ export function buildComplianceFooterHtml(opts: ComplianceFooterOptions): string
 }
 
 export function buildComplianceFooterText(opts: ComplianceFooterOptions): string {
-  const { email, includeUnsubscribe = true } = opts;
-  const lines = ['---', 'This is an automated email. Please do not reply directly to this message.'];
+  const { email, criticalNotice = false } = opts;
+  const includeUnsubscribe = criticalNotice ? false : (opts.includeUnsubscribe ?? true);
+
+  const lines: string[] = ['---'];
+
+  if (criticalNotice) {
+    lines.push('此為 TDF 2026 履約必要通知（重大變更／權益異動／安全），無法取消訂閱。');
+    lines.push(`有任何疑問請聯絡 ${CUSTOMER_SUPPORT_EMAIL}。`);
+    lines.push('');
+  }
+
+  lines.push('This is an automated email. Please do not reply directly to this message.');
 
   if (includeUnsubscribe && email) {
     lines.push(`Unsubscribe: ${getUnsubscribeUrl(email)}`);
