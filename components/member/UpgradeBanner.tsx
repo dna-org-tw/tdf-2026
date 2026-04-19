@@ -25,17 +25,16 @@ function getTicketFeatures(t: ReturnType<typeof useTranslation>['t'], tier: stri
 
 export default function UpgradeBanner({ currentTier, lang }: Props) {
   const { t } = useTranslation();
-  const [salesClosed, setSalesClosed] = useState(false);
+  const [salesClosed, setSalesClosed] = useState<boolean | null>(null);
   useEffect(() => {
     let alive = true;
     fetch('/api/tickets/status')
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (alive && d?.closed) setSalesClosed(true);
-      })
-      .catch(() => {});
+      .then((d) => { if (alive) setSalesClosed(d?.closed === true); })
+      .catch(() => { if (alive) setSalesClosed(false); });
     return () => { alive = false; };
   }, []);
+  if (salesClosed === null) return null;
   if (salesClosed) return null;
   const currentRank = TIER_RANK[currentTier];
   const nextTier = TIER_ORDER.find((t) => TIER_RANK[t] === currentRank + 1) ?? null;

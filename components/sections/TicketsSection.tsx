@@ -75,7 +75,7 @@ const ticketTiers: TicketTier[] = [
 ];
 
 export default function TicketsSection() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
   const { executeRecaptcha: executeCheckoutRecaptcha } = useRecaptcha('checkout');
   const [saleStatus, setSaleStatus] = useState<{ closed: boolean; cutoff: string } | null>(null);
@@ -329,7 +329,7 @@ export default function TicketsSection() {
               'Ticket sales are closed. Please contact registration@taiwandigitalfest.com.'}
             {saleStatus?.cutoff && (
               <div className="mt-1 text-xs text-red-200/70 font-mono">
-                cutoff: {new Date(saleStatus.cutoff).toLocaleString('en-US', {
+                cutoff: {new Date(saleStatus.cutoff).toLocaleString(lang === 'zh' ? 'zh-TW' : 'en-US', {
                   timeZone: 'Asia/Taipei',
                   dateStyle: 'medium',
                   timeStyle: 'short',
