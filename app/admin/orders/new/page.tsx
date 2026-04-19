@@ -33,7 +33,7 @@ export default function NewOrderPage() {
     e.preventDefault();
     setSubmitting(true);
     setError('');
-    let amountCents: number | undefined;
+    let amountCents = 0;
     if (amountUsd.trim() !== '') {
       const parsed = Number(amountUsd);
       if (!Number.isFinite(parsed) || parsed < 0) {
@@ -78,8 +78,8 @@ export default function NewOrderPage() {
             className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm" />
         </label>
         <label className="block text-sm">
-          姓名<span className="text-red-500">*</span>
-          <input required value={name} onChange={(e) => setName(e.target.value)}
+          姓名 — 留空則使用 email 前綴
+          <input value={name} onChange={(e) => setName(e.target.value)}
             className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm" />
         </label>
         <label className="block text-sm">
@@ -99,9 +99,9 @@ export default function NewOrderPage() {
           </label>
         )}
         <label className="block text-sm">
-          金額 (USD) — 留空則使用票種預設價格
+          金額 (USD) — 留空則預設為 0
           <input type="number" min="0" step="0.01" value={amountUsd}
-            onChange={(e) => setAmountUsd(e.target.value)} placeholder="例如 99.00"
+            onChange={(e) => setAmountUsd(e.target.value)} placeholder="例如 99.00 (留空 = 0)"
             className="w-full mt-1 px-3 py-2 border border-slate-300 rounded text-sm" />
         </label>
         <label className="block text-sm">

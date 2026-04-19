@@ -74,16 +74,13 @@ export async function POST(req: NextRequest) {
   if (!body?.customer_email || typeof body.customer_email !== 'string') {
     return NextResponse.json({ error: 'customer_email required' }, { status: 400 });
   }
-  if (!body?.customer_name || typeof body.customer_name !== 'string') {
-    return NextResponse.json({ error: 'customer_name required' }, { status: 400 });
-  }
   if (!VALID_TIERS.includes(body.ticket_tier)) {
     return NextResponse.json({ error: 'invalid ticket_tier' }, { status: 400 });
   }
   if (body.ticket_tier === 'weekly_backer' && !VALID_WEEKS.includes(body.week)) {
     return NextResponse.json({ error: 'week required for weekly_backer' }, { status: 400 });
   }
-  let amountCents: number | undefined;
+  let amountCents = 0;
   if (body.amount_cents !== undefined && body.amount_cents !== null && body.amount_cents !== '') {
     const n = Number(body.amount_cents);
     if (!Number.isInteger(n) || n < 0) {
@@ -91,12 +88,14 @@ export async function POST(req: NextRequest) {
     }
     amountCents = n;
   }
+  const rawName = typeof body.customer_name === 'string' ? body.customer_name.trim() : '';
+  const customerName = rawName || body.customer_email.split('@')[0];
 
   try {
     const order = await createManualOrder(
       {
         customer_email: body.customer_email,
-        customer_name: body.customer_name,
+        customer_name: customerName,
         ticket_tier: body.ticket_tier,
         week: body.week,
         amount_cents: amountCents,
