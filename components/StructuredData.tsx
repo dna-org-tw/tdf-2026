@@ -23,7 +23,6 @@ export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
       ? 'Taiwan Digital Nomad Association (TDNA) organizes Taiwan Digital Fest, a curated festival for digital nomads combining professional development with natural experiences in Taiwan.'
       : '台灣數位遊牧協會（TDNA）主辦台灣數位嘉年華，為數位遊牧者策劃結合專業發展與自然體驗的節慶活動。',
     sameAs: [
-      'https://www.facebook.com/taiwandigitalfest',
       'https://www.instagram.com/taiwandigitalfest',
       'https://dna.org.tw',
       // AEO optimization: link entity to external knowledge bases to boost authority
