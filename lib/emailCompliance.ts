@@ -170,9 +170,15 @@ export async function isSuppressed(
 
 /**
  * Bulk suppression filter. Returns the input emails split into allowed / suppressed.
+ *
+ * Pass `allowUnsubscribed: true` to exclude only hard deliverability signals
+ * (bounced / complained / spam / manual). Addresses whose only reason is
+ * `unsubscribed` pass through — used for `critical`-category broadcasts
+ * (履約必要通知) that legally/contractually must reach the recipient.
  */
 export async function filterSuppressed(
   emails: string[],
+  opts: { allowUnsubscribed?: boolean } = {},
 ): Promise<{ allowed: string[]; suppressed: string[] }> {
   if (!supabaseServer || emails.length === 0) {
     return { allowed: emails, suppressed: [] };
@@ -181,10 +187,17 @@ export async function filterSuppressed(
     new Set(emails.map((e) => e.trim().toLowerCase()).filter(Boolean)),
   );
 
-  const { data, error } = await supabaseServer
+  let query = supabaseServer
     .from('email_suppressions')
-    .select('email')
+    .select('email, reason')
     .in('email', normalized);
+
+  if (opts.allowUnsubscribed) {
+    // Only hard deliverability signals block the send.
+    query = query.in('reason', ['bounced', 'complained', 'spam', 'manual']);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('[EmailCompliance] filterSuppressed lookup failed:', error);
