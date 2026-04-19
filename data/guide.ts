@@ -428,7 +428,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: '我想當講者，怎麼申請？',
-                answer: '請至官網填寫「Call for Speaker」表單。團隊會依據主題，將您安排到合適的週次。若有特別期望的時間，可在備註中說明。',
+                answer: '請填寫 Call for Speaker 表單：https://forms.gle/pVc6oTEi1XZ1pAR49。團隊會依據主題，將你安排到合適的週次。若有特別期望的時間，可在備註中說明。',
               },
               {
                 question: '講者有什麼回饋？',
@@ -440,7 +440,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '我想辦 Side Event，怎麼申請？',
-                answer: '請至官網填寫「Call for Side Event」表單，並寄信至 fest@dna.org.tw。',
+                answer: '請填寫 Call for Side Event 表單：https://forms.gle/EofTp9Qso27jEeeY7，並寄信至 fest@dna.org.tw 告訴我們。',
               },
               {
                 question: 'Side Event 的合作模式是什麼？',
@@ -470,7 +470,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '怎麼成為 TDF 志工？',
-                answer: '可填寫志工申請表單。主辦方會舉辦線上志工說明會，依不同志工角色分組面談。',
+                answer: '請填寫志工申請表單：https://forms.gle/SPCggMHifbE3oqkk7。主辦方會舉辦線上志工說明會，依不同志工角色分組面談。',
               },
             ],
           },
@@ -478,7 +478,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             type: 'callout',
             tone: 'info',
             title: '簽證資訊',
-            body: '台灣已於 2025 年正式推出數位遊牧簽證（Digital Nomad Visa），允許遠端工作者停留最長 6 個月。多數國家（含美、日、歐盟、英、澳、紐、韓等）享有 90 天免簽待遇。',
+            body: '台灣已於 2025 年正式推出數位遊牧簽證（Digital Nomad Visa），允許遠端工作者停留最長 6 個月。多數國家（含美、日、歐盟、英、澳、紐、韓等）享有 90 天免簽待遇。詳情請洽 Nomad Taiwan 官方網站：https://nomading.tw。',
           },
           {
             type: 'callout',
@@ -1251,7 +1251,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: 'How do I apply to be a speaker?',
-                answer: 'Fill out the "Call for Speaker" form on the website. The team will assign you to an appropriate week based on your topic. You can note preferred dates.',
+                answer: 'Fill out the Call for Speaker form: https://forms.gle/pVc6oTEi1XZ1pAR49. The team will assign you to an appropriate week based on your topic. You can note preferred dates in the notes.',
               },
               {
                 question: 'What do speakers receive?',
@@ -1263,7 +1263,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'How do I apply to host a Side Event?',
-                answer: 'Fill out the "Call for Side Event" form on the website and email fest@dna.org.tw.',
+                answer: 'Fill out the Call for Side Event form: https://forms.gle/EofTp9Qso27jEeeY7, and email fest@dna.org.tw to let us know.',
               },
               {
                 question: 'What\'s the Side Event partnership model?',
@@ -1293,7 +1293,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'How do I become a TDF volunteer?',
-                answer: 'Fill out the volunteer application form. The organizer holds an online volunteer orientation with group interviews by role.',
+                answer: 'Fill out the volunteer application form: https://forms.gle/SPCggMHifbE3oqkk7. The organizer holds an online volunteer orientation with group interviews by role.',
               },
             ],
           },
@@ -1301,7 +1301,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             type: 'callout',
             tone: 'info',
             title: 'Visa information',
-            body: 'Taiwan launched its Digital Nomad Visa in 2025, allowing remote workers to stay up to 6 months. Most countries (US, Japan, EU, UK, Australia, NZ, Korea, etc.) enjoy 90-day visa-free entry.',
+            body: 'Taiwan launched its Digital Nomad Visa in 2025, allowing remote workers to stay up to 6 months. Most countries (US, Japan, EU, UK, Australia, NZ, Korea, etc.) enjoy 90-day visa-free entry. For details, visit the Nomad Taiwan site: https://nomading.tw.',
           },
           {
             type: 'callout',
