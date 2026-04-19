@@ -158,7 +158,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: '票券分幾個等級？各自可以參加哪些活動？',
-                answer: 'TDF 2026 票券分為四個等級：PURPLE（免費，官網訂閱 + IG 追蹤可參加紫色活動）、BLUE（30 USD，藍＋紫色活動）、GREEN（300 USD，綠＋藍＋紫色活動）、YELLOW（600 USD，全部活動＋花蓮三天兩夜旅行）。另有 Weekly Backer 票種，適合只能參加單週活動的人。',
+                answer: 'TDF 2026 票券分為四個等級：Follower（免費，訂閱電子報 + IG 追蹤即可參加紫色活動）、Explorer（30 USD，藍＋紫色活動）、Contributor（300 USD，綠＋藍＋紫色活動）、Backer（600 USD，全部活動＋花蓮三天兩夜旅行）。另有 Weekly Backer 票種，適合只能參加單週活動的人。',
               },
               {
                 question: '我可以不買嘉年華門票，只買單場活動嗎？',
@@ -205,7 +205,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: '報名後什麼時候會收到確認？',
-                answer: '主辦方會分批審核並逐步核可。請留意 Luma 上的狀態與你信箱裡的通知信。',
+                answer: '系統會根據你在 Luma 上選擇的票種以及你在 TDF 的會員身份自動比對；身份不符會被拒絕。請務必先登入會員中心確認你的身份，再去 Luma 報名活動。',
               },
               {
                 question: '報名了但沒到會怎樣？',
@@ -406,7 +406,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '花蓮住宿是什麼房型？',
-                answer: '單人房（private room），附獨立衛浴。住宿地點為木棧花蓮館。',
+                answer: '每人一間獨立套房，附獨立衛浴。住宿地點為木棧花蓮館。',
               },
               {
                 question: '非 Backer 可以參加花蓮旅行嗎？',
@@ -981,7 +981,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: 'What ticket tiers are available?',
-                answer: 'TDF 2026 has four tiers: PURPLE (free — subscribe + follow on IG for purple events), BLUE ($30 — blue + purple events), GREEN ($300 — green + blue + purple events), YELLOW ($600 VIP — all events + Hualien 3-day tour). Weekly Backer tickets are also available for single-week attendance.',
+                answer: 'TDF 2026 has four tiers: Follower (free — subscribe + follow on IG for purple events), Explorer ($30 — blue + purple events), Contributor ($300 — green + blue + purple events), Backer ($600 — all events + Hualien 3-day tour). Weekly Backer tickets are also available for single-week attendance.',
               },
               {
                 question: 'Can I buy a single event without a festival pass?',
@@ -1028,7 +1028,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: 'When will I get my registration confirmation?',
-                answer: 'Organizers approve registrations in batches. Watch your Luma status and your inbox for the latest update.',
+                answer: 'The system automatically matches the ticket tier you selected on Luma against your TDF member status; mismatches are declined. Make sure you sign in to the member home and confirm your status before submitting a reservation on Luma.',
               },
               {
                 question: 'What happens if I don\'t show up?',
@@ -1229,7 +1229,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'What\'s the room type for the Hualien stay?',
-                answer: 'Private room with en-suite bathroom at Muzhan Hualien Hotel.',
+                answer: 'One private en-suite room per person at Muzhan Hualien Hotel.',
               },
               {
                 question: 'Can non-Backers join the Hualien tour?',

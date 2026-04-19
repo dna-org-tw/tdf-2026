@@ -1,4 +1,5 @@
 import type { GuideBlock } from '@/data/guide';
+import { autolink } from './autolink';
 
 export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
   if (block.type === 'faq') {
@@ -22,7 +23,7 @@ export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
               </svg>
             </summary>
             <p className="px-5 pb-5 whitespace-pre-line text-sm leading-7 text-stone-600">
-              {item.answer}
+              {autolink(item.answer)}
             </p>
           </details>
         ))}
@@ -36,7 +37,7 @@ export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
         {block.items.map((item) => (
           <article key={item.title} className="rounded-2xl border border-stone-200 bg-white p-5">
             <h3 className="text-lg font-semibold text-stone-900">{item.title}</h3>
-            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-stone-600">{item.body}</p>
+            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-stone-600">{autolink(item.body)}</p>
           </article>
         ))}
       </div>
@@ -61,7 +62,7 @@ export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
               <tr key={`${rowIndex}-${row.join('-')}`} className="border-t border-stone-100">
                 {row.map((cell, cellIndex) => (
                   <td key={`${rowIndex}-${cellIndex}`} className="px-4 py-3 align-top text-stone-600">
-                    {cell}
+                    {autolink(cell)}
                   </td>
                 ))}
               </tr>
@@ -82,7 +83,7 @@ export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
         }`}
       >
         {block.title ? <h3 className="text-base font-semibold">{block.title}</h3> : null}
-        <p className={block.title ? 'mt-2 text-sm leading-7' : 'text-sm leading-7'}>{block.body}</p>
+        <p className={block.title ? 'mt-2 text-sm leading-7' : 'text-sm leading-7'}>{autolink(block.body)}</p>
       </div>
     );
   }
@@ -92,7 +93,7 @@ export default function GuideBlockRenderer({ block }: { block: GuideBlock }) {
       {block.items.map((item) => (
         <li key={item} className="flex gap-3">
           <span className="mt-2 h-1.5 w-1.5 rounded-full bg-stone-400" />
-          <span>{item}</span>
+          <span>{autolink(item)}</span>
         </li>
       ))}
     </ul>

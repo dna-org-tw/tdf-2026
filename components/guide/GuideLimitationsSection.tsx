@@ -1,4 +1,5 @@
 import type { GuideContent } from '@/data/guide';
+import { autolink } from './autolink';
 
 export default function GuideLimitationsSection({
   limitations,
@@ -15,7 +16,7 @@ export default function GuideLimitationsSection({
         {limitations.items.map((item) => (
           <article key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <h3 className="text-lg font-semibold">{item.title}</h3>
-            <p className="mt-2 text-sm leading-7 text-white/70">{item.body}</p>
+            <p className="mt-2 text-sm leading-7 text-white/70">{autolink(item.body, 'dark')}</p>
           </article>
         ))}
       </div>
