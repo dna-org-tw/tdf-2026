@@ -78,6 +78,25 @@ export default function TicketsSection() {
   const { t } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
   const { executeRecaptcha: executeCheckoutRecaptcha } = useRecaptcha('checkout');
+  const [saleStatus, setSaleStatus] = useState<{ closed: boolean; cutoff: string } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/tickets/status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (alive && d) setSaleStatus({ closed: !!d.closed, cutoff: d.cutoff });
+      })
+      .catch(() => {
+        // fail-open: leave saleStatus null so UI stays open (server still blocks)
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const salesClosed = saleStatus?.closed === true;
+
   const [countdown, setCountdown] = useState<CountdownTime | null>(null);
   const [loadingTier, setLoadingTier] = useState<TicketKey | null>(null);
   const [weekModalOpen, setWeekModalOpen] = useState(false);
@@ -301,6 +320,24 @@ export default function TicketsSection() {
   return (
     <section id="tickets" className="bg-gradient-to-r from-[#1E1F1C] via-[#1E1F1C] to-[#1E1F1C] text-white py-20 md:py-28 lg:py-32 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {salesClosed && (
+          <div
+            className="mb-10 rounded-xl border border-red-500/40 bg-red-500/10 px-5 py-4 text-center text-sm sm:text-base text-red-100"
+            role="status"
+          >
+            {t.tickets.salesClosed?.banner ??
+              'Ticket sales are closed. Please contact registration@taiwandigitalfest.com.'}
+            {saleStatus?.cutoff && (
+              <div className="mt-1 text-xs text-red-200/70 font-mono">
+                cutoff: {new Date(saleStatus.cutoff).toLocaleString('en-US', {
+                  timeZone: 'Asia/Taipei',
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                })} (Asia/Taipei)
+              </div>
+            )}
+          </div>
+        )}
         {/* Sale Banner Info - Only show if on sale */}
         {isOnSale && countdown && countdown.total > 0 && (
           <motion.div
@@ -588,7 +625,7 @@ export default function TicketsSection() {
                 {/* Stripe Checkout Button */}
                 <button
                   onClick={() => handleCheckout(tier)}
-                  disabled={loadingTier === tier.key}
+                  disabled={salesClosed || loadingTier === tier.key}
                   className={`
                     w-full mt-auto px-4 py-3 rounded-lg font-semibold text-sm md:text-base
                     ${tier.color.badge} text-white
@@ -597,9 +634,11 @@ export default function TicketsSection() {
                     transition-all duration-200 shadow-md hover:shadow-lg
                   `}
                 >
-                  {loadingTier === tier.key
-                    ? t.tickets?.processing ?? 'Processing...'
-                    : t.tickets?.payWithCard ?? 'Pay with card'}
+                  {salesClosed
+                    ? t.tickets.salesClosed?.button ?? 'Sales closed'
+                    : loadingTier === tier.key
+                      ? t.tickets?.processing ?? 'Processing...'
+                      : t.tickets?.payWithCard ?? 'Pay with card'}
                 </button>
               </div>
             </motion.div>
@@ -664,12 +703,14 @@ export default function TicketsSection() {
                   setSelectedWeek(null);
                   setWeekModalOpen(true);
                 }}
-                disabled={loadingTier === 'weekly_backer'}
+                disabled={salesClosed || loadingTier === 'weekly_backer'}
                 className="w-full mt-auto px-4 py-3 rounded-lg font-semibold text-sm md:text-base bg-[#FFD028] text-[#1E1F1C] hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                {loadingTier === 'weekly_backer'
-                  ? (t.tickets?.processing ?? 'Processing...')
-                  : (t.tickets?.payWithCard ?? 'Start Your Journey')}
+                {salesClosed
+                  ? t.tickets.salesClosed?.button ?? 'Sales closed'
+                  : loadingTier === 'weekly_backer'
+                    ? (t.tickets?.processing ?? 'Processing...')
+                    : (t.tickets?.payWithCard ?? 'Start Your Journey')}
               </button>
             </div>
           </div>
