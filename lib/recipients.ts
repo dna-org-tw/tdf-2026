@@ -79,6 +79,8 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
     // For 履約必要通知, keep addresses whose only suppression reason is
     // `unsubscribed`. Drop bounced/complained/spam/manual — those are hard
     // deliverability failures.
+    // Safe because email_suppressions.email is the PRIMARY KEY — each email
+    // has exactly one suppression reason, so the OR cleanly partitions cases.
     query = query.or('suppressed.eq.false,suppression_reason.eq.unsubscribed');
   } else {
     // Non-critical: exclude everyone on the suppression list.
@@ -103,7 +105,7 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
 
   // Category filter: drop addresses whose newsletter_subscriptions row has the
   // matching pref turned off, or that have unsubscribed_at set. Critical
-  // broadcasts skip this filter entirely — they are履約必要通知 and always
+  // broadcasts skip this filter entirely — they are 履約必要通知 and always
   // deliver to non-hard-bounced candidates.
   const needsPrefFilter =
     q.category &&
