@@ -33,6 +33,24 @@ export default function UpgradePageContent() {
   const [loading, setLoading] = useState(true);
   const [processingTier, setProcessingTier] = useState<TicketTier | null>(null);
   const [error, setError] = useState('');
+  const [salesClosed, setSalesClosed] = useState(false);
+  const [saleCutoff, setSaleCutoff] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/tickets/status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (alive && d) {
+          setSalesClosed(!!d.closed);
+          setSaleCutoff(d.cutoff ?? null);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const upgrade = (t as Record<string, unknown>).upgrade as Record<string, unknown> | undefined;
 
@@ -145,6 +163,33 @@ export default function UpgradePageContent() {
         </main>
         <Footer />
       </div>
+    );
+  }
+
+  if (salesClosed) {
+    return (
+      <section className="min-h-screen bg-stone-50">
+        <Navbar />
+        <div className="max-w-3xl mx-auto px-4 py-20">
+          <div className="rounded-2xl border border-red-300 bg-red-50 p-8 text-center">
+            <h1 className="text-2xl font-display font-bold text-red-900 mb-3">
+              {lang === 'zh' ? '升級通道已關閉' : 'Upgrades closed'}
+            </h1>
+            <p className="text-sm text-red-800">
+              {t.tickets?.salesClosed?.banner ??
+                'Ticket sales are closed. Please contact registration@taiwandigitalfest.com.'}
+            </p>
+            {saleCutoff && (
+              <p className="mt-2 text-xs font-mono text-red-700/70">
+                cutoff: {new Date(saleCutoff).toLocaleString(lang === 'zh' ? 'zh-TW' : 'en-US', {
+                  timeZone: 'Asia/Taipei', dateStyle: 'medium', timeStyle: 'short',
+                })} (Asia/Taipei)
+              </p>
+            )}
+          </div>
+        </div>
+        <Footer />
+      </section>
     );
   }
 
