@@ -10,9 +10,9 @@ export default function GoogleTag() {
     <>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
-      <Script id="google-gtag" strategy="afterInteractive">
+      <Script id="google-gtag" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

@@ -17,30 +17,19 @@ export default function RecaptchaScript() {
       setShouldLoad(true);
     };
 
-    // Load on any user intent signal — keeps risk-analysis coverage for real
-    // visitors while excluding reCAPTCHA (~370 KiB + its subresources) from
-    // the initial load window measured by Lighthouse.
+    // Load on any real user-intent signal — keeps risk-analysis coverage
+    // for actual visitors while excluding reCAPTCHA (~370 KiB + subresources)
+    // from the Lighthouse measurement window and from visitors who never
+    // submit a form. useRecaptcha()'s executeRecaptcha() also triggers the
+    // load for programmatic callers.
     const events = ['pointerdown', 'touchstart', 'keydown', 'focusin'] as const;
     events.forEach((e) =>
       window.addEventListener(e, load, { once: true, passive: true }),
     );
 
-    // Safety net: load after idle so form submits from synthetic/automation
-    // contexts (no pointer input) still work. 4s is long enough to stay out
-    // of the Lighthouse measurement window.
-    const idleApi = (window as unknown as {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-      cancelIdleCallback?: (id: number) => void;
-    });
-    const idleHandle = idleApi.requestIdleCallback
-      ? idleApi.requestIdleCallback(load, { timeout: 4000 })
-      : (window.setTimeout(load, 4000) as unknown as number);
-
     return () => {
       cancelled = true;
       events.forEach((e) => window.removeEventListener(e, load));
-      if (idleApi.cancelIdleCallback) idleApi.cancelIdleCallback(idleHandle);
-      else window.clearTimeout(idleHandle);
     };
   }, []);
 
