@@ -4,10 +4,12 @@ import { useState, useEffect, useRef, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '@/hooks/useTranslation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, CheckCircle2, Zap, Users } from 'lucide-react';
 import { TIER_ACCENT, type IdentityTier } from '@/components/member/MemberPassport';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useNewsletterCount } from '@/hooks/useNewsletterCount';
+import { useNearViewport } from '@/hooks/useNearViewport';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
@@ -118,12 +120,17 @@ function MemberBadge({ member }: { member: PublicMember }) {
   return (
     <Link
       href={`/members/${member.member_no}`}
+      prefetch={false}
       className="flex flex-col items-center gap-2 group"
     >
       {member.avatar_url ? (
-        <img
+        <Image
           src={member.avatar_url}
           alt={member.display_name || ''}
+          width={64}
+          height={64}
+          sizes="64px"
+          loading="lazy"
           className="w-16 h-16 rounded-full object-cover border-2 border-white/10 group-hover:border-white/30 transition-colors"
         />
       ) : (
@@ -150,6 +157,9 @@ export default function CommunitySection() {
   const { t, lang } = useTranslation();
   const { executeRecaptcha } = useRecaptcha('subscribe');
   useSectionTracking({ sectionId: 'community', sectionName: 'Community Section', category: 'Engagement' });
+  // Members list + avatars are below the fold; don't fetch until the section
+  // is within 600px of the viewport so avatar decode doesn't compete with LCP.
+  const { ref: sectionAnchorRef, isNear: shouldLoadMembers } = useNearViewport<HTMLElement>('600px');
 
   const [members, setMembers] = useState<PublicMember[]>([]);
   const [total, setTotal] = useState(0);
@@ -177,6 +187,7 @@ export default function CommunitySection() {
   };
 
   useEffect(() => {
+    if (!shouldLoadMembers) return;
     fetch('/api/members?page=1')
       .then((r) => r.ok ? r.json() : { members: [], total: 0, anonymousCount: 0 })
       .then((d) => {
@@ -187,7 +198,7 @@ export default function CommunitySection() {
         setAnimals(pickRandomAnimals(Math.min(ANIMAL_SLOT_COUNT, anon)));
       })
       .catch(() => {});
-  }, []);
+  }, [shouldLoadMembers]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -250,6 +261,7 @@ export default function CommunitySection() {
     <>
       <section
         id="community"
+        ref={sectionAnchorRef}
         className="relative bg-gradient-to-b from-[#1E1F1C] to-[#0F0F0E] py-20 md:py-28 px-4 sm:px-6 overflow-hidden"
       >
         <div className="absolute inset-0 opacity-10 pointer-events-none">

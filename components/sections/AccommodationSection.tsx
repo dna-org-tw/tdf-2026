@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -8,6 +8,7 @@ import { MapPin, ExternalLink, ChevronLeft, ChevronRight, ArrowRight, Navigation
 import Image from 'next/image';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
+import { useNearViewport } from '@/hooks/useNearViewport';
 import { useLumaData } from '@/contexts/LumaDataContext';
 import type { NomadFriendlyStore } from '@/components/NomadMap';
 
@@ -25,37 +26,6 @@ const NomadMap = dynamic(
     ),
   }
 );
-
-// Lazy-render the map only when the container is near the viewport.
-// This prevents ~26 OSM tile requests + Leaflet bundle from blocking initial load.
-function useNearViewport<T extends Element>(rootMargin: string = '400px') {
-  const ref = useRef<T | null>(null);
-  const [isNear, setIsNear] = useState(false);
-
-  useEffect(() => {
-    if (isNear || !ref.current) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      setIsNear(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setIsNear(true);
-            observer.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin },
-    );
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [isNear, rootMargin]);
-
-  return { ref, isNear };
-}
 
 // Nomad-friendly accommodation data provided by organizers
 const NOMAD_STORES: NomadFriendlyStore[] = [

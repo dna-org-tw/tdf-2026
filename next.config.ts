@@ -47,6 +47,13 @@ const nextConfig: NextConfig = {
         hostname: 'newsbuffet.aottercdn.com',
         pathname: '/media/**',
       },
+      {
+        // Supabase Storage: public buckets serve avatars with no-cache, so
+        // route them through next/image to get AVIF/WebP + 1y immutable cache.
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
     // 對於外部圖片，使用 unoptimized 以減少處理時間
     unoptimized: false,

@@ -76,6 +76,8 @@ export async function POST(req: NextRequest) {
       .upload(path, buffer, {
         contentType: file.type,
         upsert: true,
+        // Avatars are immutable for their filename; allow 1y browser + CDN cache
+        cacheControl: '31536000',
       });
     if (uploadErr) throw uploadErr;
 
