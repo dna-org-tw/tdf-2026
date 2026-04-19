@@ -73,8 +73,10 @@ export default function SendNotificationPage() {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [bodyFormat, setBodyFormat] = useState<BodyFormat>('plain');
-  type Category = 'newsletter' | 'events' | 'award';
+  type Category = 'newsletter' | 'events' | 'award' | 'critical';
   const [category, setCategory] = useState<Category>('newsletter');
+  const [criticalAck, setCriticalAck] = useState(false);
+  const isCritical = category === 'critical';
   const [recipientCount, setRecipientCount] = useState<number | null>(null);
   const [loadingCount, setLoadingCount] = useState(false);
   const [sending, setSending] = useState(false);
@@ -90,6 +92,10 @@ export default function SendNotificationPage() {
       .then((data) => { if (data) setEmailConfig(data); })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!isCritical) setCriticalAck(false);
+  }, [isCritical]);
 
   const applyPreset = (p: Preset) => {
     setTestOnly(!!p.testOnly);
@@ -224,30 +230,56 @@ export default function SendNotificationPage() {
             { value: 'newsletter', label: '節慶電子報' },
             { value: 'events', label: '活動與議程更新' },
             { value: 'award', label: 'Nomad Award 與社群活動' },
-          ] as const).map((opt) => (
-            <label
-              key={opt.value}
-              className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer ${
-                category === opt.value
-                  ? 'border-[#10B8D9] bg-[#10B8D9]/10 text-[#10B8D9]'
-                  : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <input
-                type="radio"
-                name="category"
-                value={opt.value}
-                checked={category === opt.value}
-                onChange={() => setCategory(opt.value)}
-                className="hidden"
-              />
-              {opt.label}
-            </label>
-          ))}
+            { value: 'critical', label: '⚠️ 重大通知（無法退訂）' },
+          ] as const).map((opt) => {
+            const selected = category === opt.value;
+            const isCriticalOpt = opt.value === 'critical';
+            const baseClass = 'px-3 py-1.5 text-sm rounded-lg border cursor-pointer';
+            const selectedClass = isCriticalOpt
+              ? 'border-red-500 bg-red-50 text-red-700'
+              : 'border-[#10B8D9] bg-[#10B8D9]/10 text-[#10B8D9]';
+            const idleClass = isCriticalOpt
+              ? 'border-red-300 bg-white text-red-600 hover:bg-red-50'
+              : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50';
+            return (
+              <label
+                key={opt.value}
+                className={`${baseClass} ${selected ? selectedClass : idleClass}`}
+              >
+                <input
+                  type="radio"
+                  name="category"
+                  value={opt.value}
+                  checked={selected}
+                  onChange={() => setCategory(opt.value)}
+                  className="hidden"
+                />
+                {opt.label}
+              </label>
+            );
+          })}
         </div>
-        <p className="text-xs text-slate-500 mt-2">
-          收件人若關閉此分類偏好將自動排除。
-        </p>
+        {!isCritical && (
+          <p className="text-xs text-slate-500 mt-2">
+            收件人若關閉此分類偏好將自動排除。
+          </p>
+        )}
+        {isCritical && (
+          <div
+            role="alert"
+            data-testid="critical-warning"
+            className="mt-3 border border-red-400 bg-red-50 text-red-800 rounded-lg p-3 text-sm space-y-1"
+          >
+            <div className="font-semibold">重大通知模式</div>
+            <ul className="list-disc list-inside space-y-0.5">
+              <li>僅限重大變更、會員權益異動、簽證或安全等履約必要事項</li>
+              <li>將忽略收件人的分類偏好與退訂設定（仍排除硬退信／投訴名單）</li>
+              <li>信件底部不會附退訂連結，改顯示客服聯絡方式</li>
+              <li>必須至少選一個身份／狀態／等級條件（禁止空篩選群發）</li>
+              <li>發送紀錄會特別標記供稽核</li>
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
@@ -430,13 +462,31 @@ export default function SendNotificationPage() {
       {showConfirm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-2">確認發送</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {isCritical ? '確認發送重大通知' : '確認發送'}
+            </h3>
             <p className="text-sm text-slate-700 mb-4">
               即將寄送「{subject}」給 {testOnly ? '你自己' : `${recipientCount ?? '?'} 位收件人`}，確認嗎？
             </p>
+            {isCritical && !testOnly && (
+              <label className="flex items-start gap-2 mb-4 p-3 bg-red-50 border border-red-300 rounded-lg text-sm text-red-800 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={criticalAck}
+                  onChange={(e) => setCriticalAck(e.target.checked)}
+                  data-testid="critical-ack"
+                  className="mt-0.5"
+                />
+                <span>我確認此通知符合重大通知定義（重大變更／權益異動／簽證安全），並理解將忽略收件人退訂設定。</span>
+              </label>
+            )}
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-sm border border-slate-300 rounded-lg">取消</button>
-              <button onClick={submit} disabled={sending} className="px-4 py-2 text-sm text-white bg-[#10B8D9] rounded-lg disabled:opacity-50">
+              <button onClick={() => { setShowConfirm(false); setCriticalAck(false); }} className="px-4 py-2 text-sm border border-slate-300 rounded-lg">取消</button>
+              <button
+                onClick={submit}
+                disabled={sending || (isCritical && !testOnly && !criticalAck)}
+                className="px-4 py-2 text-sm text-white bg-[#10B8D9] rounded-lg disabled:opacity-50"
+              >
                 {sending ? '發送中…' : '確認發送'}
               </button>
             </div>

@@ -49,12 +49,12 @@ export async function POST(req: NextRequest) {
   const subject = body.subject.trim();
   const emailBody = body.body.trim();
 
-  const VALID_CATEGORIES = ['newsletter', 'events', 'award'] as const;
+  const VALID_CATEGORIES = ['newsletter', 'events', 'award', 'critical'] as const;
   type Category = typeof VALID_CATEGORIES[number];
   const category = body.category as Category | undefined;
   if (!category || !VALID_CATEGORIES.includes(category)) {
     return NextResponse.json(
-      { error: '請選擇信件分類（newsletter / events / award）' },
+      { error: '請選擇信件分類（newsletter / events / award / critical）' },
       { status: 400 }
     );
   }
@@ -73,6 +73,13 @@ export async function POST(req: NextRequest) {
 
   if ((!groups || groups.length === 0) && !statuses && !memberTiers && !ticketTiers) {
     return NextResponse.json({ error: '請至少選擇一組收件人條件' }, { status: 400 });
+  }
+
+  if (category === 'critical' && !statuses && !memberTiers && !ticketTiers) {
+    return NextResponse.json(
+      { error: '重大通知必須指定身份／狀態／票種等收件人條件，不允許空篩選' },
+      { status: 400 },
+    );
   }
 
   try {
@@ -102,6 +109,7 @@ export async function POST(req: NextRequest) {
         subject,
         body: emailBody,
         body_format: bodyFormat,
+        category,
         recipient_groups: groups ?? [],
         recipient_tiers: legacyTicketTiers ?? ticketTiers ?? null,
         recipient_count: count,
@@ -117,7 +125,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Enqueue all emails (inserted as 'pending' in email_logs)
-    const { queued } = await enqueueEmails(emails, subject, logEntry.id);
+    const { queued } = await enqueueEmails(emails, subject, logEntry.id, { category });
 
     // Fire-and-forget: start processing in the background
     processAllPending(logEntry.id).catch((err) =>

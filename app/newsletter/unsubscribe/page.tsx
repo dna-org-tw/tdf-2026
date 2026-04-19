@@ -120,6 +120,9 @@ export default function UnsubscribePage() {
                 {t.unsubscribe.successNote}
               </p>
             </div>
+            <p className="text-white/50 text-xs leading-relaxed">
+              {t.unsubscribe.criticalNote}
+            </p>
             <div className="pt-4">
               <button
                 onClick={() => router.push('/')}

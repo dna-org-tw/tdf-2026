@@ -6,6 +6,7 @@ import Link from 'next/link';
 interface NotificationLog {
   id: string;
   subject: string;
+  category: 'newsletter' | 'events' | 'award' | 'critical' | null;
   recipient_groups: string[];
   recipient_tiers: string[] | null;
   recipient_count: number;
@@ -89,8 +90,13 @@ export default function AdminDashboard() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h3 className="font-semibold text-slate-900 truncate">{n.subject}</h3>
+                      {n.category === 'critical' && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium shrink-0 bg-red-100 text-red-700 border border-red-300">
+                          重大通知
+                        </span>
+                      )}
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ${statusStyle.className}`}>
                         {statusStyle.label}
                       </span>

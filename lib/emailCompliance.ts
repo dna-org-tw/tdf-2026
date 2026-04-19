@@ -28,9 +28,17 @@ const PHYSICAL_ADDRESS =
 const SENDER_ORG =
   process.env.EMAIL_SENDER_ORG?.trim() || 'Taiwan Digital Fest 2026';
 
+const CUSTOMER_SUPPORT_EMAIL =
+  process.env.CUSTOMER_SUPPORT_EMAIL?.trim() || 'fest@dna.org.tw';
+
 export interface ComplianceFooterOptions {
   email?: string;
   includeUnsubscribe?: boolean;
+  /**
+   * When true, render a "履約必要通知，無法取消訂閱" notice and force
+   * includeUnsubscribe=false. Used for `critical`-category broadcasts.
+   */
+  criticalNotice?: boolean;
 }
 
 /** User-facing unsubscribe URL (renders a confirmation page). */
@@ -51,7 +59,8 @@ export function getOneClickUnsubscribeUrl(email: string): string {
 }
 
 export function buildComplianceFooterHtml(opts: ComplianceFooterOptions): string {
-  const { email, includeUnsubscribe = true } = opts;
+  const { email, criticalNotice = false } = opts;
+  const includeUnsubscribe = criticalNotice ? false : (opts.includeUnsubscribe ?? true);
 
   let unsubscribeLine = '';
   if (includeUnsubscribe && email) {
@@ -62,8 +71,16 @@ export function buildComplianceFooterHtml(opts: ComplianceFooterOptions): string
     </p>`;
   }
 
+  const criticalBlock = criticalNotice
+    ? `
+    <p style="margin: 8px 0; color: #b45309; line-height: 1.5;">
+      此為 TDF 2026 履約必要通知（重大變更／權益異動／安全），無法取消訂閱。<br>
+      有任何疑問請聯絡 <a href="mailto:${CUSTOMER_SUPPORT_EMAIL}" style="color: #b45309; text-decoration: underline;">${CUSTOMER_SUPPORT_EMAIL}</a>。
+    </p>`
+    : '';
+
   return `
-  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 24px; padding: 16px; border-top: 1px solid #eee;">
+  <div style="text-align: center; color: #999; font-size: 12px; margin-top: 24px; padding: 16px; border-top: 1px solid #eee;">${criticalBlock}
     <p style="margin: 8px 0;">This is an automated email. Please do not reply directly to this message.</p>${unsubscribeLine}
     <p style="margin: 8px 0; line-height: 1.5;">
       <strong>${SENDER_ORG}</strong><br>
@@ -73,8 +90,18 @@ export function buildComplianceFooterHtml(opts: ComplianceFooterOptions): string
 }
 
 export function buildComplianceFooterText(opts: ComplianceFooterOptions): string {
-  const { email, includeUnsubscribe = true } = opts;
-  const lines = ['---', 'This is an automated email. Please do not reply directly to this message.'];
+  const { email, criticalNotice = false } = opts;
+  const includeUnsubscribe = criticalNotice ? false : (opts.includeUnsubscribe ?? true);
+
+  const lines: string[] = ['---'];
+
+  if (criticalNotice) {
+    lines.push('此為 TDF 2026 履約必要通知（重大變更／權益異動／安全），無法取消訂閱。');
+    lines.push(`有任何疑問請聯絡 ${CUSTOMER_SUPPORT_EMAIL}。`);
+    lines.push('');
+  }
+
+  lines.push('This is an automated email. Please do not reply directly to this message.');
 
   if (includeUnsubscribe && email) {
     lines.push(`Unsubscribe: ${getUnsubscribeUrl(email)}`);
@@ -170,9 +197,15 @@ export async function isSuppressed(
 
 /**
  * Bulk suppression filter. Returns the input emails split into allowed / suppressed.
+ *
+ * Pass `allowUnsubscribed: true` to exclude only hard deliverability signals
+ * (bounced / complained / spam / manual). Addresses whose only reason is
+ * `unsubscribed` pass through — used for `critical`-category broadcasts
+ * (履約必要通知) that legally/contractually must reach the recipient.
  */
 export async function filterSuppressed(
   emails: string[],
+  opts: { allowUnsubscribed?: boolean } = {},
 ): Promise<{ allowed: string[]; suppressed: string[] }> {
   if (!supabaseServer || emails.length === 0) {
     return { allowed: emails, suppressed: [] };
@@ -181,10 +214,19 @@ export async function filterSuppressed(
     new Set(emails.map((e) => e.trim().toLowerCase()).filter(Boolean)),
   );
 
-  const { data, error } = await supabaseServer
+  let query = supabaseServer
     .from('email_suppressions')
-    .select('email')
+    .select('email, reason')
     .in('email', normalized);
+
+  if (opts.allowUnsubscribed) {
+    // Only hard deliverability signals block the send.
+    // NOTE: keep in sync with the email_suppressions.reason CHECK constraint
+    // (see supabase/migrations/add_email_deliverability.sql).
+    query = query.in('reason', ['bounced', 'complained', 'spam', 'manual']);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('[EmailCompliance] filterSuppressed lookup failed:', error);

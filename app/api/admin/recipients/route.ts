@@ -39,15 +39,25 @@ export async function GET(req: NextRequest) {
   const memberTiers = parseList<MemberTier>(searchParams.get('memberTiers'), MEMBER_TIERS);
   const ticketTiers = parseList<TicketTier>(searchParams.get('ticketTiers'), TICKET_TIERS);
 
-  const VALID_CATEGORIES = ['newsletter', 'events', 'award'] as const;
+  const VALID_CATEGORIES = ['newsletter', 'events', 'award', 'critical'] as const;
   const categoryRaw = searchParams.get('category');
   const category = (VALID_CATEGORIES as readonly string[]).includes(categoryRaw ?? '')
-    ? (categoryRaw as 'newsletter' | 'events' | 'award')
+    ? (categoryRaw as 'newsletter' | 'events' | 'award' | 'critical')
     : undefined;
 
   if (!groups && !statuses && !memberTiers && !ticketTiers) {
     return NextResponse.json(
       { error: 'At least one of groups, statuses, memberTiers, or ticketTiers is required' },
+      { status: 400 },
+    );
+  }
+
+  // Critical broadcasts must target a concrete identity/status/tier cohort.
+  // `groups` alone (e.g. 'subscribers') is not enough — it would let an admin
+  // blast the entire newsletter universe by accident.
+  if (category === 'critical' && !statuses && !memberTiers && !ticketTiers) {
+    return NextResponse.json(
+      { error: 'Critical notifications require at least one of statuses, memberTiers, or ticketTiers' },
       { status: 400 },
     );
   }

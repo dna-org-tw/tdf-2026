@@ -20,7 +20,12 @@ const mailgunClient = mailgunApiKey && mailgunDomain
 
 export type BodyFormat = 'plain' | 'html';
 
-function buildHtml(body: string, subject: string, recipientEmail: string): string {
+function buildHtml(
+  body: string,
+  subject: string,
+  recipientEmail: string,
+  criticalNotice: boolean,
+): string {
   const bodyHtml = body
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -46,7 +51,7 @@ function buildHtml(body: string, subject: string, recipientEmail: string): strin
       Taiwan Digital Fest 2026 Team
     </p>
   </div>
-  ${buildComplianceFooterHtml({ email: recipientEmail })}
+  ${buildComplianceFooterHtml({ email: recipientEmail, criticalNotice })}
 </body>
 </html>`;
 }
@@ -57,8 +62,12 @@ function buildHtml(body: string, subject: string, recipientEmail: string): strin
  * before the closing </body> tag. Falls back to bare append if the body has
  * no </body> (still produces a deliverable email).
  */
-function injectComplianceFooter(rawHtml: string, recipientEmail: string): string {
-  const footer = buildComplianceFooterHtml({ email: recipientEmail });
+function injectComplianceFooter(
+  rawHtml: string,
+  recipientEmail: string,
+  criticalNotice: boolean,
+): string {
+  const footer = buildComplianceFooterHtml({ email: recipientEmail, criticalNotice });
   const closingBody = /<\/body\s*>/i;
   if (closingBody.test(rawHtml)) {
     return rawHtml.replace(closingBody, `${footer}\n</body>`);
@@ -95,13 +104,17 @@ function htmlToPlainText(html: string): string {
     .trim();
 }
 
-function buildPlainText(body: string, recipientEmail: string): string {
-  return `Taiwan Digital Fest 2026\n\n${body}\n\nBest regards,\nTaiwan Digital Fest 2026 Team\n\n${buildComplianceFooterText({ email: recipientEmail })}`;
+function buildPlainText(body: string, recipientEmail: string, criticalNotice: boolean): string {
+  return `Taiwan Digital Fest 2026\n\n${body}\n\nBest regards,\nTaiwan Digital Fest 2026 Team\n\n${buildComplianceFooterText({ email: recipientEmail, criticalNotice })}`;
 }
 
-function buildPlainTextFromHtml(rawHtml: string, recipientEmail: string): string {
+function buildPlainTextFromHtml(
+  rawHtml: string,
+  recipientEmail: string,
+  criticalNotice: boolean,
+): string {
   const stripped = htmlToPlainText(rawHtml);
-  return `${stripped}\n\n${buildComplianceFooterText({ email: recipientEmail })}`;
+  return `${stripped}\n\n${buildComplianceFooterText({ email: recipientEmail, criticalNotice })}`;
 }
 
 // Mailgun Basic 10k plan: ~1 msg/sec is safe; back off on 429 with exponential retry.
@@ -136,12 +149,16 @@ export async function enqueueEmails(
   emails: string[],
   subject: string,
   notificationId: string,
+  opts: { category?: 'newsletter' | 'events' | 'award' | 'critical' } = {},
 ): Promise<{ queued: number; suppressed: number }> {
   if (!supabaseServer) throw new Error('Database not configured');
 
   // Remove addresses on the suppression list before enqueueing — never send to
-  // bounced/complained/unsubscribed recipients.
-  const { allowed, suppressed } = await filterSuppressed(emails);
+  // bounced/complained recipients. For `critical` (履約必要通知) we still honor
+  // hard deliverability suppressions but allow `unsubscribed` addresses through.
+  const { allowed, suppressed } = await filterSuppressed(emails, {
+    allowUnsubscribed: opts.category === 'critical',
+  });
 
   if (allowed.length === 0) {
     return { queued: 0, suppressed: suppressed.length };
@@ -206,16 +223,17 @@ export async function processQueueBatch(
     .update({ status: 'processing' })
     .in('id', ids);
 
-  // Get notification body + format for HTML building
+  // Get notification body + format + category for HTML building
   const { data: notif } = await supabaseServer
     .from('notification_logs')
-    .select('subject, body, body_format')
+    .select('subject, body, body_format, category')
     .eq('id', notificationId)
     .single();
 
   const subject = notif?.subject ?? pending[0].subject ?? '';
   const body = notif?.body ?? '';
   const bodyFormat: BodyFormat = notif?.body_format === 'html' ? 'html' : 'plain';
+  const isCritical = notif?.category === 'critical';
 
   let sent = 0;
   let failed = 0;
@@ -227,13 +245,14 @@ export async function processQueueBatch(
     // Throttle: wait between sends to respect Mailgun rate limits
     if (idx > 0) await sleep(SEND_INTERVAL_MS);
 
-    // Per-recipient body so each email gets its own unsubscribe link.
+    // Per-recipient body so each email gets its own unsubscribe link (or,
+    // for critical, the fixed "履約必要通知" footer with no unsubscribe).
     const html = bodyFormat === 'html'
-      ? injectComplianceFooter(body, email.to_email)
-      : buildHtml(body, subject, email.to_email);
+      ? injectComplianceFooter(body, email.to_email, isCritical)
+      : buildHtml(body, subject, email.to_email, isCritical);
     const text = bodyFormat === 'html'
-      ? buildPlainTextFromHtml(body, email.to_email)
-      : buildPlainText(body, email.to_email);
+      ? buildPlainTextFromHtml(body, email.to_email, isCritical)
+      : buildPlainText(body, email.to_email, isCritical);
 
     try {
       const response = await mailgunClient.messages.create(mailgunDomain, {
@@ -243,9 +262,12 @@ export async function processQueueBatch(
         html,
         text,
         ...buildMailgunComplianceOptions({
-          unsubscribeEmail: email.to_email,
+          // Critical sends omit List-Unsubscribe so Gmail/Yahoo clients don't
+          // render their built-in one-click unsubscribe button — that would
+          // contradict the "無法取消訂閱" semantic of履約必要通知.
+          unsubscribeEmail: isCritical ? undefined : email.to_email,
           replyTo: replyToEmail,
-          tag: 'notification',
+          tag: isCritical ? 'notification-critical' : 'notification',
         }),
       });
       rateLimitAttempt = 0; // reset on success
