@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createOrder } from '@/lib/orders';
 import { verifyRecaptcha } from '@/lib/recaptcha';
+import { isTicketSaleClosed, getTicketSaleCutoff } from '@/lib/ticketSaleCutoff';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -30,6 +31,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Stripe is not configured on the server.' },
         { status: 500 }
+      );
+    }
+
+    if (await isTicketSaleClosed()) {
+      const cutoff = await getTicketSaleCutoff();
+      return NextResponse.json(
+        { error: 'sales_closed', cutoff: cutoff.toISOString() },
+        { status: 403 },
       );
     }
 
