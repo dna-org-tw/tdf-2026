@@ -410,7 +410,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '非 Backer 可以參加花蓮旅行嗎？',
-                answer: '可以，費用統一為 200 USD，不分票種。',
+                answer: '可以，不過只有在活動開始前七天才開放報名。',
               },
             ],
           },
@@ -1233,7 +1233,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'Can non-Backers join the Hualien tour?',
-                answer: 'Yes, the Hualien tour is $200 USD for all ticket tiers.',
+                answer: 'Yes, but registration only opens in the final week before the tour starts.',
               },
             ],
           },
