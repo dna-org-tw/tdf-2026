@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import StayGuaranteeStep from './StayGuaranteeStep';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[]; memberEmail: string | null }) {
+  const searchParams = useSearchParams();
   const [weekCodes, setWeekCodes] = useState<string[]>([]);
   const [primaryGuestName, setPrimaryGuestName] = useState('');
   const [primaryGuestPhone, setPrimaryGuestPhone] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
+  const [inviteCode, setInviteCode] = useState(() => searchParams.get('invite') ?? '');
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [setupIntentId, setSetupIntentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
