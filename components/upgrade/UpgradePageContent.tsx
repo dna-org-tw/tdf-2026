@@ -33,7 +33,7 @@ export default function UpgradePageContent() {
   const [loading, setLoading] = useState(true);
   const [processingTier, setProcessingTier] = useState<TicketTier | null>(null);
   const [error, setError] = useState('');
-  const [salesClosed, setSalesClosed] = useState(false);
+  const [salesClosed, setSalesClosed] = useState<boolean | null>(null);
   const [saleCutoff, setSaleCutoff] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,11 +42,11 @@ export default function UpgradePageContent() {
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (alive && d) {
-          setSalesClosed(!!d.closed);
+          setSalesClosed(d?.closed === true);
           setSaleCutoff(d.cutoff ?? null);
         }
       })
-      .catch(() => {});
+      .catch(() => { if (alive) setSalesClosed(false); });
     return () => {
       alive = false;
     };
@@ -108,6 +108,8 @@ export default function UpgradePageContent() {
       setProcessingTier(null);
     }
   };
+
+  if (salesClosed === null) return null;
 
   if (salesClosed) {
     return (

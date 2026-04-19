@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { DEFAULT_CUTOFF_ISO } from '@/lib/ticketSaleCutoff';
 
 function formatLocalInputValue(iso: string | null): string {
   if (!iso) return '';
@@ -26,7 +27,6 @@ export default function AdminSettingsPage() {
   const [cutoff, setCutoff] = useState<string | null>(null);
   const [cutoffInput, setCutoffInput] = useState('');
   const [cutoffSaving, setCutoffSaving] = useState(false);
-  const DEFAULT_CUTOFF_ISO = '2026-04-20T16:00:00Z';
 
   const load = async () => {
     setLoading(true);
@@ -126,9 +126,9 @@ export default function AdminSettingsPage() {
   const cutoffPassed = cutoff
     ? (() => {
         const d = new Date(cutoff);
-        return !isNaN(d.getTime()) && Date.now() > d.getTime();
+        return !isNaN(d.getTime()) && Date.now() >= d.getTime();
       })()
-    : (Date.now() > new Date(DEFAULT_CUTOFF_ISO).getTime());
+    : (Date.now() >= new Date(DEFAULT_CUTOFF_ISO).getTime());
 
   return (
     <div className="max-w-2xl space-y-6">

@@ -13,11 +13,12 @@ export class TicketSaleError extends Error {
 
 export async function getTicketSaleCutoffRaw(): Promise<string | null> {
   if (!supabaseServer) return null;
-  const { data } = await supabaseServer
+  const { data, error } = await supabaseServer
     .from('app_settings')
     .select('value')
     .eq('key', CUTOFF_KEY)
     .maybeSingle();
+  if (error) console.error('[getTicketSaleCutoffRaw]', error);
   return (data?.value as string | undefined) ?? null;
 }
 
