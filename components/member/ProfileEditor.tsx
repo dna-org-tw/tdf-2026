@@ -380,18 +380,18 @@ export default function ProfileEditor({ profile, lang, onSave, onCancel }: Profi
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      <div className="flex gap-3 pt-2">
+      <div className="flex items-center gap-3 pt-2">
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 bg-[#10B8D9] hover:bg-[#0EA5C4] disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors text-sm"
+          className="flex-1 bg-[#0E0E10] hover:bg-[#2A2A2E] disabled:bg-stone-300 disabled:text-stone-500 text-white font-semibold py-2.5 rounded-lg transition-colors text-sm"
         >
           {saving ? labels.saving : labels.save}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+          className="text-sm text-slate-500 hover:text-slate-800 transition-colors px-2 py-2.5"
         >
           {labels.cancel}
         </button>

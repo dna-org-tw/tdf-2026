@@ -241,20 +241,10 @@ export default function Navbar() {
 
         {/* Mobile Menu Button and Icons */}
         <div className="md:hidden flex items-center gap-4">
-          {isAdmin && (
-            <Link
-              href="/admin"
-              className={`text-xs font-medium transition-colors ${
-                scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
-              }`}
-            >
-              {t.nav.admin}
-            </Link>
-          )}
           {!authLoading && (
             <Link
               href="/me"
-              className={`transition-colors ${
+              className={`text-sm font-medium transition-colors ${
                 scrolled ? 'text-[#1E1F1C] hover:text-[#10B8D9]' : 'text-white hover:text-[#10B8D9]'
               }`}
             >
@@ -262,39 +252,12 @@ export default function Navbar() {
             </Link>
           )}
           <button
-            onClick={toggleLanguage}
-            className={`hover:text-[#10B8D9] transition-colors ${
-              scrolled ? 'text-[#1E1F1C]' : 'text-white'
-            }`}
-            aria-label={lang === 'en' ? 'Switch to Chinese' : 'Switch to English'}
-          >
-            <span className="text-sm font-semibold">{lang === 'en' ? '中文' : 'EN'}</span>
-          </button>
-          <a
-            href="http://instagram.com/taiwandigitalfest"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              trackEvent('Lead', {
-                content_name: 'Instagram Link',
-                content_category: 'Social Media',
-                link_type: 'instagram',
-                location: 'navbar_mobile',
-              });
-            }}
-            className={`hover:text-[#10B8D9] transition-colors ${
-              scrolled ? 'text-[#1E1F1C]' : 'text-white'
-            }`}
-            aria-label="Instagram"
-          >
-            <Instagram className="w-5 h-5" />
-          </a>
-          <button
             className={`transition-colors ${
               scrolled ? 'text-[#1E1F1C]' : 'text-white'
             }`}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
+            aria-expanded={isOpen}
           >
             {isOpen ? <X /> : <Menu />}
           </button>
@@ -306,6 +269,10 @@ export default function Navbar() {
         isOpen={isOpen}
         navLinks={navLinks}
         handleNavClick={handleNavClick}
+        isAdmin={isAdmin}
+        onToggleLanguage={toggleLanguage}
+        lang={lang}
+        onClose={() => setIsOpen(false)}
       />
     </nav>
   );

@@ -17,6 +17,8 @@ import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 import StaySummaryCard from '@/components/member/StaySummaryCard';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
+import ProfileVisibility from '@/components/member/ProfileVisibility';
+import { formatOrderAmount } from '@/lib/orderDisplay';
 
 const EMPTY_PROFILE: MemberProfile = {
   displayName: null,
@@ -361,7 +363,7 @@ function MemberDashboard() {
   }, []);
 
   const formatAmount = (amount: number, currency: string) =>
-    `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
+    formatOrderAmount(amount, currency, { lang });
 
   const formatDate = (s: string) =>
     new Date(s).toLocaleDateString(lang === 'zh' ? 'zh-TW' : 'en-US', {
@@ -403,60 +405,10 @@ function MemberDashboard() {
     [deadlinePassed],
   );
 
+
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      {/* Public toggle + sign out */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <button
-            type="button"
-            onClick={() => handleTogglePublic(!profile.isPublic)}
-            className="flex items-center gap-2.5 group shrink-0"
-          >
-            <div
-              className="rounded-full relative transition-colors"
-              style={{
-                width: 40,
-                height: 22,
-                minHeight: 22,
-                backgroundColor: profile.isPublic ? 'rgba(82,212,114,0.3)' : 'rgba(0,0,0,0.12)',
-              }}
-            >
-              <div
-                className="absolute rounded-full transition-all"
-                style={{
-                  width: 16,
-                  height: 16,
-                  top: 3,
-                  backgroundColor: profile.isPublic ? '#52D472' : '#aaa',
-                  left: profile.isPublic ? 21 : 3,
-                }}
-              />
-            </div>
-            <span className="text-[13px] leading-5 text-slate-600 group-hover:text-slate-800 transition-colors">
-              {profile.isPublic
-                ? (lang === 'zh' ? '身份卡已公開' : 'Card is public')
-                : (lang === 'zh' ? '身份卡未公開' : 'Card is private')}
-            </span>
-          </button>
-          {profile.isPublic && me?.memberNo && (
-            <Link
-              href={`/members/${me.memberNo}`}
-              className="text-[11px] text-[#10B8D9] hover:underline truncate"
-            >
-              /members/{me.memberNo}
-            </Link>
-          )}
-        </div>
-        <button
-          onClick={signOut}
-          className="shrink-0 text-[12px] font-mono tracking-[0.15em] uppercase text-slate-400 hover:text-red-500 transition-colors"
-        >
-          {t.auth.logout}
-        </button>
-      </div>
-
-      {/* Identity card (hero) */}
+      {/* Identity card */}
       {!loading && user?.email && (
         <MemberPassport
           email={user.email}
@@ -479,6 +431,16 @@ function MemberDashboard() {
         />
       )}
 
+      {/* Privacy controls + sign out */}
+      <ProfileVisibility
+        isPublic={profile.isPublic}
+        memberNo={me?.memberNo ?? null}
+        lang={lang}
+        onChange={handleTogglePublic}
+        onSignOut={signOut}
+        signOutLabel={t.auth.logout}
+      />
+
       {/* Upcoming events + festival countdown */}
       <UpcomingEvents registrations={lumaRegs} lang={lang} noShowConsumedCount={noShowConsumedCount} />
 
@@ -489,6 +451,7 @@ function MemberDashboard() {
         title={t.auth.orderHistory}
         count={loading ? '…' : orders.length}
         defaultOpen={false}
+        tone="orders"
       >
         {loading ? (
           <div className="space-y-2 mt-2">
@@ -551,9 +514,20 @@ function MemberDashboard() {
                           <p className="text-[11px] text-slate-500">{formatDate(parent.created_at)}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="font-semibold text-slate-900 text-sm">
-                            {formatAmount(totalPaid, parent.currency)}
-                          </p>
+                          {(() => {
+                            const { label, tone } = formatAmount(totalPaid, parent.currency);
+                            return (
+                              <p
+                                className={
+                                  tone === 'paid'
+                                    ? 'font-semibold text-slate-900 text-sm'
+                                    : 'text-[11px] font-medium uppercase tracking-wider text-slate-400'
+                                }
+                              >
+                                {label}
+                              </p>
+                            );
+                          })()}
                           <p className="text-[10px] text-[#10B8D9] mt-0.5">{t.auth.viewDetails} →</p>
                         </div>
                       </div>
@@ -566,9 +540,20 @@ function MemberDashboard() {
                             <span className="text-slate-400">↳</span>
                             <span className="capitalize font-medium">{c.ticket_tier}</span>
                             <StatusBadge status={c.status} t={t} />
-                            <span className="font-mono text-slate-500">
-                              {formatAmount(c.amount_total, c.currency)}
-                            </span>
+                            {(() => {
+                              const { label, tone } = formatAmount(c.amount_total, c.currency);
+                              return (
+                                <span
+                                  className={
+                                    tone === 'paid'
+                                      ? 'font-mono text-slate-500'
+                                      : 'text-[10px] font-medium uppercase tracking-wider text-slate-400'
+                                  }
+                                >
+                                  {label}
+                                </span>
+                              );
+                            })()}
                             <Link href={`/order/${c.id}`} className="ml-auto text-[10px] text-[#10B8D9] hover:underline">
                               {t.auth.viewDetails} →
                             </Link>
@@ -617,6 +602,7 @@ function MemberDashboard() {
           title={lang === 'zh' ? '已轉出訂單' : 'Transferred out'}
           count={outgoingTransfers.length}
           defaultOpen={false}
+          tone="transfers"
         >
           <ul className="mt-2 space-y-2">
             {outgoingTransfers.map((t) => (
@@ -648,9 +634,20 @@ function MemberDashboard() {
                   </div>
                   {t.amount_total != null && t.currency && (
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-slate-500">
-                        {`${(t.amount_total / 100).toFixed(2)} ${t.currency.toUpperCase()}`}
-                      </p>
+                      {(() => {
+                        const { label, tone } = formatOrderAmount(t.amount_total, t.currency, { lang });
+                        return (
+                          <p
+                            className={
+                              tone === 'paid'
+                                ? 'text-xs text-slate-500'
+                                : 'text-[10px] font-medium uppercase tracking-wider text-slate-400'
+                            }
+                          >
+                            {label}
+                          </p>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -667,12 +664,16 @@ function MemberDashboard() {
 
       {/* Visa support documents */}
       {user?.email && (
-        <VisaSupportSection orders={orders} labels={t.auth.visaSupport} />
+        <VisaSupportSection orders={orders} lang={lang} labels={t.auth.visaSupport} />
       )}
 
       {/* Email preferences (collapsible) */}
       {user?.email && (
-        <CollapsibleSection title={lang === 'zh' ? '信件偏好' : 'Email preferences'} defaultOpen={false}>
+        <CollapsibleSection
+          title={lang === 'zh' ? '信件偏好' : 'Email preferences'}
+          defaultOpen={false}
+          tone="email"
+        >
           <div className="mt-2">
             <EmailPreferences userEmail={user.email} />
           </div>
