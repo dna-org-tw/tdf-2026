@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   const category = body.category as Category | undefined;
   if (!category || !VALID_CATEGORIES.includes(category)) {
     return NextResponse.json(
-      { error: '請選擇信件分類（newsletter / events / award）' },
+      { error: '請選擇信件分類（newsletter / events / award / critical）' },
       { status: 400 }
     );
   }

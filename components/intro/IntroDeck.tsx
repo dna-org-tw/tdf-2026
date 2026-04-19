@@ -266,19 +266,36 @@ function SlideDeckInner({ events, speakers }: IntroDeckProps) {
           </div>
         </Slide>
 
-        {/* 7 — Event Photo Gallery (more photos, smaller) */}
-        <Slide index={6} style={{ background: '#1E1F1C', color: '#fff', padding: '2vh 2vw' }}>
-          <div className="grid w-full grid-cols-4 sm:grid-cols-5 lg:grid-cols-6" style={{ maxWidth: '96vw', gap: '0.5vw' }}>
-            {eventsWithImages.slice(0, 24).map((e, i) => (
-              <div key={i} className="relative overflow-hidden rounded-lg" style={{ height: 'calc((100vh - 8vh) / 4 - 0.5vw)' }}>
-                <img src={e.imageUrl} alt={e.title} className="absolute inset-0 h-full w-full object-cover" />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)' }} />
-                <span className="absolute bottom-0 left-0 right-0" style={{ ...fs('0.6rem', '0.8vw', '0.75rem'), fontWeight: 700, padding: '0.4vw', color: '#fff', lineHeight: 1.2 }}>
-                  {e.title.length > 25 ? e.title.slice(0, 25) + '…' : e.title}
-                </span>
+        {/* 7 — Event Photo Gallery: auto-grid fills entire viewport */}
+        <Slide index={6} style={{ background: '#1E1F1C', color: '#fff', padding: '1vh 1vw' }}>
+          {(() => {
+            const n = eventsWithImages.length;
+            const cols = Math.ceil(Math.sqrt(n * 1.9));
+            const rows = Math.ceil(n / cols);
+            return (
+              <div
+                className="w-full"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${cols}, 1fr)`,
+                  gridTemplateRows: `repeat(${rows}, 1fr)`,
+                  gap: '0.4vw',
+                  maxWidth: '98vw',
+                  height: '96vh',
+                }}
+              >
+                {eventsWithImages.map((e, i) => (
+                  <div key={i} className="relative overflow-hidden" style={{ borderRadius: 'clamp(0.4rem, 0.6vw, 0.7rem)' }}>
+                    <img src={e.imageUrl} alt={e.title} className="absolute inset-0 h-full w-full object-cover" />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 45%)' }} />
+                    <span className="absolute bottom-0 left-0 right-0" style={{ ...fs('0.45rem', '0.65vw', '0.6rem'), fontWeight: 700, padding: '0.25vw 0.3vw', color: '#fff', lineHeight: 1.15 }}>
+                      {e.title.length > 20 ? e.title.slice(0, 20) + '…' : e.title}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </Slide>
 
         {/* 8 — Schedule / Stats */}
@@ -374,46 +391,55 @@ function SlideDeckInner({ events, speakers }: IntroDeckProps) {
           </div>
         </Slide>
 
-        {/* 10 — Speakers */}
-        <Slide index={9} style={{ background: '#F6F6F6', color: '#1E1F1C' }}>
+        {/* 10 — Speakers: auto-grid fills entire viewport */}
+        <Slide index={9} style={{ background: '#F6F6F6', color: '#1E1F1C', padding: '1vh 1vw' }}>
           <h2
             className="text-center font-display"
-            style={{ ...fs('3rem', '9vw', '8rem'), fontWeight: 900, marginBottom: '3vh' }}
+            style={{ ...fs('2rem', '5vw', '4rem'), fontWeight: 900, marginBottom: '1vh' }}
           >
             {t.partners.speakers.title}
           </h2>
-          <div className="flex flex-wrap items-center justify-center" style={{ maxWidth: '90vw', gap: '1.5vw' }}>
-            {uniqueSpeakers.slice(0, 24).map((s) => (
-              <div key={s.name} className="flex flex-col items-center" style={{ gap: '0.3vh' }}>
-                {s.avatarUrl ? (
-                  <img
-                    src={s.avatarUrl}
-                    alt={s.name}
-                    className="rounded-full object-cover shadow-md"
-                    style={{ width: 'clamp(3.5rem,5.5vw,5rem)', height: 'clamp(3.5rem,5.5vw,5rem)' }}
-                  />
-                ) : (
-                  <div
-                    className="flex items-center justify-center rounded-full"
-                    style={{ width: 'clamp(3.5rem,5.5vw,5rem)', height: 'clamp(3.5rem,5.5vw,5rem)', background: 'rgba(0,78,157,0.2)', color: OCEAN, fontWeight: 900, fontSize: 'clamp(1.2rem,2.2vw,2rem)' }}
-                  >
-                    {s.name[0]}
-                  </div>
-                )}
-                <span className="truncate text-center" style={{ maxWidth: '6vw', ...fs('0.7rem', '1vw', '0.85rem'), fontWeight: 700 }}>
-                  {s.name}
-                </span>
-              </div>
-            ))}
-            {uniqueSpeakers.length > 24 && (
+          {(() => {
+            const n = uniqueSpeakers.length;
+            const cols = Math.ceil(Math.sqrt(n * 1.9));
+            const rows = Math.ceil(n / cols);
+            return (
               <div
-                className="flex items-center justify-center rounded-full"
-                style={{ width: 'clamp(3.5rem,5.5vw,5rem)', height: 'clamp(3.5rem,5.5vw,5rem)', background: 'rgba(0,0,0,0.1)', fontWeight: 900, fontSize: 'clamp(1rem,1.6vw,1.3rem)', opacity: 0.5 }}
+                className="w-full"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${cols}, 1fr)`,
+                  gridTemplateRows: `repeat(${rows}, 1fr)`,
+                  gap: '0.4vw',
+                  maxWidth: '98vw',
+                  flex: 1,
+                }}
               >
-                +{uniqueSpeakers.length - 24}
+                {uniqueSpeakers.map((s) => (
+                  <div key={s.name} className="flex flex-col items-center justify-center" style={{ gap: '0.2vh', overflow: 'hidden' }}>
+                    {s.avatarUrl ? (
+                      <img
+                        src={s.avatarUrl}
+                        alt={s.name}
+                        className="rounded-full object-cover shadow-md"
+                        style={{ width: '80%', aspectRatio: '1', maxHeight: '80%' }}
+                      />
+                    ) : (
+                      <div
+                        className="flex items-center justify-center rounded-full"
+                        style={{ width: '80%', aspectRatio: '1', maxHeight: '80%', background: 'rgba(0,78,157,0.2)', color: OCEAN, fontWeight: 900, fontSize: 'clamp(1rem,2vw,1.8rem)' }}
+                      >
+                        {s.name[0]}
+                      </div>
+                    )}
+                    <span className="truncate text-center" style={{ maxWidth: '100%', ...fs('0.45rem', '0.7vw', '0.65rem'), fontWeight: 700 }}>
+                      {s.name}
+                    </span>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
+            );
+          })()}
         </Slide>
 
         {/* 11 — Organizers */}
