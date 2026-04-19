@@ -5,6 +5,7 @@ import { upgradeOrder, OrderActionError } from '@/lib/orderActions';
 import { getUpgradePriceCents } from '@/lib/ticketPricing';
 import { TICKET_TIER_RANK, type TicketTier } from '@/lib/members';
 import type { Order } from '@/lib/types/order';
+import { isTicketSaleClosed, getTicketSaleCutoff } from '@/lib/ticketSaleCutoff';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +13,14 @@ export async function POST(req: NextRequest) {
     const session = await getSessionFromRequest(req);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (await isTicketSaleClosed()) {
+      const cutoff = await getTicketSaleCutoff();
+      return NextResponse.json(
+        { error: 'sales_closed', cutoff: cutoff.toISOString() },
+        { status: 403 },
+      );
     }
 
     // 2. Parse body
