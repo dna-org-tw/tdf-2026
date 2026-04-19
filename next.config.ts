@@ -163,11 +163,11 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://connect.facebook.net https://www.instagram.com https://js.stripe.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.recaptcha.net https://connect.facebook.net https://www.instagram.com https://js.stripe.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
               "img-src 'self' data: blob: https: http:",
               "font-src 'self' https://fonts.gstatic.com",
-              "connect-src 'self' https://*.supabase.co https://*.stripe.com https://www.google.com https://recaptchaenterprise.googleapis.com https://www.facebook.com https://api.lu.ma",
+              "connect-src 'self' https://*.supabase.co https://*.stripe.com https://www.google.com https://recaptchaenterprise.googleapis.com https://www.facebook.com https://api.lu.ma https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
               "frame-src 'self' https://www.google.com https://www.recaptcha.net https://js.stripe.com https://www.instagram.com https://www.youtube.com https://www.youtube-nocookie.com",
               "worker-src 'self'",
               "object-src 'none'",

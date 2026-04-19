@@ -647,7 +647,6 @@ export default function TeamSection() {
                           fill
                           className="object-cover"
                           sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 128px"
-                          unoptimized={speaker.avatarUrl.includes('lu.ma') || speaker.avatarUrl.includes('luma')}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[#4B4C47]">

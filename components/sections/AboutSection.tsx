@@ -1,104 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import LazyYouTubeEmbed from '@/components/LazyYouTubeEmbed';
 
+const REEL_EMBED_URL = 'https://www.instagram.com/reel/DLKU-cjpk7G/embed/?autoplay=1&muted=1';
+
 export default function AboutSection() {
   const { t, lang } = useTranslation();
-  const instagramRef = useRef<HTMLDivElement>(null);
   useSectionTracking({ sectionId: 'about', sectionName: 'About Section', category: 'Event Information' });
-
-  useEffect(() => {
-    if (!instagramRef.current) return;
-
-    // Function to try autoplay
-    const tryAutoPlay = () => {
-      if (!instagramRef.current) return;
-
-      // Find the Instagram iframe
-      const iframe = instagramRef.current.querySelector('iframe');
-      if (!iframe) return;
-
-      // Try to access iframe content (may fail due to CORS)
-      try {
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (iframeDoc) {
-          const video = iframeDoc.querySelector('video');
-          if (video) {
-            video.muted = true;
-            video.play().catch(() => {
-              // Autoplay failed, try clicking play button
-              const playButton = iframeDoc.querySelector('button[aria-label*="Play"], button[aria-label*="播放"]');
-              if (playButton) {
-                (playButton as HTMLButtonElement).click();
-              }
-            });
-          }
-        }
-      } catch {
-        // CORS restriction - try alternative method
-        // Send postMessage to iframe (if Instagram supports it)
-        iframe.contentWindow?.postMessage({ type: 'play' }, '*');
-      }
-    };
-
-    const processEmbeds = () => {
-      if (window.instgrm) {
-        window.instgrm.Embeds.process();
-        
-        // Try to trigger autoplay after embed is processed
-        setTimeout(() => {
-          tryAutoPlay();
-        }, 1000);
-      }
-    };
-
-    // Intersection Observer to lazy load Instagram script only when section is visible
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Only load Instagram script when section comes into view
-            const existingScript = document.querySelector('script[src="https://www.instagram.com/embed.js"]');
-            
-            if (!existingScript) {
-              // Load Instagram embed script lazily
-              const script = document.createElement('script');
-              script.src = 'https://www.instagram.com/embed.js';
-              script.async = true;
-              script.defer = true;
-              document.body.appendChild(script);
-
-              // Process embeds after script loads
-              script.onload = processEmbeds;
-            } else {
-              // Script already exists, process embeds after a short delay to ensure it's ready
-              setTimeout(processEmbeds, 100);
-            }
-
-            // When reel comes into view, try to autoplay
-            setTimeout(tryAutoPlay, 500);
-            
-            // Disconnect observer after loading to avoid repeated loads
-            observer.disconnect();
-          }
-        });
-      },
-      {
-        threshold: 0.1, // Trigger when 10% visible (earlier trigger for better UX)
-        rootMargin: '100px', // Start loading 100px before entering viewport
-      }
-    );
-
-    observer.observe(instagramRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
   return (
     <section
@@ -115,26 +26,14 @@ export default function AboutSection() {
             transition={{ duration: 0.8 }}
             className="w-full md:w-1/2"
           >
-            <div
-              ref={instagramRef}
-              className="relative rounded-2xl overflow-hidden shadow-2xl bg-white"
-            >
-              <blockquote
-                className="instagram-media"
-                data-instgrm-permalink="https://www.instagram.com/reel/DLKU-cjpk7G/"
-                data-instgrm-version="14"
-                style={{
-                  background: '#FFF',
-                  border: 0,
-                  borderRadius: '12px',
-                  boxShadow:
-                    '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)',
-                  margin: '1px',
-                  maxWidth: '100%',
-                  minWidth: '280px',
-                  padding: 0,
-                  width: '99.375%',
-                }}
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white aspect-[9/16] mx-auto max-w-sm md:max-w-none">
+              <iframe
+                src={REEL_EMBED_URL}
+                title="Taiwan Digital Fest Reel"
+                loading="lazy"
+                allow="autoplay; encrypted-media; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0"
               />
             </div>
           </motion.div>
