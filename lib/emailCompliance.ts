@@ -194,6 +194,8 @@ export async function filterSuppressed(
 
   if (opts.allowUnsubscribed) {
     // Only hard deliverability signals block the send.
+    // NOTE: keep in sync with the email_suppressions.reason CHECK constraint
+    // (see supabase/migrations/add_email_deliverability.sql).
     query = query.in('reason', ['bounced', 'complained', 'spam', 'manual']);
   }
 
