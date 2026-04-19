@@ -96,6 +96,32 @@ export default function TicketsSection() {
   }, []);
 
   const salesClosed = saleStatus?.closed === true;
+  const [cutoffCountdown, setCutoffCountdown] = useState<CountdownTime | null>(null);
+
+  useEffect(() => {
+    if (!saleStatus?.cutoff) return;
+    const cutoffMs = new Date(saleStatus.cutoff).getTime();
+    if (isNaN(cutoffMs)) return;
+
+    const tick = () => {
+      const diff = cutoffMs - Date.now();
+      if (diff <= 0) {
+        setCutoffCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 });
+        return;
+      }
+      setCutoffCountdown({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+        total: diff,
+      });
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [saleStatus?.cutoff]);
 
   const [countdown, setCountdown] = useState<CountdownTime | null>(null);
   const [loadingTier, setLoadingTier] = useState<TicketKey | null>(null);
@@ -320,6 +346,71 @@ export default function TicketsSection() {
   return (
     <section id="tickets" className="bg-gradient-to-r from-[#1E1F1C] via-[#1E1F1C] to-[#1E1F1C] text-white py-20 md:py-28 lg:py-32 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {!salesClosed && cutoffCountdown && cutoffCountdown.total > 0 && saleStatus?.cutoff && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 }}
+            className="mb-10 md:mb-12 rounded-2xl border border-red-500/50 bg-gradient-to-br from-red-600/20 via-orange-500/15 to-red-600/20 p-6 md:p-8 text-center"
+            role="status"
+            aria-live="polite"
+          >
+            <motion.p
+              className="text-[#FF6B47] font-bold text-lg sm:text-xl md:text-2xl uppercase tracking-wider mb-4"
+              animate={{
+                textShadow: [
+                  '0 0 10px rgba(255, 107, 71, 0.4)',
+                  '0 0 25px rgba(255, 107, 71, 0.8)',
+                  '0 0 10px rgba(255, 107, 71, 0.4)',
+                ],
+              }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              ⏰ {t.tickets.cutoffTitle ?? 'Ticket sales close in'}
+            </motion.p>
+            <div className="flex items-center justify-center gap-3 sm:gap-5 md:gap-6">
+              {[
+                { value: cutoffCountdown.days, label: lang === 'zh' ? '天' : 'Days' },
+                { value: cutoffCountdown.hours, label: lang === 'zh' ? '時' : 'Hrs' },
+                { value: cutoffCountdown.minutes, label: lang === 'zh' ? '分' : 'Min' },
+                { value: cutoffCountdown.seconds, label: lang === 'zh' ? '秒' : 'Sec' },
+              ].map((unit, i) => (
+                <div key={i} className="flex flex-col items-center min-w-[48px] sm:min-w-[60px] md:min-w-[72px]">
+                  <motion.span
+                    className="text-3xl sm:text-5xl md:text-6xl font-bold tabular-nums text-white leading-none"
+                    animate={
+                      cutoffCountdown.total < 3600000
+                        ? {
+                            textShadow: [
+                              '0 0 15px rgba(255, 107, 71, 0.6)',
+                              '0 0 35px rgba(255, 107, 71, 0.9)',
+                              '0 0 15px rgba(255, 107, 71, 0.6)',
+                            ],
+                          }
+                        : undefined
+                    }
+                    transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    {String(unit.value).padStart(2, '0')}
+                  </motion.span>
+                  <span className="mt-1 text-[10px] sm:text-xs text-red-200/80 uppercase tracking-widest">
+                    {unit.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-xs sm:text-sm text-red-200/70">
+              {t.tickets.cutoffNote ?? 'No purchases after'}{' '}
+              {new Date(saleStatus.cutoff).toLocaleString(lang === 'zh' ? 'zh-TW' : 'en-US', {
+                timeZone: 'Asia/Taipei',
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              })}{' '}
+              (Asia/Taipei)
+            </p>
+          </motion.div>
+        )}
         {salesClosed && (
           <div
             className="mb-10 rounded-xl border border-red-500/40 bg-red-500/10 px-5 py-4 text-center text-sm sm:text-base text-red-100"
