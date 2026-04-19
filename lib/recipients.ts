@@ -10,8 +10,13 @@ import {
 export type RecipientGroup = 'orders' | 'subscribers' | 'test';
 export type { TicketTier, MemberStatus, MemberTier };
 
-export type EmailCategory = 'newsletter' | 'events' | 'award';
-export const EMAIL_CATEGORIES: readonly EmailCategory[] = ['newsletter', 'events', 'award'] as const;
+export type EmailCategory = 'newsletter' | 'events' | 'award' | 'critical';
+export const EMAIL_CATEGORIES: readonly EmailCategory[] = [
+  'newsletter',
+  'events',
+  'award',
+  'critical',
+] as const;
 
 interface RecipientsQuery {
   statuses?: MemberStatus[];
@@ -69,9 +74,16 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
 
   let query = supabaseServer
     .from('members_enriched')
-    .select('email')
-    // Never send to emails on the suppression list (unsubscribed, bounced, complained).
-    .eq('suppressed', false);
+    .select('email, suppressed, suppression_reason');
+  if (q.category === 'critical') {
+    // For 履約必要通知, keep addresses whose only suppression reason is
+    // `unsubscribed`. Drop bounced/complained/spam/manual — those are hard
+    // deliverability failures.
+    query = query.or('suppressed.eq.false,suppression_reason.eq.unsubscribed');
+  } else {
+    // Non-critical: exclude everyone on the suppression list.
+    query = query.eq('suppressed', false);
+  }
   if (statuses && statuses.length) query = query.in('status', statuses);
   if (memberTiers && memberTiers.length) query = query.in('tier', memberTiers);
   if (ticketTiers && ticketTiers.length) query = query.in('highest_ticket_tier', ticketTiers);
@@ -90,9 +102,15 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
   }
 
   // Category filter: drop addresses whose newsletter_subscriptions row has the
-  // matching pref turned off, or that have unsubscribed_at set. Addresses with
-  // no subscription row pass through (treated as opted-in by default).
-  if (q.category && candidateEmails.length > 0) {
+  // matching pref turned off, or that have unsubscribed_at set. Critical
+  // broadcasts skip this filter entirely — they are履約必要通知 and always
+  // deliver to non-hard-bounced candidates.
+  const needsPrefFilter =
+    q.category &&
+    q.category !== 'critical' &&
+    candidateEmails.length > 0;
+
+  if (needsPrefFilter) {
     const prefColumn = `pref_${q.category}` as 'pref_newsletter' | 'pref_events' | 'pref_award';
     // Batch the .in() lookup — a single 990-email IN list overflows the
     // PostgREST URL/payload limit. 200/batch keeps the URL well under 16KB.
