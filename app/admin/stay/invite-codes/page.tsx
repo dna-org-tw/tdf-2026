@@ -10,6 +10,9 @@ interface InviteCode {
   batch_label: string | null;
   used_by_member_id: number | null;
   created_at: string;
+  sent_to_email: string | null;
+  sent_at: string | null;
+  sent_by: string | null;
 }
 
 export default function StayInviteCodesPage() {
@@ -22,6 +25,11 @@ export default function StayInviteCodesPage() {
   const [count, setCount] = useState(10);
   const [prefix, setPrefix] = useState('STAY');
   const [batchLabel, setBatchLabel] = useState('');
+
+  const [openSendId, setOpenSendId] = useState<string | null>(null);
+  const [sendEmail, setSendEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [rowError, setRowError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -62,6 +70,40 @@ export default function StayInviteCodesPage() {
       setError(err instanceof Error ? err.message : 'generate_failed');
     } finally {
       setGenerating(false);
+    }
+  }
+
+  function openSend(row: InviteCode) {
+    setOpenSendId(row.id);
+    setSendEmail(row.sent_to_email ?? '');
+    setRowError(null);
+  }
+
+  function cancelSend() {
+    setOpenSendId(null);
+    setSendEmail('');
+    setRowError(null);
+  }
+
+  async function submitSend(rowId: string) {
+    setSending(true);
+    setRowError(null);
+    try {
+      const res = await fetch(`/api/admin/stay/invite-codes/${rowId}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: sendEmail.trim() }),
+      });
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload.error || 'send_failed');
+      setMessage(`已寄出邀請碼至 ${sendEmail.trim()}`);
+      setOpenSendId(null);
+      setSendEmail('');
+      load();
+    } catch (err) {
+      setRowError(err instanceof Error ? err.message : 'send_failed');
+    } finally {
+      setSending(false);
     }
   }
 
@@ -135,11 +177,12 @@ export default function StayInviteCodesPage() {
                 <th className="py-2 px-3 text-left">批次</th>
                 <th className="py-2 px-3 text-left">使用者</th>
                 <th className="py-2 px-3 text-left">建立時間</th>
+                <th className="py-2 px-3 text-left">寄送</th>
               </tr>
             </thead>
             <tbody>
               {codes.map((c) => (
-                <tr key={c.id} className="border-t border-slate-100">
+                <tr key={c.id} className="border-t border-slate-100 align-top">
                   <td className="py-2 px-3 font-mono text-slate-800">{c.code}</td>
                   <td className="py-2 px-3">
                     <span
@@ -163,11 +206,61 @@ export default function StayInviteCodesPage() {
                   <td className="py-2 px-3 text-slate-600 tabular-nums">
                     {new Date(c.created_at).toLocaleString()}
                   </td>
+                  <td className="py-2 px-3">
+                    {c.status !== 'active' ? (
+                      <span className="text-slate-400">—</span>
+                    ) : openSendId === c.id ? (
+                      <div className="space-y-1">
+                        <input
+                          type="email"
+                          value={sendEmail}
+                          onChange={(e) => setSendEmail(e.target.value)}
+                          placeholder="recipient@example.com"
+                          className="w-56 px-2 py-1 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 text-xs"
+                          disabled={sending}
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => submitSend(c.id)}
+                            disabled={sending || !sendEmail.trim()}
+                            className="px-2 py-1 text-xs bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 text-white rounded"
+                          >
+                            {sending ? '寄送中...' : '送出'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelSend}
+                            disabled={sending}
+                            className="px-2 py-1 text-xs border border-slate-300 text-slate-600 hover:bg-slate-50 rounded"
+                          >
+                            取消
+                          </button>
+                        </div>
+                        {rowError && <p className="text-xs text-red-600">{rowError}</p>}
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        {c.sent_to_email && c.sent_at && (
+                          <p className="text-xs text-slate-500">
+                            已寄至 {c.sent_to_email} · {new Date(c.sent_at).toLocaleString()}
+                          </p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => openSend(c)}
+                          className="px-2 py-1 text-xs bg-white border border-cyan-500 text-cyan-700 hover:bg-cyan-50 rounded"
+                        >
+                          {c.sent_to_email ? '重寄' : '寄送'}
+                        </button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
               {codes.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-slate-400 text-sm">
+                  <td colSpan={6} className="py-8 text-center text-slate-400 text-sm">
                     尚無邀請碼
                   </td>
                 </tr>
