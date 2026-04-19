@@ -37,6 +37,9 @@ yarn-error.log*
 # worktrees
 .worktrees/
 
+# superpowers brainstorm artifacts (server PIDs, prototype HTML)
+.superpowers/
+
 # screenshots archive
 .screenshots/
 
