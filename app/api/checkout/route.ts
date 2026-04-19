@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createOrder } from '@/lib/orders';
 import { verifyRecaptcha } from '@/lib/recaptcha';
-import { isTicketSaleClosed, getTicketSaleCutoff } from '@/lib/ticketSaleCutoff';
+import { getTicketSaleCutoff } from '@/lib/ticketSaleCutoff';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (await isTicketSaleClosed()) {
-      const cutoff = await getTicketSaleCutoff();
+    const cutoff = await getTicketSaleCutoff();
+    if (Date.now() >= cutoff.getTime()) {
       return NextResponse.json(
         { error: 'sales_closed', cutoff: cutoff.toISOString() },
         { status: 403 },
