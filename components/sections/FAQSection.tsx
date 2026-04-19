@@ -34,7 +34,7 @@ export default function FAQSection() {
               transition={{ delay: i * 0.08 }}
             >
               <Link
-                href={`/guide#${item.guideTab}`}
+                href={`/guide#${item.guideSection}`}
                 className="block p-5 bg-white rounded-xl border border-stone-200 hover:border-stone-300 hover:shadow-sm transition-all h-full"
               >
                 <h3 className="font-semibold text-[#1E1F1C] mb-2">{item.question}</h3>
