@@ -186,7 +186,7 @@ export default function VisaSupportSection({ orders, lang = 'en', labels }: Visa
 
   return (
     <div id="visa-support">
-      <CollapsibleSection title={labels.title} count={loading ? '…' : 'PDF'} defaultOpen={false}>
+      <CollapsibleSection title={labels.title} count={loading ? '…' : 'PDF'} defaultOpen={false} tone="visa">
         <div className="mt-2 space-y-4">
           <p className="text-sm text-slate-600">{labels.intro}</p>
           <div className="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 flex items-start gap-3 text-sm text-slate-600 leading-relaxed">

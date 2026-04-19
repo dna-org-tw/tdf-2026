@@ -10,7 +10,7 @@ export default function StaySummaryCard({ summary }: { summary: Summary }) {
   const ctaLabel = summary.transfers.length ? 'Accept transfer' : active ? 'Manage stay' : 'Book stay';
 
   return (
-    <section className="rounded-2xl bg-white shadow-sm p-5 border border-slate-200">
+    <section className="rounded-2xl bg-[#F4ECDF] shadow-sm p-5 border border-[#DEC9A8]">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">Partner Stay</h2>

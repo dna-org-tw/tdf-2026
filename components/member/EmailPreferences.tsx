@@ -82,15 +82,15 @@ export default function EmailPreferences({ userEmail }: Props) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm animate-pulse">
-        <div className="h-4 bg-slate-200 rounded w-1/3 mb-3" />
-        <div className="h-3 bg-slate-200 rounded w-2/3" />
+      <div className="rounded-xl p-6 animate-pulse">
+        <div className="h-4 bg-slate-200/70 rounded w-1/3 mb-3" />
+        <div className="h-3 bg-slate-200/70 rounded w-2/3" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
+    <div className="pt-4 pb-2">
       <h2 className="text-xl font-bold text-slate-900 mb-1">{tp.title}</h2>
       <p className="text-sm text-slate-500 mb-4">{description}</p>
 

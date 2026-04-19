@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, useSyncExternalStore, Suspense } from 'react';
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
@@ -17,7 +17,6 @@ import UpcomingEvents from '@/components/member/UpcomingEvents';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 import StaySummaryCard from '@/components/member/StaySummaryCard';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
-import ActionHero from '@/components/member/ActionHero';
 import ProfileVisibility from '@/components/member/ProfileVisibility';
 import { formatOrderAmount } from '@/lib/orderDisplay';
 
@@ -215,19 +214,9 @@ function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTr
   return <span className={`px-2 py-[2px] rounded-full text-[10px] font-medium ${color}`}>{label}</span>;
 }
 
-let cachedNow: number | null = null;
-const nowSubscribe = (cb: () => void) => {
-  cachedNow = Date.now();
-  cb();
-  return () => {};
-};
-const nowGetClientSnapshot = () => cachedNow;
-const nowGetServerSnapshot = () => null;
-
 function MemberDashboard() {
   const { user, signOut } = useAuth();
   const { t, lang } = useTranslation();
-  const nowMs = useSyncExternalStore<number | null>(nowSubscribe, nowGetClientSnapshot, nowGetServerSnapshot);
   const [orders, setOrders] = useState<Order[]>([]);
   const [transferDeadline, setTransferDeadline] = useState<string | null>(null);
   const [deadlinePassed, setDeadlinePassed] = useState(false);
@@ -416,52 +405,10 @@ function MemberDashboard() {
     [deadlinePassed],
   );
 
-  // Derive Action Hero inputs.
-  const heroInputs = useMemo(() => {
-    if (nowMs == null) {
-      return {
-        daysUntilFestival: null as number | null,
-        daysSinceFestivalStart: null as number | null,
-        visaRequired: false,
-        firstUpcomingEventName: null as string | null,
-      };
-    }
-    const festivalStart = new Date(`${FESTIVAL_START}T00:00:00+08:00`).getTime();
-    const festivalEnd = new Date('2026-05-31T23:59:59+08:00').getTime();
-    const dayMs = 24 * 60 * 60 * 1000;
-    const daysUntilFestival = nowMs < festivalStart
-      ? Math.ceil((festivalStart - nowMs) / dayMs)
-      : null;
-    const daysSinceFestivalStart = nowMs >= festivalStart && nowMs <= festivalEnd
-      ? Math.floor((nowMs - festivalStart) / dayMs)
-      : null;
-    const hasPaidOrder = orders.some((o) => o.status === 'paid');
-    const locString = (profile.location ?? '').toLowerCase();
-    const locationLooksTaiwanese = locString.includes('taiwan')
-      || (profile.location ?? '').includes('台灣');
-    const visaRequired = hasPaidOrder && profile.location != null && !locationLooksTaiwanese;
-    const firstUpcomingEventName = lumaRegs
-      .filter((r) => r.startAt && new Date(r.startAt).getTime() >= nowMs)
-      .sort((a, b) => new Date(a.startAt!).getTime() - new Date(b.startAt!).getTime())[0]?.eventName
-      ?? null;
-    return { daysUntilFestival, daysSinceFestivalStart, visaRequired, firstUpcomingEventName };
-  }, [nowMs, orders, profile.location, lumaRegs]);
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      {/* Action Hero — priority-aware banner (payment-pending > visa > countdown/live) */}
-      {!loading && nowMs != null && (
-        <ActionHero
-          lang={lang}
-          orders={orders}
-          daysUntilFestival={heroInputs.daysUntilFestival}
-          daysSinceFestivalStart={heroInputs.daysSinceFestivalStart}
-          visaRequired={heroInputs.visaRequired}
-          firstUpcomingEventName={heroInputs.firstUpcomingEventName}
-        />
-      )}
-
-      {/* Identity card (hero) */}
+      {/* Identity card */}
       {!loading && user?.email && (
         <MemberPassport
           email={user.email}
@@ -504,6 +451,7 @@ function MemberDashboard() {
         title={t.auth.orderHistory}
         count={loading ? '…' : orders.length}
         defaultOpen={false}
+        tone="orders"
       >
         {loading ? (
           <div className="space-y-2 mt-2">
@@ -654,6 +602,7 @@ function MemberDashboard() {
           title={lang === 'zh' ? '已轉出訂單' : 'Transferred out'}
           count={outgoingTransfers.length}
           defaultOpen={false}
+          tone="transfers"
         >
           <ul className="mt-2 space-y-2">
             {outgoingTransfers.map((t) => (
@@ -720,7 +669,11 @@ function MemberDashboard() {
 
       {/* Email preferences (collapsible) */}
       {user?.email && (
-        <CollapsibleSection title={lang === 'zh' ? '信件偏好' : 'Email preferences'} defaultOpen={false}>
+        <CollapsibleSection
+          title={lang === 'zh' ? '信件偏好' : 'Email preferences'}
+          defaultOpen={false}
+          tone="email"
+        >
           <div className="mt-2">
             <EmailPreferences userEmail={user.email} />
           </div>

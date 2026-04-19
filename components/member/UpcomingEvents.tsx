@@ -122,9 +122,9 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
   }
 
   return (
-    <section className="rounded-2xl bg-white shadow-sm overflow-hidden">
+    <section className="rounded-2xl bg-[#E8F2EA] border border-[#C7DECB] shadow-sm overflow-hidden">
       {/* Header: title row + countdown */}
-      <header className="px-5 pt-4 pb-3 border-b border-stone-100">
+      <header className="px-5 pt-4 pb-3 border-b border-[#C7DECB]/60">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="font-display font-bold text-slate-900 text-base leading-tight">
@@ -153,7 +153,7 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
       </header>
 
       {/* Event list */}
-      <ul className="divide-y divide-stone-100">
+      <ul className="divide-y divide-[#C7DECB]/50">
         {upcoming.map((r) => (
           <EventRow key={r.eventApiId} reg={r} lang={lang} past={false} />
         ))}
@@ -164,8 +164,8 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
 
       {/* Past events */}
       {past.length > 0 && upcoming.length > 0 && (
-        <details className="border-t border-stone-100 group">
-          <summary className="px-5 py-3 cursor-pointer text-[12px] font-mono tracking-[0.2em] uppercase text-slate-400 hover:text-slate-600 list-none flex items-center justify-between transition-colors">
+        <details className="border-t border-[#C7DECB]/60 group">
+          <summary className="px-5 py-3 cursor-pointer text-[12px] font-mono tracking-[0.2em] uppercase text-slate-500 hover:text-slate-700 list-none flex items-center justify-between transition-colors">
             <span>
               {lang === 'zh' ? `過往活動 (${past.length})` : `Past events (${past.length})`}
             </span>
@@ -173,7 +173,7 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
               ▾
             </span>
           </summary>
-          <ul className="divide-y divide-stone-100">
+          <ul className="divide-y divide-[#C7DECB]/50">
             {past.map((r) => (
               <EventRow key={r.eventApiId} reg={r} lang={lang} past />
             ))}
@@ -182,7 +182,7 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
       )}
 
       {/* Footer: no-show warning + check-in rule */}
-      <footer className="border-t border-stone-100">
+      <footer className="border-t border-[#C7DECB]/60">
         {noShowCount > 0 && (
           <div className="px-5 py-2.5 bg-red-50/50 border-b border-red-100/60 flex items-center gap-2">
             <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-red-400" aria-hidden />
@@ -335,7 +335,7 @@ function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; p
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="group block hover:bg-stone-50 transition-colors"
+          className="group block hover:bg-[#DCE8DF] transition-colors"
         >
           {content}
         </a>
