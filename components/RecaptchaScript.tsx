@@ -12,7 +12,7 @@ export default function RecaptchaScript() {
   return (
     <Script
       src={`https://www.google.com/recaptcha/enterprise.js?render=${siteKey}`}
-      strategy="afterInteractive"
+      strategy="lazyOnload"
     />
   );
 }

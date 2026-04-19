@@ -9,6 +9,7 @@ import { ChevronDown, Users } from 'lucide-react';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import { useNewsletterCount } from '@/hooks/useNewsletterCount';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
 
@@ -57,7 +58,7 @@ function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?:
 
   return (
     <motion.span
-      className="inline-block"
+      className="inline-block tabular-nums min-w-[3ch] text-center"
       animate={isAnimating ? { scale: [1, 1.1, 1] } : {}}
       transition={{ duration: 0.3 }}
     >
@@ -77,30 +78,10 @@ export default function HeroSection() {
 
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [followerCount, setFollowerCount] = useState(0);
-  const [isLoadingCount, setIsLoadingCount] = useState(true);
+  const { count: followerCount, loading: isLoadingCount, increment: incrementFollowerCount } = useNewsletterCount();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'success' | 'error' | 'duplicate' | null>(null);
   const [modalMessage, setModalMessage] = useState('');
-
-  // Fetch follower count
-  useEffect(() => {
-    const fetchFollowerCount = async () => {
-      try {
-        const response = await fetch('/api/newsletter/count');
-        const data = await response.json();
-        if (response.ok && data.count !== undefined) {
-          setFollowerCount(data.count);
-        }
-      } catch (error) {
-        console.error('Failed to fetch follower count:', error);
-      } finally {
-        setIsLoadingCount(false);
-      }
-    };
-
-    fetchFollowerCount();
-  }, []);
 
   const handleFollowSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -178,8 +159,8 @@ export default function HeroSection() {
       setModalMessage(result.message || t.hero.followForm.successMessage);
       setEmail('');
       setModalOpen(true);
-      // Update follower count
-      setFollowerCount((prev) => prev + 1);
+      // Update follower count (shared across sections via module-level cache)
+      incrementFollowerCount();
       trackEvent('CompleteRegistration', {
         content_name: 'Hero Free Follow Form',
         content_category: 'Newsletter Subscription',
@@ -315,21 +296,21 @@ export default function HeroSection() {
               className="relative bg-black/40 border border-white/20 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 backdrop-blur-md"
             >
               <div className="relative z-10">
-                {/* Title with Follower Count */}
-                {!isLoadingCount ? (
-                  <h3 className="text-sm sm:text-base font-semibold text-white/80 mb-3 text-center">
-                    <span>{t.hero.followForm.followerCountPrefix}</span>{' '}
-                    <span className="text-[#10B8D9]">
-                      <AnimatedCounter value={followerCount} />
-                    </span>
-                    {' '}
-                    <span>{t.hero.followForm.followerCountSuffix}</span>
-                  </h3>
-                ) : (
-                  <h3 className="text-sm sm:text-base font-semibold text-white/80 mb-3 text-center">
-                    {t.hero.followForm.title}
-                  </h3>
-                )}
+                {/* Title with Follower Count — reserve height to avoid layout shift */}
+                <h3 className="text-sm sm:text-base font-semibold text-white/80 mb-3 text-center min-h-[1.5rem]">
+                  {!isLoadingCount && followerCount !== null ? (
+                    <>
+                      <span>{t.hero.followForm.followerCountPrefix}</span>{' '}
+                      <span className="text-[#10B8D9]">
+                        <AnimatedCounter value={followerCount} />
+                      </span>
+                      {' '}
+                      <span>{t.hero.followForm.followerCountSuffix}</span>
+                    </>
+                  ) : (
+                    <span>{t.hero.followForm.title}</span>
+                  )}
+                </h3>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <div className="flex-1" suppressHydrationWarning>

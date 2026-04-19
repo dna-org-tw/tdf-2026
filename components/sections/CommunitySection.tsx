@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Mail, CheckCircle2, Zap, Users } from 'lucide-react';
 import { TIER_ACCENT, type IdentityTier } from '@/components/member/MemberPassport';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import { useNewsletterCount } from '@/hooks/useNewsletterCount';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
@@ -51,7 +52,7 @@ function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?:
 
   return (
     <motion.span
-      className="inline-block"
+      className="inline-block tabular-nums min-w-[3ch] text-center"
       animate={isAnimating ? { scale: [1, 1.1, 1] } : {}}
       transition={{ duration: 0.3 }}
     >
@@ -154,8 +155,7 @@ export default function CommunitySection() {
   const [total, setTotal] = useState(0);
   const [anonymousCount, setAnonymousCount] = useState(0);
   const [animals, setAnimals] = useState<AnonymousAnimal[]>([]);
-  const [followerCount, setFollowerCount] = useState(0);
-  const [isLoadingCount, setIsLoadingCount] = useState(true);
+  const { count: followerCount, loading: isLoadingCount, increment: incrementFollowerCount } = useNewsletterCount();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalState, setModalState] = useState<{
@@ -187,16 +187,6 @@ export default function CommunitySection() {
         setAnimals(pickRandomAnimals(Math.min(ANIMAL_SLOT_COUNT, anon)));
       })
       .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/newsletter/count')
-      .then((r) => r.json())
-      .then((d) => {
-        if (typeof d?.count === 'number') setFollowerCount(d.count);
-      })
-      .catch(() => {})
-      .finally(() => setIsLoadingCount(false));
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -234,7 +224,7 @@ export default function CommunitySection() {
       if (response.ok) {
         setModalState({ isOpen: true, type: 'success', message: data.message || t.followUs.successMessage });
         setEmail('');
-        setFollowerCount((prev) => prev + 1);
+        incrementFollowerCount();
         trackEvent('CompleteRegistration', {
           content_name: 'Community Section Form',
           content_category: 'Newsletter Subscription',
@@ -282,7 +272,7 @@ export default function CommunitySection() {
               {t.followUs.subtitle}
             </p>
 
-            {!isLoadingCount && followerCount > 0 && (
+            {!isLoadingCount && followerCount !== null && followerCount > 0 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import type { CalendarEvent } from "@/lib/lumaSchedule";
 
 export interface NomadFriendlyStore {
@@ -20,21 +21,21 @@ interface NomadMapProps {
   isEn?: boolean;
 }
 
-// Fix Leaflet default icon paths (broken by webpack)
+// Fix Leaflet default icon paths (broken by webpack). Icons live in /public.
 function fixLeafletIcons() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconRetinaUrl: "/images/leaflet/marker-icon-2x.png",
+    iconUrl: "/images/leaflet/marker-icon.png",
+    shadowUrl: "/images/leaflet/marker-shadow.png",
   });
 }
 
-const MARKER_SHADOW = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
+const MARKER_SHADOW = "/images/leaflet/marker-shadow.png";
 
 const storeIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png",
+  iconUrl: "/images/leaflet/marker-icon-2x-grey.png",
   shadowUrl: MARKER_SHADOW,
   iconSize: [18, 30],
   iconAnchor: [9, 30],
@@ -142,12 +143,6 @@ export default function NomadMap({ stores, events = [], isEn = false }: NomadMap
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossOrigin=""
-      />
       <style>{`
         .event-marker {
           display: flex;

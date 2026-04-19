@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint, setVisitorFingerprint } from '@/lib/visitorStorage';
 
@@ -10,6 +9,9 @@ const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'develo
 /**
  * 進入網頁時自動記錄 visitor：fingerprint、IP、時區、語系等
  * 將 fingerprint 存至 sessionStorage，供訂閱/購買時關聯裝置
+ *
+ * Deferred until the browser is idle so FingerprintJS loading and the
+ * POST /api/visitors/record round-trip do not compete with LCP / TBT.
  */
 export default function VisitorTracker() {
   useEffect(() => {
@@ -18,6 +20,7 @@ export default function VisitorTracker() {
 
       try {
         if (!fingerprint) {
+          const { default: FingerprintJS } = await import('@fingerprintjs/fingerprintjs');
           const fp = await FingerprintJS.load();
           const result = await fp.get();
           fingerprint = result.visitorId;
@@ -50,7 +53,15 @@ export default function VisitorTracker() {
       }
     };
 
-    recordVisitor();
+    const schedule: (cb: () => void) => void =
+      typeof window !== 'undefined' && 'requestIdleCallback' in window
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? (cb) => (window as any).requestIdleCallback(cb, { timeout: 3000 })
+        : (cb) => setTimeout(cb, 2000);
+
+    schedule(() => {
+      void recordVisitor();
+    });
   }, []);
 
   return null;

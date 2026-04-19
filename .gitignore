@@ -43,6 +43,9 @@ yarn-error.log*
 # screenshots archive
 .screenshots/
 
+# performance tool output (lighthouse/psi dumps)
+.perf/
+
 # local tooling / caches
 .claude/
 .playwright-mcp/

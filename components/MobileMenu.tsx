@@ -64,6 +64,7 @@ export default function MobileMenu({
                 {isAdmin && (
                   <Link
                     href="/admin"
+                    prefetch={false}
                     onClick={onClose}
                     className="text-sm font-medium text-[#1E1F1C] hover:text-[#10B8D9]"
                   >

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -25,6 +25,37 @@ const NomadMap = dynamic(
     ),
   }
 );
+
+// Lazy-render the map only when the container is near the viewport.
+// This prevents ~26 OSM tile requests + Leaflet bundle from blocking initial load.
+function useNearViewport<T extends Element>(rootMargin: string = '400px') {
+  const ref = useRef<T | null>(null);
+  const [isNear, setIsNear] = useState(false);
+
+  useEffect(() => {
+    if (isNear || !ref.current) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsNear(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setIsNear(true);
+            observer.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin },
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [isNear, rootMargin]);
+
+  return { ref, isNear };
+}
 
 // Nomad-friendly accommodation data provided by organizers
 const NOMAD_STORES: NomadFriendlyStore[] = [
@@ -157,6 +188,7 @@ export default function AccommodationSection() {
   const isEn = lang === 'en';
   const { events } = useLumaData();
   useSectionTracking({ sectionId: 'accommodation', sectionName: 'Accommodation Section', category: 'Event Information' });
+  const { ref: mapSlotRef, isNear: shouldLoadMap } = useNearViewport<HTMLDivElement>('400px');
 
   return (
     <section id="accommodation" className="bg-white pt-20 md:pt-28 lg:pt-32 transition-colors duration-500">
@@ -201,34 +233,45 @@ export default function AccommodationSection() {
             className="rounded-lg overflow-hidden shadow-lg border border-[#F6F6F6]"
             style={{ width: '100%' }}
           >
-            <ErrorBoundary
-              fallback={
-                <div className="flex flex-col items-center justify-center h-full bg-stone-50 p-8">
-                  <MapPin className="w-16 h-16 text-amber-500 mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                    {t.accommodation.mapErrorTitle}
-                  </h3>
-                  <p className="text-sm text-slate-600 mb-4 text-center max-w-md">
-                    {t.accommodation.mapErrorDescription}{' '}
-                    <a
-                      href="https://www.google.com/maps/search/?api=1&query=台東+花蓮+住宿"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#10B8D9] hover:underline"
-                    >
-                      {t.accommodation.mapErrorSearchLink}
-                    </a>
-                    {' '}{t.accommodation.mapErrorSearchSuffix}
-                  </p>
-                </div>
-              }
-            >
-              <NomadMap
-                stores={NOMAD_STORES}
-                events={events}
-                isEn={isEn}
-              />
-            </ErrorBoundary>
+            <div ref={mapSlotRef}>
+              <ErrorBoundary
+                fallback={
+                  <div className="flex flex-col items-center justify-center h-full bg-stone-50 p-8">
+                    <MapPin className="w-16 h-16 text-amber-500 mb-4" />
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                      {t.accommodation.mapErrorTitle}
+                    </h3>
+                    <p className="text-sm text-slate-600 mb-4 text-center max-w-md">
+                      {t.accommodation.mapErrorDescription}{' '}
+                      <a
+                        href="https://www.google.com/maps/search/?api=1&query=台東+花蓮+住宿"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#10B8D9] hover:underline"
+                      >
+                        {t.accommodation.mapErrorSearchLink}
+                      </a>
+                      {' '}{t.accommodation.mapErrorSearchSuffix}
+                    </p>
+                  </div>
+                }
+              >
+                {shouldLoadMap ? (
+                  <NomadMap
+                    stores={NOMAD_STORES}
+                    events={events}
+                    isEn={isEn}
+                  />
+                ) : (
+                  <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] bg-stone-100 flex items-center justify-center">
+                    <div className="text-center text-slate-400">
+                      <MapPin className="w-10 h-10 mx-auto mb-2" />
+                      <p className="text-sm">{isEn ? 'Map loads when you scroll near' : '捲動到此會自動載入地圖'}</p>
+                    </div>
+                  </div>
+                )}
+              </ErrorBoundary>
+            </div>
           </motion.div>
         </div>
       </div>
