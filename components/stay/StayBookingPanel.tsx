@@ -95,7 +95,7 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
                 onChange={() => toggleWeek(w.code)}
               />
               <span>
-                {w.code} · {w.starts_on} → {w.ends_on} · NT${w.price_twd}
+                {w.code} · {w.starts_on} → {w.ends_on} · NT${w.price_twd} / 7 nights
               </span>
             </label>
           ))

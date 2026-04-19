@@ -41,6 +41,7 @@ export default function StayInventoryGrid({ weeks, stay }: { weeks: any[]; stay:
               <div className="text-right">
                 <div className="text-xs font-medium uppercase tracking-wider text-slate-400">TWD</div>
                 <div className="text-xl font-semibold text-slate-900">${week.price_twd.toLocaleString()}</div>
+                <div className="mt-0.5 text-xs text-slate-500">{stay.perWeekLabel}</div>
               </div>
             </div>
           </article>
