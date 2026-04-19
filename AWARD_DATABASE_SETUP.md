@@ -1,10 +1,16 @@
 # Nomad Award 資料庫設定
 
-本文件說明 Nomad Award 功能所需的資料庫表結構。
+> **⚠️ 過時（Deprecated）**
+>
+> 本文件描述的 `award_posts` 表已不再使用。實際部署的表是 **`ig_posts`**（JSONB `data` 欄位存完整 Instagram scrape 原始資料），migration 在 `supabase/migrations/zz_create_ig_posts.sql`。投票表 `award_votes` 仍然有效（`supabase/migrations/zz_create_award_votes.sql`）。
+>
+> 程式碼路徑：`app/api/award/posts/route.ts` 的 `getIgPosts()` 與 `app/api/award/fetch-reels/route.ts` 的 `fetchAllIgPosts()` 皆以 `ig_posts` 為唯一真相來源。
+>
+> 以下內容僅作歷史參考，請勿據以建表。
 
 ## 需要的資料庫表
 
-### 1. `award_posts` 表
+### 1. `award_posts` 表（已過時）
 
 儲存 Instagram 貼文資訊，包含從 API 獲取的所有欄位。
 

@@ -66,6 +66,7 @@ export interface Order {
   parent_order_id: string | null;
   valid_from: string | null;
   valid_until: string | null;
+  visitor_fingerprint: string | null;
   created_at: string;
   updated_at: string;
 }
