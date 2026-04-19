@@ -18,7 +18,8 @@ export type EmailType =
   | 'stay_waitlist_offer'
   | 'stay_waitlist_expired'
   | 'stay_modification_confirmed'
-  | 'stay_no_show_charged';
+  | 'stay_no_show_charged'
+  | 'stay_invite_code';
 
 interface EmailLogEntry {
   to_email: string;
