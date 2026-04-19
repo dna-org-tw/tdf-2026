@@ -466,7 +466,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '可以提供參與證明或邀請函嗎？',
-                answer: '可以。購票完成後，請寄信至 fest@dna.org.tw，附上購票證明，主辦方會開立參與證明文件，可作為簽證申請的輔助文件。',
+                answer: '可以。購票完成後，請直接到會員中心的簽證輔助文件頁面自助下載 PDF。',
               },
               {
                 question: '怎麼成為 TDF 志工？',
@@ -1289,7 +1289,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'Can you provide a participation certificate or invitation letter?',
-                answer: 'Yes. After purchasing a ticket, email fest@dna.org.tw with proof of purchase. The organizer will issue a participation certificate that can support visa applications.',
+                answer: 'Yes. After completing your purchase, go to the visa support document page in the member home to download the PDF yourself.',
               },
               {
                 question: 'How do I become a TDF volunteer?',
