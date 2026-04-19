@@ -358,6 +358,10 @@ export const content = {
       followerCta: "Follow for Free",
       payWithCard: "Start Your Journey",
       processing: "Preparing your journey...",
+      salesClosed: {
+        banner: "Ticket sales closed at 2026-04-21 00:00 (Asia/Taipei). For late orders please contact registration@taiwandigitalfest.com",
+        button: "Sales closed",
+      },
       follower: {
         title: "Follower",
         subtitle: "Still on the fence? Follow us for free!",
@@ -1510,6 +1514,10 @@ export const content = {
       followerCta: "免費關注",
       payWithCard: "開始你的旅程",
       processing: "馬上就好...",
+      salesClosed: {
+        banner: "售票已於 2026-04-21 00:00（台北時間）結束。如需補購，請來信 registration@taiwandigitalfest.com",
+        button: "售票已結束",
+      },
       follower: {
         title: "Follower",
         subtitle: "還沒決定好嗎？先來免費關注吧！",
