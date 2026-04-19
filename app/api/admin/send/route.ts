@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Enqueue all emails (inserted as 'pending' in email_logs)
-    const { queued } = await enqueueEmails(emails, subject, logEntry.id);
+    const { queued } = await enqueueEmails(emails, subject, logEntry.id, { category });
 
     // Fire-and-forget: start processing in the background
     processAllPending(logEntry.id).catch((err) =>
