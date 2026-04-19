@@ -86,7 +86,7 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
     const { data: votes } = supabaseServer
       ? await supabaseServer
           .from('award_votes')
-          .select('post_id, count')
+          .select('post_id')
           .eq('confirmed', true)
       : { data: null };
 
@@ -102,121 +102,6 @@ async function fetchInstagramPosts(): Promise<InstagramPost[]> {
     return [];
   } catch (error) {
     console.error('[Award API] Failed to fetch Instagram posts:', error);
-    return [];
-  }
-}
-
-/**
- * Fetch stored posts from the database (if posts are stored in the DB)
- */
-async function getStoredPosts(): Promise<InstagramPost[]> {
-  if (!supabaseServer) {
-    return [];
-  }
-
-  try {
-    const { data: posts, error } = await supabaseServer
-      .from('award_posts')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('[Award API] Failed to fetch stored posts:', error);
-      return [];
-    }
-
-    // Fetch vote count for each post
-    const { data: votes } = supabaseServer
-      ? await supabaseServer
-          .from('award_votes')
-          .select('post_id')
-          .eq('confirmed', true)
-      : { data: null };
-
-    const voteCounts: Record<string, number> = {};
-    if (votes) {
-      votes.forEach((vote: { post_id: string }) => {
-        voteCounts[vote.post_id] = (voteCounts[vote.post_id] || 0) + 1;
-      });
-    }
-
-    return (posts || []).map((post: {
-      id: string;
-      permalink?: string;
-      media_url?: string;
-      caption?: string;
-      username?: string;
-      timestamp?: string;
-      created_at?: string;
-      input_url?: string;
-      post_type?: string;
-      short_code?: string;
-      url?: string;
-      display_url?: string;
-      video_url?: string;
-      dimensions_height?: number;
-      dimensions_width?: number;
-      likes_count?: number;
-      comments_count?: number;
-      video_play_count?: number;
-      ig_play_count?: number;
-      fb_like_count?: number;
-      fb_play_count?: number;
-      video_duration?: number;
-      owner_full_name?: string;
-      owner_username?: string;
-      owner_id?: string;
-      first_comment?: string;
-      location_name?: string;
-      product_type?: string;
-      hashtags?: string[];
-      mentions?: string[];
-      images?: string[];
-      latest_comments?: unknown[];
-      child_posts?: unknown[];
-      tagged_users?: unknown[];
-      music_info?: unknown;
-      coauthor_producers?: unknown[];
-    }): InstagramPost => ({
-      id: post.id,
-      permalink: post.permalink || post.url || '',
-      media_url: post.media_url || post.display_url || post.video_url || '',
-      caption: post.caption || undefined,
-      username: post.username || post.owner_username || '',
-      timestamp: post.timestamp || post.created_at || new Date().toISOString(),
-      vote_count: voteCounts[post.id] || 0,
-      input_url: post.input_url || null,
-      post_type: post.post_type || null,
-      short_code: post.short_code || null,
-      url: post.url || null,
-      display_url: post.display_url || null,
-      video_url: post.video_url || null,
-      dimensions_height: post.dimensions_height || null,
-      dimensions_width: post.dimensions_width || null,
-      likes_count: post.likes_count || null,
-      comments_count: post.comments_count || null,
-      video_play_count: post.video_play_count || null,
-      ig_play_count: post.ig_play_count || null,
-      fb_like_count: post.fb_like_count || null,
-      fb_play_count: post.fb_play_count || null,
-      video_duration: post.video_duration || null,
-      owner_full_name: post.owner_full_name || null,
-      owner_username: post.owner_username || null,
-      owner_id: post.owner_id || null,
-      first_comment: post.first_comment || null,
-      location_name: post.location_name || null,
-      product_type: post.product_type || null,
-      hashtags: post.hashtags || null,
-      mentions: post.mentions || null,
-      images: post.images || null,
-      latest_comments: post.latest_comments || null,
-      child_posts: post.child_posts || null,
-      tagged_users: post.tagged_users || null,
-      music_info: post.music_info || null,
-      coauthor_producers: post.coauthor_producers || null,
-    }));
-  } catch (error) {
-    console.error('[Award API] Error fetching stored posts:', error);
     return [];
   }
 }
@@ -391,11 +276,6 @@ export async function GET(_req: NextRequest) {
   try {
     // Prefer fetching all data from ig_posts table
     let posts = await getIgPosts();
-
-    // If ig_posts table is empty, try award_posts table
-    if (posts.length === 0) {
-      posts = await getStoredPosts();
-    }
 
     // If no posts in database, try fetching from Instagram API
     if (posts.length === 0) {

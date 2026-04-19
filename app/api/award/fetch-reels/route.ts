@@ -26,21 +26,6 @@ async function fetchAllIgPosts(): Promise<unknown[]> {
         details: error.details,
         hint: error.hint,
       });
-      
-      // If table doesn't exist, fall back to award_posts table
-      if (error.code === '42P01' || error.message?.includes('does not exist')) {
-        const { data: awardPosts, error: awardError } = await supabaseServer
-          .from('award_posts')
-          .select('*');
-        
-        if (awardError) {
-          console.error('[Award API] Failed to fetch posts from award_posts table:', awardError);
-          return [];
-        }
-        
-        return awardPosts || [];
-      }
-      
       return [];
     }
 
