@@ -29,7 +29,7 @@ const SENDER_ORG =
   process.env.EMAIL_SENDER_ORG?.trim() || 'Taiwan Digital Fest 2026';
 
 const CUSTOMER_SUPPORT_EMAIL =
-  process.env.CUSTOMER_SUPPORT_EMAIL?.trim() || 'info@dna.org.tw';
+  process.env.CUSTOMER_SUPPORT_EMAIL?.trim() || 'fest@dna.org.tw';
 
 export interface ComplianceFooterOptions {
   email?: string;
