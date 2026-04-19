@@ -7,9 +7,11 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { trackEvent } from '@/components/FacebookPixel';
 import { guideContent } from '@/data/guide';
 import GuideHero from '@/components/guide/GuideHero';
+import GuideSearch from '@/components/guide/GuideSearch';
 import GuideQuickNav from '@/components/guide/GuideQuickNav';
 import GuideSectionRenderer from '@/components/guide/GuideSectionRenderer';
 import GuideLimitationsSection from '@/components/guide/GuideLimitationsSection';
+import GuideContactCard from '@/components/guide/GuideContactCard';
 
 const Footer = dynamic(() => import('@/components/Footer'), {
   ssr: false,
@@ -52,11 +54,13 @@ export default function GuidePage() {
       <div className="container mx-auto px-4 sm:px-6 pt-28 pb-16">
         <div className="mx-auto max-w-6xl space-y-8">
           <GuideHero guide={guide} />
+          <GuideSearch sections={guide.sections} lang={lang} />
           <GuideQuickNav navGroups={guide.navGroups} />
           {guide.sections.map((section) => (
             <GuideSectionRenderer key={section.id} section={section} />
           ))}
           <GuideLimitationsSection limitations={guide.limitations} />
+          <GuideContactCard lang={lang} />
         </div>
       </div>
       <Footer />

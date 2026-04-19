@@ -166,11 +166,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '購票後要怎麼確認訂單？',
-                answer: '購票成功後系統會寄送確認信。若沒有收到，請先到官網右上角用 email 登入查看 `/me` 與訂單中心；仍找不到再聯繫 registration@taiwandigitalfest.com 或 IG。',
+                answer: '購票成功後系統會寄送確認信。若沒有收到，請到官網右上角用 email 登入會員中心查看你的訂單；仍找不到再聯繫 registration@taiwandigitalfest.com 或 IG。',
               },
               {
                 question: '可以退票嗎？',
-                answer: '票券條款預設不可退款，但已付款母訂單支援在截止日前自助轉讓。',
+                answer: '票券原則上不可退款，但已付款的票可以在截止日前自助轉讓給朋友。',
               },
             ],
           },
@@ -181,7 +181,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         group: 'event',
         label: '活動報名',
         title: '如何用票券去預約各場活動',
-        intro: 'TDF 的活動報名與票券是分開處理：先拿到參與資格，再去 Luma 頁面送出預約。',
+        intro: 'TDF 的活動報名和票券是分開處理：先拿到參與資格，再到我們的活動預約平台 Luma 送出每場活動的預約。',
         blocks: [
           {
             type: 'steps',
@@ -191,12 +191,12 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
                 body: '先購買嘉年華票券，或持有對應活動可接受的身份與權限。',
               },
               {
-                title: '到 Luma 頁面送出預約',
-                body: '前往各場活動的 Luma 頁面提出申請，工作人員會在後台依票券等級與順序核對。',
+                title: '到 Luma 送出預約',
+                body: 'Luma 是我們使用的活動預約平台。到每場活動的 Luma 頁面提出申請，工作人員會依你的票券等級與報名順序核對。',
               },
               {
                 title: '等待審核結果',
-                body: '核可後會收到 Luma 的批准狀態；活動當天以 Luma 預約紀錄完成報到。',
+                body: '核可後會收到 Luma 的批准通知信；活動當天以 Luma 上的預約紀錄完成報到。',
               },
             ],
           },
@@ -205,7 +205,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: '報名後什麼時候會收到確認？',
-                answer: '系統會依主辦方審核節奏逐步核可。請以 Luma 狀態與通知信為準。',
+                answer: '主辦方會分批審核並逐步核可。請留意 Luma 上的狀態與你信箱裡的通知信。',
               },
               {
                 question: '報名了但沒到會怎樣？',
@@ -239,7 +239,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: '想要找 TDF 合作住宿？',
-                answer: '我們有找了在地合作商家，每晚約 25–30 USD，詳情請洽 `/stay`。',
+                answer: '我們有找了在地合作商家，每晚約 25–30 USD，詳情請見官網的合作住宿頁面。',
               },
             ],
           },
@@ -517,15 +517,15 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-guide',
         group: 'member',
         label: '會員指南',
-        title: '這不只是查訂單，而是一套獨立會員系統',
-        intro: 'TDF 的會員能力包含登入、身份卡、公開或私密名片、收藏、活動與訂單、自助轉讓、信件偏好，以及已上線但仍有缺口的自助升級流程。',
+        title: '不只是查訂單，而是一整套會員工具',
+        intro: 'TDF 會員可以登入個人頁、擁有專屬會員卡、公開或私密分享名片、收藏其他會眾、查看活動與訂單、把票轉讓給朋友、調整信件偏好，以及自助升級票種。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
                 title: '你會在這一區看到什麼',
-                body: '這一區會先講什麼是 member，再說明登入與身份卡、名片與公開頁、收藏、活動與訂單、轉讓、信件偏好、升級，以及目前限制。',
+                body: '這一區會依序說明：什麼樣的人算會員、怎麼登入和看會員卡、如何編輯名片與公開頁、收藏功能、活動與訂單管理、轉讓票券、信件偏好、升級票種，以及目前還在優化中的部分。',
               },
             ],
           },
@@ -535,19 +535,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-basics',
         group: 'member',
         label: '會員是什麼',
-        title: '登入帳號和會員身份是兩層不同資料',
-        intro: '系統中的 `users` 是登入帳號，`members` 才是實際會員身份。只有進到 `members` 的 email 才會拿到 `member_no`，並啟用完整會員能力。',
+        title: '誰算是 TDF 的會員',
+        intro: '只要你曾經和 TDF 有過互動——買過票、訂閱過電子報、收過我們的活動信，你的 email 就會成為會員。登入會員中心後，就會看到完整的會員專屬功能。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: '什麼情況會成為 member',
-                body: '`members` 不只來自付費訂單，也會從 newsletter 訂閱與系統寄信紀錄建立，所以 follower 也可能是 member。',
+                title: '哪些人會自動成為會員',
+                body: '不只買過票的人是會員——只要你訂閱過電子報、或收過我們寄出的活動信，你的 email 也會自動成為會員，享有會員卡與相關功能。',
               },
               {
-                title: '沒有 member row 會發生什麼事',
-                body: '你仍然可以登入 `/me`，但若 email 尚未對應到 `members` row，`member_no`、公開卡、收藏等能力會受限或空白。',
+                title: '如果系統不認得你怎麼辦',
+                body: '你還是可以用 email 登入會員中心，但部分功能（會員編號、公開名片、收藏等）會看起來空空的。如果你確定有買過票或訂閱過卻仍找不到資料，請來信 fest@dna.org.tw，我們會協助處理。',
               },
             ],
           },
@@ -557,19 +557,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-auth-passport',
         group: 'member',
         label: '登入與身份卡',
-        title: '用 email 驗證碼登入，再由系統判斷你的身份卡等級',
-        intro: '會員登入走 email + 6 碼驗證碼，可重寄，session cookie 保留 7 天；登入後 `/me` 會集中顯示會員身份卡、活動、訂單、收藏提醒與設定。',
+        title: '用 email 驗證碼登入，看你的會員卡',
+        intro: '輸入你的 email，我們會寄一組 6 碼驗證碼，輸入後就完成登入；驗證碼可以重寄，登入狀態會保留 7 天。登入後在會員中心可以看到你的會員卡、報名的活動、訂單紀錄、收藏提醒和個人設定。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: '會員首頁是整合式 dashboard',
-                body: '登入後會集中讀取 member 編號、身份等級、名片資料、活動、訂單、轉讓紀錄、收藏提醒、住宿摘要與信件偏好。',
+                title: '會員中心整合所有資訊',
+                body: '登入後一頁就能看到：你的會員編號、身份等級、名片資料、報名的活動、訂單紀錄、轉讓紀錄、收藏提醒、住宿摘要與信件偏好。',
               },
               {
-                title: '身份卡等級如何決定',
-                body: '系統會依已付款訂單決定 `follower / explore / contribute / weekly_backer / backer` 身份與有效期間；沒有付費單就回到 follower。',
+                title: '會員卡等級怎麼決定',
+                body: '系統依你購買的票券自動判定：免費會員（追蹤者）、單週票持有者、一般票持有者，或最高階票持有者。每個等級都有對應的有效期間；沒買票時就是免費會員。',
               },
             ],
           },
@@ -579,23 +579,23 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-profile-card',
         group: 'member',
         label: '名片與公開頁',
-        title: '你的會員卡可以公開，也可以保持私密後用 QR 分享',
-        intro: '目前可編輯顯示名稱、頭像、所在地、自介、標籤與社群連結，並在公開與私密之間切換。',
+        title: '你的會員名片可以公開，也可以保持私密',
+        intro: '會員名片可以填寫顯示名稱、頭像、所在地、自我介紹、興趣標籤和社群連結，並隨時切換「公開給大家看」或「保持私密」。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: '可編輯欄位',
-                body: '顯示名稱、頭像、所在地、自介、標籤與社群連結都寫入 `member_profiles`；頭像支援 JPEG / PNG / WebP，大小上限 2MB。',
+                title: '可以填什麼',
+                body: '顯示名稱、頭像、所在地、自我介紹、興趣標籤、社群連結都可以自己編輯。頭像支援 JPEG / PNG / WebP，檔案大小上限 2MB。',
               },
               {
-                title: '公開名片與目錄',
-                body: '公開後會擁有 `/members/{memberNo}` 個人頁，也會出現在 `/members` 公開目錄中，支援搜尋與分頁。',
+                title: '公開名片與會員目錄',
+                body: '把名片設為公開後，你會擁有自己的會員頁網址，也會出現在公開的會員目錄中，方便其他會眾搜尋認識你。',
               },
               {
                 title: '私密分享',
-                body: '即使名片保持私密，仍可透過有效期 5 分鐘的 QR token 在現場分享。',
+                body: '就算名片保持私密，現場也可以打開會員卡上的 QR code 給對方掃，臨時分享你的名片。為了保護你的隱私，這個 QR code 每 5 分鐘會自動更新一次。',
               },
             ],
           },
@@ -605,19 +605,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-collections',
         group: 'member',
         label: '收藏',
-        title: '你可以收藏其他會員，也能知道誰收藏了你',
-        intro: '公開卡可以直接收藏；私密卡需帶有效 QR token。系統會阻擋收藏自己。',
+        title: '你可以收藏其他會員，也會知道誰收藏了你',
+        intro: '在活動中認識新朋友後，可以把對方加入你的收藏，方便日後聯繫。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
                 title: '怎麼收藏',
-                body: '登入會員後，可在公開會員頁直接收藏；若對方是私密卡，需透過 QR token 驗證後才能收藏。',
+                body: '登入後，到對方的公開會員頁就能直接點擊收藏。如果對方名片是私密的，需要請對方現場讓你掃 QR code 之後才能收藏。',
               },
               {
-                title: '在哪裡查看收藏',
-                body: '`/me/collections` 會顯示你收藏的人、誰收藏了你、未讀數，以及移除自己已收藏對象的操作。',
+                title: '在哪裡查看',
+                body: '會員中心的「收藏」分頁會顯示：你收藏了哪些人、有哪些人收藏了你、有沒有新的收藏通知，也可以移除你已收藏的對象。',
               },
             ],
           },
@@ -627,19 +627,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-activity-orders',
         group: 'member',
         label: '活動與訂單',
-        title: '會員頁同時是你的 participation center',
-        intro: '這裡同時整合了活動報名狀態與訂單紀錄，而不是只有單純查票。',
+        title: '會員中心是你的活動參與紀錄',
+        intro: '這裡可以一次看到你報名了哪些活動，以及買過哪些票，不用到處查。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
                 title: '我的活動',
-                body: 'Dashboard 會從 Luma 同步 upcoming / past events、核准或候補狀態、是否簽到，以及 no-show penalty 是否已被消化。',
+                body: '會員中心會自動從活動預約平台（Luma）同步你的活動清單：即將參加的、已參加過的、目前是已核可還是候補、現場是否完成簽到，還有缺席紀錄是否已恢復正常。',
               },
               {
                 title: '訂單中心',
-                body: '`/me` 會列出所有訂單，父訂單與升級子訂單分組展示；單筆詳情頁會顯示金額、折扣、稅、付款方式、聯絡資訊與轉讓紀錄。',
+                body: '會員中心會列出你買過的所有訂單。如果你之前有加購升級，系統會把它和原本的訂單放在一起顯示。點開單筆訂單可以看到金額、折扣、稅金、付款方式、聯絡資訊和轉讓紀錄。',
               },
             ],
           },
@@ -649,23 +649,23 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-transfers',
         group: 'member',
         label: '轉讓',
-        title: '已付款的母訂單可以在截止日前自助轉讓',
-        intro: '若該訂單下已有已付款升級子單，系統會一起轉讓，並留下 audit trail 與通知信。',
+        title: '無法使用的票可以在截止日前轉給朋友',
+        intro: '如果你買了票但臨時不能來，可以自己把已付款的訂單轉讓給朋友，不用客服協助。如果你之前有加購升級，系統會一起轉過去，避免票券和持有人分離。',
         blocks: [
           {
             type: 'steps',
             items: [
               {
-                title: '從 dashboard 發起轉讓',
-                body: '只有符合條件的已付款母訂單會出現轉讓操作；若截止日已過，按鈕會變成不可用。',
+                title: '在會員中心點選轉讓',
+                body: '只有已付款且還在轉讓期限內的訂單會出現「轉讓」按鈕；超過截止日後就無法轉讓。',
               },
               {
-                title: '系統一起處理升級子單',
-                body: '若該母訂單底下已有已付款升級子單，轉讓時會一起搬移，避免票種與 ownership 分離。',
+                title: '升級加購會一起轉過去',
+                body: '如果你之前有加購升級，系統會把原票和升級加購一起轉給對方，不會分開。',
               },
               {
-                title: '追蹤轉讓結果',
-                body: 'Dashboard 會列出已轉出訂單，轉出與接收雙方都會收到通知信。',
+                title: '追蹤結果',
+                body: '會員中心會顯示你已轉出的訂單。轉讓完成後，你和對方都會收到通知信，雙方都有完整紀錄可以查。',
               },
             ],
           },
@@ -675,15 +675,15 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-preferences',
         group: 'member',
         label: '信件偏好',
-        title: '三類通知都能自助管理',
-        intro: '會員可以調整 `newsletter / events / award` 三類通知，也可以一鍵全部退訂。',
+        title: '三種通知都可以自己決定要不要收',
+        intro: '不想收信？你可以分別開關三種通知，也可以一鍵全部取消。',
         blocks: [
           {
             type: 'checklist',
             items: [
-              'newsletter：電子報與內容更新',
-              'events：活動相關通知',
-              'award：Nomad Award 相關信件',
+              '電子報：定期內容更新',
+              '活動通知：報名、提醒、變更等',
+              'Nomad Award 信件：投票活動相關訊息',
             ],
           },
         ],
@@ -692,14 +692,14 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-upgrade',
         group: 'member',
         label: '升級',
-        title: '會員可從 `/upgrade` 走自助升級流程',
-        intro: '升級頁會找出目前最高等的可升級母訂單、計算價差，並透過 Stripe hosted invoice 補差價。',
+        title: '想升級票種？系統幫你算差額並付款',
+        intro: '到升級頁面後，系統會自動找出你目前最高的可升級訂單、計算和新票種的價差，並把你導到付款頁補差價。',
         blocks: [
           {
             type: 'callout',
             tone: 'info',
-            title: '升級路徑仍有缺口',
-            body: '一般升級流程已上線，但部分升級路徑仍有缺口，尤其是 `weekly_backer` 相關條件，詳見頁尾限制。',
+            title: '升級到單週票需要人工協助',
+            body: '一般票種之間的升級可以線上完成；如果你想升級成單週票（Weekly Backer），目前需要我們協助處理，請來信 fest@dna.org.tw。',
           },
         ],
       },
@@ -707,19 +707,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-overview',
         group: 'stay',
         label: '合作住宿',
-        title: 'Partner Stay 不是推薦住宿清單，而是一套獨立預訂流程',
-        intro: '`/stay` 是已上線的合作住宿系統，提供 Norden Ruder 的週次房況、房型細節、預訂與後續管理流程。',
+        title: '我們的合作住宿可以直接在網站上預訂',
+        intro: '合作住宿頁面提供 Norden Ruder 的每週房況、房型細節，可以直接在網站上預訂並後續管理。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: '公開可見的資訊',
-                body: '任何人都可以進 `/stay` 查看房型、每週價格、剩餘房數與住宿規則。',
+                title: '不用登入也能看的資訊',
+                body: '任何人都可以瀏覽房型、每週價格、剩餘房數與住宿規則。',
               },
               {
-                title: '只有會員可預訂',
-                body: '真正送出 booking 仍需要會員登入與 member 身份，未登入會看到 sign-in gate。',
+                title: '預訂需要會員身份',
+                body: '實際送出預訂需要先登入會員。如果你還沒登入，系統會帶你先去登入。',
               },
             ],
           },
@@ -729,23 +729,23 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-booking',
         group: 'stay',
         label: '如何預訂',
-        title: '合作住宿目前支援一般擔保與 invite code 兩條路徑',
-        intro: '使用者可選擇週次、填主住客資料；目前為單人入住 only，沒有雙人同住預訂流程。',
+        title: '可以用信用卡擔保或邀請碼完成預訂',
+        intro: '預訂時請選擇你想入住的週次、填寫住客資料。目前只開放單人入住，尚未支援雙人同住。',
         blocks: [
           {
             type: 'steps',
             items: [
               {
                 title: '查看週次與房況',
-                body: '公開 `/stay` 頁會顯示每週日期、價格、實際房型資訊與剩餘房數。',
+                body: '住宿頁面會顯示每週的日期、價格、實際房型資訊和剩餘房數。',
               },
               {
-                title: '登入會員後選週次',
-                body: '會員在右側 booking panel 勾選欲入住週次，填寫主住客姓名與電話，系統固定用單人入住規則建立 booking。',
+                title: '登入後選擇週次',
+                body: '登入會員後，在預訂面板勾選你想入住的週次，填寫住客姓名與電話即可。目前每筆預訂都是單人入住。',
               },
               {
-                title: '完成擔保或輸入 invite code',
-                body: '一般 booking 需先完成 Stripe SetupIntent card guarantee；若持有有效 invite code，則可走 complimentary path。',
+                title: '用信用卡擔保或輸入邀請碼',
+                body: '一般預訂需要先用信用卡完成擔保（不會立即扣款）；如果你持有有效邀請碼，可以直接以邀請碼完成預訂、免擔保。',
               },
             ],
           },
@@ -755,19 +755,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-after-booking',
         group: 'stay',
         label: '預訂後能做什麼',
-        title: 'Member 端已經接上摘要、候補與轉讓資料流，但前台管理介面仍偏第一版',
-        intro: '預訂後的 booking、候補與轉讓流程已接上 `/me` 摘要，但前台自助管理與接受轉讓頁面目前仍較精簡。',
+        title: '預訂後可以改週次、加入候補、轉讓給朋友',
+        intro: '預訂完成後，所有後續操作都可以在會員中心進行。',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: '在 `/me` 看到什麼',
-                body: '會員頁已有 Partner Stay summary card，能依目前 summary 狀態顯示 Book stay、Manage stay 或 Accept transfer 的入口。',
+                title: '會員中心會顯示住宿摘要',
+                body: '登入後可以看到你的住宿狀態，並依情況提供「立即預訂」、「管理我的住宿」或「接受朋友轉讓」的入口。',
               },
               {
-                title: '系統已接好的流程',
-                body: '後端已有 modify week、transfer initiate、transfer accept、waitlist join/leave、waitlist offer、以及 reconcile cron 流程。',
+                title: '可以做什麼',
+                body: '預訂後你還可以更改入住週次、把住宿轉讓給朋友，或在房間額滿時加入候補名單，有空房釋出時系統會通知你。',
               },
             ],
           },
@@ -777,16 +777,16 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-rules',
         group: 'stay',
         label: '規則與注意事項',
-        title: '合作住宿有自己的扣款、候補與轉讓規則',
-        intro: '合作住宿有自己的扣款、候補與轉讓規則，和一般住宿推薦不同。',
+        title: '合作住宿有自己的扣款與轉讓規則',
+        intro: '預訂前請留意以下幾點規則。',
         blocks: [
           {
             type: 'checklist',
             items: [
-              'No-show 可能會收取整週房費，admin 端已有 no-show charge flow。',
-              '候補 offer 與轉讓接受都有時效，過期後 reconcile 會回收狀態並釋出名額。',
-              '剩餘房數與候補釋出會隨 waitlist / transfer / reconcile 流程更新。',
-              '部分補救與後續操作目前由 `/admin/stay` tooling 支援。',
+              '如果你預訂了卻沒入住、也沒事先取消，可能會被扣整週房費。',
+              '候補通知與接受轉讓都有回覆時間限制，如果逾期未回應，名額會自動釋出給其他人。',
+              '剩餘房數會隨候補、轉讓與系統定期清理而動態更新。',
+              '如果遇到任何問題，歡迎來信 fest@dna.org.tw，我們會協助處理。',
             ],
           },
         ],
@@ -795,19 +795,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'visa-support',
         group: 'visa',
         label: '簽證輔助文件',
-        title: '會員現在可以在 `/me` 自助儲存資料並下載 PDF support letter',
-        intro: '這不是公開 FAQ，而是會員後台的新工具：填好簽證資料後即可產出正式 PDF 輔助文件。',
+        title: '會員可以自己在會員中心下載簽證輔助文件',
+        intro: '需要申請簽證？會員可以在會員中心填寫資料，並下載一份正式 PDF 輔助文件。',
         blocks: [
           {
             type: 'steps',
             items: [
               {
-                title: '先儲存簽證資料',
-                body: '填寫護照英文姓名、國籍、生日、護照號碼、核發國家、到期日、預計入離境日、在台地址與申請館處後，先儲存資料。',
+                title: '先填寫並儲存資料',
+                body: '填寫護照英文姓名、國籍、生日、護照號碼、核發國家、護照到期日、預計入境與離境日、在台地址，以及你打算前往申請的駐外館處，按下儲存。',
               },
               {
-                title: '再下載 PDF',
-                body: '系統會驗證 member 身份、讀取已儲存資料、挑選最佳 paid order snapshot，然後產生正式 PDF 下載。',
+                title: '下載 PDF',
+                body: '我們會根據你的會員資料和你買過的票券紀錄，自動產出一份正式 PDF 文件給你下載。',
               },
             ],
           },
@@ -816,11 +816,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 title: '這份文件的性質',
-                body: '它是簽證 support letter，不等同官方簽證核發保證。',
+                body: '這是一份簽證輔助文件，可以協助你的申請，但不代表保證可以拿到簽證——簽證是否核發仍由各國駐外館處決定。',
               },
               {
-                title: '其他限制',
-                body: '下載有 rate limit，且文件內容會依會員當下儲存的資料與最佳 paid order 狀態生成。',
+                title: '其他注意事項',
+                body: '為避免誤用，短時間內無法重複下載；文件內容會依你目前儲存的資料和最近的票券紀錄產生。',
               },
             ],
           },
@@ -828,27 +828,27 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
       },
     ],
     limitations: {
-      title: '目前限制與注意事項',
+      title: '目前的限制與注意事項',
       items: [
         {
-          title: '會員資料編輯仍有缺口',
-          body: '`languages` 與 `timezone` 已存在於資料表與 API，也會顯示在公開會員頁，但 `/me` 前台目前沒有編輯介面。',
+          title: '部分會員資料欄位需要協助',
+          body: '個人公開頁目前可以顯示你的語言和時區，但還沒有提供前台自助編輯介面。如有需要更新，請來信 fest@dna.org.tw，我們會協助修改。',
         },
         {
-          title: 'Weekly Backer 自助升級未完整',
-          body: '`/upgrade` 前台目前沒有收集 `target_week`，但後端升級到 `weekly_backer` 時需要這個欄位，因此這條升級路徑要保守描述。',
+          title: '升級單週票需要人工協助',
+          body: '一般票種之間的升級可以線上完成，但升級成單週票（Weekly Backer）目前需要我們協助處理，請來信 fest@dna.org.tw。',
         },
         {
-          title: 'Nomad Award 不是會員專屬功能',
-          body: 'Nomad Award 走的是 email + newsletter + reCAPTCHA，不依賴 `/me` session，不應寫成會員能力。',
+          title: 'Nomad Award 是公開投票活動',
+          body: 'Nomad Award 不需要登入會員即可參與；用 email 訂閱即可投票，這個活動不算在會員專屬功能內。',
         },
         {
-          title: 'Partner Stay 的前台管理仍偏第一版',
-          body: '住宿系統的 booking、waitlist、transfer、admin tooling 都已存在，但 member 前台管理與接受轉讓頁仍較精簡。',
+          title: '住宿管理介面持續優化中',
+          body: '合作住宿的預訂、候補、轉讓流程都能正常使用，但部分操作介面仍在優化。如果遇到任何問題，歡迎來信 fest@dna.org.tw。',
         },
         {
-          title: '簽證文件屬於 support letter',
-          body: '文件可作為輔助申請資料，但不構成官方簽證結果保證。',
+          title: '簽證文件不等於簽證保證',
+          body: '我們提供的文件可以作為簽證申請的輔助資料，但不構成官方簽證核發保證。',
         },
       ],
     },
@@ -989,11 +989,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'How do I confirm my order after purchasing?',
-                answer: 'A confirmation email is sent automatically after purchase. If you didn\'t receive it, log in with your email via the top-right of the website to view `/me` and your orders. Still missing? Contact registration@taiwandigitalfest.com or DM us on Instagram.',
+                answer: 'A confirmation email is sent automatically after purchase. If you did not receive it, sign in with your email via the top-right of the site to view your orders in the member home. Still missing? Contact registration@taiwandigitalfest.com or DM us on Instagram.',
               },
               {
                 question: 'Can I get a refund?',
-                answer: 'Tickets are non-refundable by default, but paid parent orders support self-service transfer before the cutoff date.',
+                answer: 'Tickets are non-refundable by default, but you can transfer a paid ticket to a friend yourself before the cutoff date.',
               },
             ],
           },
@@ -1004,7 +1004,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         group: 'event',
         label: 'Registration',
         title: 'Using your ticket to reserve individual events',
-        intro: 'At TDF, buying a ticket and reserving a seat are separate steps: get access first, then book each event via its Luma page.',
+        intro: 'At TDF, buying a ticket and reserving a seat are separate steps: get access first, then reserve each event on Luma (our event reservation platform).',
         blocks: [
           {
             type: 'steps',
@@ -1015,11 +1015,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 title: 'Reserve on Luma',
-                body: 'Go to each event\'s Luma page and submit a reservation. Staff verify tier and order in the background.',
+                body: 'Luma is the event reservation platform we use. Go to each event\'s Luma page and submit a reservation; staff will verify your ticket tier and registration order.',
               },
               {
                 title: 'Wait for approval',
-                body: 'Once approved you\'ll see the Luma approval status; on the day of the event, check in with your Luma reservation.',
+                body: 'Once approved you will see your status on Luma and receive a confirmation email. On the day of the event, check in with your Luma reservation.',
               },
             ],
           },
@@ -1028,7 +1028,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 question: 'When will I get my registration confirmation?',
-                answer: 'Organizers approve registrations in batches. Check your Luma status and notification emails for the latest state.',
+                answer: 'Organizers approve registrations in batches. Watch your Luma status and your inbox for the latest update.',
               },
               {
                 question: 'What happens if I don\'t show up?',
@@ -1062,7 +1062,7 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
               },
               {
                 question: 'Is there a TDF partner accommodation?',
-                answer: 'We have local partner venues at around $25–30 USD per night. See `/stay` for details.',
+                answer: 'We have local partner venues at around $25–30 USD per night. See the partner stay page on our website for details.',
               },
             ],
           },
@@ -1340,15 +1340,15 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-guide',
         group: 'member',
         label: 'Member Guide',
-        title: 'More than a place to check your order — a full member system',
-        intro: 'TDF members get login, identity cards, public or private profile cards, collections, events and orders, self-service transfers, email preferences, and a self-service upgrade flow that is live but still has gaps.',
+        title: 'More than just an order lookup — a full member toolkit',
+        intro: 'As a TDF member you can sign in, see your member card, share a public or private profile, collect other attendees, manage your events and orders, transfer tickets to friends, adjust email preferences, and upgrade your ticket tier.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
                 title: 'What you will find in this area',
-                body: 'This area first explains what a member is, then walks through login and identity cards, profile cards and public pages, collections, events and orders, transfers, email preferences, upgrades, and current limitations.',
+                body: 'This section walks through who counts as a member, how to sign in and view your member card, how to edit your profile and public page, how collections work, your events and orders, ticket transfers, email preferences, ticket upgrades, and parts of the experience we are still polishing.',
               },
             ],
           },
@@ -1358,19 +1358,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-basics',
         group: 'member',
         label: 'What Counts as a Member',
-        title: 'A login account and a member identity are not the same record',
-        intro: '`users` is the sign-in account layer, while `members` is the actual member identity. Only emails that have a `members` row receive a `member_no` and unlock the full card, public page, and collection features.',
+        title: 'Who is a TDF member',
+        intro: 'If you have ever interacted with TDF — bought a ticket, subscribed to our newsletter, or received one of our event emails — your email is already a member. Sign in to your member home and you will see all the member features.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: 'How someone becomes a member',
-                body: '`members` is populated not only from paid orders, but also from newsletter subscriptions and system email logs, so a follower can still count as a member.',
+                title: 'Who automatically becomes a member',
+                body: 'You do not need to buy a ticket. If you have subscribed to our newsletter, or received any of our event emails, your email automatically becomes a member with access to your member card and related features.',
               },
               {
-                title: 'What happens without a member row',
-                body: 'A user can still sign in to `/me`, but if the email has no matching `members` row yet, `member_no`, public-card, and collection capabilities remain limited or blank.',
+                title: 'What if the system does not recognize you',
+                body: 'You can still sign in with your email, but some features (member number, public profile, collections) will look empty. If you are sure you have purchased a ticket or subscribed and your data is still missing, please email fest@dna.org.tw and we will help you sort it out.',
               },
             ],
           },
@@ -1380,19 +1380,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-auth-passport',
         group: 'member',
         label: 'Login & Identity Card',
-        title: 'Sign in with an email code, then the system determines your identity card tier',
-        intro: 'Member login uses email + a 6-digit code with resend support, and the session cookie lasts 7 days. Once signed in, `/me` presents the identity card, events, orders, collection alerts, and settings in one place.',
+        title: 'Sign in with an email code, then see your member card',
+        intro: 'Enter your email and we will send you a 6-digit verification code; type it in to sign in. You can request a fresh code if needed, and you will stay signed in for 7 days. Once signed in, the member home shows your member card, registered events, order history, collection alerts, and personal settings in one place.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: 'The member home is an integrated dashboard',
-                body: 'After signing in, the dashboard loads the member number, identity tier, profile card data, events, orders, transfer history, collection alerts, stay summary, and email preferences together.',
+                title: 'Everything in one place',
+                body: 'After signing in, you see your member number, tier, profile card, registered events, orders, transfer history, collection alerts, stay summary, and email preferences all on a single page.',
               },
               {
-                title: 'How the identity tier is decided',
-                body: 'Tier (`follower / explore / contribute / weekly_backer / backer`) and its valid period are derived from paid orders. Without any paid order, the tier falls back to follower.',
+                title: 'How your member tier is decided',
+                body: 'Your tier is set automatically based on the tickets you have purchased: free member (follower), single-week ticket holder, regular ticket holder, or top-tier ticket holder — each with its own valid period. If you have not bought a ticket yet, you start as a free member.',
               },
             ],
           },
@@ -1402,23 +1402,23 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-profile-card',
         group: 'member',
         label: 'Profile Card & Public Page',
-        title: 'Your member card can be public or kept private and shared via QR',
-        intro: 'You can currently edit display name, avatar, location, bio, tags, and social links, and toggle between public and private visibility.',
+        title: 'Your member card can be public or stay private',
+        intro: 'Your card can show a display name, avatar, location, short bio, interest tags, and social links — and you can switch between public visibility and private mode at any time.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: 'Editable fields',
-                body: 'Display name, avatar, location, bio, tags, and social links are stored in `member_profiles`. Avatars accept JPEG / PNG / WebP, up to 2MB.',
+                title: 'What you can fill in',
+                body: 'You can edit your display name, avatar, location, bio, interest tags, and social links yourself. Avatars accept JPEG, PNG, or WebP, up to 2MB.',
               },
               {
-                title: 'Public card and directory',
-                body: 'Once public, you get a `/members/{memberNo}` personal page and appear in the `/members` public directory with search and pagination.',
+                title: 'Public card and member directory',
+                body: 'Once you make your card public, you get your own member page link and appear in the public member directory, where other attendees can find you.',
               },
               {
-                title: 'Private sharing',
-                body: 'Even if the card stays private, it can still be shared on-site through a QR token that is valid for 5 minutes.',
+                title: 'Sharing privately',
+                body: 'Even when your card stays private, you can still pull up a QR code on your member card on-site to share it ad hoc. To protect your privacy the QR code refreshes every 5 minutes.',
               },
             ],
           },
@@ -1428,19 +1428,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-collections',
         group: 'member',
         label: 'Collections',
-        title: 'You can collect other members, and see who has collected you',
-        intro: 'Public cards can be collected directly; private cards require a valid QR token. The system blocks self-collection.',
+        title: 'Collect other members, and see who has collected you',
+        intro: 'Met someone interesting at an event? Add them to your collection so you can find them again later.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
                 title: 'How to collect',
-                body: 'After signing in, you can collect directly from a public member page. For private cards, a QR token must be validated first.',
+                body: 'Once signed in, you can collect anyone directly from their public member page. If their card is private, ask them to show you their on-site QR code first.',
               },
               {
-                title: 'Where to review collections',
-                body: '`/me/collections` shows who you have collected, who has collected you, unread counts, and lets you remove people you have collected.',
+                title: 'Where to review them',
+                body: 'The Collections tab in your member home shows everyone you have collected, who has collected you, any new collection notifications, and lets you remove anyone from your list.',
               },
             ],
           },
@@ -1450,19 +1450,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-activity-orders',
         group: 'member',
         label: 'Events & Orders',
-        title: 'The member page is also your participation center',
-        intro: 'This area combines event registration status with order history, rather than being a simple ticket lookup.',
+        title: 'Your member home doubles as your participation history',
+        intro: 'See every event you have signed up for and every ticket you have bought, all in one place.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
                 title: 'My events',
-                body: 'The dashboard syncs upcoming / past events, approval or waitlist status, check-in state, and whether a no-show penalty has been resolved — all from Luma.',
+                body: 'Your member home automatically syncs from Luma (our event reservation platform): upcoming and past events, whether you are approved or on the waitlist, whether you checked in on-site, and whether any past no-show has been cleared.',
               },
               {
                 title: 'Order center',
-                body: '`/me` lists every order, grouping parent orders with their upgrade child orders. The detail page shows amount, discount, tax, payment method, contact info, and transfer history.',
+                body: 'Every ticket you have bought is listed here. If you previously added an upgrade, the system displays it grouped with the original order. Open any order to see the amount, discount, tax, payment method, contact details, and transfer history.',
               },
             ],
           },
@@ -1472,23 +1472,23 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-transfers',
         group: 'member',
         label: 'Transfers',
-        title: 'Paid parent orders can be transferred before the cutoff date',
-        intro: 'If the parent order has paid upgrade child orders, the system transfers them together, leaving an audit trail and sending notification emails.',
+        title: 'Cannot use your ticket? Transfer it to a friend',
+        intro: 'If you cannot make it after all, you can transfer your paid ticket to a friend yourself, no support ticket needed. If you previously added an upgrade, that moves with the ticket so they never get split apart.',
         blocks: [
           {
             type: 'steps',
             items: [
               {
-                title: 'Initiate transfer from the dashboard',
-                body: 'Only eligible paid parent orders show the transfer action. After the cutoff date, the button becomes unavailable.',
+                title: 'Start the transfer in your member home',
+                body: 'Only paid orders that are still inside the transfer window will show a Transfer button; once the cutoff has passed it is no longer available.',
               },
               {
-                title: 'Upgrade child orders move together',
-                body: 'If the parent order has paid upgrade child orders, they are transferred together so that ticket tier and ownership stay aligned.',
+                title: 'Upgrades go with the ticket',
+                body: 'If you previously paid for an upgrade, the original ticket and the upgrade move to your friend together — they will not be separated.',
               },
               {
-                title: 'Track the transfer outcome',
-                body: 'The dashboard lists transferred-out orders, and both the sender and recipient receive notification emails.',
+                title: 'Track the result',
+                body: 'Your member home lists every order you have transferred out. Once the transfer goes through, both you and the recipient receive a notification email and both sides get a clean record.',
               },
             ],
           },
@@ -1498,15 +1498,15 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-preferences',
         group: 'member',
         label: 'Email Preferences',
-        title: 'All three notification categories are self-managed',
-        intro: 'Members can adjust `newsletter / events / award` notifications individually, or unsubscribe from all of them at once.',
+        title: 'Three kinds of notifications, each with its own switch',
+        intro: 'Do not want every email? Toggle each category on or off, or unsubscribe from all of them in one click.',
         blocks: [
           {
             type: 'checklist',
             items: [
-              'newsletter: newsletter and content updates',
-              'events: event-related notifications',
-              'award: Nomad Award emails',
+              'Newsletter: regular content updates',
+              'Event notifications: registration, reminders, schedule changes',
+              'Nomad Award emails: voting and award-related news',
             ],
           },
         ],
@@ -1515,14 +1515,14 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'member-upgrade',
         group: 'member',
         label: 'Upgrade',
-        title: 'Members can self-upgrade through `/upgrade`',
-        intro: 'The upgrade page finds your highest eligible parent order, calculates the price delta, and charges the difference via a Stripe hosted invoice.',
+        title: 'Want to upgrade your ticket? We calculate the difference and charge it',
+        intro: 'On the upgrade page, the system automatically finds your highest existing ticket, calculates the price difference between your current tier and the new one, and takes you to a payment page to top up the difference.',
         blocks: [
           {
             type: 'callout',
             tone: 'info',
-            title: 'Some upgrade paths still have gaps',
-            body: 'The general upgrade flow is live, but some upgrade paths still have gaps — especially around `weekly_backer` requirements. See the limitations at the end.',
+            title: 'Upgrading to a single-week ticket needs our help',
+            body: 'You can self-upgrade between regular ticket tiers online. If you want to upgrade to a single-week ticket (Weekly Backer), we currently handle it manually — please email fest@dna.org.tw.',
           },
         ],
       },
@@ -1530,19 +1530,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-overview',
         group: 'stay',
         label: 'Partner Stay',
-        title: 'Partner Stay is not a list of recommendations — it is a standalone booking flow',
-        intro: '`/stay` is the live partner-stay system that surfaces weekly Norden Ruder inventory, real room details, booking, and post-booking management.',
+        title: 'Book our partner accommodation directly on the website',
+        intro: 'The partner stay page shows weekly availability and room details for Norden Ruder, and lets you book and manage everything online.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: 'Publicly visible information',
-                body: 'Anyone can visit `/stay` to see room types, weekly prices, remaining rooms, and stay rules.',
+                title: 'What you can see without signing in',
+                body: 'Anyone can browse room types, weekly prices, remaining availability, and the stay rules.',
               },
               {
-                title: 'Only members can book',
-                body: 'Actually submitting a booking still requires a signed-in member; unauthenticated visitors see a sign-in gate.',
+                title: 'Booking requires sign-in',
+                body: 'To actually submit a booking, you need to sign in as a member first. If you are not signed in, the site will prompt you to log in before continuing.',
               },
             ],
           },
@@ -1552,23 +1552,23 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-booking',
         group: 'stay',
         label: 'How Booking Works',
-        title: 'Partner stay currently supports a guaranteed path and an invite-code path',
-        intro: 'Members can choose weeks and fill in primary guest details. The current booking flow is single-occupancy only.',
+        title: 'Book with a card guarantee or with an invite code',
+        intro: 'Pick the week(s) you want to stay and fill in the guest details. Bookings are single-occupancy only for now — double occupancy is not yet supported.',
         blocks: [
           {
             type: 'steps',
             items: [
               {
-                title: 'Review weekly inventory and room details',
-                body: 'The public `/stay` page shows weekly dates, prices, real room details, and remaining-room visibility.',
+                title: 'Check weekly availability and room details',
+                body: 'The stay page shows the dates, price, real room details, and remaining rooms for each week.',
               },
               {
-                title: 'Choose weeks after signing in',
-                body: 'Signed-in members use the booking panel to pick weeks and submit primary guest details; the system always builds the booking under single-occupancy rules.',
+                title: 'Pick your weeks after signing in',
+                body: 'Once signed in, use the booking panel to select the week(s) you want and enter the guest name and phone number. Each booking is single-occupancy.',
               },
               {
-                title: 'Either verify a card or use an invite code',
-                body: 'Regular bookings require a Stripe SetupIntent card guarantee, while a valid invite code enables the complimentary path.',
+                title: 'Use a card guarantee or an invite code',
+                body: 'Regular bookings require a credit card to hold the reservation (you will not be charged immediately). If you have a valid invite code, you can enter it instead and skip the card guarantee.',
               },
             ],
           },
@@ -1578,19 +1578,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-after-booking',
         group: 'stay',
         label: 'After Booking',
-        title: 'The member side already wires up summaries, waitlists, and transfers, but the management UI is still first-generation',
-        intro: 'After booking, the reservation, waitlist, and transfer flows are wired into your `/me` summary, though the member-facing management and accept-transfer pages are still minimal.',
+        title: 'After booking, you can change weeks, join a waitlist, or transfer',
+        intro: 'Once booked, you can manage everything from your member home.',
         blocks: [
           {
             type: 'feature-list',
             items: [
               {
-                title: 'What `/me` shows',
-                body: 'The member page already has a Partner Stay summary card that surfaces Book stay, Manage stay, or Accept transfer entry points based on the current summary state.',
+                title: 'Your stay summary in the member home',
+                body: 'After signing in, you will see your current stay status, with shortcuts to "Book stay", "Manage my stay", or "Accept a transfer" depending on what you have.',
               },
               {
-                title: 'Flows that are wired up',
-                body: 'The backend already supports modify week, transfer initiate, transfer accept, waitlist join/leave, waitlist offer, and the reconcile cron.',
+                title: 'What you can do',
+                body: 'After booking you can change which week you stay, transfer your stay to a friend, or join the waitlist when a week is fully booked — we will notify you if a room frees up.',
               },
             ],
           },
@@ -1600,16 +1600,16 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'stay-rules',
         group: 'stay',
         label: 'Rules & Notes',
-        title: 'Partner stay has its own charge, waitlist, and transfer rules',
-        intro: 'Partner stay has its own charging, waitlist, and transfer rules that differ from a generic accommodation recommendation.',
+        title: 'Partner stay has its own charge and transfer rules',
+        intro: 'A few things to keep in mind before you book.',
         blocks: [
           {
             type: 'checklist',
             items: [
-              'No-shows may be charged for the full week; the admin side already has a no-show charge flow.',
-              'Waitlist offers and transfer acceptance have expirations — after they expire, reconcile releases the slot.',
-              'Remaining room counts and waitlist releases update as waitlist / transfer / reconcile flows run.',
-              'Some remediation and follow-up actions are currently handled by `/admin/stay` tooling.',
+              'If you book a stay but neither show up nor cancel in advance, you may be charged for the full week.',
+              'Waitlist offers and incoming transfers have a response deadline — if you do not respond in time, the slot is automatically released to someone else.',
+              'Remaining room counts update as waitlists, transfers, and routine cleanup run.',
+              'If you run into any problems, please email fest@dna.org.tw and we will help you sort it out.',
             ],
           },
         ],
@@ -1618,19 +1618,19 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
         id: 'visa-support',
         group: 'visa',
         label: 'Visa Support Documents',
-        title: 'Members can now save visa details and download a PDF support letter from `/me`',
-        intro: 'This is a member tool rather than a public visa FAQ. Save your details first, then download a formal PDF document.',
+        title: 'Members can download a visa support letter from their member home',
+        intro: 'Need a document to support your visa application? Members can fill in their visa details and download an official PDF support letter directly from the member home.',
         blocks: [
           {
             type: 'steps',
             items: [
               {
-                title: 'Save your visa profile',
-                body: 'Enter your passport English name, nationality, birth date, passport number, issuing country, expiry date, planned arrival and departure dates, Taiwan stay address, and destination mission, then save the form.',
+                title: 'Save your details first',
+                body: 'Enter your passport English name, nationality, date of birth, passport number, issuing country, passport expiry date, planned arrival and departure dates, your address in Taiwan, and the overseas mission you plan to apply at — then save the form.',
               },
               {
-                title: 'Download the PDF support letter',
-                body: 'The server validates the member, reads the saved profile, picks the best paid-order snapshot, and then generates a PDF download.',
+                title: 'Download the PDF',
+                body: 'Based on your member profile and the tickets you have purchased, we will automatically generate an official PDF for you to download.',
               },
             ],
           },
@@ -1639,11 +1639,11 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
             items: [
               {
                 title: 'What this document is',
-                body: 'It is a visa support letter, not a guarantee that an official visa will be issued.',
+                body: 'It is a visa support letter — it can support your application, but it is not a guarantee that a visa will be issued. The decision still belongs to the consulate or representative office.',
               },
               {
-                title: 'Other limitations',
-                body: 'Downloads are rate-limited, and the document content reflects the member\'s currently saved profile and the best available paid-order state.',
+                title: 'Other things to know',
+                body: 'To prevent misuse, you cannot re-download the document repeatedly in a short period. The content reflects the details and ticket history you currently have on file.',
               },
             ],
           },
@@ -1654,24 +1654,24 @@ export const guideContent: { en: GuideContent; zh: GuideContent } = {
       title: 'Current Limitations & Notes',
       items: [
         {
-          title: 'Member profile editing still has gaps',
-          body: '`languages` and `timezone` already exist in the database and API, and they render on the public member page, but `/me` does not yet offer an editing UI for them.',
+          title: 'Some profile fields need our help',
+          body: 'Your public member page can display your languages and timezone, but there is no self-service editor for them yet. If you would like to update them, please email fest@dna.org.tw and we will help.',
         },
         {
-          title: 'Weekly Backer self-upgrade is incomplete',
-          body: '`/upgrade` does not currently collect `target_week` in the UI, but the backend requires that field when upgrading to `weekly_backer`, so this upgrade path should be described conservatively.',
+          title: 'Upgrading to a single-week ticket needs our help',
+          body: 'You can self-upgrade between regular ticket tiers online. If you want to upgrade to a single-week ticket (Weekly Backer), please email fest@dna.org.tw — we currently process these manually.',
         },
         {
-          title: 'Nomad Award is not a member-only feature',
-          body: 'Nomad Award runs on email + newsletter + reCAPTCHA and does not depend on the `/me` session, so it should not be described as a member capability.',
+          title: 'Nomad Award is open to everyone',
+          body: 'You do not need to log in as a member to take part in Nomad Award — anyone with an email subscription can vote. So it is not part of the members-only feature set.',
         },
         {
-          title: 'Partner Stay member UI is still first-generation',
-          body: 'The booking, waitlist, transfer, and admin tooling all exist, but the member-side management and accept-transfer pages are still minimal.',
+          title: 'Stay management screens are still being polished',
+          body: 'Booking, waitlists, and transfers for partner stays all work, but a few of the management screens are still being polished. If you hit any issues, please email fest@dna.org.tw.',
         },
         {
-          title: 'Visa document is a support letter',
-          body: 'The document can support a visa application but does not guarantee the official visa outcome.',
+          title: 'A visa support letter is not a visa',
+          body: 'The document can support your visa application but does not guarantee that an official visa will be issued.',
         },
       ],
     },
