@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getPricingByKey, isOnSale } from '@/lib/ticketPricing';
@@ -24,6 +25,18 @@ function getTicketFeatures(t: ReturnType<typeof useTranslation>['t'], tier: stri
 
 export default function UpgradeBanner({ currentTier, lang }: Props) {
   const { t } = useTranslation();
+  const [salesClosed, setSalesClosed] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/tickets/status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (alive && d?.closed) setSalesClosed(true);
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  if (salesClosed) return null;
   const currentRank = TIER_RANK[currentTier];
   const nextTier = TIER_ORDER.find((t) => TIER_RANK[t] === currentRank + 1) ?? null;
 
