@@ -1,11 +1,15 @@
 'use client';
 
 import Script from 'next/script';
+import { useCookieConsent } from '@/lib/cookieConsent';
 
 const GA_MEASUREMENT_ID = 'G-514WNV4FS9';
 const ADS_ID = 'AW-17947994689';
 
 export default function GoogleTag() {
+  const consent = useCookieConsent();
+  if (consent !== 'accepted') return null;
+
   return (
     <>
       <Script

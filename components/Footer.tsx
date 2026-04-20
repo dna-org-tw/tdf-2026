@@ -122,6 +122,18 @@ export default function Footer() {
               >
                 {t.footer.codeOfConduct}
               </Link>
+              <Link
+                href="/privacy"
+                className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
+              >
+                {t.footer.ourPrivacyPolicy}
+              </Link>
+              <Link
+                href="/terms"
+                className="hover:text-[#10B8D9] transition-colors text-[#F6F6F6]/80"
+              >
+                {t.footer.ourTermsOfService}
+              </Link>
             </div>
             <a 
               href="mailto:fest@dna.org.tw"

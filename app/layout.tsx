@@ -7,6 +7,7 @@ import StructuredData from '@/components/StructuredData';
 import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
 import GoogleTag from '@/components/GoogleTag';
+import CookieConsent from '@/components/CookieConsent';
 import RecaptchaScript from '@/components/RecaptchaScript';
 import VisitorTracker from '@/components/VisitorTracker';
 import DiscountCodeCapture from '@/components/DiscountCodeCapture';
@@ -155,6 +156,7 @@ export default async function RootLayout({
         <AuthProvider>
         {children}
         </AuthProvider>
+        <CookieConsent />
         {/* SEO: Provide basic content for crawlers without JavaScript */}
         <noscript>
           <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>

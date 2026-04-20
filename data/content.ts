@@ -370,6 +370,14 @@ export const content = {
         features: ["Exclusive Digital Nomad Community", "Opening Marketplace", "Digital Nomad Activities x 10+"],
         price: "Free",
         cta: "Become our follower"
+      },
+      legalNotice: {
+        line1: "Ticket sales are processed by Nomad Explore LLC (Wyoming, USA). Event services are operated by Taiwan Digital Nomad Association (Taiwan).",
+        line2: "By purchasing, you agree to our",
+        terms: "Terms of Service",
+        and: "and",
+        privacy: "Privacy Policy",
+        line3: ", including refund rules. Festival updates may be emailed to you; every message includes a one-click unsubscribe."
       }
     },
     upgrade: {
@@ -832,11 +840,20 @@ export const content = {
       callForSideEvents: "Host Your Side Event",
       orderQuery: "Order Query",
       codeOfConduct: "Code of Conduct",
+      ourPrivacyPolicy: "Privacy",
+      ourTermsOfService: "Terms",
       recaptcha: "This site is protected by reCAPTCHA and the Google",
       privacyPolicy: "Privacy Policy",
       termsOfService: "Terms of Service",
       and: "and",
       apply: "apply."
+    },
+    cookieBanner: {
+      ariaLabel: "Cookie consent",
+      message: "We use essential cookies to run this site. With your consent we also use analytics (Google) and marketing (Meta) cookies to improve the festival.",
+      learnMore: "Learn more",
+      accept: "Accept",
+      reject: "Reject"
     },
     codeOfConduct: {
       title: "Code of Conduct",
@@ -881,6 +898,257 @@ export const content = {
         scope: "We expect participants to follow these rules at all event venues, workshops, side events, and event-related social activities, both in person and online.",
         contact: "For any questions or concerns regarding this Code of Conduct, please contact us at fest@dna.org.tw."
       },
+      backToHome: "Back to homepage"
+    },
+    privacy: {
+      title: "Privacy Policy",
+      lastUpdated: "Last updated: April 2026",
+      intro: "This Privacy Policy explains how Taiwan Digital Fest 2026 (\"TDF 2026\", \"we\", \"us\") handles personal information when you visit fest.dna.org.tw, buy a ticket, subscribe to our updates, or participate in festival activities. Two legal entities jointly operate TDF 2026, acting as joint controllers under Article 26 of the EU GDPR: Taiwan Digital Nomad Association (Taiwan) runs the festival, member services, and event logistics; Nomad Explore LLC (Wyoming, USA) handles ticket sales and payments. We process personal data in accordance with Taiwan's Personal Data Protection Act (PDPA), the EU General Data Protection Regulation (GDPR) where applicable, California Consumer Privacy Rights Act (CPRA), and equivalent local laws.",
+      sections: [
+        {
+          title: "1. Who we are",
+          paragraphs: [
+            "TDF 2026 is jointly operated by two entities acting as joint data controllers:",
+            "(a) Taiwan Digital Nomad Association (\"TDNA\") — a non-profit society registered in Taiwan (社團法人台灣數位遊牧者協會). TDNA is the controller for festival operations, member profiles, event registrations, visa support letters, partner accommodation matching, and marketing communications. Registered address: 2F.-1, No. 72, Sec. 1, Zhongxiao W. Rd., Zhongzheng Dist., Taipei City 100, Taiwan.",
+            "(b) Nomad Explore LLC (\"Nomad Explore\") — a limited liability company registered in Wyoming, USA. Nomad Explore is the controller for ticket purchase transactions, including payment processing through Stripe, invoice records, and refund handling.",
+            "The two entities have signed a joint controller agreement pursuant to GDPR Article 26 that allocates responsibilities. For any privacy matter — including access, correction, deletion, portability, or consent withdrawal — you may contact either entity at fest@dna.org.tw and we will route the request to the appropriate controller on your behalf."
+          ]
+        },
+        {
+          title: "2. Information we collect",
+          paragraphs: [
+            "We collect only what is necessary to run the festival, deliver your ticket, contact you when relevant, and keep the site secure. Categories we collect:"
+          ],
+          items: [
+            "Identity and contact data: name, email address, phone number, and billing/shipping address provided at checkout or newsletter signup.",
+            "Transaction data: ticket tier, order history, payment status, invoice numbers, refund records. Full card numbers are handled by Stripe and never stored on our servers.",
+            "Member profile data: display name, avatar, profile preferences, event registrations, collected namecards, and (if applicable) visa support letter requests.",
+            "Accommodation data: partner stay selections, invite codes, and related booking metadata when you reserve through our partner system.",
+            "Device and usage data: IP address, browser/OS identifiers, visitor fingerprint, referring URL, pages viewed, timestamps.",
+            "Analytics and marketing data: aggregated engagement metrics via Google Analytics 4 and Meta Pixel (where cookies are allowed).",
+            "Communications: email opens, bounces, unsubscribes, and support correspondence you send us."
+          ]
+        },
+        {
+          title: "3. How we use your information",
+          paragraphs: ["We process your data only for the purposes listed below:"],
+          items: [
+            "To fulfil your ticket order, issue receipts, and provide event access.",
+            "To send service messages (order confirmation, schedule changes, visa documents) that are required to deliver what you purchased.",
+            "To send newsletters, event updates, and Nomad Award announcements — only if you have subscribed or are a ticket holder and have not opted out.",
+            "To enable member features: namecards, event RSVP, partner accommodation booking, visa support letter generation.",
+            "To protect the site against fraud and abuse (rate limiting, reCAPTCHA bot filtering, visitor fingerprinting of abusive traffic).",
+            "To measure aggregate site performance and improve the festival (analytics).",
+            "To comply with legal obligations such as tax records and PDPA/GDPR requests."
+          ]
+        },
+        {
+          title: "4. Legal bases for processing",
+          paragraphs: [
+            "Where GDPR applies, we rely on the following lawful grounds: (a) performance of a contract — processing needed to deliver your ticket or member services; (b) your consent — for optional marketing emails and optional analytics cookies; (c) legitimate interests — running a safe, functional event website, preventing fraud, and measuring basic performance; (d) legal obligation — e.g. retaining financial records as required by Taiwan tax law. You may withdraw consent at any time without affecting the lawfulness of prior processing."
+          ]
+        },
+        {
+          title: "5. Who we share your data with",
+          paragraphs: [
+            "We do not sell or share your personal information as those terms are defined in the California CPRA. We share limited data with the following processors solely so they can perform services on our behalf, and only under contractual data protection commitments:"
+          ],
+          items: [
+            "Stripe, Inc. — payment processing. Stripe receives your name, email, billing address, and payment instrument. Stripe is certified PCI DSS Level 1. See stripe.com/privacy.",
+            "Mailgun Technologies, Inc. — transactional and marketing email delivery. Mailgun receives your email address and the content we send you.",
+            "Supabase Inc. — managed Postgres and authentication hosting for our application database.",
+            "Vercel Inc. — hosting and content delivery for the website.",
+            "Google LLC — reCAPTCHA Enterprise (bot protection) and Google Analytics 4 (anonymised traffic analytics).",
+            "Meta Platforms, Inc. — Meta Pixel (optional marketing measurement).",
+            "Luma (Calendar) — event RSVP and attendee list synchronisation for sessions hosted on Luma."
+          ],
+          afterItems: [
+            "We may also disclose information when required by law, court order, or to protect the rights, property, or safety of TDF, our members, or the public."
+          ]
+        },
+        {
+          title: "6. International transfers",
+          paragraphs: [
+            "Some of our processors are located outside Taiwan (primarily in the United States and European Union). Where data leaves Taiwan or the EEA, we rely on standard contractual clauses or equivalent safeguards provided by the processor to protect your information."
+          ]
+        },
+        {
+          title: "7. How long we keep your data",
+          paragraphs: [
+            "We retain personal information only as long as needed for the purposes above, then delete or anonymise it. Typical retention periods:"
+          ],
+          items: [
+            "Order and payment records: 5 years after the order, to meet Taiwan tax and accounting requirements.",
+            "Member profile and event registrations: until you delete your account or 24 months after the festival ends, whichever comes first.",
+            "Newsletter subscriptions: until you unsubscribe, plus a short suppression record so we don't accidentally re-contact you.",
+            "Email delivery logs (opens, bounces, complaints): up to 24 months for deliverability reputation.",
+            "Analytics data: aggregated with short identifiers, retained per Google Analytics' default retention (14 months).",
+            "Visitor fingerprints for abuse prevention: up to 12 months, sooner if clearly benign."
+          ]
+        },
+        {
+          title: "8. Your rights",
+          paragraphs: [
+            "Subject to local law, you have the right to:"
+          ],
+          items: [
+            "Access the personal information we hold about you.",
+            "Request correction of inaccurate or incomplete data.",
+            "Request deletion of your data where we no longer have a legal reason to keep it.",
+            "Export a copy of your data in a portable format.",
+            "Object to or restrict certain processing, including marketing.",
+            "Withdraw consent for optional processing at any time.",
+            "Lodge a complaint with your local data protection authority."
+          ],
+          afterItems: [
+            "To exercise any of these rights, email fest@dna.org.tw. We will respond within 30 days. For email unsubscribes, every marketing email also contains a one-click unsubscribe link."
+          ]
+        },
+        {
+          title: "9. Cookies and tracking technologies",
+          paragraphs: [
+            "We use cookies and similar technologies for three purposes: (a) essential site functions such as authentication and cart state; (b) optional analytics (Google Analytics 4) to understand aggregate traffic; (c) optional marketing measurement (Meta Pixel) where permitted.",
+            "Essential cookies cannot be disabled. You can block analytics and marketing cookies in your browser settings or via your device's tracking-prevention features. Disabling analytics does not affect your ability to buy a ticket or use the member area.",
+            "For visitors in the EU and UK, we display a cookie consent banner and do not load optional tracking scripts until you explicitly accept."
+          ]
+        },
+        {
+          title: "10. Security",
+          paragraphs: [
+            "We protect your information using industry-standard safeguards: encrypted transport (HTTPS everywhere), encrypted database storage, access controls scoped by role, server-side secrets kept out of client code, and regular dependency security review. No system is perfectly secure, but we continuously monitor for and respond to issues."
+          ]
+        },
+        {
+          title: "11. Children",
+          paragraphs: [
+            "Our services are not directed to children under 14. We do not knowingly collect personal information from children under 14. If you believe a child has provided us with personal information, contact fest@dna.org.tw and we will delete it."
+          ]
+        },
+        {
+          title: "12. Changes to this policy",
+          paragraphs: [
+            "We may update this Privacy Policy from time to time. Material changes will be announced on this page and, where appropriate, by email to subscribed members. The \"Last updated\" date at the top of the page indicates the latest revision."
+          ]
+        }
+      ],
+      contactTitle: "Contact",
+      contactBody: "Questions about this policy, or requests to exercise your rights, can be sent to",
+      contactEmail: "fest@dna.org.tw",
+      backToHome: "Back to homepage"
+    },
+    terms: {
+      title: "Terms of Service",
+      lastUpdated: "Last updated: April 2026",
+      intro: "These Terms of Service (\"Terms\") govern your use of fest.dna.org.tw (the \"Site\") and your participation in Taiwan Digital Fest 2026 (\"TDF 2026\"). By purchasing a ticket, registering an account, or using the Site, you agree to these Terms. If you do not agree, do not use the Site or attend the event. The Site and TDF 2026 are jointly operated by Taiwan Digital Nomad Association (\"TDNA\", Taiwan) and Nomad Explore LLC (Wyoming, USA).",
+      sections: [
+        {
+          title: "1. Parties and scope",
+          paragraphs: [
+            "When you purchase a ticket, your payment contract is with Nomad Explore LLC. When you use member services (event registration, namecard, visa support letter, accommodation matching), your service contract is with TDNA. Together they operate TDF 2026. Questions about either relationship can be directed to fest@dna.org.tw."
+          ]
+        },
+        {
+          title: "2. Tickets and entry",
+          paragraphs: [
+            "A ticket grants the named purchaser access to the festival activities covered by that tier, during the festival dates stated on the Site. Tickets are issued in the purchaser's name and are not transferable to another person without our prior written consent. We may require valid photo ID at check-in to match the name on the ticket. Admission is subject to the Code of Conduct and to organiser discretion for matters of safety or compliance."
+          ]
+        },
+        {
+          title: "3. Prices, currency, and taxes",
+          paragraphs: [
+            "Ticket prices are shown on the Site in the currencies indicated. Applicable taxes are shown at checkout where required. For buyers who need a Taiwanese tax invoice (統一發票) with a uniform business number (統編), please provide the number during checkout via the tax ID field. We cannot reissue invoices after the event without reasonable cause."
+          ]
+        },
+        {
+          title: "4. Refund and cancellation policy",
+          paragraphs: [
+            "Because TDF 2026 is a live event with venue, staffing, and supplier commitments made in advance, the following refund rules apply:"
+          ],
+          items: [
+            "Before the public ticket sale cutoff published on the Site: you may request a full refund by emailing fest@dna.org.tw. Refunds are returned to the original payment method within 14 days.",
+            "Between the sale cutoff and 7 days before the festival start date: we will refund 50% of the ticket price.",
+            "Within 7 days of the festival start date, or after the festival has begun: tickets are non-refundable except where required by law.",
+            "If TDF 2026 is cancelled in full by the organisers, all ticket holders receive a full refund. If specific sessions are cancelled or rescheduled, the overall ticket remains valid and no partial refund is owed.",
+            "If you cannot attend due to visa denial and you applied with a support letter we issued, we will refund 50% of the ticket price on presentation of the denial notice."
+          ],
+          afterItems: [
+            "The EU consumer right of withdrawal (Directive 2011/83/EU Article 16(l)) does not apply to tickets for live events on a specific date. This limitation does not affect any non-waivable statutory rights under your local law."
+          ]
+        },
+        {
+          title: "5. Conduct, safety, and removal",
+          paragraphs: [
+            "All attendees must follow the Code of Conduct at code-of-conduct. We reserve the right to refuse entry, remove attendees, or cancel tickets without refund for behaviour that violates the Code of Conduct, disrupts the event, or endangers others. You are responsible for your own safety, belongings, and conduct while at the event and surrounding activities."
+          ]
+        },
+        {
+          title: "6. Photography and media release",
+          paragraphs: [
+            "TDF 2026 is a public-facing festival. Photographers and videographers will be present. By attending, you consent to being photographed, filmed, and recorded, and you grant TDNA and Nomad Explore LLC a worldwide, royalty-free, non-exclusive licence to use those images and recordings for festival documentation, marketing, and reporting. If you object to appearing in specific material, please contact fest@dna.org.tw and we will make reasonable efforts to remove or blur identifying elements in materials we control."
+          ]
+        },
+        {
+          title: "7. Visa support letters",
+          paragraphs: [
+            "We may issue a visa support letter to confirm that you are a registered ticket holder. A support letter is an invitation document only — it does not guarantee visa approval, and visa decisions are made solely by the relevant authority. We are not responsible for visa outcomes. If your visa is denied, see the refund rules in Section 4."
+          ]
+        },
+        {
+          title: "8. Partner accommodation",
+          paragraphs: [
+            "We list curated partner stays and facilitate introductions using invite codes. The booking contract for accommodation is between you and the partner property. We are not a party to that contract and are not liable for the condition, pricing changes, cancellation terms, or any dispute regarding the accommodation. Contact the partner directly for booking issues; we can assist with introductions but cannot arbitrate."
+          ]
+        },
+        {
+          title: "9. Member accounts and content",
+          paragraphs: [
+            "If you create an account, you are responsible for keeping your credentials safe and for the activity performed under your account. You must provide accurate information. You may not impersonate others, scrape member data, or use the Site to harass, spam, or infringe rights.",
+            "By submitting content to TDF 2026 (for example, namecard text, Nomad Award submissions, profile bios), you grant TDNA and Nomad Explore LLC a worldwide, royalty-free, non-exclusive licence to display and distribute that content in connection with operating the festival and promoting it. You retain ownership of your content and may delete it via your account or by contacting support. Deletion may take up to 30 days to fully propagate across caches and backups."
+          ]
+        },
+        {
+          title: "10. Intellectual property",
+          paragraphs: [
+            "All logos, brand marks, trade dress, and original content on the Site are owned by TDNA, Nomad Explore LLC, or their licensors. You may not reproduce, modify, or create derivative works without prior written permission, except for personal non-commercial use such as sharing event information on social media."
+          ]
+        },
+        {
+          title: "11. Disclaimers",
+          paragraphs: [
+            "The Site and the event are provided \"as is\". To the fullest extent permitted by law, we disclaim all warranties, express or implied, including warranties of merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the Site will be uninterrupted, error-free, or free of harmful components, or that any content on third-party platforms we link to is accurate."
+          ]
+        },
+        {
+          title: "12. Limitation of liability",
+          paragraphs: [
+            "To the fullest extent permitted by law, the aggregate liability of TDNA, Nomad Explore LLC, their affiliates, officers, employees, contractors, and volunteers arising out of or relating to these Terms or TDF 2026 shall not exceed the amount you paid for your ticket in the twelve months preceding the event giving rise to the claim. We shall not be liable for any indirect, incidental, consequential, special, or punitive damages, including lost profits, lost data, or loss of goodwill. Nothing in these Terms limits liability for gross negligence, wilful misconduct, death, or personal injury caused by our negligence, where such limitation would be prohibited by law."
+          ]
+        },
+        {
+          title: "13. Force majeure",
+          paragraphs: [
+            "We are not liable for delays, cancellations, or failures to perform caused by events beyond our reasonable control, including natural disasters, pandemics, government action, power failures, strikes, or war. Where a force majeure event forces cancellation of TDF 2026 in full, the refund policy in Section 4 applies."
+          ]
+        },
+        {
+          title: "14. Governing law and disputes",
+          paragraphs: [
+            "These Terms are governed by the laws of Taiwan (R.O.C.) for matters concerning TDNA and the event itself, and by the laws of the State of Wyoming, USA, for matters concerning ticket purchase contracts with Nomad Explore LLC. Any dispute shall first be addressed through good-faith negotiation; failing resolution, exclusive jurisdiction lies with the Taipei District Court of Taiwan for TDNA-related disputes and with the state or federal courts located in Wyoming for Nomad Explore LLC-related disputes. Nothing here limits mandatory consumer-protection rights you may have under the laws of your place of residence."
+          ]
+        },
+        {
+          title: "15. Changes to these Terms",
+          paragraphs: [
+            "We may update these Terms from time to time. Material changes will be announced on this page and, where appropriate, by email. The \"Last updated\" date indicates the latest revision. Your continued use of the Site after changes take effect constitutes acceptance."
+          ]
+        },
+        {
+          title: "16. Contact",
+          paragraphs: [
+            "For any question about these Terms, email fest@dna.org.tw."
+          ]
+        }
+      ],
       backToHome: "Back to homepage"
     },
     checkout: {
@@ -1529,6 +1797,14 @@ export const content = {
         features: ["專屬數位遊牧社群", "開幕市集", "數位遊牧活動 x 10+"],
         price: "免費",
         cta: "成為我們的 follower"
+      },
+      legalNotice: {
+        line1: "票務由 Nomad Explore LLC（美國懷俄明州）處理；活動服務由社團法人台灣數位遊牧者協會（台灣）營運。",
+        line2: "購票即代表您同意我們的",
+        terms: "服務條款",
+        and: "與",
+        privacy: "隱私權政策",
+        line3: "（含退款規則）。我們可能寄送節慶更新至您的信箱，每封信皆可一鍵退訂。"
       }
     },
     upgrade: {
@@ -1991,11 +2267,20 @@ export const content = {
       callForSideEvents: "立即舉辦 Side Event",
       orderQuery: "查詢訂單",
       codeOfConduct: "活動行為準則",
+      ourPrivacyPolicy: "隱私權",
+      ourTermsOfService: "服務條款",
       recaptcha: "此網站受 reCAPTCHA 保護，並適用 Google",
       privacyPolicy: "隱私權政策",
       termsOfService: "服務條款",
       and: "和",
       apply: "適用。"
+    },
+    cookieBanner: {
+      ariaLabel: "Cookie 同意",
+      message: "本網站使用必要 Cookie 以維持運作。取得您同意後，我們也會使用分析（Google）與行銷（Meta）Cookie 以改善活動體驗。",
+      learnMore: "了解更多",
+      accept: "同意",
+      reject: "拒絕"
     },
     codeOfConduct: {
       title: "活動行為準則",
@@ -2040,6 +2325,249 @@ export const content = {
         scope: "我們期待參與者在所有活動場地、工作坊、Side Events 及活動相關社交場合（含實體與線上）均遵守本準則。",
         contact: "若對本行為準則有任何疑問或疑慮，請來信 fest@dna.org.tw 與我們聯絡。"
       },
+      backToHome: "返回首頁"
+    },
+    privacy: {
+      title: "隱私權政策",
+      lastUpdated: "最後更新：2026 年 4 月",
+      intro: "本隱私權政策說明 Taiwan Digital Fest 2026（「TDF 2026」、「我們」）在您造訪 fest.dna.org.tw、購票、訂閱更新或參與活動時如何處理您的個人資料。TDF 2026 由兩個法律實體共同營運，依 GDPR 第 26 條屬於共同控制者（joint controllers）：社團法人台灣數位遊牧者協會（Taiwan Digital Nomad Association，TDNA，台灣）負責活動營運與會員服務；Nomad Explore LLC（美國懷俄明州）負責票券銷售與付款處理。我們依循台灣個人資料保護法（個資法）、歐盟一般資料保護規則（GDPR，於適用時）、加州消費者隱私權法（CPRA）及其他當地法律處理個資。",
+      sections: [
+        {
+          title: "1. 我們是誰",
+          paragraphs: [
+            "TDF 2026 由下列兩個實體共同營運，擔任共同資料控制者：",
+            "(a) 社團法人台灣數位遊牧者協會（「TDNA」）— 台灣登記之非營利社團法人。TDNA 為活動營運、會員檔案、活動報名、簽證支持信、合作住宿媒合與行銷通訊之控制者。登記地址：100 台北市中正區忠孝西路一段 72 號 2 樓之 1。",
+            "(b) Nomad Explore LLC（「Nomad Explore」）— 於美國懷俄明州註冊之有限責任公司，為票券購買交易（含透過 Stripe 處理之付款、發票記錄、退款處理）之控制者。",
+            "兩實體已依 GDPR 第 26 條簽署共同控制者協議，分工各自之責任。如欲行使查閱、更正、刪除、可攜、撤回同意等任何隱私權相關請求，您可來信 fest@dna.org.tw，我們將代為轉交給適當之控制者處理。"
+          ]
+        },
+        {
+          title: "2. 蒐集的資料",
+          paragraphs: ["我們僅蒐集營運活動、交付票券、必要聯絡及維護網站安全所需之最少資料："],
+          items: [
+            "身分與聯絡資料：結帳或訂閱時提供的姓名、電子郵件、電話、帳單／寄送地址。",
+            "交易資料：票種、訂單記錄、付款狀態、發票號碼、退款記錄。完整卡號由 Stripe 處理，不會儲存於我們的伺服器。",
+            "會員檔案資料：顯示名稱、頭像、偏好設定、活動報名、收藏之名片、簽證支持信申請（如適用）。",
+            "住宿資料：透過合作系統訂房時所選住宿、邀請碼與相關訂房中繼資料。",
+            "裝置與使用資料：IP 位址、瀏覽器／作業系統識別、訪客指紋、來源網址、瀏覽頁面、時間戳記。",
+            "分析與行銷資料：透過 Google Analytics 4 與 Meta Pixel 蒐集之彙總互動指標（於 Cookie 同意之前提下）。",
+            "通訊紀錄：電子郵件開信、退信、退訂，以及您寄送的客服往來。"
+          ]
+        },
+        {
+          title: "3. 如何使用您的資料",
+          paragraphs: ["我們僅為下列目的處理您的資料："],
+          items: [
+            "完成票券訂單、開立收據、提供入場權限。",
+            "寄發履約必要訊息（訂單確認、議程變動、簽證文件），以交付您所購買的內容。",
+            "寄送節慶電子報、活動更新、Nomad Award 公告 — 僅限已訂閱者或未選擇退出的持票者。",
+            "提供會員功能：名片、活動報名、合作住宿訂房、簽證支持信產生。",
+            "保護網站免於詐騙與濫用（流量限制、reCAPTCHA 反機器人、可疑流量之訪客指紋）。",
+            "彙總網站表現並改善活動（分析）。",
+            "遵循法定義務，例如稅務記錄保存與 PDPA/GDPR 請求處理。"
+          ]
+        },
+        {
+          title: "4. 處理之法律依據",
+          paragraphs: [
+            "GDPR 適用時，我們依循下列合法基礎：(a) 履行契約 — 交付票券與會員服務所必需；(b) 您的同意 — 選擇性行銷信件與選擇性分析 Cookie；(c) 正當利益 — 維運安全、可用的活動網站、防詐與基本效能衡量；(d) 法定義務 — 例如依台灣稅法保存財務記錄。您可隨時撤回同意，不影響撤回前處理之合法性。"
+          ]
+        },
+        {
+          title: "5. 資料分享對象",
+          paragraphs: [
+            "我們不出售或分享您的個人資料（依 CPRA 之定義）。我們僅在受託處理者代為履行服務之必要範圍內分享有限資料，並依契約要求資料保護承諾："
+          ],
+          items: [
+            "Stripe, Inc. — 付款處理。Stripe 會接收您的姓名、電子郵件、帳單地址與付款工具。Stripe 通過 PCI DSS Level 1 認證。詳見 stripe.com/privacy。",
+            "Mailgun Technologies, Inc. — 交易信與行銷信寄送。Mailgun 會接收您的電子郵件與我們寄送的內容。",
+            "Supabase Inc. — 託管之 Postgres 資料庫與身分驗證。",
+            "Vercel Inc. — 網站託管與內容傳遞（CDN）。",
+            "Google LLC — reCAPTCHA Enterprise（反機器人）與 Google Analytics 4（匿名化流量分析）。",
+            "Meta Platforms, Inc. — Meta Pixel（選擇性行銷衡量）。",
+            "Luma（行事曆）— Luma 上議程之活動報名與出席名單同步。"
+          ],
+          afterItems: [
+            "如法律、法院命令有要求，或為保護 TDF、會員或大眾之權利、財產、安全，我們亦可能揭露資料。"
+          ]
+        },
+        {
+          title: "6. 跨境傳輸",
+          paragraphs: [
+            "我們部分受託處理者位於台灣以外（主要在美國與歐盟）。資料離開台灣或 EEA 時，我們依賴該處理者提供之標準契約條款（SCC）或同等保障機制，以保護您的資料。"
+          ]
+        },
+        {
+          title: "7. 資料保存期間",
+          paragraphs: ["我們僅為前述目的所需之期間保留個資，之後予以刪除或匿名化。典型保存期間："],
+          items: [
+            "訂單與付款記錄：訂單成立後 5 年，以符合台灣稅務與會計規定。",
+            "會員檔案與活動報名：直至您刪除帳號，或活動結束後 24 個月（以先到者為準）。",
+            "電子報訂閱：直至您退訂，並保留短期抑制名單避免意外再次寄送。",
+            "郵件寄送紀錄（開信、退信、投訴）：最多 24 個月，用於維持寄信信譽。",
+            "分析資料：以短期識別符彙總儲存，依 Google Analytics 預設保存期間（14 個月）。",
+            "防濫用之訪客指紋：最多 12 個月，確認為合法流量則更早刪除。"
+          ]
+        },
+        {
+          title: "8. 您的權利",
+          paragraphs: ["依當地法律，您有下列權利："],
+          items: [
+            "查閱我們所持有之您的個人資料。",
+            "要求更正不正確或不完整之資料。",
+            "於我們無合法保存理由時，要求刪除您的資料。",
+            "以可攜格式匯出您的資料。",
+            "反對或限制特定處理（含行銷）。",
+            "隨時撤回選擇性處理之同意。",
+            "向當地資料保護主管機關提出申訴。"
+          ],
+          afterItems: [
+            "如欲行使上述任一權利，請來信 fest@dna.org.tw，我們將於 30 日內回覆。所有行銷信件亦皆附一鍵退訂連結。"
+          ]
+        },
+        {
+          title: "9. Cookie 與追蹤技術",
+          paragraphs: [
+            "我們基於三種目的使用 Cookie 與類似技術：(a) 必要功能，如身分驗證與購物車狀態；(b) 選擇性分析（Google Analytics 4），以了解彙總流量；(c) 選擇性行銷衡量（Meta Pixel），於同意之前提下使用。",
+            "必要 Cookie 無法關閉。您可於瀏覽器設定或裝置之追蹤防護中封鎖分析與行銷 Cookie。關閉分析不影響您購票或使用會員區域之能力。",
+            "於歐盟及英國之訪客，我們於網站上顯示 Cookie 同意橫幅，在您明確同意前不會載入選擇性追蹤工具。"
+          ]
+        },
+        {
+          title: "10. 安全措施",
+          paragraphs: [
+            "我們採業界標準措施保護您的資料：全站 HTTPS 加密傳輸、資料庫加密儲存、以角色為單位之存取控管、伺服器端機密不進入前端程式碼，並定期檢視相依套件之安全性。無系統能完全安全，但我們持續監控與處理問題。"
+          ]
+        },
+        {
+          title: "11. 未成年人",
+          paragraphs: [
+            "我們的服務並非針對 14 歲以下兒童。我們不會刻意蒐集 14 歲以下兒童之個人資料。若您認為兒童提供了資料，請來信 fest@dna.org.tw，我們將予以刪除。"
+          ]
+        },
+        {
+          title: "12. 政策更新",
+          paragraphs: [
+            "我們可能不時更新本隱私權政策。重大變更會於本頁公告，並於適當時以電子郵件通知已訂閱會員。頁面頂部「最後更新」日期即代表最新版本。"
+          ]
+        }
+      ],
+      contactTitle: "聯絡方式",
+      contactBody: "如對本政策有任何問題或欲行使權利，請來信至",
+      contactEmail: "fest@dna.org.tw",
+      backToHome: "返回首頁"
+    },
+    terms: {
+      title: "服務條款",
+      lastUpdated: "最後更新：2026 年 4 月",
+      intro: "本服務條款（「條款」）規範您使用 fest.dna.org.tw（「網站」）及參與 Taiwan Digital Fest 2026（「TDF 2026」）之行為。您購票、註冊帳號或使用本網站即表示同意本條款。若您不同意，請勿使用本網站或出席活動。本網站與 TDF 2026 由社團法人台灣數位遊牧者協會（「TDNA」，台灣）與 Nomad Explore LLC（美國懷俄明州）共同營運。",
+      sections: [
+        {
+          title: "1. 當事人與適用範圍",
+          paragraphs: [
+            "您購票時之付款契約相對人為 Nomad Explore LLC；使用會員服務（活動報名、名片、簽證支持信、住宿媒合）時之服務契約相對人為 TDNA。雙方共同營運 TDF 2026。如有疑問，請來信 fest@dna.org.tw。"
+          ]
+        },
+        {
+          title: "2. 票券與入場",
+          paragraphs: [
+            "票券授權購票人於活動日期內參與該票種所涵蓋之活動內容。票券以購票人姓名記名，未經我方書面同意不得轉讓。報到時可能需出示身分證件以核對票券姓名。入場須遵守行為準則，並受主辦單位基於安全或合規之裁量。"
+          ]
+        },
+        {
+          title: "3. 價格、幣別與稅務",
+          paragraphs: [
+            "票價以網站所示幣別計價，應課之稅將於結帳時依需求顯示。需開立載有統編之台灣統一發票者，請於結帳時以 tax ID 欄位填入。活動結束後非有正當事由不接受重開發票。"
+          ]
+        },
+        {
+          title: "4. 退款與取消政策",
+          paragraphs: ["因 TDF 2026 為實體活動，場地、人力、供應商多須預先承諾，退款規則如下："],
+          items: [
+            "公開售票截止日前：可來信 fest@dna.org.tw 申請全額退款，退款將於 14 日內返還原付款管道。",
+            "售票截止日起至活動開始前 7 日內：可退還票價 50%。",
+            "活動開始前 7 日內，或活動已開始後：除法律另有規定，概不退款。",
+            "若 TDF 2026 完全由主辦取消，持票人可獲全額退款。若僅個別議程取消或改期，票券整體仍然有效，不退差額。",
+            "若因我方出具之簽證支持信遭拒簽而無法出席，出示拒簽通知即可退還票價 50%。"
+          ],
+          afterItems: [
+            "歐盟消費者指令 2011/83 第 16(l) 條之七日鑑賞期不適用於特定日期之現場活動票券。此限制不影響您所在地法律不可拋棄之消費者權利。"
+          ]
+        },
+        {
+          title: "5. 行為、安全與除名",
+          paragraphs: [
+            "所有參與者均須遵守行為準則（見 /code-of-conduct）。對違反準則、擾亂活動或危及他人者，我方保留拒絕入場、請離或取消票券（不予退款）之權利。您需就自身安全、財物與行為負責。"
+          ]
+        },
+        {
+          title: "6. 攝影與媒體授權",
+          paragraphs: [
+            "TDF 2026 為公開活動，現場將有攝影與錄影。出席即表示您同意被拍攝及錄製，並授予 TDNA 與 Nomad Explore LLC 全球、免權利金、非專屬之使用權，用於活動紀錄、行銷與報導。若您對特定素材有異議，請來信 fest@dna.org.tw，我們將盡合理努力在我們掌控之素材中移除或模糊辨識特徵。"
+          ]
+        },
+        {
+          title: "7. 簽證支持信",
+          paragraphs: [
+            "我方可能出具簽證支持信以證明您為已報名之持票人。支持信僅為邀請文件，不保證簽證核發；核發與否由主管機關決定。我方不對簽證結果負責。若遭拒簽，退款依第 4 條規定。"
+          ]
+        },
+        {
+          title: "8. 合作住宿",
+          paragraphs: [
+            "我方列出合作住宿並透過邀請碼協助媒合。住宿之訂房契約存在於您與合作夥伴之間，我方非當事人，亦不就住宿條件、價格調整、取消條款或相關爭議負責。有問題請直接聯繫合作夥伴；我方可協助介紹但無法仲裁。"
+          ]
+        },
+        {
+          title: "9. 會員帳號與內容",
+          paragraphs: [
+            "若您註冊帳號，您須妥善保管登入憑證，並對您帳號下之活動負責。您須提供正確資訊，並不得冒用他人身分、爬取會員資料，或利用本網站騷擾、寄發垃圾訊息、侵害權利。",
+            "您將內容提交至 TDF 2026（如名片文字、Nomad Award 投稿、個人檔案簡介）時，即授予 TDNA 與 Nomad Explore LLC 全球、免權利金、非專屬之使用權，用於活動營運與宣傳。您保有內容所有權，並可透過帳號刪除或來信請求刪除。刪除最多可能需 30 日完整散播至所有快取與備份。"
+          ]
+        },
+        {
+          title: "10. 智慧財產",
+          paragraphs: [
+            "網站上所有商標、品牌標識、原創內容由 TDNA、Nomad Explore LLC 或其授權人所有。除個人非商業用途（例如於社群媒體分享活動資訊）外，未經書面同意不得重製、改作或衍生。"
+          ]
+        },
+        {
+          title: "11. 免責聲明",
+          paragraphs: [
+            "本網站與活動以「現況」提供。於法律允許之最大範圍內，我方不擔保任何明示或默示之保證，包括可商用性、特定用途適合性與不侵權。我方不保證網站不中斷、無錯誤、無有害元件，亦不保證所連結之第三方平台內容之正確性。"
+          ]
+        },
+        {
+          title: "12. 責任限制",
+          paragraphs: [
+            "於法律允許之最大範圍內，TDNA、Nomad Explore LLC 及其關係人、幹部、員工、承攬商、志工因本條款或 TDF 2026 所生之累積責任，不超過您於請求事由前十二個月內所支付之票價。我方不就任何間接、附隨、衍生、特殊或懲罰性損害負責，包括利潤損失、資料損失或商譽損失。本條不限制因我方重大過失、故意、因過失致死或人身傷害之責任，若該等限制為法律禁止者。"
+          ]
+        },
+        {
+          title: "13. 不可抗力",
+          paragraphs: [
+            "我方不就超出我方合理控制範圍之延誤、取消或無法履行負責，包括天災、疫情、政府行為、斷電、罷工、戰爭等。若不可抗力事件導致 TDF 2026 全部取消，退款依第 4 條辦理。"
+          ]
+        },
+        {
+          title: "14. 準據法與爭議解決",
+          paragraphs: [
+            "本條款關於 TDNA 與活動事項，適用中華民國法律；關於與 Nomad Explore LLC 之票務契約事項，適用美國懷俄明州法律。任何爭議應先以善意協商解決；協商不成時，TDNA 相關爭議以台灣台北地方法院為第一審專屬管轄法院，Nomad Explore LLC 相關爭議以懷俄明州所在之州法院或聯邦法院為專屬管轄。本條不限制您依所在地法律享有之不可拋棄之消費者保護權利。"
+          ]
+        },
+        {
+          title: "15. 條款更新",
+          paragraphs: [
+            "我方得隨時更新本條款。重大變更將於本頁公告，並於適當時以電子郵件通知。頁首「最後更新」日期即最新版本。變更生效後繼續使用本網站即視為同意。"
+          ]
+        },
+        {
+          title: "16. 聯絡方式",
+          paragraphs: [
+            "對本條款如有任何疑問，請來信 fest@dna.org.tw。"
+          ]
+        }
+      ],
       backToHome: "返回首頁"
     },
     checkout: {

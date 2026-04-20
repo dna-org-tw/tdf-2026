@@ -857,6 +857,22 @@ export default function TicketsSection() {
             </div>
           </div>
         </motion.div>
+
+        {/* Legal acknowledgement — shown below all ticket cards */}
+        <p className="mt-8 max-w-3xl mx-auto text-center text-xs text-white/60 leading-relaxed">
+          {t.tickets.legalNotice?.line1 ??
+            'Ticket sales are processed by Nomad Explore LLC (Wyoming, USA). Event services are operated by Taiwan Digital Nomad Association.'}{' '}
+          {t.tickets.legalNotice?.line2 ?? 'By purchasing, you agree to our'}{' '}
+          <a href="/terms" className="text-[#10B8D9] underline hover:text-[#10B8D9]/80">
+            {t.tickets.legalNotice?.terms ?? 'Terms of Service'}
+          </a>{' '}
+          {t.tickets.legalNotice?.and ?? 'and'}{' '}
+          <a href="/privacy" className="text-[#10B8D9] underline hover:text-[#10B8D9]/80">
+            {t.tickets.legalNotice?.privacy ?? 'Privacy Policy'}
+          </a>
+          {t.tickets.legalNotice?.line3 ??
+            ', including refund rules. Festival updates may be emailed to you; every message includes a one-click unsubscribe.'}
+        </p>
       </div>
 
       {/* Email 訂閱 Modal */}

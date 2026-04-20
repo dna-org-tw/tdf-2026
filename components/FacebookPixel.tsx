@@ -1,10 +1,14 @@
 'use client';
 
 import Script from 'next/script';
+import { readCookieConsent, useCookieConsent } from '@/lib/cookieConsent';
 
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1740357633585300';
 
 export default function FacebookPixel() {
+  const consent = useCookieConsent();
+  if (consent !== 'accepted') return null;
+
   return (
     <>
       {/* Facebook Pixel Code */}
@@ -64,8 +68,10 @@ function forwardToWebhook(
 
 // Export tracking function for use by other components
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
+  if (typeof window === 'undefined') return;
+  if (readCookieConsent() !== 'accepted') return;
   const eventId = createEventId();
-  if (typeof window !== 'undefined' && window.fbq) {
+  if (window.fbq) {
     window.fbq('track', eventName, parameters, { eventID: eventId });
   }
   forwardToWebhook('standard', eventName, parameters, eventId);
@@ -73,8 +79,10 @@ export const trackEvent = (eventName: string, parameters?: Record<string, any>) 
 
 // Export custom event tracking function
 export const trackCustomEvent = (eventName: string, parameters?: Record<string, any>) => {
+  if (typeof window === 'undefined') return;
+  if (readCookieConsent() !== 'accepted') return;
   const eventId = createEventId();
-  if (typeof window !== 'undefined' && window.fbq) {
+  if (window.fbq) {
     window.fbq('trackCustom', eventName, parameters, { eventID: eventId });
   }
   forwardToWebhook('custom', eventName, parameters, eventId);

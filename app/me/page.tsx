@@ -511,6 +511,60 @@ function MemberDashboard() {
         </CollapsibleSection>
       )}
 
+      {/* Data rights (GDPR / PDPA access, export, deletion) */}
+      {user?.email && (
+        <CollapsibleSection
+          title={lang === 'zh' ? '我的資料權利' : 'My data rights'}
+          defaultOpen={false}
+          tone="email"
+        >
+          <div className="mt-2 space-y-3 text-sm text-slate-700">
+            <p className="leading-relaxed">
+              {lang === 'zh'
+                ? '您可依 GDPR、台灣個資法等法律，要求查閱、更正、匯出或刪除我們所持有的您的個人資料。'
+                : 'You have the right under GDPR, Taiwan PDPA, and similar laws to access, correct, export, or delete the personal data we hold about you.'}
+            </p>
+            <p className="leading-relaxed">
+              {lang === 'zh'
+                ? '請來信下列信箱提出請求，我們將於 30 日內回覆：'
+                : 'Please email the address below to exercise any of these rights. We will respond within 30 days:'}{' '}
+              <a
+                href={`mailto:fest@dna.org.tw?subject=${encodeURIComponent(
+                  lang === 'zh' ? '資料權利請求' : 'Data rights request',
+                )}&body=${encodeURIComponent(
+                  (lang === 'zh'
+                    ? '請求類型（查閱／更正／匯出／刪除／其他）：\n\n說明：\n\n帳號信箱：'
+                    : 'Request type (access / correct / export / delete / other):\n\nDetails:\n\nAccount email: ') +
+                    (user?.email ?? ''),
+                )}`}
+                className="text-[#10B8D9] hover:underline font-medium"
+              >
+                fest@dna.org.tw
+              </a>
+            </p>
+            <p className="leading-relaxed text-slate-600">
+              {lang === 'zh' ? (
+                <>
+                  詳細隱私權說明請見{' '}
+                  <Link href="/privacy" className="text-[#10B8D9] hover:underline">
+                    隱私權政策
+                  </Link>
+                  。
+                </>
+              ) : (
+                <>
+                  For full details, see our{' '}
+                  <Link href="/privacy" className="text-[#10B8D9] hover:underline">
+                    Privacy Policy
+                  </Link>
+                  .
+                </>
+              )}
+            </p>
+          </div>
+        </CollapsibleSection>
+      )}
+
       {transferTarget && (
         <TransferOrderModal
           open={!!transferTarget}
