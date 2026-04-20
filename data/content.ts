@@ -1060,19 +1060,19 @@ export const content = {
           ]
         },
         {
-          title: "4. Refund and cancellation policy",
+          title: "4. No-refund policy; transfer instead",
           paragraphs: [
-            "Because TDF 2026 is a live event with venue, staffing, and supplier commitments made in advance, the following refund rules apply:"
+            "Because TDF 2026 is a live event with venue, staffing, and supplier commitments made in advance, tickets are non-refundable. You may instead transfer your ticket to another person free of charge (see below)."
           ],
           items: [
-            "Before the public ticket sale cutoff published on the Site: you may request a full refund by emailing fest@dna.org.tw. Refunds are returned to the original payment method within 14 days.",
-            "Between the sale cutoff and 7 days before the festival start date: we will refund 50% of the ticket price.",
-            "Within 7 days of the festival start date, or after the festival has begun: tickets are non-refundable except where required by law.",
-            "If TDF 2026 is cancelled in full by the organisers, all ticket holders receive a full refund. If specific sessions are cancelled or rescheduled, the overall ticket remains valid and no partial refund is owed.",
-            "If you cannot attend due to visa denial and you applied with a support letter we issued, we will refund 50% of the ticket price on presentation of the denial notice."
+            "24-hour cooling-off: you may request a full refund within 24 hours of the original purchase by emailing fest@dna.org.tw. This applies once per customer and does not apply to tier upgrade orders.",
+            "Event cancelled by organisers: if TDF 2026 is cancelled in full, all ticket holders receive a full refund. If specific sessions are cancelled or rescheduled, the overall ticket remains valid and no partial refund is owed.",
+            "Visa denial with our support letter: if you cannot attend because the relevant authority denies your visa and you applied with a visa support letter we issued, we will refund 50% of the ticket price on presentation of the denial notice.",
+            "Outside the three situations above, tickets are non-refundable regardless of reason (change of plans, illness, travel disruption, force majeure affecting only you, etc.). Please transfer the ticket instead."
           ],
           afterItems: [
-            "The EU consumer right of withdrawal (Directive 2011/83/EU Article 16(l)) does not apply to tickets for live events on a specific date. This limitation does not affect any non-waivable statutory rights under your local law."
+            "Ticket transfer: you may transfer your ticket to another person at no charge through your member account until the transfer deadline published on the Site (typically set a short time before the festival begins). Transferring changes the ticket holder's name for on-site check-in; the original purchaser and the new holder should both receive confirmation emails.",
+            "This policy is lawful under Taiwan's Consumer Protection Act (consumer seven-day cooling-off period does not apply to dated-event tickets), EU Consumer Rights Directive 2011/83/EU Article 16(l), UK Consumer Rights Act 2015, and equivalent US state laws. It does not affect any non-waivable statutory rights you may have under the laws of your place of residence."
           ]
         },
         {
@@ -2481,17 +2481,19 @@ export const content = {
           ]
         },
         {
-          title: "4. 退款與取消政策",
-          paragraphs: ["因 TDF 2026 為實體活動，場地、人力、供應商多須預先承諾，退款規則如下："],
+          title: "4. 不退款政策；改以轉讓處理",
+          paragraphs: [
+            "因 TDF 2026 為實體活動，場地、人力、供應商多須預先承諾，票券不予退款。您可改以免費轉讓票券予他人（詳下）。"
+          ],
           items: [
-            "公開售票截止日前：可來信 fest@dna.org.tw 申請全額退款，退款將於 14 日內返還原付款管道。",
-            "售票截止日起至活動開始前 7 日內：可退還票價 50%。",
-            "活動開始前 7 日內，或活動已開始後：除法律另有規定，概不退款。",
-            "若 TDF 2026 完全由主辦取消，持票人可獲全額退款。若僅個別議程取消或改期，票券整體仍然有效，不退差額。",
-            "若因我方出具之簽證支持信遭拒簽而無法出席，出示拒簽通知即可退還票價 50%。"
+            "24 小時冷靜期：您可於首次購票 24 小時內來信 fest@dna.org.tw 申請全額退款。此權利每位買家僅能行使一次，不適用於票種升級訂單。",
+            "主辦單位取消活動：若 TDF 2026 完全由主辦取消，持票人獲全額退款。若僅個別議程取消或改期，票券整體仍然有效，不退差額。",
+            "持我方簽證支持信遭拒簽：若因主管機關拒發簽證而無法出席，且您申辦時使用我方出具之簽證支持信，出示拒簽通知即可退還票價 50%。",
+            "以上三種情形外，票券概不退款（含個人行程異動、疾病、交通中斷、僅影響您個人之不可抗力等）。請改以轉讓處理。"
           ],
           afterItems: [
-            "歐盟消費者指令 2011/83 第 16(l) 條之七日鑑賞期不適用於特定日期之現場活動票券。此限制不影響您所在地法律不可拋棄之消費者權利。"
+            "票券轉讓：您可於網站公告之轉讓截止日前（通常為活動開始前短時間），透過會員帳號免費轉讓票券予他人。轉讓後將更新報到姓名；原購票人與新持票人均會收到通知信。",
+            "本政策符合台灣消費者保護法（消保法 §19 之七日鑑賞期不適用特定日期活動票券）、歐盟消費者指令 2011/83 §16(l)、英國 Consumer Rights Act 2015 及美國相關州法。本政策不影響您所在地法律不可拋棄之消費者權利。"
           ]
         },
         {
