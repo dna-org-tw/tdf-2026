@@ -148,6 +148,18 @@ export default function MembersPage() {
           只看多筆訂單
         </label>
         <span className="text-sm text-slate-500">共 {total} 位會員</span>
+        <a
+          href={`/api/admin/members/export?${new URLSearchParams({
+            ...(search ? { search } : {}),
+            ...(identities.length ? { identity: identities.join(',') } : {}),
+            ...(displayStatuses.length ? { displayStatus: displayStatuses.join(',') } : {}),
+            ...(repeatOnly ? { repeat: '1' } : {}),
+          }).toString()}`}
+          className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4] transition-colors whitespace-nowrap"
+          title="以目前篩選條件匯出 CSV"
+        >
+          匯出 CSV
+        </a>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
