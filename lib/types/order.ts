@@ -67,6 +67,7 @@ export interface Order {
   valid_from: string | null;
   valid_until: string | null;
   visitor_fingerprint: string | null;
+  marketing_consent: boolean | null;
   created_at: string;
   updated_at: string;
 }
@@ -94,6 +95,7 @@ export interface CreateOrderInput {
   currency: string;
   source?: OrderSource;
   visitor_fingerprint?: string | null;
+  marketing_consent?: boolean | null;
 }
 
 export interface UpdateOrderInput {

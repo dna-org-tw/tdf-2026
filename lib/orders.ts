@@ -28,6 +28,9 @@ export async function createOrder(input: CreateOrderInput): Promise<Order | null
     if (input.visitor_fingerprint) insertData.visitor_fingerprint = input.visitor_fingerprint;
     if (input.stripe_invoice_id) insertData.stripe_invoice_id = input.stripe_invoice_id;
     if (input.source) insertData.source = input.source;
+    if (typeof input.marketing_consent === 'boolean') {
+      insertData.marketing_consent = input.marketing_consent;
+    }
 
     const { data, error } = await supabaseServer
       .from('orders')

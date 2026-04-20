@@ -104,13 +104,45 @@ export async function getRecipients(q: RecipientsQuery): Promise<RecipientsResul
   }
 
   // Category filter: drop addresses whose newsletter_subscriptions row has the
-  // matching pref turned off, or that have unsubscribed_at set. Critical
-  // broadcasts skip this filter entirely — they are 履約必要通知 and always
-  // deliver to non-hard-bounced candidates.
+  // matching pref turned off, or that have unsubscribed_at set. Also drop
+  // emails whose most recent order has marketing_consent = FALSE (explicit
+  // opt-out at checkout — GDPR/CASL evidence). Critical broadcasts skip all
+  // of this — they are 履約必要通知 and always deliver to non-hard-bounced
+  // candidates.
   const needsPrefFilter =
     q.category &&
     q.category !== 'critical' &&
     candidateEmails.length > 0;
+
+  if (q.category !== 'critical' && candidateEmails.length > 0 && supabaseServer) {
+    // Fetch explicit opt-outs from orders (marketing_consent = false).
+    // NULL is treated as legacy soft opt-in (grandfathered) and not dropped here.
+    const BATCH_SIZE = 200;
+    const optedOut = new Set<string>();
+    for (let i = 0; i < candidateEmails.length; i += BATCH_SIZE) {
+      const chunk = candidateEmails.slice(i, i + BATCH_SIZE);
+      const { data, error } = await supabaseServer
+        .from('orders')
+        .select('customer_email, marketing_consent')
+        .in('customer_email', chunk)
+        .eq('marketing_consent', false);
+      if (error) {
+        console.error('[Recipients] Error fetching marketing_consent opt-outs:', error);
+        break;
+      }
+      for (const row of data ?? []) {
+        const e = String((row as { customer_email?: string }).customer_email ?? '').trim().toLowerCase();
+        if (e) optedOut.add(e);
+      }
+    }
+    // If any opted-out email also has an explicit newsletter_subscriptions
+    // row with pref on (they later changed their mind and signed up),
+    // the downstream pref filter will re-include them via that subscription.
+    for (const e of optedOut) {
+      const idx = candidateEmails.indexOf(e);
+      if (idx >= 0) candidateEmails.splice(idx, 1);
+    }
+  }
 
   if (needsPrefFilter) {
     const prefColumn = `pref_${q.category}` as 'pref_newsletter' | 'pref_events' | 'pref_award';

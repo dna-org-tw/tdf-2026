@@ -134,6 +134,8 @@ export async function POST(req: NextRequest) {
     });
 
     const visitorFingerprint = body?.visitor_fingerprint ?? null;
+    const marketingConsent =
+      typeof body?.marketing_consent === 'boolean' ? body.marketing_consent : false;
 
     // Create order record in Supabase (amounts set to 0; updated later by webhook/sync with actual Stripe amounts)
     const order = await createOrder({
@@ -145,6 +147,7 @@ export async function POST(req: NextRequest) {
       amount_discount: 0,
       currency: 'usd',
       visitor_fingerprint: visitorFingerprint,
+      marketing_consent: marketingConsent,
     });
 
     if (!order) {
