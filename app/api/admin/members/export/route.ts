@@ -17,13 +17,11 @@ function csvEscape(value: unknown): string {
   return str;
 }
 
-function formatAmount(cents: number | null): string {
-  if (cents === null || cents === undefined) return '';
+function formatAmount(cents: number): string {
   return (cents / 100).toFixed(2);
 }
 
-function formatBool(value: boolean | null | undefined): string {
-  if (value === null || value === undefined) return '';
+function formatBool(value: boolean): string {
   return value ? 'TRUE' : 'FALSE';
 }
 
