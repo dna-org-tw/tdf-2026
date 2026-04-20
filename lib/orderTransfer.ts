@@ -4,6 +4,7 @@ import {
   sendOrderTransferredFromEmail,
   sendOrderTransferredToEmail,
 } from './sendOrderTransferEmail';
+import { resetLumaApprovalsForTransferredEmail } from './lumaTransferReset';
 
 export class OrderTransferError extends Error {
   constructor(
@@ -263,6 +264,21 @@ export async function transferOrder(input: TransferInput): Promise<TransferResul
     .update({ paid: false })
     .eq('email', fromEmail);
   if (lumaErr) console.error('[transferOrder] Failed to reset luma_guests:', lumaErr);
+
+  // 6b. Push the old email's currently-approved / pending Luma registrations
+  // back to `waitlist` (closest Luma-API-accepted equivalent of "pending"),
+  // so the old owner can no longer walk in to events they'd been approved for.
+  // Failures are logged but never block the transfer.
+  try {
+    const lumaReset = await resetLumaApprovalsForTransferredEmail(fromEmail);
+    if (lumaReset.attempted > 0) {
+      console.log(
+        `[transferOrder] Luma reset for ${fromEmail}: attempted=${lumaReset.attempted} updated=${lumaReset.updated} failed=${lumaReset.failed} skippedNoCookie=${lumaReset.skippedNoCookie}`,
+      );
+    }
+  } catch (err) {
+    console.error('[transferOrder] Luma approval reset threw:', err);
+  }
 
   // 7. Fire notification emails (logged inside, errors swallowed so the transfer itself is not rolled back)
   await sendOrderTransferredFromEmail(fromEmail, updatedParent, newEmail).catch((err) =>
