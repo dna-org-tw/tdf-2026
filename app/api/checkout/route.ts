@@ -124,6 +124,12 @@ export async function POST(req: NextRequest) {
       tax_id_collection: {
         enabled: true,
       },
+      custom_text: {
+        submit: {
+          message:
+            'By completing this purchase you agree to the [Terms & Conditions](https://fest.dna.org.tw/terms).',
+        },
+      },
       ...(week ? { metadata: { week } } : {}),
     });
 
