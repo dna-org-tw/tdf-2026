@@ -11,7 +11,9 @@ import { parseMemberFilter, applyMemberFilter } from '@/lib/adminMembersQuery';
 function csvEscape(value: unknown): string {
   if (value === null || value === undefined) return '';
   const str = String(value);
-  if (/[",\n\r]/.test(str)) {
+  // Quote on RFC 4180 hazards OR on formula-injection prefixes (=, +, -, @, tab).
+  // Phone fields often start with "+" and member names are user-controlled at checkout.
+  if (/[",\n\r]/.test(str) || /^[=+\-@\t]/.test(str)) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
