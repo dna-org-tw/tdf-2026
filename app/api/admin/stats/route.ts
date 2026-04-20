@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabaseServer';
 type OrderRow = {
   id: string;
   amount_total: number | string | null;
+  amount_refunded: number | string | null;
   currency: string | null;
   ticket_tier: 'explore' | 'contribute' | 'weekly_backer' | 'backer';
   status: string;
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
       supabaseServer
         .from('orders')
         .select(
-          'id, amount_total, currency, ticket_tier, status, customer_email, customer_name, created_at, parent_order_id'
+          'id, amount_total, amount_refunded, currency, ticket_tier, status, customer_email, customer_name, created_at, parent_order_id'
         )
         .limit(50000),
       supabaseServer
@@ -72,22 +73,36 @@ export async function GET(req: NextRequest) {
 
     const paid = O.filter((o) => o.status === 'paid');
 
-    // ---- Tier counts (paid vs complimentary) ----
-    const tierStats: Record<'explore' | 'contribute' | 'backer', { paid: number; comp: number; total: number }> = {
-      explore: { paid: 0, comp: 0, total: 0 },
-      contribute: { paid: 0, comp: 0, total: 0 },
-      backer: { paid: 0, comp: 0, total: 0 },
+    // ---- Tier counts (paid vs complimentary) + net revenue per tier ----
+    // Revenue also includes partially_refunded orders (net = amount_total - amount_refunded).
+    // Upgrade orders already carry their target ticket_tier and the delta amount,
+    // so they naturally land in the upgraded bucket with the right amount.
+    const tierStats: Record<
+      'explore' | 'contribute' | 'backer',
+      { paid: number; comp: number; total: number; revenue: number }
+    > = {
+      explore: { paid: 0, comp: 0, total: 0, revenue: 0 },
+      contribute: { paid: 0, comp: 0, total: 0, revenue: 0 },
+      backer: { paid: 0, comp: 0, total: 0, revenue: 0 },
     };
-    for (const o of paid) {
+    const revenueOrders = O.filter(
+      (o) => o.status === 'paid' || o.status === 'partially_refunded'
+    );
+    for (const o of revenueOrders) {
       let group: keyof typeof tierStats | null = null;
       if (TIER_GROUPS.explore.includes(o.ticket_tier as 'explore')) group = 'explore';
       else if (TIER_GROUPS.contribute.includes(o.ticket_tier as 'contribute')) group = 'contribute';
       else if ((TIER_GROUPS.backer as readonly string[]).includes(o.ticket_tier)) group = 'backer';
       if (!group) continue;
-      const isComp = Number(o.amount_total || 0) === 0;
-      if (isComp) tierStats[group].comp += 1;
-      else tierStats[group].paid += 1;
-      tierStats[group].total += 1;
+      const net = Number(o.amount_total || 0) - Number(o.amount_refunded || 0);
+      tierStats[group].revenue += net;
+      // Counts only reflect paid (not partially_refunded, to preserve existing semantics)
+      if (o.status === 'paid') {
+        const isComp = Number(o.amount_total || 0) === 0;
+        if (isComp) tierStats[group].comp += 1;
+        else tierStats[group].paid += 1;
+        tierStats[group].total += 1;
+      }
     }
 
     // ---- Unique emails (union orders + subscriptions) ----
@@ -95,21 +110,23 @@ export async function GET(req: NextRequest) {
     for (const o of O) if (o.customer_email) emailSet.add(o.customer_email.toLowerCase());
     for (const s of S) if (s.email) emailSet.add(s.email.toLowerCase());
 
-    // ---- Revenue ----
-    const totalRevenue = paid.reduce((sum, o) => sum + Number(o.amount_total || 0), 0);
-    const currency = paid[0]?.currency || 'usd';
+    // ---- Revenue (net = amount_total - amount_refunded) ----
+    // Grand total equals sum of per-tier revenues; includes partially_refunded.
+    const netOf = (o: OrderRow) => Number(o.amount_total || 0) - Number(o.amount_refunded || 0);
+    const totalRevenue = revenueOrders.reduce((sum, o) => sum + netOf(o), 0);
+    const currency = revenueOrders[0]?.currency || paid[0]?.currency || 'usd';
 
     const now = Date.now();
     const d7 = 7 * 24 * 60 * 60 * 1000;
-    const last7Revenue = paid
+    const last7Revenue = revenueOrders
       .filter((o) => now - new Date(o.created_at).getTime() < d7)
-      .reduce((sum, o) => sum + Number(o.amount_total || 0), 0);
-    const prev7Revenue = paid
+      .reduce((sum, o) => sum + netOf(o), 0);
+    const prev7Revenue = revenueOrders
       .filter((o) => {
         const t = now - new Date(o.created_at).getTime();
         return t >= d7 && t < 2 * d7;
       })
-      .reduce((sum, o) => sum + Number(o.amount_total || 0), 0);
+      .reduce((sum, o) => sum + netOf(o), 0);
 
     // ---- 14-day trend (orders + subscriptions per day) ----
     const days: string[] = [];

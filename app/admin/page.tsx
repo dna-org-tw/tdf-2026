@@ -3,13 +3,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import type { ReconcileResult } from '@/lib/stripeReconcileTypes';
+import { isTerminalResult } from '@/lib/stripeReconcileTypes';
 
 interface Stats {
   uniqueEmails: number;
   tiers: {
-    explore: { paid: number; comp: number; total: number };
-    contribute: { paid: number; comp: number; total: number };
-    backer: { paid: number; comp: number; total: number };
+    explore: { paid: number; comp: number; total: number; revenue: number };
+    contribute: { paid: number; comp: number; total: number; revenue: number };
+    backer: { paid: number; comp: number; total: number; revenue: number };
   };
   revenue: {
     total: number;
@@ -84,12 +86,14 @@ function StatCard({
   label,
   value,
   sub,
+  sub2,
   color,
   ring,
 }: {
   label: string;
   value: string | number;
   sub?: string;
+  sub2?: string;
   color: string;
   ring: string;
 }) {
@@ -100,6 +104,7 @@ function StatCard({
         {value}
       </p>
       {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+      {sub2 && <p className="text-xs text-slate-500 mt-1 font-medium tabular-nums">{sub2}</p>}
     </div>
   );
 }
@@ -107,6 +112,8 @@ function StatCard({
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reconcile, setReconcile] = useState<ReconcileResult | null>(null);
+  const [reconcileLoading, setReconcileLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/admin/stats')
@@ -114,6 +121,14 @@ export default function AdminDashboard() {
       .then((data) => setStats(data))
       .catch((err) => console.error('[Admin]', err))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/admin/stripe-reconcile')
+      .then((res) => res.json())
+      .then((data) => setReconcile(data))
+      .catch((err) => console.error('[Admin Reconcile]', err))
+      .finally(() => setReconcileLoading(false));
   }, []);
 
   if (loading) {
@@ -159,6 +174,11 @@ export default function AdminDashboard() {
           label="Explorer 數"
           value={stats.tiers.explore.total}
           sub={`${stats.tiers.explore.paid} 張付款 / ${stats.tiers.explore.comp} 張招待`}
+          sub2={
+            stats.tiers.explore.revenue > 0
+              ? `收入 ${formatCurrency(stats.tiers.explore.revenue, stats.revenue.currency)}`
+              : undefined
+          }
           color="#10B8D9"
           ring="border-[#10B8D9]"
         />
@@ -166,6 +186,11 @@ export default function AdminDashboard() {
           label="Contributor 數"
           value={stats.tiers.contribute.total}
           sub={`${stats.tiers.contribute.paid} 張付款 / ${stats.tiers.contribute.comp} 張招待`}
+          sub2={
+            stats.tiers.contribute.revenue > 0
+              ? `收入 ${formatCurrency(stats.tiers.contribute.revenue, stats.revenue.currency)}`
+              : undefined
+          }
           color="#22C55E"
           ring="border-[#22C55E]"
         />
@@ -173,6 +198,11 @@ export default function AdminDashboard() {
           label="Backer 數"
           value={stats.tiers.backer.total}
           sub={`${stats.tiers.backer.paid} 張付款 / ${stats.tiers.backer.comp} 張招待（含 Weekly Backer）`}
+          sub2={
+            stats.tiers.backer.revenue > 0
+              ? `收入 ${formatCurrency(stats.tiers.backer.revenue, stats.revenue.currency)}`
+              : undefined
+          }
           color="#EAB308"
           ring="border-[#EAB308]"
         />
@@ -181,7 +211,14 @@ export default function AdminDashboard() {
       {/* Revenue + Attention */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm">
-          <h2 className="font-semibold text-slate-900 mb-4">營收健康</h2>
+          <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
+            <h2 className="font-semibold text-slate-900">營收健康</h2>
+            <ReconcileBadge
+              result={reconcile}
+              loading={reconcileLoading}
+              currency={stats.revenue.currency}
+            />
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-xs text-slate-500 mb-1">總收入</p>
@@ -417,6 +454,85 @@ function PrefRow({ label, value, max, color }: { label: string; value: number; m
         <div className="h-2 rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
     </div>
+  );
+}
+
+function ReconcileBadge({
+  result,
+  loading,
+  currency,
+}: {
+  result: ReconcileResult | null;
+  loading: boolean;
+  currency: string;
+}) {
+  if (loading || !result) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border bg-slate-50 text-slate-500 border-slate-200 animate-pulse">
+        對帳中…
+      </span>
+    );
+  }
+
+  const base = 'inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border';
+
+  if (isTerminalResult(result)) {
+    if (result.status === 'not_configured') {
+      return (
+        <span className={`${base} bg-slate-50 text-slate-500 border-slate-200`}>Stripe 未設定</span>
+      );
+    }
+    if (result.status === 'db_unavailable') {
+      return (
+        <span className={`${base} bg-red-50 text-red-700 border-red-200`}>DB 無法連線</span>
+      );
+    }
+    if (result.status === 'multi_currency') {
+      return (
+        <span className={`${base} bg-slate-50 text-slate-600 border-slate-200`}>
+          混合幣別，暫不對帳
+        </span>
+      );
+    }
+    return (
+      <Link
+        href="/admin/reconcile"
+        className={`${base} bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100`}
+      >
+        暫無法對帳 · 查看 →
+      </Link>
+    );
+  }
+
+  const checkedRel = formatRelative(result.checked_at);
+
+  if (result.status === 'ok') {
+    return (
+      <span className={`${base} bg-green-50 text-green-700 border-green-200`}>
+        已同步 · {checkedRel}
+        {result.is_test_mode && <span className="text-green-500">（test）</span>}
+      </span>
+    );
+  }
+
+  if (result.status === 'critical') {
+    return (
+      <Link
+        href="/admin/reconcile"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-600 text-white border border-red-700 hover:bg-red-700"
+      >
+        ⚠ 有 {result.counts.missing_in_db} 筆待釐清 · 查看 →
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      href="/admin/reconcile"
+      className={`${base} bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100`}
+    >
+      差異 {formatCurrency(Math.abs(result.diff), currency)} · 查看 →
+    </Link>
   );
 }
 
