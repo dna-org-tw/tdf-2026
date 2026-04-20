@@ -858,6 +858,9 @@ export const content = {
       accept: "Accept",
       reject: "Reject"
     },
+    a11y: {
+      skipToContent: "Skip to main content"
+    },
     codeOfConduct: {
       title: "Code of Conduct",
       lastUpdated: "Last updated: February 2026",
@@ -2287,6 +2290,9 @@ export const content = {
       learnMore: "了解更多",
       accept: "同意",
       reject: "拒絕"
+    },
+    a11y: {
+      skipToContent: "跳至主要內容"
     },
     codeOfConduct: {
       title: "活動行為準則",

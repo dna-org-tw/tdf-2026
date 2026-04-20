@@ -8,6 +8,7 @@ import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
 import GoogleTag from '@/components/GoogleTag';
 import CookieConsent from '@/components/CookieConsent';
+import SkipLink from '@/components/SkipLink';
 import RecaptchaScript from '@/components/RecaptchaScript';
 import VisitorTracker from '@/components/VisitorTracker';
 import DiscountCodeCapture from '@/components/DiscountCodeCapture';
@@ -136,6 +137,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} ${notoSansTC.variable} font-sans antialiased bg-stone-50 text-slate-900 selection:bg-teal-500 selection:text-white`}
       >
+        <SkipLink />
         <ServiceWorkerRegistration />
         {/* Performance optimization: Preconnect to external domains - Next.js will move these to head */}
         <PreconnectLinks />
