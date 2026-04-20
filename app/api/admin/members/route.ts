@@ -8,22 +8,10 @@ import {
   type MemberIdentity,
   type DisplayStatus,
   type EnrichedMember,
-  MEMBER_STATUSES,
-  MEMBER_TIERS,
-  TICKET_TIERS,
-  MEMBER_IDENTITIES,
-  DISPLAY_STATUSES,
-  DISPLAY_STATUS_TO_DB,
   ticketTierToIdentity,
   memberStatusToDisplay,
 } from '@/lib/members';
-
-function parseList<T extends string>(raw: string | null, allowed: readonly T[]): T[] | undefined {
-  if (!raw) return undefined;
-  const list = raw.split(',').map((s) => s.trim()).filter(Boolean) as T[];
-  const filtered = list.filter((v) => (allowed as readonly string[]).includes(v));
-  return filtered.length ? filtered : undefined;
-}
+import { parseMemberFilter, applyMemberFilter } from '@/lib/adminMembersQuery';
 
 export async function GET(req: NextRequest) {
   const session = await getAdminSession(req);
@@ -35,69 +23,16 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
-  const search = searchParams.get('search')?.trim() || '';
-  const statuses = parseList<MemberStatus>(searchParams.get('status'), MEMBER_STATUSES);
-  const tiers = parseList<MemberTier>(searchParams.get('tier'), MEMBER_TIERS);
-  const ticketTiers = parseList<TicketTier>(searchParams.get('ticketTier'), TICKET_TIERS);
-  const identities = parseList<MemberIdentity>(searchParams.get('identity'), MEMBER_IDENTITIES);
-  const displayStatuses = parseList<DisplayStatus>(searchParams.get('displayStatus'), DISPLAY_STATUSES);
-  const repeatOnly = searchParams.get('repeat') === '1';
+  const filter = parseMemberFilter(searchParams);
   const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
   const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
 
   try {
-    // Resolve identity filter to ticket tier conditions
-    const resolveIdentityFilter = (): { ticketTiersFromIdentity?: TicketTier[]; includeNullTier?: boolean } => {
-      if (!identities) return {};
-      const tiers: TicketTier[] = [];
-      let includeNullTier = false;
-      for (const id of identities) {
-        if (id === 'backer') { tiers.push('backer', 'weekly_backer'); }
-        else if (id === 'contributor') { tiers.push('contribute'); }
-        else if (id === 'explorer') { tiers.push('explore'); }
-        else if (id === 'follower') { includeNullTier = true; }
-      }
-      return { ticketTiersFromIdentity: tiers.length ? tiers : undefined, includeNullTier };
-    };
-
-    // Resolve displayStatus filter to DB status values
-    const resolveDisplayStatusFilter = (): MemberStatus[] | undefined => {
-      if (!displayStatuses) return statuses; // fall back to raw status filter
-      const dbStatuses: MemberStatus[] = [];
-      for (const ds of displayStatuses) {
-        dbStatuses.push(...DISPLAY_STATUS_TO_DB[ds]);
-      }
-      return dbStatuses.length ? dbStatuses : undefined;
-    };
-
-    const { ticketTiersFromIdentity, includeNullTier } = resolveIdentityFilter();
-    const resolvedStatuses = resolveDisplayStatusFilter();
-
-    const buildFiltered = () => {
-      let q = supabaseServer!.from('members_enriched').select('*', { count: 'exact' });
-      if (search) {
-        q = q.or(`email.ilike.%${search}%,name.ilike.%${search}%`);
-      }
-      if (resolvedStatuses) q = q.in('status', resolvedStatuses);
-      if (tiers) q = q.in('tier', tiers);
-      if (ticketTiers) q = q.in('highest_ticket_tier', ticketTiers);
-      // Identity-based ticket tier filter
-      if (ticketTiersFromIdentity && includeNullTier) {
-        // Need OR: tier in (...) OR tier is null
-        q = q.or(`highest_ticket_tier.in.(${ticketTiersFromIdentity.join(',')}),highest_ticket_tier.is.null`);
-      } else if (ticketTiersFromIdentity) {
-        q = q.in('highest_ticket_tier', ticketTiersFromIdentity);
-      } else if (includeNullTier) {
-        q = q.is('highest_ticket_tier', null);
-      }
-      if (repeatOnly) q = q.gt('paid_order_count', 1);
-      return q;
-    };
-
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    const { data, count, error } = await buildFiltered()
+    const baseQuery = supabaseServer.from('members_enriched').select('*', { count: 'exact' });
+    const { data, count, error } = await applyMemberFilter(baseQuery, filter)
       .order('score', { ascending: false })
       .order('last_interaction_at', { ascending: false, nullsFirst: false })
       .range(from, to);
@@ -109,11 +44,11 @@ export async function GET(req: NextRequest) {
 
     // Summary counts: filtered only by search (so chips show counts for the search scope,
     // not the already-filtered status/tier scope).
-    let summaryQuery = supabaseServer!
+    let summaryQuery = supabaseServer
       .from('members_enriched')
       .select('status, tier, highest_ticket_tier', { head: false });
-    if (search) {
-      summaryQuery = summaryQuery.or(`email.ilike.%${search}%,name.ilike.%${search}%`);
+    if (filter.search) {
+      summaryQuery = summaryQuery.or(`email.ilike.%${filter.search}%,name.ilike.%${filter.search}%`);
     }
     const { data: summaryRows, error: summaryErr } = await summaryQuery;
     if (summaryErr) {
