@@ -1007,7 +1007,8 @@ export const content = {
             "Lodge a complaint with your local data protection authority."
           ],
           afterItems: [
-            "To exercise any of these rights, email fest@dna.org.tw. We will respond within 30 days. For email unsubscribes, every marketing email also contains a one-click unsubscribe link."
+            "To exercise any of these rights, email fest@dna.org.tw. We will respond within 30 days. For email unsubscribes, every marketing email also contains a one-click unsubscribe link.",
+            "If you reside in the EU, UK, Singapore, the Philippines, Indonesia, Malaysia, Vietnam, Thailand, Japan, South Korea, or another jurisdiction with applicable data-protection law (e.g. PDPA, Personal Data Protection Act, PDPD, APPI, PIPA), you may also exercise any additional rights granted to you by that local law beyond those listed above. Send your request to fest@dna.org.tw and we will respond within 30 days or sooner if required by local law."
           ]
         },
         {
@@ -1073,12 +1074,12 @@ export const content = {
           items: [
             "24-hour cooling-off: you may request a full refund within 24 hours of the original purchase by emailing fest@dna.org.tw. This applies once per customer and does not apply to tier upgrade orders.",
             "Event cancelled by organisers: if TDF 2026 is cancelled in full, all ticket holders receive a full refund. If specific sessions are cancelled or rescheduled, the overall ticket remains valid and no partial refund is owed.",
-            "Visa denial with our support letter: if you cannot attend because the relevant authority denies your visa and you applied with a visa support letter we issued, we will refund 50% of the ticket price on presentation of the denial notice.",
+            "Visa denial with our support letter: if you cannot attend because the relevant authority denies your visa and you applied with a visa support letter we issued, we will refund 80% of the ticket price on presentation of the denial notice.",
             "Outside the three situations above, tickets are non-refundable regardless of reason (change of plans, illness, travel disruption, force majeure affecting only you, etc.). Please transfer the ticket instead."
           ],
           afterItems: [
             "Ticket transfer: you may transfer your ticket to another person at no charge through your member account until the transfer deadline published on the Site (typically set a short time before the festival begins). Transferring changes the ticket holder's name for on-site check-in; the original purchaser and the new holder should both receive confirmation emails.",
-            "This policy is lawful under Taiwan's Consumer Protection Act (consumer seven-day cooling-off period does not apply to dated-event tickets), EU Consumer Rights Directive 2011/83/EU Article 16(l), UK Consumer Rights Act 2015, and equivalent US state laws. It does not affect any non-waivable statutory rights you may have under the laws of your place of residence."
+            "This policy is designed under EU Consumer Rights Directive 2011/83/EU Article 16(l) (exemption of the right of withdrawal for leisure services supplied on a specific date), the UK Consumer Rights Act 2015, and applicable Taiwan and US state law. It does not affect any non-waivable statutory rights you may have under the laws of your place of residence."
           ]
         },
         {
@@ -1100,9 +1101,10 @@ export const content = {
           ]
         },
         {
-          title: "8. Partner accommodation",
+          title: "8. Partner accommodation and external trip operator",
           paragraphs: [
-            "We list curated partner stays and facilitate introductions using invite codes. The booking contract for accommodation is between you and the partner property. We are not a party to that contract and are not liable for the condition, pricing changes, cancellation terms, or any dispute regarding the accommodation. Contact the partner directly for booking issues; we can assist with introductions but cannot arbitrate."
+            "We list curated partner stays and facilitate introductions using invite codes. The booking contract for accommodation is between you and the partner property. We are not a party to that contract and are not liable for the condition, pricing changes, cancellation terms, or any dispute regarding the accommodation. Contact the partner directly for booking issues; we can assist with introductions but cannot arbitrate.",
+            "The 3-Day 2-Night Hualien Digital Nomad Trip bundled into the Backer ticket is operated by a licensed Taiwan travel agency (Class-A, 甲種旅行業). The operator's name and licence number will be published on the trip page before the festival begins. Under Taiwan's Tourism Development Act (發展觀光條例) and the Regulations Governing Travel Agencies, the licensed operator will issue a standard domestic travel contract (國內旅遊定型化契約) to each participant covering transportation, lodging arrangements, and the itinerary of the trip. TDNA and Nomad Explore LLC act as the referring organiser and bundler of this trip into the Backer ticket; the travel-service relationship for on-trip transportation, lodging, guiding, and itinerary delivery is between you and the licensed operator. For anything that happens during the trip itself (schedule changes, transportation delays, accommodation issues, activity safety), please contact the licensed operator first; we will assist with coordination but cannot substitute for the operator's statutory responsibilities."
           ]
         },
         {
@@ -1341,7 +1343,7 @@ export const content = {
         },
         {
           question: "What are the ticket types available?",
-          answer: "There are three ticket types: Explorer (basic access with community, opening party, and 30+ activities), Contributor (includes outdoor buffet, VIP dinners, and 40+ activities), and Backer (full access including VIP lunches, VVIP experiences, Hualien trip, and 50+ activities)."
+          answer: "There are four ticket types, all purchasable self-serve on the Tickets section — no email required. Explorer ($25 USD sale / $30 standard): community access, opening marketplace, and 30+ activities. Contributor ($250 / $300): adds Outdoor Nomad Buffet and 4 VIP Dinners, plus 40+ activities. Weekly Backer ($200 / $250): one full festival week of your choice (Week 1–4), including Outdoor Nomad Buffet + 1 VIP Dinner + 1 VIP Lunch and 40+ activities. Backer ($500 / $600): the full month, with 4 VIP Dinners, 4 VIP Lunches, 4 VVIP Experiences, the 3-Day 2-Night Hualien Digital Nomad Trip, and 50+ activities."
         },
         {
           question: "How do I register for Taiwan Digital Fest 2026?",
@@ -2434,7 +2436,8 @@ export const content = {
             "向當地資料保護主管機關提出申訴。"
           ],
           afterItems: [
-            "如欲行使上述任一權利，請來信 fest@dna.org.tw，我們將於 30 日內回覆。所有行銷信件亦皆附一鍵退訂連結。"
+            "如欲行使上述任一權利，請來信 fest@dna.org.tw，我們將於 30 日內回覆。所有行銷信件亦皆附一鍵退訂連結。",
+            "若您為歐盟、英國、新加坡、菲律賓、印尼、馬來西亞、越南、泰國、日本、韓國或其他具個資保護法制之國家居民（如 PDPA、PDPD、APPI、PIPA 等），除本政策所列權利外，您亦得依當地法律行使其所授予之額外權利。請來信 fest@dna.org.tw，我們將於 30 日內回覆，當地法律另有較短期限者從其規定。"
           ]
         },
         {
@@ -2500,12 +2503,12 @@ export const content = {
           items: [
             "24 小時冷靜期：您可於首次購票 24 小時內來信 fest@dna.org.tw 申請全額退款。此權利每位買家僅能行使一次，不適用於票種升級訂單。",
             "主辦單位取消活動：若 TDF 2026 完全由主辦取消，持票人獲全額退款。若僅個別議程取消或改期，票券整體仍然有效，不退差額。",
-            "持我方簽證支持信遭拒簽：若因主管機關拒發簽證而無法出席，且您申辦時使用我方出具之簽證支持信，出示拒簽通知即可退還票價 50%。",
+            "持我方簽證支持信遭拒簽：若因主管機關拒發簽證而無法出席，且您申辦時使用我方出具之簽證支持信，出示拒簽通知即可退還票價 80%。",
             "以上三種情形外，票券概不退款（含個人行程異動、疾病、交通中斷、僅影響您個人之不可抗力等）。請改以轉讓處理。"
           ],
           afterItems: [
             "票券轉讓：您可於網站公告之轉讓截止日前（通常為活動開始前短時間），透過會員帳號免費轉讓票券予他人。轉讓後將更新報到姓名；原購票人與新持票人均會收到通知信。",
-            "本政策符合台灣消費者保護法（消保法 §19 之七日鑑賞期不適用特定日期活動票券）、歐盟消費者指令 2011/83 §16(l)、英國 Consumer Rights Act 2015 及美國相關州法。本政策不影響您所在地法律不可拋棄之消費者權利。"
+            "本政策依歐盟消費者權利指令 2011/83/EU 第 16(l) 條（特定日期休閒活動服務之解除權豁免）、英國 Consumer Rights Act 2015，以及台灣與美國相關州法之規定設計。本政策不影響您所在地法律不可拋棄之消費者權利。"
           ]
         },
         {
@@ -2527,9 +2530,10 @@ export const content = {
           ]
         },
         {
-          title: "8. 合作住宿",
+          title: "8. 合作住宿與外部旅遊承辦",
           paragraphs: [
-            "我方列出合作住宿並透過邀請碼協助媒合。住宿之訂房契約存在於您與合作夥伴之間，我方非當事人，亦不就住宿條件、價格調整、取消條款或相關爭議負責。有問題請直接聯繫合作夥伴；我方可協助介紹但無法仲裁。"
+            "我方列出合作住宿並透過邀請碼協助媒合。住宿之訂房契約存在於您與合作夥伴之間，我方非當事人，亦不就住宿條件、價格調整、取消條款或相關爭議負責。有問題請直接聯繫合作夥伴；我方可協助介紹但無法仲裁。",
+            "Backer 票券所含之「三天兩夜花蓮數位遊牧旅行」，由具交通部觀光署甲種旅行業執照之合作旅行社承辦。承辦業者名稱與執照字號，將於活動開始前於該行程頁面公告。依發展觀光條例及旅行業管理規則，該持證旅行社將依國內旅遊定型化契約與每位參加者簽約，內容涵蓋交通、住宿安排與行程內容。TDNA 與 Nomad Explore LLC 僅為本行程之召集與整合者，將本行程併入 Backer 票券；行程期間之交通、住宿、導覽與行程交付之旅遊服務關係，存在於您與該持證旅行社之間。行程中發生之任何事項（議程異動、交通延誤、住宿問題、活動安全等），請優先聯繫承辦旅行社；我方可協助居中協調，惟不取代承辦旅行社依法負擔之責任。"
           ]
         },
         {
@@ -2768,7 +2772,7 @@ export const content = {
         },
         {
           question: "有哪些票種可以選擇？",
-          answer: "共有三種票種：Explorer（基本參與，包含社群、開幕派對和 30+ 活動）、Contributor（包含五星級饗宴、VIP 晚餐和 40+ 活動），以及 Backer（完整參與，包含 VIP 午餐、VVIP 體驗、花蓮之旅和 50+ 活動）。"
+          answer: "共有四種票種，全部於票券區直接線上購買，無須來信洽詢。Explorer（早鳥 $25 USD／原價 $30）：社群參與、開幕市集與 30+ 活動。Contributor（早鳥 $250／原價 $300）：加上戶外遊牧饗宴與 4 場 VIP 晚餐，共 40+ 活動。Weekly Backer（早鳥 $200／原價 $250）：自選活動期間一週（第 1–4 週），含戶外遊牧饗宴 + 1 場 VIP 晚餐 + 1 場 VIP 午餐與 40+ 活動。Backer（早鳥 $500／原價 $600）：整月完整參與，含 4 場 VIP 晚餐、4 場 VIP 午餐、4 場 VVIP 體驗、三天兩夜花蓮數位遊牧旅行與 50+ 活動。"
         },
         {
           question: "如何報名 2026 台灣數位嘉年華？",
