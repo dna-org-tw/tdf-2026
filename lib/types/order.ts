@@ -124,4 +124,5 @@ export interface UpdateOrderInput {
   internal_notes?: string | null;
   valid_from?: string | null;
   valid_until?: string | null;
+  marketing_consent?: boolean | null;
 }

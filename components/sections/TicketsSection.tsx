@@ -134,8 +134,6 @@ export default function TicketsSection() {
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const [resultModalType, setResultModalType] = useState<'success' | 'error' | 'duplicate' | null>(null);
   const [resultModalMessage, setResultModalMessage] = useState('');
-  // Explicit marketing consent (GDPR/CASL). Default unchecked per Art. 4(11).
-  const [marketingConsent, setMarketingConsent] = useState(false);
   useSectionTracking({ sectionId: 'tickets', sectionName: 'Tickets Section', category: 'Tickets' });
 
   const saleEndDate = '3/31';
@@ -240,7 +238,6 @@ export default function TicketsSection() {
           tier: tier.key,
           visitor_fingerprint: getVisitorFingerprint(),
           recaptchaToken,
-          marketing_consent: marketingConsent,
           ...(week ? { week } : {}),
         }),
       });
@@ -861,22 +858,11 @@ export default function TicketsSection() {
           </div>
         </motion.div>
 
-        {/* Marketing consent (explicit opt-in, unchecked by default per GDPR) */}
-        <label className="mt-8 max-w-3xl mx-auto flex items-start gap-3 cursor-pointer text-sm text-white/80">
-          <input
-            type="checkbox"
-            checked={marketingConsent}
-            onChange={(e) => setMarketingConsent(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-white/30 bg-white/5 text-[#10B8D9] focus:ring-[#10B8D9] focus:ring-offset-0 accent-[#10B8D9]"
-          />
-          <span>
-            {t.tickets.marketingConsent?.label ??
-              'Yes, send me festival news and event updates (optional — you can unsubscribe anytime).'}
-          </span>
-        </label>
-
-        {/* Legal acknowledgement — shown below all ticket cards */}
-        <p className="mt-4 max-w-3xl mx-auto text-center text-xs text-white/60 leading-relaxed">
+        {/* Legal acknowledgement — shown below all ticket cards.
+            Marketing consent is captured natively by Stripe next to the
+            email field via consent_collection.promotions — see
+            app/api/checkout/route.ts. */}
+        <p className="mt-8 max-w-3xl mx-auto text-center text-xs text-white/60 leading-relaxed">
           {t.tickets.legalNotice?.line1 ??
             'Ticket sales are processed by Nomad Explore LLC (Wyoming, USA). Event services are operated by Taiwan Digital Nomad Association.'}{' '}
           {t.tickets.legalNotice?.line2 ?? 'By purchasing, you agree to our'}{' '}

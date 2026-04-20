@@ -193,6 +193,9 @@ export async function updateOrder(
     if (input.valid_until !== undefined) {
       updateData.valid_until = input.valid_until;
     }
+    if (input.marketing_consent !== undefined) {
+      updateData.marketing_consent = input.marketing_consent;
+    }
 
     const { data, error } = await supabaseServer
       .from('orders')

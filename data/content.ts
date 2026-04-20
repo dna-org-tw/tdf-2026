@@ -378,9 +378,6 @@ export const content = {
         and: "and",
         privacy: "Privacy Policy",
         line3: ", including refund rules. Festival updates may be emailed to you; every message includes a one-click unsubscribe."
-      },
-      marketingConsent: {
-        label: "Yes, send me festival news and event updates (optional — you can unsubscribe anytime)."
       }
     },
     upgrade: {
@@ -1813,9 +1810,6 @@ export const content = {
         and: "與",
         privacy: "隱私權政策",
         line3: "（含退款規則）。我們可能寄送節慶更新至您的信箱，每封信皆可一鍵退訂。"
-      },
-      marketingConsent: {
-        label: "願意收到節慶最新消息與活動更新（選填 — 隨時可取消訂閱）。"
       }
     },
     upgrade: {

@@ -124,6 +124,13 @@ export async function POST(req: NextRequest) {
       tax_id_collection: {
         enabled: true,
       },
+      // Explicit marketing consent (GDPR/CASL) rendered natively by Stripe
+      // directly below the email field. `auto` shows the checkbox in
+      // jurisdictions that require explicit opt-in; elsewhere session.consent
+      // stays null and we treat the row as legacy soft opt-in (NULL).
+      consent_collection: {
+        promotions: 'auto',
+      },
       custom_text: {
         submit: {
           message:
@@ -134,10 +141,10 @@ export async function POST(req: NextRequest) {
     });
 
     const visitorFingerprint = body?.visitor_fingerprint ?? null;
-    const marketingConsent =
-      typeof body?.marketing_consent === 'boolean' ? body.marketing_consent : false;
 
-    // Create order record in Supabase (amounts set to 0; updated later by webhook/sync with actual Stripe amounts)
+    // Create order record in Supabase (amounts set to 0; updated later by webhook/sync with actual Stripe amounts).
+    // marketing_consent stays NULL here; the Stripe webhook writes the real
+    // value from session.consent.promotions once the customer submits.
     const order = await createOrder({
       stripe_session_id: session.id,
       ticket_tier: tier,
@@ -147,7 +154,6 @@ export async function POST(req: NextRequest) {
       amount_discount: 0,
       currency: 'usd',
       visitor_fingerprint: visitorFingerprint,
-      marketing_consent: marketingConsent,
     });
 
     if (!order) {

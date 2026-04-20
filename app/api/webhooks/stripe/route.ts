@@ -149,6 +149,17 @@ export async function POST(req: NextRequest) {
         ? await extractSessionDiscount(session, stripe)
         : { discount_code: null, discount_promotion_code_id: null, discount_coupon_id: null };
 
+      // Map Stripe's native promotions-consent outcome (shown by
+      // consent_collection.promotions: 'auto') to our tri-state column:
+      // opt_in → true, opt_out → false, not shown (non-required regions) → null.
+      const promotionsConsent = session.consent?.promotions;
+      const marketingConsent =
+        promotionsConsent === 'opt_in'
+          ? true
+          : promotionsConsent === 'opt_out'
+            ? false
+            : null;
+
       // Update order
       const orderData = {
         stripe_payment_intent_id:
@@ -170,6 +181,7 @@ export async function POST(req: NextRequest) {
         discount_code: discountInfo.discount_code,
         discount_promotion_code_id: discountInfo.discount_promotion_code_id,
         discount_coupon_id: discountInfo.discount_coupon_id,
+        marketing_consent: marketingConsent,
         ...validityDates,
       };
 
