@@ -1,5 +1,6 @@
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
+import { marked } from 'marked';
 import { supabaseServer } from '@/lib/supabaseServer';
 import {
   buildComplianceFooterHtml,
@@ -7,6 +8,10 @@ import {
   buildMailgunComplianceOptions,
   filterSuppressed,
 } from '@/lib/emailCompliance';
+
+// GFM + single-newline → <br> matches what admins expect when composing in
+// the /admin/send textarea. Sync mode so buildHtml can stay non-async.
+const MARKED_OPTIONS = { gfm: true, breaks: true, async: false } as const;
 
 const mailgunApiKey = process.env.MAILGUN_API_KEY;
 const mailgunDomain = process.env.MAILGUN_DOMAIN;
@@ -26,11 +31,9 @@ function buildHtml(
   recipientEmail: string,
   criticalNotice: boolean,
 ): string {
-  const bodyHtml = body
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>');
+  // Markdown → HTML. Admin-authored content, so raw HTML passthrough is OK
+  // (they can already switch body_format='html' for full control).
+  const bodyHtml = marked.parse(body, MARKED_OPTIONS) as string;
 
   return `<!DOCTYPE html>
 <html>

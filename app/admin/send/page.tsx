@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { marked } from 'marked';
 import {
   type MemberStatus,
   type MemberTier,
@@ -27,6 +28,11 @@ interface Preset {
 
 const PRESETS: Preset[] = [
   { id: 'test', label: '寄送測試信（寄給自己）', testOnly: true },
+  {
+    id: 'all',
+    label: '全體會員（含訂閱者）',
+    displayStatuses: ['completed', 'pending', 'abandoned', 'not_started'],
+  },
   { id: 'all-paid', label: '全體已完成', displayStatuses: ['completed'] },
   { id: 'vip', label: 'VIP (已完成 + S/A)', displayStatuses: ['completed'], memberTiers: ['S', 'A'] },
   { id: 'chase', label: '催單 (待完成/已放棄)', displayStatuses: ['pending', 'abandoned'] },
@@ -35,12 +41,12 @@ const PRESETS: Preset[] = [
 
 type BodyFormat = 'plain' | 'html';
 
+// Mirror the server's markdown render in lib/notificationEmail.ts so the
+// preview matches what gets actually sent.
+const MARKED_OPTIONS = { gfm: true, breaks: true, async: false } as const;
+
 function buildPlainPreviewHtml(body: string, subject: string): string {
-  const bodyHtml = body
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>');
+  const bodyHtml = marked.parse(body, MARKED_OPTIONS) as string;
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
@@ -193,7 +199,11 @@ export default function SendNotificationPage() {
       } else {
         setSuccessMessage(`已寄送給 ${data.queued ?? recipientCount} 位收件人`);
         setShowConfirm(false);
-        router.refresh();
+        if (data.notificationId && !testOnly) {
+          router.push(`/admin/history/${data.notificationId}`);
+        } else {
+          router.refresh();
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '發送失敗');
@@ -396,7 +406,7 @@ export default function SendNotificationPage() {
           <span className="text-xs text-slate-400">
             {bodyFormat === 'html'
               ? '（系統會在 </body> 前自動追加退訂連結與寄件人地址）'
-              : '（純文字會自動套用品牌外框）'}
+              : '（純文字會自動套用品牌外框，支援 Markdown）'}
           </span>
         </div>
         <textarea
@@ -404,7 +414,7 @@ export default function SendNotificationPage() {
           onChange={(e) => setBody(e.target.value)}
           placeholder={bodyFormat === 'html'
             ? '貼上完整 HTML（含 <html><body>…）'
-            : '內文（支援換行）'}
+            : '內文（支援換行 + Markdown：**粗體**  *斜體*  [連結](url)  - 項目  # 標題）'}
           rows={bodyFormat === 'html' ? 18 : 12}
           className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm font-mono"
         />
