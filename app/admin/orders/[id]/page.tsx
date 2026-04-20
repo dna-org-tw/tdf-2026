@@ -510,6 +510,15 @@ export default function OrderDetailPage() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-3">
             <h3 className="font-semibold text-slate-900">退款</h3>
+            <div className="text-xs bg-slate-50 border border-slate-200 text-slate-700 p-3 rounded space-y-1">
+              <div className="font-semibold text-slate-900">退款政策提示（見 /terms §4）</div>
+              <ul className="list-disc pl-4 space-y-0.5">
+                <li>24 小時冷靜期（首次購票，不含升級）— 可全額退</li>
+                <li>主辦取消整個 TDF 2026 — 全額退</li>
+                <li>持我方簽證支持信遭拒簽 — 退 50%</li>
+              </ul>
+              <div className="text-slate-600 pt-1">其他情況建議引導客戶使用「轉讓」功能。若為例外處理，請於備註欄清楚記錄理由供稽核。</div>
+            </div>
             {order.source === 'stripe_invoice_offline' && (
               <div className="text-xs bg-yellow-50 text-yellow-800 p-2 rounded">
                 這是線下付款訂單，Stripe 沒有收款記錄。此操作只更新 DB — 請另外處理實際金流。
