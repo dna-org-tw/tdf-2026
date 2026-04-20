@@ -166,6 +166,15 @@ export async function updateOrder(
     if (input.payment_method_type !== undefined) {
       updateData.payment_method_type = input.payment_method_type;
     }
+    if (input.discount_code !== undefined) {
+      updateData.discount_code = input.discount_code;
+    }
+    if (input.discount_promotion_code_id !== undefined) {
+      updateData.discount_promotion_code_id = input.discount_promotion_code_id;
+    }
+    if (input.discount_coupon_id !== undefined) {
+      updateData.discount_coupon_id = input.discount_coupon_id;
+    }
     if (input.stripe_invoice_id !== undefined) {
       updateData.stripe_invoice_id = input.stripe_invoice_id;
     }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -110,12 +111,14 @@ function ChartTooltip({ active, payload, label }: any) {
 }
 
 export default function OrdersPage() {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [tier, setTier] = useState('');
   const [status, setStatus] = useState('');
   const [hasCustomer, setHasCustomer] = useState(false);
+  const [discountCode, setDiscountCode] = useState(searchParams.get('discount_code') || '');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -151,6 +154,7 @@ export default function OrdersPage() {
       if (tier) params.set('tier', tier);
       if (status) params.set('status', status);
       if (hasCustomer) params.set('hasCustomer', '1');
+      if (discountCode) params.set('discount_code', discountCode);
       params.set('page', String(page));
       params.set('limit', '20');
 
@@ -166,7 +170,7 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, tier, status, hasCustomer, page]);
+  }, [search, tier, status, hasCustomer, discountCode, page]);
 
   useEffect(() => {
     const timer = setTimeout(fetchOrders, 300);
@@ -175,7 +179,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, tier, status, hasCustomer]);
+  }, [search, tier, status, hasCustomer, discountCode]);
 
   const formatAmount = (amount: number, currency: string) => {
     return `${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
@@ -321,6 +325,19 @@ export default function OrdersPage() {
           />
           只顯示有顧客資訊
         </label>
+        {discountCode && (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#10B8D9]/10 text-[#0B7A92] rounded-full text-xs font-medium">
+            折扣碼：<span className="font-mono">{discountCode}</span>
+            <button
+              type="button"
+              onClick={() => setDiscountCode('')}
+              className="ml-0.5 hover:text-[#10B8D9]"
+              aria-label="移除折扣碼篩選"
+            >
+              ×
+            </button>
+          </span>
+        )}
         <span className="text-sm text-slate-500">共 {total} 筆訂單</span>
         <a
           href={`/api/admin/orders/export?${new URLSearchParams({
@@ -328,6 +345,7 @@ export default function OrdersPage() {
             ...(tier ? { tier } : {}),
             ...(status ? { status } : {}),
             ...(hasCustomer ? { hasCustomer: '1' } : {}),
+            ...(discountCode ? { discount_code: discountCode } : {}),
           }).toString()}`}
           className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4] transition-colors whitespace-nowrap"
           title="以目前篩選條件匯出 CSV"

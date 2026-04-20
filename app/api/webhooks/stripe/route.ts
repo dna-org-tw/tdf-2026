@@ -5,6 +5,7 @@ import { sendOrderEmail } from '@/lib/sendOrderEmail';
 import { mapPaymentStatusToOrderStatus } from '@/lib/orderStatus';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { getValidityPeriod } from '@/lib/ticketPricing';
+import { extractSessionDiscount } from '@/lib/stripeDiscount';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -143,6 +144,11 @@ export async function POST(req: NextRequest) {
         ? getValidityPeriod(sessionTier, sessionWeek)
         : {};
 
+      // Resolve which promotion code (if any) was applied.
+      const discountInfo = session.total_details?.amount_discount
+        ? await extractSessionDiscount(session, stripe)
+        : { discount_code: null, discount_promotion_code_id: null, discount_coupon_id: null };
+
       // Update order
       const orderData = {
         stripe_payment_intent_id:
@@ -161,6 +167,9 @@ export async function POST(req: NextRequest) {
         payment_method_brand: paymentMethodBrand,
         payment_method_last4: paymentMethodLast4,
         payment_method_type: paymentMethodType,
+        discount_code: discountInfo.discount_code,
+        discount_promotion_code_id: discountInfo.discount_promotion_code_id,
+        discount_coupon_id: discountInfo.discount_coupon_id,
         ...validityDates,
       };
 

@@ -18,6 +18,7 @@ interface Order {
   amount_discount: number;
   amount_refunded: number;
   currency: string;
+  discount_code: string | null;
   customer_email: string | null;
   customer_name: string | null;
   internal_notes: string | null;
@@ -328,7 +329,19 @@ export default function OrderDetailPage() {
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div><span className="text-slate-500">票種：</span><span className="text-slate-900">{order.ticket_tier}</span></div>
           <div><span className="text-slate-500">小計：</span><span className="text-slate-900 font-mono">{formatAmount(order.amount_subtotal, order.currency)}</span></div>
-          <div><span className="text-slate-500">折扣：</span><span className="text-slate-900 font-mono">-{formatAmount(order.amount_discount, order.currency)}</span></div>
+          <div>
+            <span className="text-slate-500">折扣：</span>
+            <span className="text-slate-900 font-mono">-{formatAmount(order.amount_discount, order.currency)}</span>
+            {order.discount_code && (
+              <a
+                href={`/admin/discounts`}
+                className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded bg-[#10B8D9]/10 text-[#0B7A92] text-[11px] font-mono hover:underline"
+                title="查看折扣碼分析"
+              >
+                {order.discount_code}
+              </a>
+            )}
+          </div>
           <div><span className="text-slate-500">稅：</span><span className="text-slate-900 font-mono">{formatAmount(order.amount_tax, order.currency)}</span></div>
           <div><span className="text-slate-500">總計：</span><span className="text-slate-900 font-mono font-semibold">{formatAmount(order.amount_total, order.currency)}</span></div>
           <div><span className="text-slate-500">已退款：</span><span className="text-slate-900 font-mono">{formatAmount(order.amount_refunded, order.currency)}</span></div>

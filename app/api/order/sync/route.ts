@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { updateOrder, createOrder } from '@/lib/orders';
 import { getAdminSession } from '@/lib/adminAuth';
 import { mapPaymentStatusToOrderStatus } from '@/lib/orderStatus';
+import { extractSessionDiscount } from '@/lib/stripeDiscount';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -93,6 +94,10 @@ export async function POST(req: NextRequest) {
       session.status
     );
 
+    const discountInfo = session.total_details?.amount_discount
+      ? await extractSessionDiscount(session, stripe)
+      : { discount_code: null, discount_promotion_code_id: null, discount_coupon_id: null };
+
     // Update order
     const orderUpdateData = {
       stripe_payment_intent_id:
@@ -111,6 +116,9 @@ export async function POST(req: NextRequest) {
       payment_method_brand: paymentMethodBrand,
       payment_method_last4: paymentMethodLast4,
       payment_method_type: paymentMethodType,
+      discount_code: discountInfo.discount_code,
+      discount_promotion_code_id: discountInfo.discount_promotion_code_id,
+      discount_coupon_id: discountInfo.discount_coupon_id,
     };
 
     let updatedOrder = await updateOrder(sessionId, orderUpdateData);

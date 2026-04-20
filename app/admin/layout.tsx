@@ -21,6 +21,9 @@ function AdminNav() {
           <Link href="/admin/orders" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             訂單管理
           </Link>
+          <Link href="/admin/discounts" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
+            折扣碼
+          </Link>
           <Link href="/admin/stay" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             住宿 Stay
           </Link>

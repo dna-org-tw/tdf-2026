@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
   const tier = searchParams.get('tier') || '';
   const status = searchParams.get('status') || '';
   const hasCustomer = searchParams.get('hasCustomer') === '1';
+  const discountCode = searchParams.get('discount_code')?.trim() || '';
   const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
   const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
   const offset = (page - 1) * limit;
@@ -38,6 +39,9 @@ export async function GET(req: NextRequest) {
     }
     if (hasCustomer) {
       query = query.not('customer_email', 'is', null);
+    }
+    if (discountCode) {
+      query = query.eq('discount_code', discountCode);
     }
 
     query = query.range(offset, offset + limit - 1);

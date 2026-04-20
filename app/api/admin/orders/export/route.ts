@@ -11,6 +11,7 @@ interface OrderRow {
   status: string | null;
   amount_total: number | null;
   amount_discount: number | null;
+  discount_code: string | null;
   currency: string | null;
   payment_method_brand: string | null;
   payment_method_last4: string | null;
@@ -45,6 +46,7 @@ export async function GET(req: NextRequest) {
   const tier = searchParams.get('tier') || '';
   const status = searchParams.get('status') || '';
   const hasCustomer = searchParams.get('hasCustomer') === '1';
+  const discountCode = searchParams.get('discount_code')?.trim() || '';
 
   const pageSize = 1000;
   const rows: OrderRow[] = [];
@@ -54,7 +56,7 @@ export async function GET(req: NextRequest) {
     while (true) {
       let query = supabaseServer
         .from('orders')
-        .select('id, stripe_session_id, customer_email, customer_name, ticket_tier, status, amount_total, amount_discount, currency, payment_method_brand, payment_method_last4, created_at')
+        .select('id, stripe_session_id, customer_email, customer_name, ticket_tier, status, amount_total, amount_discount, discount_code, currency, payment_method_brand, payment_method_last4, created_at')
         .order('created_at', { ascending: false })
         .range(offset, offset + pageSize - 1);
 
@@ -64,6 +66,7 @@ export async function GET(req: NextRequest) {
       if (tier) query = query.eq('ticket_tier', tier);
       if (status) query = query.eq('status', status);
       if (hasCustomer) query = query.not('customer_email', 'is', null);
+      if (discountCode) query = query.eq('discount_code', discountCode);
 
       const { data, error } = await query;
       if (error) {
@@ -85,6 +88,7 @@ export async function GET(req: NextRequest) {
       'status',
       'amount_total',
       'amount_discount',
+      'discount_code',
       'currency',
       'payment_method_brand',
       'payment_method_last4',
@@ -101,6 +105,7 @@ export async function GET(req: NextRequest) {
         csvEscape(r.status),
         csvEscape(formatAmount(r.amount_total)),
         csvEscape(formatAmount(r.amount_discount)),
+        csvEscape(r.discount_code),
         csvEscape(r.currency),
         csvEscape(r.payment_method_brand),
         csvEscape(r.payment_method_last4),
