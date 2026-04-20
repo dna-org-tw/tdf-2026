@@ -48,7 +48,9 @@ export async function extractSessionDiscount(
   let session: Stripe.Checkout.Session;
   try {
     session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['total_details.breakdown.discounts.discount.promotion_code'],
+      // Stripe caps expand at 4 levels; promotion_code stays an ID and is
+      // resolved separately below via promotionCodes.retrieve.
+      expand: ['total_details.breakdown.discounts.discount'],
     });
   } catch (err) {
     console.error('[stripeDiscount] Failed to retrieve session', sessionId, err);
