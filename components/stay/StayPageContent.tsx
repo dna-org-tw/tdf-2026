@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import LoginForm from '@/components/auth/LoginForm';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '@/contexts/AuthContext';
 import StayHero from './StayHero';
@@ -14,15 +15,16 @@ import StayManagementPanel from './StayManagementPanel';
 
 export default function StayPageContent() {
   const { t, lang } = useTranslation();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [weeks, setWeeks] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [summary, setSummary] = useState<{ bookings: any[]; waitlist: any[]; transfers: any[] } | null>(null);
 
   useEffect(() => {
+    if (!user?.email) return;
     fetch('/api/stay/weeks').then((r) => r.json()).then((d) => setWeeks(d.weeks ?? []));
-  }, []);
+  }, [user?.email]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -35,6 +37,26 @@ export default function StayPageContent() {
   const activeBooking = summary?.bookings.find((b) =>
     ['confirmed', 'partially_transferred'].includes(b.status),
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <div className="animate-spin w-8 h-8 border-3 border-[#10B8D9] border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Navbar />
+        <main className="pt-24 pb-16 px-4 sm:px-6">
+          <LoginForm />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-stone-50 text-slate-900">
