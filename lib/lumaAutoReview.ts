@@ -181,11 +181,13 @@ async function makeDecision(
     return { status: 'waitlist', reason: 'waitlist:no_membership' };
   }
 
-  // 2. Tier mismatch check
+  // 2. Tier mismatch check — member exists but tier insufficient → waitlist
+  // (more forgiving than declined; member can upgrade tier and be eligible
+  // when their RSVP comes back through pending_approval).
   const requiredWeight = LUMA_TICKET_WEIGHTS[guest.ticket_type_name ?? ''] ?? 0;
   const mWeight = memberWeight(member.highest_ticket_tier, member.status);
   if (mWeight < requiredWeight) {
-    return { status: 'declined', reason: 'declined:tier_mismatch' };
+    return { status: 'waitlist', reason: 'waitlist:tier_mismatch' };
   }
 
   // 3. Weekly backer validity
