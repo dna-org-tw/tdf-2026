@@ -326,7 +326,16 @@ export default function LumaSyncPage() {
               <li key={r.id} className="flex items-center gap-2 rounded border border-slate-200 bg-white px-2 py-1">
                 <span className={`rounded-full px-2 py-0.5 font-medium ${statusColor(r.status)}`}>{r.status}</span>
                 <span className="flex-1 truncate text-slate-700">{r.event_name ?? r.event_api_id}</span>
-                <span className="text-slate-500">{r.guests_count}</span>
+                <span className="text-slate-500" title="本次同步該活動的 guest 總數">{r.guests_count}</span>
+                {r.review_approved > 0 && (
+                  <span className="text-green-700" title="核准">✓{r.review_approved}</span>
+                )}
+                {r.review_waitlisted > 0 && (
+                  <span className="text-amber-700" title="候補">⏳{r.review_waitlisted}</span>
+                )}
+                {r.review_skipped > 0 && (
+                  <span className="text-slate-500" title="跳過（審核錯誤）">↷{r.review_skipped}</span>
+                )}
                 {r.guests_removed > 0 && (
                   <span className="text-red-600" title="移除：本地有但 Luma 已無">−{r.guests_removed}</span>
                 )}

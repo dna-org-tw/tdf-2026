@@ -91,6 +91,9 @@ interface ReviewCounters {
 interface ProcessEventResult {
   guestsUpserted: number;
   guestsRemoved: number;
+  reviewApproved: number;
+  reviewWaitlisted: number;
+  reviewSkipped: number;
 }
 
 /**
@@ -103,9 +106,9 @@ async function processEvent(
   jobId: number,
   eventApiId: string,
   cookie: string,
-  counters: ReviewCounters,
   noShowConsumedExtra: Map<string, number>,
 ): Promise<ProcessEventResult> {
+  const eventCounters: ReviewCounters = { approved: 0, waitlisted: 0, skipped: 0 };
   const supa = db();
   const guests = await fetchEventGuests(eventApiId, cookie);
   const mapped = guests
@@ -161,12 +164,12 @@ async function processEvent(
         await sleep(SLEEP_MS_BETWEEN_LUMA_WRITES);
       }
 
-      if (decision.status === 'approved') counters.approved += 1;
-      else counters.waitlisted += 1;
+      if (decision.status === 'approved') eventCounters.approved += 1;
+      else eventCounters.waitlisted += 1;
     } catch (err) {
       if (err instanceof LumaAuthError) throw err;
       console.error(`[luma-sync] review skip ${row.email} @ ${eventApiId}:`, err);
-      counters.skipped += 1;
+      eventCounters.skipped += 1;
       // Fall through: row still gets upserted with its Luma-reported status.
     }
   }
@@ -228,7 +231,13 @@ async function processEvent(
     if (delErr) throw delErr;
   }
 
-  return { guestsUpserted: mapped.length, guestsRemoved: ghosts.length };
+  return {
+    guestsUpserted: mapped.length,
+    guestsRemoved: ghosts.length,
+    reviewApproved: eventCounters.approved,
+    reviewWaitlisted: eventCounters.waitlisted,
+    reviewSkipped: eventCounters.skipped,
+  };
 }
 
 /**
@@ -372,23 +381,23 @@ export async function runSyncJob(jobId: number): Promise<void> {
       .eq('event_api_id', eventApiId);
 
     try {
-      const { guestsUpserted, guestsRemoved } = await processEvent(
-        jobId,
-        eventApiId,
-        cookie,
-        counters,
-        noShowConsumedExtra,
-      );
-      totalGuestsUpserted += guestsUpserted;
-      totalGuestsRemoved += guestsRemoved;
+      const result = await processEvent(jobId, eventApiId, cookie, noShowConsumedExtra);
+      totalGuestsUpserted += result.guestsUpserted;
+      totalGuestsRemoved += result.guestsRemoved;
+      counters.approved += result.reviewApproved;
+      counters.waitlisted += result.reviewWaitlisted;
+      counters.skipped += result.reviewSkipped;
       processed += 1;
 
       await supa
         .from('luma_sync_event_results')
         .update({
           status: 'done',
-          guests_count: guestsUpserted,
-          guests_removed: guestsRemoved,
+          guests_count: result.guestsUpserted,
+          guests_removed: result.guestsRemoved,
+          review_approved: result.reviewApproved,
+          review_waitlisted: result.reviewWaitlisted,
+          review_skipped: result.reviewSkipped,
           finished_at: new Date().toISOString(),
         })
         .eq('job_id', jobId)

@@ -31,6 +31,9 @@ export interface SyncEventResult {
   status: SyncEventStatus;
   guests_count: number;
   guests_removed: number;
+  review_approved: number;
+  review_waitlisted: number;
+  review_skipped: number;
   error_message: string | null;
   started_at: string | null;
   finished_at: string | null;
