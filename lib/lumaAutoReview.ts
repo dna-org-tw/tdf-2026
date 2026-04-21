@@ -1,28 +1,23 @@
 import { supabaseServer } from '@/lib/supabaseServer';
-import { updateGuestStatus, LumaAuthError } from '@/lib/lumaApi';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-interface PendingGuest {
-  id: number;
-  event_api_id: string;
+export interface GuestForDecision {
   email: string;
-  member_id: number | null;
-  luma_guest_api_id: string;
+  event_api_id: string;
   ticket_type_name: string | null;
-  activity_status: string;
 }
 
 interface MemberInfo {
   member_id: number | null;
-  status: string; // 'paid' | 'subscriber' | 'other' | ...
+  status: string;
   highest_ticket_tier: string | null;
 }
 
-interface ReviewDecision {
-  status: 'approved' | 'declined' | 'waitlist';
+export interface ReviewDecision {
+  status: 'approved' | 'waitlist';
   reason: string;
   consumedNoShowEventApiId?: string;
 }
@@ -45,43 +40,22 @@ const TIER_WEIGHTS: Record<string, number> = {
   backer: 4,
 };
 
-/** Higher weight = processed first */
-function guestSortWeight(ticketTypeName: string | null): number {
+/** Higher weight = processed first (worker uses this to sort guests). */
+export function guestSortWeight(ticketTypeName: string | null): number {
   return LUMA_TICKET_WEIGHTS[ticketTypeName ?? ''] ?? 0;
 }
 
 function memberWeight(tier: string | null, status: string): number {
   if (tier && TIER_WEIGHTS[tier] !== undefined) return TIER_WEIGHTS[tier];
-  // Subscribers with no paid order → follower weight
-  if (status === 'subscriber') return 1;
+  // Any recognised member (paid order without a known tier, or newsletter
+  // subscriber) is treated as a follower → eligible for TDF Follower events.
+  if (status === 'paid' || status === 'subscriber') return 1;
   return 0;
 }
 
 // ---------------------------------------------------------------------------
 // Database helpers
 // ---------------------------------------------------------------------------
-
-async function fetchPendingGuests(jobId: number): Promise<PendingGuest[]> {
-  if (!supabaseServer) throw new Error('supabase not initialised');
-
-  // Get event_api_ids that belong to this job
-  const { data: eventResults } = await supabaseServer
-    .from('luma_sync_event_results')
-    .select('event_api_id')
-    .eq('job_id', jobId);
-
-  const eventApiIds = (eventResults ?? []).map((r: { event_api_id: string }) => r.event_api_id);
-  if (eventApiIds.length === 0) return [];
-
-  const { data, error } = await supabaseServer
-    .from('luma_guests')
-    .select('id, event_api_id, email, member_id, luma_guest_api_id, ticket_type_name, activity_status')
-    .in('event_api_id', eventApiIds)
-    .in('activity_status', ['pending_approval', 'going', 'approved']);
-
-  if (error) throw new Error(`fetch_pending_guests: ${error.message}`);
-  return (data ?? []) as PendingGuest[];
-}
 
 async function lookupMember(email: string): Promise<MemberInfo | null> {
   if (!supabaseServer) throw new Error('supabase not initialised');
@@ -96,7 +70,6 @@ async function lookupMember(email: string): Promise<MemberInfo | null> {
   return data as MemberInfo | null;
 }
 
-/** Check if any weekly_backer or backer order covers eventDate */
 async function isWeeklyBackerValid(email: string, eventDate: string): Promise<boolean> {
   if (!supabaseServer) throw new Error('supabase not initialised');
 
@@ -150,7 +123,6 @@ async function getNoShowData(email: string): Promise<NoShowData> {
     (r: { event_api_id: string }) => r.event_api_id,
   );
 
-  // Count previously consumed no-show penalties
   const { count, error: cErr } = await supabaseServer
     .from('luma_review_log')
     .select('id', { count: 'exact', head: true })
@@ -169,34 +141,32 @@ async function getNoShowData(email: string): Promise<NoShowData> {
 // Decision logic
 // ---------------------------------------------------------------------------
 
-async function makeDecision(
-  guest: PendingGuest,
+export async function makeDecision(
+  guest: GuestForDecision,
   noShowConsumedExtra: Map<string, number>,
 ): Promise<ReviewDecision> {
   const email = guest.email.toLowerCase().trim();
 
-  // 1. Membership check — no identity in our system → waitlist (per spec)
+  // 1. Membership check — no identity in our system → waitlist
   const member = await lookupMember(email);
   if (!member || (member.status !== 'paid' && member.status !== 'subscriber')) {
     return { status: 'waitlist', reason: 'waitlist:no_membership' };
   }
 
-  // 2. Tier mismatch check — member exists but tier insufficient → waitlist
-  // (more forgiving than declined; member can upgrade tier and be eligible
-  // when their RSVP comes back through pending_approval).
+  // 2. Tier mismatch — member exists but tier insufficient → waitlist
   const requiredWeight = LUMA_TICKET_WEIGHTS[guest.ticket_type_name ?? ''] ?? 0;
   const mWeight = memberWeight(member.highest_ticket_tier, member.status);
   if (mWeight < requiredWeight) {
     return { status: 'waitlist', reason: 'waitlist:tier_mismatch' };
   }
 
-  // 3. Weekly backer validity
+  // 3. Weekly backer validity — no paid order covering event date → waitlist
   if (member.highest_ticket_tier === 'weekly_backer') {
     const eventStartAt = await getEventStartDate(guest.event_api_id);
     if (eventStartAt) {
       const valid = await isWeeklyBackerValid(email, eventStartAt);
       if (!valid) {
-        return { status: 'declined', reason: 'declined:weekly_out_of_range' };
+        return { status: 'waitlist', reason: 'waitlist:weekly_out_of_range' };
       }
     }
   }
@@ -208,9 +178,7 @@ async function makeDecision(
   const pendingNoShows = noShowData.noShowEventApiIds.length - effectiveConsumed;
 
   if (pendingNoShows > 0) {
-    // Pick the first unconsumed no-show event
     const consumedEventApiId = noShowData.noShowEventApiIds[effectiveConsumed] ?? undefined;
-    // Increment in-memory consumed count for this email
     noShowConsumedExtra.set(email, extraConsumed + 1);
     return {
       status: 'waitlist',
@@ -221,108 +189,4 @@ async function makeDecision(
 
   // 5. All checks pass
   return { status: 'approved', reason: 'approved:eligible' };
-}
-
-// ---------------------------------------------------------------------------
-// Main entry point
-// ---------------------------------------------------------------------------
-
-const DELAY_MS = 300;
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export async function runAutoReview(jobId: number, cookie: string): Promise<void> {
-  if (!supabaseServer) throw new Error('supabase not initialised');
-
-  const guests = await fetchPendingGuests(jobId);
-
-  // Sort by tier weight descending (higher tier processed first)
-  guests.sort((a, b) => guestSortWeight(b.ticket_type_name) - guestSortWeight(a.ticket_type_name));
-
-  let approved = 0;
-  let declined = 0;
-  let waitlisted = 0;
-  let skipped = 0;
-
-  // Track extra consumed no-show penalties within this batch
-  const noShowConsumedExtra = new Map<string, number>();
-
-  for (let i = 0; i < guests.length; i++) {
-    const guest = guests[i];
-
-    try {
-      const decision = await makeDecision(guest, noShowConsumedExtra);
-
-      // Skip Luma API + log when desired status matches current — avoids
-      // hammering Luma on every sync for already-correct guests, and prevents
-      // double-counting of no_show_penalty consumption logs.
-      const noChange = decision.status === guest.activity_status;
-
-      if (!noChange) {
-        // Call Luma API to update status
-        await updateGuestStatus(cookie, guest.event_api_id, guest.luma_guest_api_id, decision.status);
-
-        // Update local guest status
-        await supabaseServer
-          .from('luma_guests')
-          .update({ activity_status: decision.status })
-          .eq('id', guest.id);
-
-        // Insert review log
-        await supabaseServer.from('luma_review_log').insert({
-          job_id: jobId,
-          event_api_id: guest.event_api_id,
-          email: guest.email.toLowerCase().trim(),
-          member_id: guest.member_id,
-          luma_guest_api_id: guest.luma_guest_api_id,
-          previous_status: guest.activity_status,
-          new_status: decision.status,
-          reason: decision.reason,
-          consumed_no_show_event_api_id: decision.consumedNoShowEventApiId ?? null,
-        });
-      }
-
-      // Tally (count what the decision was, regardless of API call)
-      if (decision.status === 'approved') approved++;
-      else if (decision.status === 'declined') declined++;
-      else if (decision.status === 'waitlist') waitlisted++;
-
-      // Rate-limit between Luma API calls (only when we actually called)
-      if (!noChange && i < guests.length - 1) {
-        await sleep(DELAY_MS);
-      }
-    } catch (err) {
-      // Bubble up auth errors immediately
-      if (err instanceof LumaAuthError) {
-        // Save partial stats before throwing
-        await supabaseServer
-          .from('luma_sync_jobs')
-          .update({
-            review_approved: approved,
-            review_declined: declined,
-            review_waitlisted: waitlisted,
-            review_skipped: skipped,
-          })
-          .eq('id', jobId);
-        throw err;
-      }
-
-      // Skip individual guest on other errors
-      console.error(`[auto-review] skipping guest ${guest.luma_guest_api_id}:`, err);
-      skipped++;
-    }
-  }
-
-  // Update sync job with final review stats
-  await supabaseServer
-    .from('luma_sync_jobs')
-    .update({
-      review_approved: approved,
-      review_declined: declined,
-      review_waitlisted: waitlisted,
-      review_skipped: skipped,
-    })
-    .eq('id', jobId);
 }
