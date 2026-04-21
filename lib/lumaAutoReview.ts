@@ -73,24 +73,20 @@ function memberWeight(tier: string | null, status: string): number {
 }
 
 /**
- * Pick the highest-tier ticket the member is entitled to *within this event*.
- * Returns null if no ticket in the event has weight ≤ memberWeight (shouldn't
- * happen because we already passed the tier check, but defensive). Returns the
- * same ticket the guest already holds if no upgrade is available.
+ * Pick the highest-tier TDF ticket the member is entitled to *within this
+ * event*. Non-TDF tickets (weight 0 — Standard/VIP/Free etc.) are never an
+ * upgrade target; they are the problem we redirect away from. Returns null
+ * if no TDF ticket in the event has weight ≤ memberWeight.
  */
-function pickUpgradeTarget(
+function pickBestTdfTicket(
   eventTickets: EventTicketType[],
   memberWeightValue: number,
-  currentTicketApiId: string | null,
 ): EventTicketType | null {
-  // Sort by weight descending, pick the first ≤ memberWeight
-  const eligible = eventTickets
-    .filter((t) => t.weight <= memberWeightValue)
-    .sort((a, b) => b.weight - a.weight);
-  const best = eligible[0] ?? null;
-  if (!best) return null;
-  if (currentTicketApiId && best.api_id === currentTicketApiId) return null;
-  return best;
+  return (
+    eventTickets
+      .filter((t) => t.weight > 0 && t.weight <= memberWeightValue)
+      .sort((a, b) => b.weight - a.weight)[0] ?? null
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -194,10 +190,21 @@ export async function makeDecision(
     return { status: 'waitlist', reason: 'waitlist:no_membership' };
   }
 
-  // 2. Tier mismatch — member exists but tier insufficient → waitlist
-  const requiredWeight = LUMA_TICKET_WEIGHTS[guest.ticket_type_name ?? ''] ?? 0;
   const mWeight = memberWeight(member.highest_ticket_tier, member.status);
-  if (mWeight < requiredWeight) {
+  const currentTicketWeight = LUMA_TICKET_WEIGHTS[guest.ticket_type_name ?? ''] ?? 0;
+  const bestTdfTicket = pickBestTdfTicket(eventTickets, mWeight);
+
+  // 2. Eligibility gate based on the guest's *current* ticket selection.
+  //    - Non-TDF tickets (weight 0) are never eligible — no member can stay on
+  //      them. If the event has a TDF alternative the member qualifies for, we
+  //      will redirect them to it (step 5); otherwise waitlist.
+  //    - TDF tickets use the normal tier check (member weight ≥ ticket weight).
+  if (currentTicketWeight === 0) {
+    if (!bestTdfTicket) {
+      return { status: 'waitlist', reason: 'waitlist:non_tdf_ticket' };
+    }
+    // fall through — bestTdfTicket will be the forced upgrade target.
+  } else if (mWeight < currentTicketWeight) {
     return { status: 'waitlist', reason: 'waitlist:tier_mismatch' };
   }
 
@@ -228,16 +235,16 @@ export async function makeDecision(
     };
   }
 
-  // 5. All checks pass — approve + compute upgrade target if applicable.
-  // Upgrading protects lower-tier capacity: a Backer member who picked
-  // TDF Follower gets reassigned to TDF Backer, freeing the Follower slot.
-  const upgrade = pickUpgradeTarget(eventTickets, mWeight, guest.current_ticket_type_api_id);
-  if (upgrade) {
+  // 5. Approve — if the best available TDF ticket for this member is different
+  // from what they currently hold, reassign them. This both redirects non-TDF
+  // selections to a TDF ticket and upgrades low-tier TDF selections to the
+  // member's entitled tier.
+  if (bestTdfTicket && bestTdfTicket.api_id !== guest.current_ticket_type_api_id) {
     return {
       status: 'approved',
       reason: 'approved:upgraded',
-      targetTicketTypeApiId: upgrade.api_id,
-      targetTicketTypeName: upgrade.name,
+      targetTicketTypeApiId: bestTdfTicket.api_id,
+      targetTicketTypeName: bestTdfTicket.name,
     };
   }
   return { status: 'approved', reason: 'approved:eligible' };
