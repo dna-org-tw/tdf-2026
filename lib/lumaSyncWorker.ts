@@ -9,7 +9,12 @@ import {
 } from '@/lib/lumaApi';
 import { getDecryptedCookie, markCookieInvalid } from '@/lib/lumaSyncConfig';
 import { sendCookieExpiredAlert } from '@/lib/luma-alert-email';
-import { makeDecision, guestSortWeight } from '@/lib/lumaAutoReview';
+import {
+  makeDecision,
+  guestSortWeight,
+  ticketWeight,
+  type EventTicketType,
+} from '@/lib/lumaAutoReview';
 
 const SLEEP_MS_BETWEEN_EVENTS = 500;
 const SLEEP_MS_BETWEEN_LUMA_WRITES = 300;
@@ -44,6 +49,7 @@ interface MappedGuest {
   checked_in_at: string | null;
   registered_at: string | null;
   ticket_type_name: string | null;
+  event_ticket_type_api_id: string | null;
   amount_cents: number | null;
   currency: string | null;
   last_synced_at: string;
@@ -64,10 +70,30 @@ function mapGuest(g: LumaGuest, eventApiId: string): MappedGuest | null {
     checked_in_at: g.checked_in_at ?? null,
     registered_at: g.registered_at ?? null,
     ticket_type_name: ticket?.event_ticket_type_info?.name ?? null,
+    event_ticket_type_api_id: ticket?.event_ticket_type_info?.api_id ?? null,
     amount_cents: amountCents,
     currency: ticket?.currency ?? null,
     last_synced_at: new Date().toISOString(),
   };
+}
+
+/**
+ * Distinct ticket types in an event, derived from the guests we just fetched.
+ * Ticket types with no existing guest cannot be the target of an upgrade this
+ * run; they will become available once someone RSVPs for them.
+ */
+function collectEventTicketTypes(guests: MappedGuest[]): EventTicketType[] {
+  const byApiId = new Map<string, EventTicketType>();
+  for (const g of guests) {
+    if (!g.event_ticket_type_api_id || !g.ticket_type_name) continue;
+    if (byApiId.has(g.event_ticket_type_api_id)) continue;
+    byApiId.set(g.event_ticket_type_api_id, {
+      api_id: g.event_ticket_type_api_id,
+      name: g.ticket_type_name,
+      weight: ticketWeight(g.ticket_type_name),
+    });
+  }
+  return [...byApiId.values()];
 }
 
 async function failJob(jobId: number, reason: string) {
@@ -115,6 +141,8 @@ async function processEvent(
     .map((g) => mapGuest(g, eventApiId))
     .filter((r): r is MappedGuest => r !== null);
 
+  const eventTicketTypes = collectEventTicketTypes(mapped);
+
   // Process higher-tier tickets first so they claim capacity ahead of lower ones.
   mapped.sort(
     (a, b) => guestSortWeight(b.ticket_type_name) - guestSortWeight(a.ticket_type_name),
@@ -139,15 +167,25 @@ async function processEvent(
           email: row.email,
           event_api_id: eventApiId,
           ticket_type_name: row.ticket_type_name,
+          current_ticket_type_api_id: row.event_ticket_type_api_id,
         },
+        eventTicketTypes,
         noShowConsumedExtra,
       );
 
-      const noChange = decision.status === row.activity_status;
+      const statusChanged = decision.status !== row.activity_status;
+      const ticketUpgraded = !!decision.targetTicketTypeApiId;
+      const mutated = statusChanged || ticketUpgraded;
 
-      if (!noChange) {
+      if (mutated) {
         if (row.luma_guest_api_id) {
-          await updateGuestStatus(cookie, eventApiId, row.luma_guest_api_id, decision.status);
+          await updateGuestStatus(
+            cookie,
+            eventApiId,
+            row.luma_guest_api_id,
+            decision.status,
+            decision.targetTicketTypeApiId ?? null,
+          );
         }
         reviewLogs.push({
           job_id: jobId,
@@ -161,6 +199,10 @@ async function processEvent(
           consumed_no_show_event_api_id: decision.consumedNoShowEventApiId ?? null,
         });
         row.activity_status = decision.status;
+        if (ticketUpgraded && decision.targetTicketTypeApiId) {
+          row.event_ticket_type_api_id = decision.targetTicketTypeApiId;
+          row.ticket_type_name = decision.targetTicketTypeName ?? row.ticket_type_name;
+        }
         await sleep(SLEEP_MS_BETWEEN_LUMA_WRITES);
       }
 

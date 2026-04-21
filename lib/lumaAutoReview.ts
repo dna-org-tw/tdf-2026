@@ -8,6 +8,13 @@ export interface GuestForDecision {
   email: string;
   event_api_id: string;
   ticket_type_name: string | null;
+  current_ticket_type_api_id: string | null;
+}
+
+export interface EventTicketType {
+  api_id: string;
+  name: string;
+  weight: number;
 }
 
 interface MemberInfo {
@@ -20,6 +27,13 @@ export interface ReviewDecision {
   status: 'approved' | 'waitlist';
   reason: string;
   consumedNoShowEventApiId?: string;
+  /**
+   * When status === 'approved' AND the guest currently holds a lower-tier
+   * ticket than they are entitled to, this is the api_id of the ticket type
+   * we should reassign them to on Luma.
+   */
+  targetTicketTypeApiId?: string;
+  targetTicketTypeName?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -45,12 +59,38 @@ export function guestSortWeight(ticketTypeName: string | null): number {
   return LUMA_TICKET_WEIGHTS[ticketTypeName ?? ''] ?? 0;
 }
 
+/** Weight for a Luma ticket type name. Unknown names → 0 (lowest). */
+export function ticketWeight(ticketTypeName: string | null): number {
+  return LUMA_TICKET_WEIGHTS[ticketTypeName ?? ''] ?? 0;
+}
+
 function memberWeight(tier: string | null, status: string): number {
   if (tier && TIER_WEIGHTS[tier] !== undefined) return TIER_WEIGHTS[tier];
   // Any recognised member (paid order without a known tier, or newsletter
   // subscriber) is treated as a follower → eligible for TDF Follower events.
   if (status === 'paid' || status === 'subscriber') return 1;
   return 0;
+}
+
+/**
+ * Pick the highest-tier ticket the member is entitled to *within this event*.
+ * Returns null if no ticket in the event has weight ≤ memberWeight (shouldn't
+ * happen because we already passed the tier check, but defensive). Returns the
+ * same ticket the guest already holds if no upgrade is available.
+ */
+function pickUpgradeTarget(
+  eventTickets: EventTicketType[],
+  memberWeightValue: number,
+  currentTicketApiId: string | null,
+): EventTicketType | null {
+  // Sort by weight descending, pick the first ≤ memberWeight
+  const eligible = eventTickets
+    .filter((t) => t.weight <= memberWeightValue)
+    .sort((a, b) => b.weight - a.weight);
+  const best = eligible[0] ?? null;
+  if (!best) return null;
+  if (currentTicketApiId && best.api_id === currentTicketApiId) return null;
+  return best;
 }
 
 // ---------------------------------------------------------------------------
@@ -143,6 +183,7 @@ async function getNoShowData(email: string): Promise<NoShowData> {
 
 export async function makeDecision(
   guest: GuestForDecision,
+  eventTickets: EventTicketType[],
   noShowConsumedExtra: Map<string, number>,
 ): Promise<ReviewDecision> {
   const email = guest.email.toLowerCase().trim();
@@ -187,6 +228,17 @@ export async function makeDecision(
     };
   }
 
-  // 5. All checks pass
+  // 5. All checks pass — approve + compute upgrade target if applicable.
+  // Upgrading protects lower-tier capacity: a Backer member who picked
+  // TDF Follower gets reassigned to TDF Backer, freeing the Follower slot.
+  const upgrade = pickUpgradeTarget(eventTickets, mWeight, guest.current_ticket_type_api_id);
+  if (upgrade) {
+    return {
+      status: 'approved',
+      reason: 'approved:upgraded',
+      targetTicketTypeApiId: upgrade.api_id,
+      targetTicketTypeName: upgrade.name,
+    };
+  }
   return { status: 'approved', reason: 'approved:eligible' };
 }

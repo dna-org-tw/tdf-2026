@@ -32,7 +32,11 @@ export interface LumaGuestTicket {
   amount?: number | null;
   currency?: string | null;
   is_captured?: boolean;
-  event_ticket_type_info?: { name?: string | null; type?: string | null } | null;
+  event_ticket_type_info?: {
+    api_id?: string | null;
+    name?: string | null;
+    type?: string | null;
+  } | null;
 }
 
 export interface LumaGuest {
@@ -126,6 +130,12 @@ export async function updateGuestStatus(
   eventApiId: string,
   rsvpApiId: string,
   approvalStatus: 'approved' | 'declined' | 'waitlist',
+  /**
+   * When non-null, Luma reassigns the guest to this ticket type on approval
+   * (used to upgrade a member to their entitled tier). When null, Luma keeps
+   * the ticket the guest originally selected.
+   */
+  targetTicketTypeApiId: string | null = null,
 ): Promise<void> {
   await lumaFetch(
     'https://api2.luma.com/event/admin/update-guest-status',
@@ -137,7 +147,7 @@ export async function updateGuestStatus(
         rsvp_api_id: rsvpApiId,
         approval_status: approvalStatus,
         should_refund: false,
-        event_ticket_type_api_id: null,
+        event_ticket_type_api_id: targetTicketTypeApiId,
       }),
     },
   );
