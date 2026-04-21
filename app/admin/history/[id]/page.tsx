@@ -55,6 +55,7 @@ export default function NotificationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'sent' | 'failed'>('all');
   const [retrying, setRetrying] = useState(false);
+  const [resuming, setResuming] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchDetail = useCallback(async () => {
@@ -113,6 +114,22 @@ export default function NotificationDetailPage() {
     }
   };
 
+  const handleResume = async () => {
+    if (!window.confirm(
+      '若背景發送其實仍在進行中，續發可能會造成同一封信被重複寄出。\n\n' +
+      '確定這個批次已經卡住、要手動續發嗎？',
+    )) return;
+    setResuming(true);
+    try {
+      await fetch(`/api/admin/history/${id}/resume`, { method: 'POST' });
+      await fetchDetail();
+    } catch (err) {
+      console.error('[Detail] resume error', err);
+    } finally {
+      setResuming(false);
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('zh-TW', {
       year: 'numeric',
@@ -137,6 +154,13 @@ export default function NotificationDetailPage() {
   const total = emailLogs.length;
   const doneCount = sentCount + failedCount;
   const progressPct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+  // Treat as "stuck" only if the notification is older than this threshold and
+  // there are still pending rows. Long batches (~1 sec/email) routinely take
+  // 15+ minutes to finish naturally, so we err on the side of patience.
+  const STALE_THRESHOLD_MS = 20 * 60 * 1000;
+  const ageMs = notification ? Date.now() - new Date(notification.created_at).getTime() : 0;
+  const stalePendingCount = pendingCount > 0 && ageMs > STALE_THRESHOLD_MS ? pendingCount : 0;
 
   if (loading) {
     return (
@@ -254,16 +278,28 @@ export default function NotificationDetailPage() {
           </div>
         )}
 
-        {/* Retry button */}
-        {failedCount > 0 && pendingCount === 0 && (
-          <button
-            onClick={handleRetry}
-            disabled={retrying}
-            className="bg-red-50 hover:bg-red-100 text-red-700 font-medium px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50"
-          >
-            {retrying ? '重新排入中…' : `重試 ${failedCount} 封失敗的信件`}
-          </button>
-        )}
+        {/* Action buttons */}
+        <div className="flex flex-wrap gap-2">
+          {failedCount > 0 && pendingCount === 0 && (
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="bg-red-50 hover:bg-red-100 text-red-700 font-medium px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50"
+            >
+              {retrying ? '重新排入中…' : `重試 ${failedCount} 封失敗的信件`}
+            </button>
+          )}
+          {stalePendingCount > 0 && (
+            <button
+              onClick={handleResume}
+              disabled={resuming}
+              className="bg-yellow-50 hover:bg-yellow-100 text-yellow-800 font-medium px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50"
+              title={`此批次已建立超過 20 分鐘，仍有 ${stalePendingCount} 封未送出 — 背景 worker 可能已中斷`}
+            >
+              {resuming ? '續發中…' : `續發 ${stalePendingCount} 封排隊中（卡住 ${Math.floor(ageMs / 60000)} 分）`}
+            </button>
+          )}
+        </div>
 
         {/* Email body preview */}
         <details className="mt-4">
