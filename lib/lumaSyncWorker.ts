@@ -436,12 +436,32 @@ export async function runSyncJob(jobId: number): Promise<void> {
   let totalGuestsUpserted = 0;
   let totalGuestsRemoved = 0;
   let cookieAuthFailure = false;
+  let cancelled = false;
+  let abandoned = false;
 
   const counters: ReviewCounters = { approved: 0, waitlisted: 0, skipped: 0 };
   const noShowConsumedExtra = new Map<string, number>();
 
   for (const item of items) {
     const eventApiId = item.event.api_id;
+
+    // Poll for external state changes at each event boundary:
+    //   - cancel_requested_at: admin pressed "取消" → finalize as cancelled
+    //   - status !== 'running': another process (reconciler, parallel worker)
+    //     already finalized this job; exit silently to avoid overwriting.
+    const { data: checkRow } = await supa
+      .from('luma_sync_jobs')
+      .select('cancel_requested_at, status')
+      .eq('id', jobId)
+      .single();
+    if (checkRow && checkRow.status !== 'running') {
+      abandoned = true;
+      break;
+    }
+    if (checkRow?.cancel_requested_at) {
+      cancelled = true;
+      break;
+    }
 
     await supa
       .from('luma_sync_event_results')
@@ -503,6 +523,31 @@ export async function runSyncJob(jobId: number): Promise<void> {
       .eq('id', jobId);
 
     await sleep(SLEEP_MS_BETWEEN_EVENTS);
+  }
+
+  if (abandoned) {
+    console.warn(`[luma-sync] job ${jobId} was finalized externally; worker exiting without overwriting status`);
+    return;
+  }
+
+  if (cancelled) {
+    await supa
+      .from('luma_sync_jobs')
+      .update({
+        status: 'cancelled',
+        phase: 'done',
+        finished_at: new Date().toISOString(),
+        error_summary: 'cancelled_by_admin',
+        processed_events: processed,
+        failed_events: failed,
+        total_guests_upserted: totalGuestsUpserted,
+        total_guests_removed: totalGuestsRemoved,
+        review_approved: counters.approved,
+        review_waitlisted: counters.waitlisted,
+        review_skipped: counters.skipped,
+      })
+      .eq('id', jobId);
+    return;
   }
 
   if (cookieAuthFailure) {

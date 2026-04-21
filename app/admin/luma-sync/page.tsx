@@ -13,6 +13,7 @@ export default function LumaSyncPage() {
   const [editingCookie, setEditingCookie] = useState(false);
   const [cookieDraft, setCookieDraft] = useState('');
   const [busy, setBusy] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<
     | { kind: 'ok'; entryCount: number }
@@ -85,6 +86,17 @@ export default function LumaSyncPage() {
       if (!r.ok) setError(data.error ?? 'failed');
       await fetchJobs();
     } finally { setBusy(false); }
+  };
+
+  const cancelSync = async (jobId: number) => {
+    if (!confirm('要取消目前的同步嗎？worker 會在下一個活動邊界停止（進行中的那個活動會先處理完）。')) return;
+    setCancelling(true); setError(null);
+    try {
+      const r = await fetch(`/api/admin/luma-sync/jobs/${jobId}`, { method: 'DELETE' });
+      const data = await r.json();
+      if (!r.ok) setError(data.error ?? 'cancel_failed');
+      await fetchJobs();
+    } finally { setCancelling(false); }
   };
 
   const testCookie = async () => {
@@ -182,6 +194,7 @@ export default function LumaSyncPage() {
     succeeded: 'bg-green-100 text-green-800',
     partial: 'bg-amber-100 text-amber-800',
     failed: 'bg-red-100 text-red-800',
+    cancelled: 'bg-slate-200 text-slate-600',
     pending: 'bg-slate-200 text-slate-700',
     done: 'bg-green-100 text-green-800',
     skipped: 'bg-slate-100 text-slate-500',
@@ -342,10 +355,26 @@ export default function LumaSyncPage() {
           <h2 className="mb-3 text-lg font-semibold text-slate-900 flex items-center gap-2">
             進行中 (job #{current.id})
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              current.phase === 'done' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+              current.cancel_requested_at
+                ? 'bg-amber-100 text-amber-800'
+                : current.phase === 'done'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-blue-100 text-blue-800'
             }`}>
-              {current.phase === 'done' ? '完成' : '同步中'}
+              {current.cancel_requested_at
+                ? '取消中…'
+                : current.phase === 'done'
+                  ? '完成'
+                  : '同步中'}
             </span>
+            <button
+              onClick={() => cancelSync(current.id)}
+              disabled={cancelling || !!current.cancel_requested_at || current.phase === 'done'}
+              className="ml-auto rounded-md border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="在下個活動邊界停止 worker；進行中的那個活動會先處理完。"
+            >
+              {current.cancel_requested_at ? '已請求取消' : cancelling ? '取消中…' : '取消同步'}
+            </button>
           </h2>
 
           {/* Combined sync + review progress */}

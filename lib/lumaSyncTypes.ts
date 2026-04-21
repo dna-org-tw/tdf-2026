@@ -1,4 +1,4 @@
-export type SyncJobStatus = 'queued' | 'running' | 'succeeded' | 'partial' | 'failed';
+export type SyncJobStatus = 'queued' | 'running' | 'succeeded' | 'partial' | 'failed' | 'cancelled';
 export type SyncJobPhase = 'syncing' | 'reviewing' | 'done';
 export type SyncEventStatus = 'pending' | 'running' | 'done' | 'failed' | 'skipped';
 
@@ -16,6 +16,7 @@ export interface SyncJob {
   total_guests_removed: number;
   error_summary: string | null;
   triggered_by: string | null;
+  cancel_requested_at: string | null;
   created_at: string;
   review_approved: number;
   review_declined: number;
