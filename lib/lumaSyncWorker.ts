@@ -3,6 +3,7 @@ import {
   fetchCalendarItems,
   fetchEventGuests,
   updateGuestStatus,
+  updateGuestTicketType,
   LumaAuthError,
   type LumaCalendarItem,
   type LumaGuest,
@@ -196,13 +197,22 @@ async function processEvent(
 
       if (mutated) {
         if (row.luma_guest_api_id) {
-          await updateGuestStatus(
-            cookie,
-            eventApiId,
-            row.luma_guest_api_id,
-            decision.status,
-            decision.targetTicketTypeApiId ?? null,
-          );
+          // Status and ticket type live on two separate Luma endpoints.
+          // Update status first (admins expect status-first semantics), then
+          // reassign ticket type. Either can be skipped independently.
+          if (statusChanged) {
+            await updateGuestStatus(cookie, eventApiId, row.luma_guest_api_id, decision.status);
+            await sleep(SLEEP_MS_BETWEEN_LUMA_WRITES);
+          }
+          if (ticketUpgraded && decision.targetTicketTypeApiId) {
+            await updateGuestTicketType(
+              cookie,
+              eventApiId,
+              row.luma_guest_api_id,
+              decision.targetTicketTypeApiId,
+            );
+            await sleep(SLEEP_MS_BETWEEN_LUMA_WRITES);
+          }
         }
         reviewLogs.push({
           job_id: jobId,
@@ -220,7 +230,6 @@ async function processEvent(
           row.event_ticket_type_api_id = decision.targetTicketTypeApiId;
           row.ticket_type_name = decision.targetTicketTypeName ?? row.ticket_type_name;
         }
-        await sleep(SLEEP_MS_BETWEEN_LUMA_WRITES);
       }
 
       if (decision.status === 'approved') eventCounters.approved += 1;

@@ -130,12 +130,6 @@ export async function updateGuestStatus(
   eventApiId: string,
   rsvpApiId: string,
   approvalStatus: 'approved' | 'declined' | 'waitlist',
-  /**
-   * When non-null, Luma reassigns the guest to this ticket type on approval
-   * (used to upgrade a member to their entitled tier). When null, Luma keeps
-   * the ticket the guest originally selected.
-   */
-  targetTicketTypeApiId: string | null = null,
 ): Promise<void> {
   await lumaFetch(
     'https://api2.luma.com/event/admin/update-guest-status',
@@ -147,7 +141,33 @@ export async function updateGuestStatus(
         rsvp_api_id: rsvpApiId,
         approval_status: approvalStatus,
         should_refund: false,
-        event_ticket_type_api_id: targetTicketTypeApiId,
+        event_ticket_type_api_id: null,
+      }),
+    },
+  );
+}
+
+/**
+ * Reassigns a guest to a different ticket type. This is a separate Luma
+ * endpoint from `update-guest-status`; passing `event_ticket_type_api_id` on
+ * the status endpoint silently no-ops for ticket changes, so callers must use
+ * this endpoint whenever the guest's ticket tier needs to change.
+ */
+export async function updateGuestTicketType(
+  cookie: string,
+  eventApiId: string,
+  rsvpApiId: string,
+  ticketTypeApiId: string,
+): Promise<void> {
+  await lumaFetch(
+    'https://api2.luma.com/event/admin/update-guest-ticket-type',
+    cookie,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        event_api_id: eventApiId,
+        rsvp_api_id: rsvpApiId,
+        event_ticket_type_api_id: ticketTypeApiId,
       }),
     },
   );
