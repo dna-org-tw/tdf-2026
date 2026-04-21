@@ -1,0 +1,30 @@
+name: Luma Sync Cron
+
+on:
+  schedule:
+    # Every 30 minutes. The /api/cron/luma-sync endpoint dedupes via
+    # `existing in_progress` check, so overlapping ticks are safe.
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: luma-sync-cron
+  cancel-in-progress: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST cron endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          response=$(curl -fsS -w "\n%{http_code}" -X POST \
+            https://fest.dna.org.tw/api/cron/luma-sync \
+            -H "Authorization: Bearer $CRON_SECRET")
+          body=$(echo "$response" | sed '$d')
+          status=$(echo "$response" | tail -n1)
+          echo "HTTP $status -- $body"
+          [ "$status" = "200" ] || { echo "non-200 status"; exit 1; }
