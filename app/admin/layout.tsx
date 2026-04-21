@@ -39,6 +39,9 @@ function AdminNav() {
           <Link href="/admin/history" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             發送紀錄
           </Link>
+          <Link href="/admin/auditing" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
+            稽核軌跡
+          </Link>
           <Link
             href="/admin/luma-sync"
             className="relative inline-flex items-center text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap"
