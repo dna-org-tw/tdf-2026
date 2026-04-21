@@ -137,6 +137,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
   let processed = 0;
   let failed = 0;
   let totalGuestsUpserted = 0;
+  let totalGuestsRemoved = 0;
   let cookieAuthFailure = false;
 
   for (const item of items) {
@@ -164,6 +165,53 @@ export async function runSyncJob(jobId: number): Promise<void> {
         }
       }
 
+      // Reverse-sync: Luma is the source of truth. Any local guest for this
+      // event whose email is not in the freshly-fetched Luma roster must be
+      // a ghost (cancelled/deleted on Luma side) — remove locally and audit.
+      const lumaEmails = new Set(rows.map((r) => r.email));
+      const { data: localGuests, error: localErr } = await supa
+        .from('luma_guests')
+        .select('id, email, activity_status, luma_guest_api_id, member_id')
+        .eq('event_api_id', eventApiId);
+      if (localErr) throw localErr;
+
+      const ghosts = (localGuests ?? []).filter(
+        (g: { email: string }) => !lumaEmails.has(g.email),
+      );
+
+      if (ghosts.length > 0) {
+        const ghostIds = ghosts.map((g: { id: number }) => g.id);
+        const { error: logErr } = await supa.from('luma_review_log').insert(
+          ghosts.map(
+            (g: {
+              email: string;
+              activity_status: string | null;
+              luma_guest_api_id: string | null;
+              member_id: number | null;
+            }) => ({
+              job_id: jobId,
+              event_api_id: eventApiId,
+              email: g.email,
+              member_id: g.member_id ?? null,
+              luma_guest_api_id: g.luma_guest_api_id,
+              previous_status: g.activity_status ?? 'unknown',
+              new_status: 'removed',
+              reason: 'removed:not_in_luma',
+              consumed_no_show_event_api_id: null,
+            }),
+          ),
+        );
+        if (logErr) throw logErr;
+
+        const { error: delErr } = await supa
+          .from('luma_guests')
+          .delete()
+          .in('id', ghostIds);
+        if (delErr) throw delErr;
+
+        totalGuestsRemoved += ghosts.length;
+      }
+
       totalGuestsUpserted += rows.length;
       processed += 1;
       await supa
@@ -171,6 +219,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
         .update({
           status: 'done',
           guests_count: rows.length,
+          guests_removed: ghosts.length,
           finished_at: new Date().toISOString(),
         })
         .eq('job_id', jobId)
@@ -199,6 +248,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
         processed_events: processed,
         failed_events: failed,
         total_guests_upserted: totalGuestsUpserted,
+        total_guests_removed: totalGuestsRemoved,
       })
       .eq('id', jobId);
 
@@ -232,6 +282,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
         processed_events: processed,
         failed_events: failed,
         total_guests_upserted: totalGuestsUpserted,
+        total_guests_removed: totalGuestsRemoved,
       })
       .eq('id', jobId);
     return;
@@ -246,6 +297,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
       processed_events: processed,
       failed_events: failed,
       total_guests_upserted: totalGuestsUpserted,
+      total_guests_removed: totalGuestsRemoved,
     })
     .eq('id', jobId);
 

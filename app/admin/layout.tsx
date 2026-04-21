@@ -4,9 +4,15 @@
 import { useState, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import {
+  LumaCookieStatusProvider,
+  LumaCookieBanner,
+  useLumaCookieStatus,
+} from '@/components/admin/LumaCookieStatus';
 
 function AdminNav() {
   const { user, signOut } = useAuth();
+  const { cookieInvalid } = useLumaCookieStatus();
 
   return (
     <nav className="bg-[#1E1F1C] text-white px-4 sm:px-6 py-3 sm:py-4">
@@ -33,8 +39,18 @@ function AdminNav() {
           <Link href="/admin/history" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             發送紀錄
           </Link>
-          <Link href="/admin/luma-sync" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
+          <Link
+            href="/admin/luma-sync"
+            className="relative inline-flex items-center text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap"
+          >
             Luma 同步
+            {cookieInvalid && (
+              <span
+                aria-label="Luma session 失效"
+                title="Luma session 失效"
+                className="ml-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-red-500"
+              />
+            )}
           </Link>
           <Link href="/admin/settings" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             設定
@@ -208,12 +224,15 @@ function AdminGate({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      <AdminNav />
-      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {children}
-      </main>
-    </div>
+    <LumaCookieStatusProvider>
+      <div className="min-h-screen bg-stone-50">
+        <LumaCookieBanner />
+        <AdminNav />
+        <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {children}
+        </main>
+      </div>
+    </LumaCookieStatusProvider>
   );
 }
 

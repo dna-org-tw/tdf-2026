@@ -77,7 +77,7 @@ async function fetchPendingGuests(jobId: number): Promise<PendingGuest[]> {
     .from('luma_guests')
     .select('id, event_api_id, email, member_id, luma_guest_api_id, ticket_type_name, activity_status')
     .in('event_api_id', eventApiIds)
-    .eq('activity_status', 'pending_approval');
+    .in('activity_status', ['pending_approval', 'going', 'approved']);
 
   if (error) throw new Error(`fetch_pending_guests: ${error.message}`);
   return (data ?? []) as PendingGuest[];
@@ -175,10 +175,10 @@ async function makeDecision(
 ): Promise<ReviewDecision> {
   const email = guest.email.toLowerCase().trim();
 
-  // 1. Membership check
+  // 1. Membership check — no identity in our system → waitlist (per spec)
   const member = await lookupMember(email);
   if (!member || (member.status !== 'paid' && member.status !== 'subscriber')) {
-    return { status: 'declined', reason: 'declined:no_membership' };
+    return { status: 'waitlist', reason: 'waitlist:no_membership' };
   }
 
   // 2. Tier mismatch check
@@ -253,35 +253,42 @@ export async function runAutoReview(jobId: number, cookie: string): Promise<void
     try {
       const decision = await makeDecision(guest, noShowConsumedExtra);
 
-      // Call Luma API to update status
-      await updateGuestStatus(cookie, guest.event_api_id, guest.luma_guest_api_id, decision.status);
+      // Skip Luma API + log when desired status matches current — avoids
+      // hammering Luma on every sync for already-correct guests, and prevents
+      // double-counting of no_show_penalty consumption logs.
+      const noChange = decision.status === guest.activity_status;
 
-      // Update local guest status
-      await supabaseServer
-        .from('luma_guests')
-        .update({ activity_status: decision.status })
-        .eq('id', guest.id);
+      if (!noChange) {
+        // Call Luma API to update status
+        await updateGuestStatus(cookie, guest.event_api_id, guest.luma_guest_api_id, decision.status);
 
-      // Insert review log
-      await supabaseServer.from('luma_review_log').insert({
-        job_id: jobId,
-        event_api_id: guest.event_api_id,
-        email: guest.email.toLowerCase().trim(),
-        member_id: guest.member_id,
-        luma_guest_api_id: guest.luma_guest_api_id,
-        previous_status: guest.activity_status,
-        new_status: decision.status,
-        reason: decision.reason,
-        consumed_no_show_event_api_id: decision.consumedNoShowEventApiId ?? null,
-      });
+        // Update local guest status
+        await supabaseServer
+          .from('luma_guests')
+          .update({ activity_status: decision.status })
+          .eq('id', guest.id);
 
-      // Tally
+        // Insert review log
+        await supabaseServer.from('luma_review_log').insert({
+          job_id: jobId,
+          event_api_id: guest.event_api_id,
+          email: guest.email.toLowerCase().trim(),
+          member_id: guest.member_id,
+          luma_guest_api_id: guest.luma_guest_api_id,
+          previous_status: guest.activity_status,
+          new_status: decision.status,
+          reason: decision.reason,
+          consumed_no_show_event_api_id: decision.consumedNoShowEventApiId ?? null,
+        });
+      }
+
+      // Tally (count what the decision was, regardless of API call)
       if (decision.status === 'approved') approved++;
       else if (decision.status === 'declined') declined++;
       else if (decision.status === 'waitlist') waitlisted++;
 
-      // Rate-limit between Luma API calls
-      if (i < guests.length - 1) {
+      // Rate-limit between Luma API calls (only when we actually called)
+      if (!noChange && i < guests.length - 1) {
         await sleep(DELAY_MS);
       }
     } catch (err) {

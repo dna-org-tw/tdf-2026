@@ -306,7 +306,11 @@ export default function LumaSyncPage() {
                 匯入活動 {current.processed_events} / {current.total_events || '?'}
               </span>
               <span className="text-slate-600">
-                失敗 {current.failed_events} · {current.total_guests_upserted} guests · {fmtDuration(current.started_at, null)}
+                失敗 {current.failed_events} · {current.total_guests_upserted} guests
+                {current.total_guests_removed > 0 && (
+                  <span className="text-red-600"> · 移除 {current.total_guests_removed}</span>
+                )}
+                {' · '}{fmtDuration(current.started_at, null)}
               </span>
             </div>
             <div className="h-2 overflow-hidden rounded bg-slate-200">
@@ -344,6 +348,9 @@ export default function LumaSyncPage() {
                 <span className={`rounded-full px-2 py-0.5 font-medium ${statusColor(r.status)}`}>{r.status}</span>
                 <span className="flex-1 truncate text-slate-700">{r.event_name ?? r.event_api_id}</span>
                 <span className="text-slate-500">{r.guests_count}</span>
+                {r.guests_removed > 0 && (
+                  <span className="text-red-600" title="移除：本地有但 Luma 已無">−{r.guests_removed}</span>
+                )}
                 {r.error_message && <span className="max-w-xs truncate text-red-600">{r.error_message}</span>}
               </li>
             ))}
@@ -385,7 +392,12 @@ export default function LumaSyncPage() {
                     <td className="pr-3">{fmtDuration(j.started_at, j.finished_at)}</td>
                     <td className="pr-3">{j.processed_events}/{j.total_events}</td>
                     <td className="pr-3">{j.failed_events}</td>
-                    <td className="pr-3">{j.total_guests_upserted}</td>
+                    <td className="pr-3">
+                      {j.total_guests_upserted}
+                      {j.total_guests_removed > 0 && (
+                        <span className="text-red-600"> (−{j.total_guests_removed})</span>
+                      )}
+                    </td>
                     <td className="pr-3">
                       {(j.review_approved + j.review_declined + j.review_waitlisted) > 0 ? (
                         <span className="text-[10px]">
@@ -411,6 +423,9 @@ export default function LumaSyncPage() {
                               <span className={`rounded-full px-2 py-0.5 font-medium ${statusColor(r.status)}`}>{r.status}</span>
                               <span className="flex-1 truncate">{r.event_name ?? r.event_api_id}</span>
                               <span className="text-slate-500">{r.guests_count}</span>
+                              {r.guests_removed > 0 && (
+                                <span className="text-red-600" title="移除：本地有但 Luma 已無">−{r.guests_removed}</span>
+                              )}
                               {r.error_message && <span className="max-w-xs truncate text-red-600">{r.error_message}</span>}
                             </li>
                           ))}

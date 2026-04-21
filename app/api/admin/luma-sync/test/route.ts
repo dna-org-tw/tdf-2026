@@ -9,7 +9,15 @@ export async function POST(req: NextRequest) {
   const session = await getAdminSession(req);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const cookie = await getDecryptedCookie();
+  let cookie: string | null;
+  try {
+    cookie = await getDecryptedCookie();
+  } catch (err) {
+    return NextResponse.json(
+      { ok: false, error: `cookie_decrypt_failed: ${(err as Error).message}` },
+      { status: 500 },
+    );
+  }
   if (!cookie) {
     return NextResponse.json({ ok: false, error: 'no_cookie' }, { status: 400 });
   }

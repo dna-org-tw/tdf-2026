@@ -13,6 +13,7 @@ export interface SyncJob {
   processed_events: number;
   failed_events: number;
   total_guests_upserted: number;
+  total_guests_removed: number;
   error_summary: string | null;
   triggered_by: string | null;
   created_at: string;
@@ -29,6 +30,7 @@ export interface SyncEventResult {
   event_name: string | null;
   status: SyncEventStatus;
   guests_count: number;
+  guests_removed: number;
   error_message: string | null;
   started_at: string | null;
   finished_at: string | null;
