@@ -120,6 +120,7 @@ interface ProcessEventResult {
   reviewApproved: number;
   reviewWaitlisted: number;
   reviewSkipped: number;
+  skipped: boolean;
 }
 
 /**
@@ -142,6 +143,22 @@ async function processEvent(
     .filter((r): r is MappedGuest => r !== null);
 
   const eventTicketTypes = collectEventTicketTypes(mapped);
+
+  // If the event has no TDF ticket type among the fetched guests, skip it
+  // entirely: no upsert, no review, no reverse-sync. These are events outside
+  // the TDF flow (or with latent-only TDF tickets that no one has RSVP'd yet)
+  // and should not be mirrored locally.
+  const hasTdfTicket = eventTicketTypes.some((t) => t.weight > 0);
+  if (!hasTdfTicket) {
+    return {
+      guestsUpserted: 0,
+      guestsRemoved: 0,
+      reviewApproved: 0,
+      reviewWaitlisted: 0,
+      reviewSkipped: 0,
+      skipped: true,
+    };
+  }
 
   // Process higher-tier tickets first so they claim capacity ahead of lower ones.
   mapped.sort(
@@ -279,6 +296,7 @@ async function processEvent(
     reviewApproved: eventCounters.approved,
     reviewWaitlisted: eventCounters.waitlisted,
     reviewSkipped: eventCounters.skipped,
+    skipped: false,
   };
 }
 
@@ -434,7 +452,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
       await supa
         .from('luma_sync_event_results')
         .update({
-          status: 'done',
+          status: result.skipped ? 'skipped' : 'done',
           guests_count: result.guestsUpserted,
           guests_removed: result.guestsRemoved,
           review_approved: result.reviewApproved,

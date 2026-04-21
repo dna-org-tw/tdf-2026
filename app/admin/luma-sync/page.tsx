@@ -147,6 +147,7 @@ export default function LumaSyncPage() {
     failed: 'bg-red-100 text-red-800',
     pending: 'bg-slate-200 text-slate-700',
     done: 'bg-green-100 text-green-800',
+    skipped: 'bg-slate-100 text-slate-500',
   }[s] ?? 'bg-slate-200 text-slate-700');
 
   return (

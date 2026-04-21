@@ -1,6 +1,6 @@
 export type SyncJobStatus = 'queued' | 'running' | 'succeeded' | 'partial' | 'failed';
 export type SyncJobPhase = 'syncing' | 'reviewing' | 'done';
-export type SyncEventStatus = 'pending' | 'running' | 'done' | 'failed';
+export type SyncEventStatus = 'pending' | 'running' | 'done' | 'failed' | 'skipped';
 
 export interface SyncJob {
   id: number;
