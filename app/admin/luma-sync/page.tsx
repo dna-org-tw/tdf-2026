@@ -12,7 +12,6 @@ export default function LumaSyncPage() {
   const [expandedResults, setExpandedResults] = useState<SyncEventResult[]>([]);
   const [editingCookie, setEditingCookie] = useState(false);
   const [cookieDraft, setCookieDraft] = useState('');
-  const [scheduleDraft, setScheduleDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<
@@ -28,7 +27,6 @@ export default function LumaSyncPage() {
     if (r.ok) {
       const c = (await r.json()) as SyncConfigPublic;
       setConfig(c);
-      setScheduleDraft(c.cronSchedule);
     }
   }, []);
 
@@ -128,15 +126,6 @@ export default function LumaSyncPage() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cronEnabled: enabled }),
-    });
-    fetchConfig();
-  };
-
-  const saveSchedule = async () => {
-    await fetch('/api/admin/luma-sync/config', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cronSchedule: scheduleDraft }),
     });
     fetchConfig();
   };
@@ -254,19 +243,20 @@ export default function LumaSyncPage() {
                 />
                 啟用排程
               </label>
-              <input
-                value={scheduleDraft}
-                onChange={(e) => setScheduleDraft(e.target.value)}
-                className="ml-2 rounded border border-slate-300 px-2 py-1 font-mono text-xs"
-                placeholder="0 19 * * *"
-              />
-              <button
-                onClick={saveSchedule}
-                className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
+              <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs text-slate-700">
+                {config.cronSchedule}
+              </span>
+              <a
+                href="https://github.com/dna-org-tw/tdf-2026/blob/main/.github/workflows/luma-sync-cron.yml"
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-[#10B8D9] hover:underline"
               >
-                儲存排程
-              </button>
-              <span className="text-xs text-slate-500">UTC（0 19 * * * = 03:00 台北）</span>
+                改排程 → 編輯 GitHub workflow ↗
+              </a>
+            </div>
+            <div className="text-xs text-slate-500">
+              排程實際由 GitHub Actions 控制，本欄只顯示 DB 上的標籤；後台修改不會改變實際執行時間。
             </div>
             <div className="text-xs text-slate-500">
               上次手動執行：{fmtDate(config.lastManualRunAt)} · 設定更新：{fmtDate(config.updatedAt)} ({config.updatedBy ?? '—'})
@@ -291,25 +281,26 @@ export default function LumaSyncPage() {
           <h2 className="mb-3 text-lg font-semibold text-slate-900 flex items-center gap-2">
             進行中 (job #{current.id})
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              current.phase === 'reviewing' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+              current.phase === 'done' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
             }`}>
-              {current.phase === 'syncing' ? '匯入中' : current.phase === 'reviewing' ? '審核中' : '完成'}
+              {current.phase === 'done' ? '完成' : '同步中'}
             </span>
           </h2>
 
-          {/* Sync progress */}
+          {/* Combined sync + review progress */}
           <div className="mb-3">
             <div className="mb-1 flex flex-wrap justify-between gap-2 text-sm">
               <span className="flex items-center gap-1.5">
-                {current.phase === 'syncing' && <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />}
-                {current.phase !== 'syncing' && <span className="inline-block h-2 w-2 rounded-full bg-green-500" />}
-                匯入活動 {current.processed_events} / {current.total_events || '?'}
+                {current.phase !== 'done' && <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />}
+                {current.phase === 'done' && <span className="inline-block h-2 w-2 rounded-full bg-green-500" />}
+                {current.processed_events} / {current.total_events || '?'} 活動
               </span>
               <span className="text-slate-600">
-                失敗 {current.failed_events} · {current.total_guests_upserted} guests
+                {current.total_guests_upserted} guests
                 {current.total_guests_removed > 0 && (
                   <span className="text-red-600"> · 移除 {current.total_guests_removed}</span>
                 )}
+                {current.failed_events > 0 && <span> · 失敗 {current.failed_events}</span>}
                 {' · '}{fmtDuration(current.started_at, null)}
               </span>
             </div>
@@ -323,24 +314,12 @@ export default function LumaSyncPage() {
                 }}
               />
             </div>
-          </div>
-
-          {/* Review progress */}
-          {(current.phase === 'reviewing' || current.phase === 'done') && (
-            <div className="mb-3 rounded-md border border-purple-200 bg-purple-50 px-3 py-2">
-              <div className="flex items-center gap-1.5 text-sm font-medium text-purple-800">
-                {current.phase === 'reviewing' && <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-purple-500" />}
-                {current.phase === 'done' && <span className="inline-block h-2 w-2 rounded-full bg-green-500" />}
-                自動審核
-              </div>
-              <div className="mt-1 flex flex-wrap gap-3 text-xs text-purple-700">
-                <span>核准 {current.review_approved}</span>
-                <span>拒絕 {current.review_declined}</span>
-                <span>候補 {current.review_waitlisted}</span>
-                {current.review_skipped > 0 && <span>跳過 {current.review_skipped}</span>}
-              </div>
+            <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-600">
+              <span className="text-green-700">核准 {current.review_approved}</span>
+              <span className="text-amber-700">候補 {current.review_waitlisted}</span>
+              {current.review_skipped > 0 && <span>跳過 {current.review_skipped}</span>}
             </div>
-          )}
+          </div>
 
           <ul className="max-h-96 space-y-1 overflow-y-auto text-xs">
             {results.map((r) => (
@@ -402,8 +381,12 @@ export default function LumaSyncPage() {
                       {(j.review_approved + j.review_declined + j.review_waitlisted) > 0 ? (
                         <span className="text-[10px]">
                           <span className="text-green-700">{j.review_approved}✓</span>
-                          {' '}
-                          <span className="text-red-600">{j.review_declined}✗</span>
+                          {j.review_declined > 0 && (
+                            <>
+                              {' '}
+                              <span className="text-red-600">{j.review_declined}✗</span>
+                            </>
+                          )}
                           {' '}
                           <span className="text-amber-700">{j.review_waitlisted}⏳</span>
                         </span>
