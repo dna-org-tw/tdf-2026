@@ -30,5 +30,12 @@ export async function register() {
     } catch (e) {
       console.error('[luma-sync] reconcile failed', e);
     }
+
+    try {
+      const { resumeStalledNotifications } = await import('@/lib/notificationReconciler');
+      await resumeStalledNotifications();
+    } catch (e) {
+      console.error('[notification-reconciler] resume failed', e);
+    }
   }
 }
