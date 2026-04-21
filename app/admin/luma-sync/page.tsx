@@ -22,12 +22,6 @@ export default function LumaSyncPage() {
     | null
   >(null);
   const [testing, setTesting] = useState(false);
-  const [triggeringCron, setTriggeringCron] = useState(false);
-  const [triggerResult, setTriggerResult] = useState<
-    | { kind: 'ok'; jobId?: number; message?: string }
-    | { kind: 'error'; message: string }
-    | null
-  >(null);
 
   const fetchConfig = useCallback(async () => {
     const r = await fetch('/api/admin/luma-sync/config');
@@ -139,46 +133,6 @@ export default function LumaSyncPage() {
     } finally { setBusy(false); }
   };
 
-  const triggerCron = async () => {
-    setTriggeringCron(true);
-    setTriggerResult(null);
-    try {
-      const r = await fetch('/api/admin/luma-sync/trigger-cron', { method: 'POST' });
-      const data = await r.json();
-      const upstream = data.body ?? {};
-      if (r.ok && upstream.jobId) {
-        setTriggerResult({ kind: 'ok', jobId: upstream.jobId });
-        await fetchJobs();
-      } else if (r.ok) {
-        setTriggerResult({
-          kind: 'ok',
-          message:
-            upstream.skipped === 'cron_disabled'
-              ? '排程旗標關閉中（cron_enabled=false），cron 端會直接 skip。'
-              : (upstream.skipped ?? JSON.stringify(upstream)),
-        });
-      } else {
-        setTriggerResult({
-          kind: 'error',
-          message: `${data.error ?? `HTTP ${r.status}`} — ${upstream.message ?? upstream.error ?? ''}`.trim(),
-        });
-      }
-    } catch (e) {
-      setTriggerResult({ kind: 'error', message: (e as Error).message });
-    } finally {
-      setTriggeringCron(false);
-    }
-  };
-
-  const toggleCron = async (enabled: boolean) => {
-    await fetch('/api/admin/luma-sync/config', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cronEnabled: enabled }),
-    });
-    fetchConfig();
-  };
-
   const fmtDate = (iso: string | null) => iso ? new Date(iso).toLocaleString('zh-TW') : '—';
   const fmtDuration = (start: string | null, end: string | null) => {
     if (!start) return '—';
@@ -286,52 +240,10 @@ export default function LumaSyncPage() {
             )}
             <div className="flex flex-wrap items-center gap-3">
               <span className="w-28 shrink-0 text-slate-500">Cron</span>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={config.cronEnabled}
-                  onChange={(e) => toggleCron(e.target.checked)}
-                />
-                啟用排程
-              </label>
               <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs text-slate-700">
                 {config.cronSchedule}
               </span>
-              <a
-                href="https://github.com/dna-org-tw/tdf-2026/blob/main/.github/workflows/luma-sync-cron.yml"
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-[#10B8D9] hover:underline"
-              >
-                改排程 → 編輯 GitHub workflow ↗
-              </a>
-              <button
-                onClick={triggerCron}
-                disabled={triggeringCron}
-                className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50 disabled:opacity-50"
-                title="走和 GitHub Actions 一樣的路徑（CRON_SECRET + cron_enabled 檢查），方便手動驗證 cron 鏈路。"
-              >
-                {triggeringCron ? '觸發中…' : '立即觸發 cron'}
-              </button>
             </div>
-            <div className="text-xs text-slate-500">
-              排程實際由 GitHub Actions 控制，本欄只顯示 DB 上的標籤；後台修改不會改變實際執行時間。
-            </div>
-            {triggerResult && (
-              <div
-                className={`rounded-md border px-3 py-2 text-xs ${
-                  triggerResult.kind === 'ok'
-                    ? 'border-green-200 bg-green-50 text-green-800'
-                    : 'border-amber-200 bg-amber-50 text-amber-800'
-                }`}
-              >
-                {triggerResult.kind === 'ok' && triggerResult.jobId
-                  ? `Cron 已觸發 — job #${triggerResult.jobId} 已排入。`
-                  : triggerResult.kind === 'ok'
-                    ? `Cron 端回應：${triggerResult.message}`
-                    : `觸發失敗：${triggerResult.message}`}
-              </div>
-            )}
             <div className="text-xs text-slate-500">
               上次手動執行：{fmtDate(config.lastManualRunAt)} · 設定更新：{fmtDate(config.updatedAt)} ({config.updatedBy ?? '—'})
             </div>
