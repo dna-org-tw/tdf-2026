@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { csvEscape } from '@/lib/csv';
 
 interface OrderRow {
   id: string;
@@ -16,15 +17,6 @@ interface OrderRow {
   payment_method_brand: string | null;
   payment_method_last4: string | null;
   created_at: string;
-}
-
-function csvEscape(value: unknown): string {
-  if (value === null || value === undefined) return '';
-  const str = String(value);
-  if (/[",\n\r]/.test(str)) {
-    return `"${str.replace(/"/g, '""')}"`;
-  }
-  return str;
 }
 
 function formatAmount(amount: number | null): string {

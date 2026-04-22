@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { csvEscape } from '@/lib/csv';
 
 interface SubscriberRow {
   email: string;
@@ -9,15 +10,6 @@ interface SubscriberRow {
   timezone: string | null;
   locale: string | null;
   created_at: string;
-}
-
-function csvEscape(value: unknown): string {
-  if (value === null || value === undefined) return '';
-  const str = String(value);
-  if (/[",\n\r]/.test(str)) {
-    return `"${str.replace(/"/g, '""')}"`;
-  }
-  return str;
 }
 
 export async function GET(req: NextRequest) {
