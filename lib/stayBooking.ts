@@ -25,6 +25,12 @@ export interface CreateStayBookingInput {
 export async function createStayBooking(input: CreateStayBookingInput) {
   if (!supabaseServer) throw new Error('db_not_configured');
 
+  const name = (input.primaryGuestName ?? '').trim();
+  const phone = (input.primaryGuestPhone ?? '').trim();
+  if (!name) throw new Error('primary_guest_name_required');
+  if (!phone) throw new Error('primary_guest_phone_required');
+  if (!/^\+[1-9]\d{6,14}$/.test(phone)) throw new Error('primary_guest_phone_invalid');
+
   const weeks = await getStayWeeksByCodes(input.weekCodes);
   if (weeks.length !== input.weekCodes.length) throw new Error('week_not_found');
 
@@ -44,9 +50,9 @@ export async function createStayBooking(input: CreateStayBookingInput) {
       member_id: input.memberId,
       status: 'confirmed',
       booking_type: bookingType,
-      primary_guest_name: input.primaryGuestName,
+      primary_guest_name: name,
       primary_guest_email: input.memberEmail,
-      primary_guest_phone: input.primaryGuestPhone,
+      primary_guest_phone: phone,
       guest_count: input.guestCount,
       second_guest_name: input.secondGuestName ?? null,
     })

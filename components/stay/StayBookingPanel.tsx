@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import StayGuaranteeStep from './StayGuaranteeStep';
+import { PHONE_COUNTRIES } from '@/lib/phoneCountries';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[]; memberEmail: string | null }) {
@@ -11,7 +12,8 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
   const searchParams = useSearchParams();
   const [weekCodes, setWeekCodes] = useState<string[]>([]);
   const [primaryGuestName, setPrimaryGuestName] = useState('');
-  const [primaryGuestPhone, setPrimaryGuestPhone] = useState('');
+  const [phoneDial, setPhoneDial] = useState('+886');
+  const [phoneLocal, setPhoneLocal] = useState('');
   const [inviteCode, setInviteCode] = useState(() => searchParams.get('invite') ?? '');
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [setupIntentId, setSetupIntentId] = useState<string | null>(null);
@@ -52,7 +54,17 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
     setClientSecret(data.clientSecret);
   }
 
-  const canSubmit = weekCodes.length > 0 && (inviteCode.trim().length > 0 || setupIntentId !== null);
+  const E164_RE = /^\+[1-9]\d{6,14}$/;
+  const phoneLocalDigits = phoneLocal.replace(/\D/g, '');
+  const combinedPhone = phoneDial + phoneLocalDigits;
+  const phoneValid = E164_RE.test(combinedPhone);
+  const phoneShowError = phoneLocal.length > 0 && !phoneValid;
+
+  const canSubmit =
+    weekCodes.length > 0 &&
+    primaryGuestName.trim().length > 0 &&
+    phoneValid &&
+    (inviteCode.trim().length > 0 || setupIntentId !== null);
   const showVerifyCardButton = !inviteCode.trim() && weekCodes.length > 0 && clientSecret === null;
 
   async function submitBooking() {
@@ -63,8 +75,8 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          primaryGuestName,
-          primaryGuestPhone,
+          primaryGuestName: primaryGuestName.trim(),
+          primaryGuestPhone: combinedPhone,
           guestCount: 1,
           secondGuestName: null,
           weekCodes,
@@ -134,22 +146,51 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
 
       <div className="mt-4 space-y-3">
         <div>
-          <label className="block text-sm font-medium text-slate-700">Primary guest name</label>
+          <label className="block text-sm font-medium text-slate-700">
+            Primary guest name <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
+            required
             value={primaryGuestName}
             onChange={(e) => setPrimaryGuestName(e.target.value)}
             className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700">Primary guest phone</label>
-          <input
-            type="tel"
-            value={primaryGuestPhone}
-            onChange={(e) => setPrimaryGuestPhone(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
-          />
+          <label className="block text-sm font-medium text-slate-700">
+            Primary guest phone <span className="text-red-500">*</span>
+          </label>
+          <div className="mt-1 flex gap-2">
+            <select
+              value={phoneDial}
+              onChange={(e) => setPhoneDial(e.target.value)}
+              className="w-36 rounded-lg border border-stone-300 bg-white px-2 py-2 text-sm"
+              aria-label="Country dial code"
+            >
+              {PHONE_COUNTRIES.map((c) => (
+                <option key={c.code} value={c.dial}>
+                  {c.dial} {c.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="tel"
+              required
+              inputMode="numeric"
+              placeholder="912345678"
+              value={phoneLocal}
+              onChange={(e) => setPhoneLocal(e.target.value)}
+              className={`flex-1 rounded-lg border px-3 py-2 text-sm ${
+                phoneShowError ? 'border-red-400' : 'border-stone-300'
+              }`}
+            />
+          </div>
+          <p className={`mt-1 text-xs ${phoneShowError ? 'text-red-600' : 'text-slate-500'}`}>
+            {phoneShowError
+              ? 'Enter your local number (digits only) — the country code is set above.'
+              : 'Digits only; country code is selected from the dropdown.'}
+          </p>
         </div>
 
         <p className="rounded-lg bg-stone-50 px-3 py-2 text-xs text-slate-500">
