@@ -88,6 +88,7 @@ export default function StayAdminDashboard() {
                   <th className="py-2 px-3 text-right">已確認</th>
                   <th className="py-2 px-3 text-right">候補 (active)</th>
                   <th className="py-2 px-3 text-left">狀態</th>
+                  <th className="py-2 px-3 text-right">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,6 +121,15 @@ export default function StayAdminDashboard() {
                         >
                           {w.status}
                         </span>
+                      </td>
+                      <td className="py-2 px-3 text-right">
+                        <a
+                          href={`/api/admin/stay/weeks/${w.id}/export`}
+                          download
+                          className="inline-block px-2.5 py-1 text-xs bg-cyan-500 hover:bg-cyan-600 text-white rounded transition-colors"
+                        >
+                          匯出名單
+                        </a>
                       </td>
                     </tr>
                   );
