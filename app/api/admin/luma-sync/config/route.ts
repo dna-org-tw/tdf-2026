@@ -17,15 +17,15 @@ export async function PUT(req: NextRequest) {
   const { cookie, cronEnabled, cronSchedule } = body as {
     cookie?: string; cronEnabled?: boolean; cronSchedule?: string;
   };
-  // The actual cron is owned by .github/workflows/luma-sync-cron.yml — writing
-  // to luma_sync_config.cron_schedule does NOT change the firing time.
-  // Reject writes here to avoid the "edited but nothing changed" surprise.
+  // The actual cron is owned by Supabase pg_cron (see
+  // supabase/migrations/add_pg_cron_luma_sync.sql). Writing to
+  // luma_sync_config.cron_schedule does NOT change the firing time.
   if (cronSchedule !== undefined) {
     return NextResponse.json(
       {
         error: 'cron_schedule_is_read_only',
         message:
-          'Schedule is controlled by .github/workflows/luma-sync-cron.yml. Edit the workflow file and push to main.',
+          'Schedule is controlled by Supabase pg_cron job `luma-sync-every-30min`. Update the schedule via cron.schedule() on the database.',
       },
       { status: 400 },
     );
