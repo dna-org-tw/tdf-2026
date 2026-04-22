@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 import StayGuaranteeStep from './StayGuaranteeStep';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[]; memberEmail: string | null }) {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [weekCodes, setWeekCodes] = useState<string[]>([]);
   const [primaryGuestName, setPrimaryGuestName] = useState('');
@@ -27,6 +29,9 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bookableWeeks = weeks.filter((w: any) => w.booking_open !== false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const closedWeeks = weeks.filter((w: any) => w.booking_open === false);
+  const allClosed = weeks.length > 0 && bookableWeeks.length === 0;
 
   function toggleWeek(code: string) {
     setWeekCodes((prev) => (prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]));
@@ -85,22 +90,45 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
 
       <div className="mt-4 space-y-2">
         <p className="text-sm font-medium text-slate-700">Choose weeks</p>
-        {bookableWeeks.length === 0 ? (
+        {bookableWeeks.length === 0 && closedWeeks.length === 0 ? (
           <p className="text-sm text-slate-500">No weeks available.</p>
         ) : (
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          bookableWeeks.map((w: any) => (
-            <label key={w.code} className="flex items-center gap-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={weekCodes.includes(w.code)}
-                onChange={() => toggleWeek(w.code)}
-              />
-              <span>
-                {w.code} · {w.starts_on} → {w.ends_on} · NT${w.price_twd} / 7 nights
-              </span>
-            </label>
-          ))
+          <>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {bookableWeeks.map((w: any) => (
+              <label key={w.code} className="flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={weekCodes.includes(w.code)}
+                  onChange={() => toggleWeek(w.code)}
+                />
+                <span>
+                  {w.code} · {w.starts_on} → {w.ends_on} · NT${w.price_twd} / 7 nights
+                </span>
+              </label>
+            ))}
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {closedWeeks.map((w: any) => (
+              <label
+                key={w.code}
+                className="flex items-center gap-2 text-sm text-slate-400 cursor-not-allowed"
+                title={t.stay.bookingClosedNote}
+              >
+                <input type="checkbox" disabled checked={false} />
+                <span className="line-through">
+                  {w.code} · {w.starts_on} → {w.ends_on} · NT${w.price_twd} / 7 nights
+                </span>
+                <span className="ml-1 inline-flex items-center rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-500 no-underline">
+                  {t.stay.bookingClosedLabel}
+                </span>
+              </label>
+            ))}
+          </>
+        )}
+        {allClosed && (
+          <p className="mt-2 rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-600">
+            {t.stay.bookingClosedNote}
+          </p>
         )}
       </div>
 

@@ -9,6 +9,13 @@ function remainingBadge(week: any, stay: any) {
       </span>
     );
   }
+  if (week.booking_open === false) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-500">
+        {stay.bookingClosedLabel}
+      </span>
+    );
+  }
   const urgent = remaining <= 5;
   const cls = urgent
     ? 'bg-rose-100 text-rose-700 border border-rose-200'
