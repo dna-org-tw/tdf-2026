@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { csvEscape } from '@/lib/csv';
+import { renderStayWeekBookingPdf, type StayBookingPdfRow } from '@/lib/stayWeekBookingPdf';
 
 interface BookingRow {
   id: string;
@@ -62,48 +62,45 @@ export async function GET(
     .in('status', ACTIVE_STATUSES);
   if (bwErr) return NextResponse.json({ error: bwErr.message }, { status: 500 });
 
-  const rows = ((bookingWeeks ?? []) as unknown as BookingWeekRow[])
+  const rows: StayBookingPdfRow[] = ((bookingWeeks ?? []) as unknown as BookingWeekRow[])
     .filter((bw): bw is BookingWeekRow & { stay_bookings: BookingRow } => bw.stay_bookings !== null)
-    .sort((a, b) => a.stay_bookings.created_at.localeCompare(b.stay_bookings.created_at));
+    .sort((a, b) => a.stay_bookings.created_at.localeCompare(b.stay_bookings.created_at))
+    .map((bw) => {
+      const r = bw.stay_bookings;
+      const isPaid = r.booking_type === 'guaranteed';
+      return {
+        bookingId: r.id.slice(0, 8),
+        isPaid,
+        amount: isPaid ? bw.booked_price_twd : null,
+        name: r.primary_guest_name,
+        phone: r.primary_guest_phone,
+        email: r.primary_guest_email,
+        notes: r.internal_notes,
+      };
+    });
 
-  const header = [
-    '入住日',
-    '退房日',
-    '訂房編號',
-    '付費',
-    '金額',
-    '主住客姓名',
-    '電話',
-    'Email',
-    '備註',
-  ];
-  const lines = [header.map(csvEscape).join(',')];
-  for (const bw of rows) {
-    const r = bw.stay_bookings;
-    const isPaid = r.booking_type === 'guaranteed';
-    lines.push([
-      csvEscape(week.starts_on),
-      csvEscape(week.ends_on),
-      csvEscape(r.id.slice(0, 8)),
-      csvEscape(isPaid ? '✓' : ''),
-      csvEscape(isPaid && bw.booked_price_twd != null ? bw.booked_price_twd : ''),
-      csvEscape(r.primary_guest_name),
-      csvEscape(r.primary_guest_phone),
-      csvEscape(r.primary_guest_email),
-      csvEscape(r.internal_notes),
-    ].join(','));
+  try {
+    const pdfBuffer = await renderStayWeekBookingPdf({
+      weekCode: week.code,
+      startsOn: week.starts_on,
+      endsOn: week.ends_on,
+      generatedAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      rows,
+    });
+
+    const ts = new Date().toISOString().slice(0, 10);
+    const filename = `stay-${week.code}-${ts}.pdf`;
+
+    return new NextResponse(new Uint8Array(pdfBuffer), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Cache-Control': 'no-store',
+      },
+    });
+  } catch (error) {
+    console.error('[Stay PDF export]', error);
+    return NextResponse.json({ error: 'pdf_render_failed' }, { status: 500 });
   }
-  const csv = '\uFEFF' + lines.join('\r\n');
-
-  const ts = new Date().toISOString().slice(0, 10);
-  const filename = `stay-${week.code}-${ts}.csv`;
-
-  return new NextResponse(csv, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-      'Cache-Control': 'no-store',
-    },
-  });
 }
