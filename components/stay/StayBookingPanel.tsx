@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import StayGuaranteeStep from './StayGuaranteeStep';
 import { PHONE_COUNTRIES } from '@/lib/phoneCountries';
+import { getStayBookingDeadlineDate } from '@/lib/stayTime';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[]; memberEmail: string | null }) {
@@ -108,7 +109,7 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
           <>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {bookableWeeks.map((w: any) => (
-              <label key={w.code} className="flex items-center gap-2 text-sm text-slate-700">
+              <label key={w.code} className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"
                   checked={weekCodes.includes(w.code)}
@@ -116,6 +117,9 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
                 />
                 <span>
                   {w.code} · {w.starts_on} → {w.ends_on} · NT${w.price_twd} / 7 nights
+                </span>
+                <span className="text-xs text-slate-400">
+                  · {t.stay.bookingCutoffPrefix} {getStayBookingDeadlineDate(w.starts_on)}
                 </span>
               </label>
             ))}
