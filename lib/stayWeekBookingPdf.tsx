@@ -95,6 +95,8 @@ function StayWeekBookingDocument({ data }: { data: StayWeekBookingPdfData }) {
     0,
   );
   const paidCount = data.rows.filter((r) => r.isPaid).length;
+  const bookingCount = data.rows.filter((r) => r.bookingId !== '').length;
+  const fillerCount = data.rows.length - bookingCount;
 
   return (
     <Document title={`stay-${data.weekCode}`} author="Taiwan Digital Fest 2026">
@@ -103,7 +105,7 @@ function StayWeekBookingDocument({ data }: { data: StayWeekBookingPdfData }) {
           住宿訂房名單 {data.weekCode}
         </Text>
         <Text style={styles.meta}>
-          日期 {data.startsOn} – {data.endsOn} ・ 共 {data.rows.length} 筆（付費 {paidCount} 筆，合計 {formatAmount(totalPaid)}）・ 匯出時間 {data.generatedAt}
+          日期 {data.startsOn} – {data.endsOn} ・ 訂房 {bookingCount} 筆（付費 {paidCount} 筆，合計 {formatAmount(totalPaid)}）{fillerCount > 0 ? ` ・ 主辦單位保留 ${fillerCount} 筆` : ''} ・ 匯出時間 {data.generatedAt}
         </Text>
 
         <View style={styles.table}>
@@ -118,7 +120,7 @@ function StayWeekBookingDocument({ data }: { data: StayWeekBookingPdfData }) {
             <Text style={[styles.cell, styles.headCell, styles.colNotes]}>備註</Text>
           </View>
           {data.rows.map((r, idx) => (
-            <View key={r.bookingId} style={styles.row} wrap={false}>
+            <View key={`${idx}-${r.bookingId}`} style={styles.row} wrap={false}>
               <Text style={[styles.cell, styles.colNo]}>{idx + 1}</Text>
               <Text style={[styles.cell, styles.colCode]}>{r.bookingId}</Text>
               <Text style={[styles.cell, styles.colPaid]}>{r.isPaid ? '✓' : ''}</Text>

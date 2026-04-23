@@ -37,7 +37,7 @@ export async function GET(
 
   const { data: week, error: weekErr } = await supabaseServer
     .from('stay_weeks')
-    .select('id, code, starts_on, ends_on')
+    .select('id, code, starts_on, ends_on, room_capacity')
     .eq('id', id)
     .maybeSingle();
   if (weekErr) return NextResponse.json({ error: weekErr.message }, { status: 500 });
@@ -78,6 +78,19 @@ export async function GET(
         notes: r.internal_notes,
       };
     });
+
+  const fillerCount = Math.max(0, (week.room_capacity ?? 0) - rows.length);
+  for (let i = 0; i < fillerCount; i++) {
+    rows.push({
+      bookingId: '',
+      isPaid: false,
+      amount: null,
+      name: '徐愷',
+      phone: '+886-983-665352',
+      email: 'accommodation@taiwandigitalfest.com',
+      notes: '主辦單位使用',
+    });
+  }
 
   try {
     const pdfBuffer = await renderStayWeekBookingPdf({

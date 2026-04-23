@@ -37,7 +37,7 @@ export async function GET(
 
   const { data: week, error: weekErr } = await supabaseServer
     .from('stay_weeks')
-    .select('id, code, starts_on, ends_on')
+    .select('id, code, starts_on, ends_on, room_capacity')
     .eq('id', id)
     .maybeSingle();
   if (weekErr) return NextResponse.json({ error: weekErr.message }, { status: 500 });
@@ -91,6 +91,21 @@ export async function GET(
       csvEscape(r.primary_guest_phone),
       csvEscape(r.primary_guest_email),
       csvEscape(r.internal_notes),
+    ].join(','));
+  }
+
+  const fillerCount = Math.max(0, (week.room_capacity ?? 0) - rows.length);
+  for (let i = 0; i < fillerCount; i++) {
+    lines.push([
+      csvEscape(week.starts_on),
+      csvEscape(week.ends_on),
+      csvEscape(''),
+      csvEscape(''),
+      csvEscape(''),
+      csvEscape('徐愷'),
+      csvEscape('+886-983-665352'),
+      csvEscape('accommodation@taiwandigitalfest.com'),
+      csvEscape('主辦單位使用'),
     ].join(','));
   }
   const csv = '\uFEFF' + lines.join('\r\n');
