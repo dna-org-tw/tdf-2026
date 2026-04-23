@@ -45,15 +45,6 @@ const styles = StyleSheet.create({
     borderRightWidth: 0.5,
     borderColor: '#9CA3AF',
   },
-  headCell: { fontSize: 9 },
-  colNo: { width: 24, textAlign: 'right' },
-  colCode: { width: 54 },
-  colPaid: { width: 28, textAlign: 'center' },
-  colAmount: { width: 56, textAlign: 'right' },
-  colName: { width: 80 },
-  colPhone: { width: 82 },
-  colEmail: { width: 140 },
-  colNotes: { flex: 1 },
   footer: {
     position: 'absolute',
     bottom: 12,
@@ -89,6 +80,19 @@ function formatAmount(amount: number | null): string {
   return `NT$ ${amount.toLocaleString('en-US')}`;
 }
 
+// Rough em-width estimate so columns can be sized to fit their widest value
+// without wrapping. CJK glyphs in NotoSans are ~1em, Latin/digits ~0.55em.
+function estimateTextWidth(text: string, fontSize: number): number {
+  let units = 0;
+  for (const ch of text) {
+    const code = ch.codePointAt(0) ?? 0;
+    units += code >= 0x2e80 ? 1.0 : 0.55;
+  }
+  return units * fontSize;
+}
+
+type Align = 'left' | 'right' | 'center';
+
 function StayWeekBookingDocument({ data }: { data: StayWeekBookingPdfData }) {
   const totalPaid = data.rows.reduce(
     (sum, r) => sum + (r.isPaid && r.amount != null ? r.amount : 0),
@@ -97,6 +101,55 @@ function StayWeekBookingDocument({ data }: { data: StayWeekBookingPdfData }) {
   const paidCount = data.rows.filter((r) => r.isPaid).length;
   const bookingCount = data.rows.filter((r) => r.bookingId !== '').length;
   const fillerCount = data.rows.length - bookingCount;
+
+  const headers = ['#', '訂房編號', '付費', '金額', '主住客姓名', '電話', 'Email', '備註'];
+  const aligns: Align[] = ['right', 'left', 'center', 'right', 'left', 'left', 'left', 'left'];
+
+  const rowValues: string[][] = data.rows.map((r, idx) => [
+    String(idx + 1),
+    r.bookingId,
+    r.isPaid ? '✓' : '',
+    r.isPaid ? formatAmount(r.amount) : '',
+    r.name,
+    r.phone,
+    r.email,
+    r.notes ?? '',
+  ]);
+
+  const BASE_FONT = 9;
+  const CELL_PAD_X = 10; // 5pt padding × 2 sides
+  const SAFETY = 3; // extra slack so width estimation cannot force a wrap
+  const PAGE_WIDTH = 842; // A4 landscape
+  const PAGE_PAD_X = 56;
+  const USABLE_WIDTH = PAGE_WIDTH - PAGE_PAD_X;
+
+  let widths = headers.map((h, i) => {
+    const vals = [h, ...rowValues.map((row) => row[i])];
+    const maxContent = Math.max(...vals.map((v) => estimateTextWidth(v, BASE_FONT)));
+    return maxContent + CELL_PAD_X + SAFETY;
+  });
+
+  let fontSize = BASE_FONT;
+  const totalWidth = widths.reduce((a, b) => a + b, 0);
+
+  if (totalWidth > USABLE_WIDTH) {
+    const scale = USABLE_WIDTH / totalWidth;
+    fontSize = BASE_FONT * scale;
+    widths = widths.map((w) => w * scale);
+  } else {
+    // Park the remaining width on the notes column so the table spans the page.
+    widths[widths.length - 1] += USABLE_WIDTH - totalWidth;
+  }
+
+  const cellStyle = (i: number, isHeader = false) => [
+    styles.cell,
+    {
+      width: widths[i],
+      textAlign: aligns[i],
+      fontSize,
+      fontWeight: isHeader ? 700 : 400,
+    },
+  ];
 
   return (
     <Document title={`stay-${data.weekCode}`} author="Taiwan Digital Fest 2026">
@@ -109,28 +162,20 @@ function StayWeekBookingDocument({ data }: { data: StayWeekBookingPdfData }) {
         </Text>
 
         <View style={styles.table}>
-          <View style={[styles.row, styles.headRow]}>
-            <Text style={[styles.cell, styles.headCell, styles.colNo]}>#</Text>
-            <Text style={[styles.cell, styles.headCell, styles.colCode]}>訂房編號</Text>
-            <Text style={[styles.cell, styles.headCell, styles.colPaid]}>付費</Text>
-            <Text style={[styles.cell, styles.headCell, styles.colAmount]}>金額</Text>
-            <Text style={[styles.cell, styles.headCell, styles.colName]}>主住客姓名</Text>
-            <Text style={[styles.cell, styles.headCell, styles.colPhone]}>電話</Text>
-            <Text style={[styles.cell, styles.headCell, styles.colEmail]}>Email</Text>
-            <Text style={[styles.cell, styles.headCell, styles.colNotes]}>備註</Text>
-          </View>
-          {data.rows.map((r, idx) => (
-            <View key={`${idx}-${r.bookingId}`} style={styles.row} wrap={false}>
-              <Text style={[styles.cell, styles.colNo]}>{idx + 1}</Text>
-              <Text style={[styles.cell, styles.colCode]}>{r.bookingId}</Text>
-              <Text style={[styles.cell, styles.colPaid]}>{r.isPaid ? '✓' : ''}</Text>
-              <Text style={[styles.cell, styles.colAmount]}>
-                {r.isPaid ? formatAmount(r.amount) : ''}
+          <View style={[styles.row, styles.headRow]} fixed>
+            {headers.map((h, i) => (
+              <Text key={i} style={cellStyle(i, true)}>
+                {h}
               </Text>
-              <Text style={[styles.cell, styles.colName]}>{r.name}</Text>
-              <Text style={[styles.cell, styles.colPhone]}>{r.phone}</Text>
-              <Text style={[styles.cell, styles.colEmail]}>{r.email}</Text>
-              <Text style={[styles.cell, styles.colNotes]}>{r.notes ?? ''}</Text>
+            ))}
+          </View>
+          {rowValues.map((row, idx) => (
+            <View key={idx} style={styles.row} wrap={false}>
+              {row.map((v, i) => (
+                <Text key={i} style={cellStyle(i)}>
+                  {v}
+                </Text>
+              ))}
             </View>
           ))}
         </View>
