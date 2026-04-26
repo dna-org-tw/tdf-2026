@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
-const PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 50;
 
 export async function GET(req: NextRequest) {
   if (!supabaseServer) {
@@ -11,7 +12,11 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get('q')?.trim() || '';
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-  const offset = (page - 1) * PAGE_SIZE;
+  const limitParam = parseInt(searchParams.get('limit') || '', 10);
+  const pageSize = Number.isFinite(limitParam) && limitParam > 0
+    ? Math.min(limitParam, MAX_PAGE_SIZE)
+    : DEFAULT_PAGE_SIZE;
+  const offset = (page - 1) * pageSize;
 
   try {
     // Get all public member profiles joined with members
@@ -31,7 +36,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { data: profiles, count: publicCount, error: pErr } = await profileQuery
-      .range(offset, offset + PAGE_SIZE - 1);
+      .range(offset, offset + pageSize - 1);
     if (pErr) throw pErr;
 
     const { count: totalMembers } = await supabaseServer
@@ -46,7 +51,7 @@ export async function GET(req: NextRequest) {
         total: publicCount ?? 0,
         anonymousCount,
         page,
-        pageSize: PAGE_SIZE,
+        pageSize,
       });
     }
 
@@ -102,7 +107,7 @@ export async function GET(req: NextRequest) {
       total: publicCount ?? 0,
       anonymousCount,
       page,
-      pageSize: PAGE_SIZE,
+      pageSize,
     });
   } catch (e) {
     console.error('[Members List]', e);

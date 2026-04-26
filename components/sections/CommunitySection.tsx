@@ -17,7 +17,7 @@ import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
 import { pickRandomAnimals, type AnonymousAnimal } from '@/lib/anonymousAnimals';
 
-const ANIMAL_SLOT_COUNT = 6;
+const MEMBER_GRID_SIZE = 30;
 
 function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -72,24 +72,6 @@ function AnonymousAnimalBadge({ animal, label }: { animal: AnonymousAnimal; labe
     >
       <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl bg-white/5 border-2 border-white/10 select-none">
         <span aria-hidden>{animal.emoji}</span>
-      </div>
-      <div className="text-center min-w-0 max-w-[100px]">
-        <p className="text-[13px] font-medium text-white/40 truncate">
-          {label}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function MoreMembersBadge({ count, label }: { count: number; label: string }) {
-  return (
-    <div
-      className="flex flex-col items-center gap-2"
-      aria-label={label}
-    >
-      <div className="w-16 h-16 rounded-full flex items-center justify-center bg-white/5 border-2 border-dashed border-white/20 select-none">
-        <span className="text-sm font-bold text-white/70">+{count}</span>
       </div>
       <div className="text-center min-w-0 max-w-[100px]">
         <p className="text-[13px] font-medium text-white/40 truncate">
@@ -178,24 +160,24 @@ export default function CommunitySection() {
     cta: '查看所有夥伴',
     empty: '成為第一位公開名片的夥伴',
     anonymousLabel: '匿名夥伴',
-    moreMembers: '位夥伴',
   } : {
     cta: 'View all members',
     empty: 'Be the first to share your card',
     anonymousLabel: 'Anonymous',
-    moreMembers: 'more',
   };
 
   useEffect(() => {
     if (!shouldLoadMembers) return;
-    fetch('/api/members?page=1')
+    fetch(`/api/members?page=1&limit=${MEMBER_GRID_SIZE}`)
       .then((r) => r.ok ? r.json() : { members: [], total: 0, anonymousCount: 0 })
       .then((d) => {
-        setMembers(d.members ?? []);
+        const fetchedMembers: PublicMember[] = d.members ?? [];
+        setMembers(fetchedMembers);
         setTotal(d.total ?? 0);
         const anon = d.anonymousCount ?? 0;
         setAnonymousCount(anon);
-        setAnimals(pickRandomAnimals(Math.min(ANIMAL_SLOT_COUNT, anon)));
+        const remainingSlots = Math.max(0, MEMBER_GRID_SIZE - fetchedMembers.length);
+        setAnimals(pickRandomAnimals(Math.min(remainingSlots, anon)));
       })
       .catch(() => {});
   }, [shouldLoadMembers]);
@@ -315,7 +297,7 @@ export default function CommunitySection() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="flex flex-wrap justify-center gap-8 sm:gap-10 mb-10"
             >
-              {members.slice(0, 12).map((m) => (
+              {members.slice(0, MEMBER_GRID_SIZE).map((m) => (
                 <MemberBadge key={m.member_no} member={m} />
               ))}
               {animals.map((a) => (
@@ -325,12 +307,6 @@ export default function CommunitySection() {
                   label={labels.anonymousLabel}
                 />
               ))}
-              {anonymousCount > ANIMAL_SLOT_COUNT && (
-                <MoreMembersBadge
-                  count={anonymousCount - ANIMAL_SLOT_COUNT}
-                  label={labels.moreMembers}
-                />
-              )}
             </motion.div>
           ) : (
             <motion.div
@@ -343,7 +319,7 @@ export default function CommunitySection() {
             </motion.div>
           )}
 
-          {total > 0 && (
+          {(total + anonymousCount) > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -356,9 +332,7 @@ export default function CommunitySection() {
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/15 transition-colors text-sm"
               >
                 {labels.cta}
-                {total > 12 && (
-                  <span className="text-[#10B8D9] text-[12px]">+{total - 12}</span>
-                )}
+                <span className="text-[#10B8D9] text-[12px]">({total + anonymousCount})</span>
                 <span aria-hidden>→</span>
               </Link>
             </motion.div>
