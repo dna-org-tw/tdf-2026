@@ -2,6 +2,7 @@
 
 import { useMemo, useSyncExternalStore } from 'react';
 import type { Registration } from '@/lib/lumaSyncTypes';
+import { toLumaEventUrl } from '@/lib/lumaUrl';
 
 const LUMA_CALENDAR_URL = 'https://lu.ma/calendar/cal-S2KwfjOEzcZl8E8';
 const FESTIVAL_START = new Date('2026-05-01T00:00:00+08:00');
@@ -205,12 +206,6 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
   );
 }
 
-function lumaUrl(slug: string | null): string | null {
-  if (!slug) return null;
-  if (slug.startsWith('http')) return slug;
-  return `https://lu.ma/${slug}`;
-}
-
 function CheckInBadge({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; past: boolean }) {
   const isCheckedIn = !!reg.checkedInAt;
   const isPast = past;
@@ -256,7 +251,7 @@ function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; p
   const start = reg.startAt ? new Date(reg.startAt) : null;
   const status = reg.activityStatus ? STATUS_LABELS[reg.activityStatus] : null;
   const isCheckedIn = !!reg.checkedInAt;
-  const href = lumaUrl(reg.url);
+  const href = toLumaEventUrl(reg.url);
 
   // Date tile color based on approval status
   const isApproved = reg.activityStatus === 'approved';

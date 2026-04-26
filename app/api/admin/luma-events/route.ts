@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { toLumaEventUrl } from '@/lib/lumaUrl';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,6 +88,7 @@ async function listResponse() {
 
   const rows = (events ?? []).map((e: EventRow) => ({
     ...e,
+    url: toLumaEventUrl(e.url),
     counts:
       counts.get(e.event_api_id) ?? {
         approved: 0,
@@ -168,7 +170,7 @@ async function detailResponse(eventApiId: string) {
   }));
 
   return NextResponse.json({
-    event,
+    event: { ...event, url: toLumaEventUrl(event.url) },
     pivot: Array.from(pivot.entries())
       .map(([ticket_type_name, counts]) => ({ ticket_type_name, counts }))
       .sort((a, b) => b.counts.total - a.counts.total),

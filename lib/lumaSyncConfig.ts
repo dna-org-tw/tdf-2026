@@ -1,6 +1,7 @@
 import { supabaseServer } from '@/lib/supabaseServer';
 import { decryptCookie, encryptCookie } from '@/lib/lumaSyncCrypto';
 import type { Registration, SyncConfigPublic } from '@/lib/lumaSyncTypes';
+import { toLumaEventUrl } from '@/lib/lumaUrl';
 
 interface RawConfig {
   luma_session_cookie_enc: string | null;
@@ -157,7 +158,7 @@ export async function shapeRegistrations(
     eventName: r.luma_events?.name ?? r.event_api_id,
     startAt: r.luma_events?.start_at ?? null,
     endAt: r.luma_events?.end_at ?? null,
-    url: r.luma_events?.url ?? null,
+    url: toLumaEventUrl(r.luma_events?.url ?? null),
     activityStatus: r.activity_status,
     paid: r.paid,
     checkedInAt: r.checked_in_at,
