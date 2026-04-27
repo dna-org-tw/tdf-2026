@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
+import { MapPin, Briefcase, Hourglass, Tag, Link2, Bookmark, FileText, Pencil } from 'lucide-react';
 import type { TicketTier } from '@/lib/members';
 import CardShareModal from './CardShareModal';
 
@@ -354,87 +355,6 @@ function AvatarHero({
   );
 }
 
-function InlineField({
-  value,
-  placeholder,
-  onSave,
-  multiline,
-  maxLength,
-  className,
-}: {
-  value: string;
-  placeholder: string;
-  onSave: (v: string) => void;
-  multiline?: boolean;
-  maxLength?: number;
-  className?: string;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
-
-  const startEdit = () => {
-    setDraft(value);
-    setEditing(true);
-    setTimeout(() => inputRef.current?.focus(), 0);
-  };
-
-  const save = () => {
-    const trimmed = draft.trim();
-    if (trimmed !== value) onSave(trimmed);
-    setEditing(false);
-  };
-
-  const cancel = () => {
-    setDraft(value);
-    setEditing(false);
-  };
-
-  if (editing) {
-    const shared = {
-      ref: inputRef as never,
-      value: draft,
-      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDraft(e.target.value),
-      onKeyDown: (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !multiline) { e.preventDefault(); save(); }
-        if (e.key === 'Escape') cancel();
-      },
-      onBlur: save,
-      maxLength,
-      className: 'bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-[13px] w-full outline-none focus:border-white/40 ' + (className ?? ''),
-      placeholder,
-    };
-    return multiline ? <textarea {...shared} rows={2} /> : <input type="text" {...shared} />;
-  }
-
-  if (!value) {
-    return (
-      <button
-        type="button"
-        onClick={startEdit}
-        className="text-left w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2"
-      >
-        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M8 3v10M3 8h10" />
-        </svg>
-        <span className={'text-white/35 text-[12px] ' + (className ?? '')}>{placeholder}</span>
-      </button>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={startEdit}
-      className={'text-left group inline-flex items-center gap-1 ' + (className ?? '')}
-    >
-      <span>{value}</span>
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
-      </svg>
-    </button>
-  );
-}
 
 function ClearanceStars({ rank, accent }: { rank: number; accent: string }) {
   return (
@@ -465,52 +385,6 @@ function formatValidityDate(dateStr: string, lang: 'en' | 'zh'): string {
     : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function NameHeroText({
-  name,
-  fallback,
-  editable,
-  onSave,
-  lang,
-}: {
-  name: string | null;
-  fallback: string;
-  editable?: boolean;
-  onSave?: (v: string) => void;
-  lang: 'en' | 'zh';
-}) {
-  const display = (name && name.trim()) || fallback;
-
-  const baseStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-display), var(--font-noto-sans-tc), system-ui, sans-serif',
-    fontWeight: 800,
-    fontSize: 'clamp(22px, 11cqw, 44px)',
-    lineHeight: 0.95,
-    letterSpacing: '-0.02em',
-    color: 'white',
-    overflowWrap: 'anywhere',
-    textShadow: '0 1px 2px rgba(0,0,0,0.45)',
-  };
-
-  if (editable && onSave) {
-    return (
-      <div className="max-w-full" style={baseStyle}>
-        <InlineField
-          value={name ?? ''}
-          placeholder={lang === 'zh' ? '輸入姓名' : 'Enter name'}
-          onSave={onSave}
-          maxLength={50}
-          className="font-bold text-white"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <h2 className="break-words" style={baseStyle}>
-      {display}
-    </h2>
-  );
-}
 
 function MemberInfoChips({
   profile,
@@ -682,9 +556,9 @@ function ChipQr({
       onClick={onOpen}
       className="group relative shrink-0 rounded-md bg-white p-1 transition-transform hover:scale-[1.04] focus:outline-none focus:ring-2 focus:ring-white/40"
       style={{
-        width: 'clamp(56px, 22cqw, 88px)',
-        height: 'clamp(56px, 22cqw, 88px)',
-        boxShadow: `0 0 0 1px ${accent}66, 0 4px 12px rgba(0,0,0,0.45)`,
+        width: 'clamp(36px, 11cqw, 52px)',
+        height: 'clamp(36px, 11cqw, 52px)',
+        boxShadow: `0 0 0 1px ${accent}66, 0 2px 8px rgba(0,0,0,0.45)`,
       }}
       aria-label={lang === 'zh' ? '展開名片 QR' : 'Show share QR'}
     >
@@ -744,264 +618,290 @@ export default function MemberPassport({
     }
   }, []);
 
+  // Build the info rows that should appear in the body (skip empty ones)
+  const infoRows: Array<{ key: string; icon: React.ReactNode; label: string; value: React.ReactNode }> = [];
+  if (profile?.location) {
+    infoRows.push({
+      key: 'location',
+      icon: <MapPin className="w-3.5 h-3.5" />,
+      label: lang === 'zh' ? '所在地' : 'Location',
+      value: <p className="text-[14px] text-white/85 leading-snug">{profile.location}</p>,
+    });
+  }
+  if (profile?.workTypes && profile.workTypes.length > 0) {
+    infoRows.push({
+      key: 'work',
+      icon: <Briefcase className="w-3.5 h-3.5" />,
+      label: lang === 'zh' ? '工作型態' : 'Work',
+      value: (
+        <div className="flex flex-wrap gap-1.5">
+          {profile.workTypes.map((w) => (
+            <span
+              key={w}
+              className="px-2 py-0.5 rounded-full text-[11px] font-medium"
+              style={{ backgroundColor: `${accent}1f`, color: accent, boxShadow: `inset 0 0 0 1px ${accent}33` }}
+            >
+              {WORK_TYPE_LABELS[w]?.[lang] ?? w}
+            </span>
+          ))}
+        </div>
+      ),
+    });
+  }
+  if (profile?.nomadExperience) {
+    infoRows.push({
+      key: 'nomad',
+      icon: <Hourglass className="w-3.5 h-3.5" />,
+      label: lang === 'zh' ? '數位遊牧資歷' : 'Nomad experience',
+      value: (
+        <p className="text-[14px] text-white/85">
+          {NOMAD_EXPERIENCE_LABELS[profile.nomadExperience]?.[lang] ?? profile.nomadExperience}
+        </p>
+      ),
+    });
+  }
+  if (profile?.bio) {
+    infoRows.push({
+      key: 'bio',
+      icon: <FileText className="w-3.5 h-3.5" />,
+      label: lang === 'zh' ? '自我介紹' : 'Bio',
+      value: <p className="text-[13.5px] text-white/85 leading-relaxed whitespace-pre-line">{profile.bio}</p>,
+    });
+  }
+  if (profile?.tags && profile.tags.length > 0) {
+    infoRows.push({
+      key: 'tags',
+      icon: <Tag className="w-3.5 h-3.5" />,
+      label: lang === 'zh' ? '標籤' : 'Tags',
+      value: (
+        <div className="flex flex-wrap gap-1.5">
+          {profile.tags.slice(0, 12).map((tag) => (
+            <span
+              key={tag}
+              className="px-2 py-0.5 rounded-full text-[11px] font-medium"
+              style={{ backgroundColor: `${accent}1f`, color: accent, boxShadow: `inset 0 0 0 1px ${accent}33` }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      ),
+    });
+  }
+  if (profile && Object.keys(profile.socialLinks).length > 0) {
+    infoRows.push({
+      key: 'social',
+      icon: <Link2 className="w-3.5 h-3.5" />,
+      label: lang === 'zh' ? '社群連結' : 'Social',
+      value: (
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          {Object.entries(profile.socialLinks).map(([platform, url]) => (
+            <a
+              key={platform}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] font-mono text-white/75 hover:text-white underline-offset-2 hover:underline transition-colors"
+            >
+              {platform}
+            </a>
+          ))}
+        </div>
+      ),
+    });
+  }
+  if (memberNo && collectionsLabel) {
+    infoRows.push({
+      key: 'collections',
+      icon: <Bookmark className="w-3.5 h-3.5" />,
+      label: lang === 'zh' ? '收藏' : 'Collections',
+      value: (
+        <Link
+          href="/me/collections"
+          className="inline-flex items-center gap-2 text-[14px] text-white/85 hover:text-white transition-colors"
+        >
+          <span>{collectionsLabel}</span>
+          {collectionsUnread > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
+              {collectionsUnread}
+            </span>
+          )}
+          <span aria-hidden>→</span>
+        </Link>
+      ),
+    });
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.2, 0.7, 0.2, 1] }}
-      className="relative w-full"
+      className="relative w-full max-w-[26rem] mx-auto"
     >
-      {/* Unified card: face + info section in one rounded container */}
+      {/* Portrait passport card — single rounded container */}
       <div
         className="relative overflow-hidden rounded-2xl text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)]"
-        style={{ backgroundColor: surface }}
+        style={{ backgroundColor: surface, containerType: 'inline-size' }}
       >
         {/* Top accent bar */}
         <div
-          className="absolute inset-x-0 top-0 h-1 z-20"
+          className="absolute inset-x-0 top-0 h-1 z-30"
           style={{ background: accentBar }}
         />
 
-        {pattern && (
+        {/* ===== Hero (square, full-width avatar) ===== */}
+        <div className="relative" style={{ aspectRatio: '1 / 1' }}>
+          {/* Avatar fills the entire hero */}
+          <AvatarHero
+            name={profile?.displayName ?? null}
+            email={email}
+            accent={accent}
+            avatarUrl={profile?.avatarUrl}
+            glow={glow}
+            surface={surface}
+            editable={false}
+            lang={lang}
+          />
+
+          {/* Pattern overlay (subtle) */}
+          {pattern && (
+            <div
+              className="absolute inset-0 pointer-events-none opacity-50 mix-blend-overlay"
+              style={{ backgroundImage: pattern }}
+              aria-hidden
+            />
+          )}
+
+          {/* Tier glow tint at the top */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-60"
-            style={{ backgroundImage: pattern }}
+            className="absolute inset-x-0 top-0 pointer-events-none opacity-60"
+            style={{ background: glow, height: '50%' }}
             aria-hidden
           />
-        )}
 
-        <div
-          className="absolute inset-x-0 top-0 pointer-events-none opacity-75"
-          style={{ background: glow, height: '62%' }}
-          aria-hidden
-        />
-
-        {/* ===== Card face (top) ===== */}
-        <div
-          className="relative z-10 flex"
-          style={{ aspectRatio: '1.58 / 1' }}
-        >
+          {/* Top dimming for header legibility */}
           <div
-            className="relative shrink-0 overflow-hidden border-r border-white/10"
-            style={{ width: '38%', containerType: 'inline-size' }}
-          >
-            <AvatarHero
-              name={profile?.displayName ?? null}
-              email={email}
+            className="absolute inset-x-0 top-0 h-24 pointer-events-none bg-gradient-to-b from-black/55 via-black/20 to-transparent z-10"
+            aria-hidden
+          />
+
+          {/* Bottom dimming for identity legibility */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-2/3 pointer-events-none bg-gradient-to-t from-black/90 via-black/55 to-transparent z-10"
+            aria-hidden
+          />
+
+          {/* Top header overlay */}
+          <div className="absolute top-0 inset-x-0 z-20 flex items-start justify-between gap-3 p-4 pt-5">
+            <div className="min-w-0">
+              <p className="text-[10px] font-mono tracking-[0.3em] uppercase text-white/85">
+                TDF 2026
+              </p>
+              <p className="mt-0.5 text-[12px] font-mono tracking-[0.15em] text-white/95">
+                {memberNo ?? 'M-———'}
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              <ClearanceStars rank={rank} accent={accent} />
+            </div>
+          </div>
+
+          {/* Edit button (top-right, sits below the stars row visually) */}
+          {editable && (
+            <button
+              type="button"
+              onClick={openEditor}
+              className="absolute top-12 right-3 z-30 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-md text-white/90 hover:text-white text-[11px] font-medium transition-colors border border-white/15"
+              aria-label={lang === 'zh' ? '編輯' : 'Edit'}
+            >
+              <Pencil className="w-3 h-3" />
+              {lang === 'zh' ? '編輯' : 'Edit'}
+            </button>
+          )}
+
+          {/* Bottom identity overlay */}
+          <div className="absolute bottom-0 inset-x-0 z-20 p-4 sm:p-5">
+            {/* Tier (small, de-emphasised) */}
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: accent }}
+                aria-hidden
+              />
+              <p
+                className="text-[10px] font-mono tracking-[0.3em] uppercase truncate"
+                style={{ color: accent, opacity: 0.95 }}
+              >
+                {tierName}
+              </p>
+            </div>
+
+            {/* Name (hero, large in portrait) */}
+            <h2
+              className="break-words"
+              style={{
+                fontFamily: 'var(--font-display), var(--font-noto-sans-tc), system-ui, sans-serif',
+                fontWeight: 800,
+                fontSize: 'clamp(28px, 11.5cqw, 44px)',
+                lineHeight: 0.98,
+                letterSpacing: '-0.02em',
+                color: 'white',
+                textShadow: '0 2px 8px rgba(0,0,0,0.55)',
+                overflowWrap: 'anywhere',
+              }}
+            >
+              {(profile?.displayName?.trim()) ||
+                (email ? email.split('@')[0] : (memberNo ?? 'Member'))}
+            </h2>
+
+            {/* Member info chips */}
+            <MemberInfoChips
+              profile={profile}
               accent={accent}
-              avatarUrl={profile?.avatarUrl}
-              glow={glow}
-              surface={surface}
-              editable={false}
               lang={lang}
             />
           </div>
-
-          <div
-            className="relative flex-1 flex flex-col min-w-0 p-3 sm:p-5 pt-4 sm:pt-6"
-            style={{ containerType: 'inline-size' }}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] uppercase text-white/80">
-                  TDF 2026
-                </p>
-                <p className="mt-0.5 text-[11px] sm:text-[13px] font-mono tracking-[0.12em] text-white/95">
-                  {memberNo ?? 'M-———'}
-                </p>
-              </div>
-              <ClearanceStars rank={rank} accent={accent} />
-            </div>
-
-            <div className="flex-1 flex flex-col justify-end pb-2 sm:pb-3 min-w-0">
-              {/* Tier (de-emphasised) */}
-              <div className="flex items-center gap-1.5 mb-1">
-                <span
-                  className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-                  style={{ backgroundColor: accent }}
-                  aria-hidden
-                />
-                <p
-                  className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] uppercase truncate"
-                  style={{ color: accent, opacity: 0.85 }}
-                >
-                  {tierName}
-                </p>
-              </div>
-
-              {/* Name (hero) — read-only */}
-              <NameHeroText
-                name={profile?.displayName ?? null}
-                fallback={email ? email.split('@')[0] : (memberNo ?? 'Member')}
-                editable={false}
-                lang={lang}
-              />
-
-              {/* Member info chips: nationality, work, nomad */}
-              <MemberInfoChips
-                profile={profile}
-                accent={accent}
-                lang={lang}
-              />
-            </div>
-
-            <div className="flex items-end justify-between gap-2 sm:gap-3">
-              <ValidityFoot
-                tier={tier}
-                rank={rank}
-                validFrom={validFrom}
-                validUntil={validUntil}
-                lang={lang}
-              />
-              {memberNo && qrLabels && (
-                <ChipQr
-                  memberNo={memberNo}
-                  accent={accent}
-                  surface={surface}
-                  onOpen={() => setShareOpen(true)}
-                  lang={lang}
-                />
-              )}
-            </div>
-          </div>
         </div>
 
-        {/* ===== Info section (bottom — same container) ===== */}
-        {showInfoSection && (
-          <div className="relative z-10 border-t border-white/10 bg-black/30 backdrop-blur-[2px] p-4 sm:p-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                    {lang === 'zh' ? '所在地' : 'Location'}
-                  </p>
-                  <p className="text-[12px] text-white/70">{profile?.location || '—'}</p>
-                </div>
+        {/* ===== Validity strip (between hero and info) ===== */}
+        <div
+          className="relative z-10 flex items-center justify-between gap-3 px-4 py-2.5 border-y border-white/10"
+          style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+        >
+          <ValidityFoot
+            tier={tier}
+            rank={rank}
+            validFrom={validFrom}
+            validUntil={validUntil}
+            lang={lang}
+          />
+          {memberNo && qrLabels && (
+            <ChipQr
+              memberNo={memberNo}
+              accent={accent}
+              surface={surface}
+              onOpen={() => setShareOpen(true)}
+              lang={lang}
+            />
+          )}
+        </div>
 
-                <div>
-                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                    {lang === 'zh' ? '自我介紹' : 'Bio'}
-                  </p>
-                  <p className="text-[13px] text-white/80 leading-relaxed">
-                    {profile?.bio || '—'}
+        {/* ===== Info rows (stacked, hide when empty) ===== */}
+        {showInfoSection && infoRows.length > 0 && (
+          <div className="relative z-10 bg-black/40 backdrop-blur-[2px] divide-y divide-white/8">
+            {infoRows.map((row) => (
+              <div key={row.key} className="px-4 py-3">
+                <div className="flex items-center gap-1.5 mb-1 text-white/40">
+                  <span aria-hidden>{row.icon}</span>
+                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase">
+                    {row.label}
                   </p>
                 </div>
-
-                <div>
-                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                    {lang === 'zh' ? '標籤' : 'Tags'}
-                  </p>
-                  {profile && profile.tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {profile.tags.slice(0, 8).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-                          style={{ backgroundColor: `${accent}20`, color: accent }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-[12px] text-white/40">—</p>
-                  )}
-                </div>
+                <div className="pl-[22px]">{row.value}</div>
               </div>
-
-              <div className="space-y-3">
-                <div>
-                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                    {lang === 'zh' ? '工作型態' : 'Work type'}
-                  </p>
-                  {profile?.workTypes && profile.workTypes.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {profile.workTypes.map((w) => (
-                        <span
-                          key={w}
-                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-                          style={{ backgroundColor: `${accent}20`, color: accent }}
-                        >
-                          {WORK_TYPE_LABELS[w]?.[lang] ?? w}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-[12px] text-white/40">—</p>
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                    {lang === 'zh' ? '數位遊牧資歷' : 'Nomad experience'}
-                  </p>
-                  <p className="text-[12px] text-white/70">
-                    {profile?.nomadExperience
-                      ? NOMAD_EXPERIENCE_LABELS[profile.nomadExperience]?.[lang] ?? profile.nomadExperience
-                      : '—'}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                    {lang === 'zh' ? '社群連結' : 'Social'}
-                  </p>
-                  {profile && Object.keys(profile.socialLinks).length > 0 ? (
-                    <div className="flex flex-wrap gap-3">
-                      {Object.entries(profile.socialLinks).map(([platform, url]) => (
-                        <a
-                          key={platform}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
-                        >
-                          {platform}
-                        </a>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-[12px] text-white/40">—</p>
-                  )}
-                </div>
-
-                {memberNo && collectionsLabel && (
-                  <div>
-                    <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                      {lang === 'zh' ? '收藏' : 'Collections'}
-                    </p>
-                    <Link
-                      href="/me/collections"
-                      className="inline-flex items-center gap-2 text-[13px] text-white/75 hover:text-white transition-colors"
-                    >
-                      <span>{collectionsLabel}</span>
-                      {collectionsUnread > 0 && (
-                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
-                          {collectionsUnread}
-                        </span>
-                      )}
-                      <span aria-hidden>→</span>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
+            ))}
           </div>
-        )}
-
-        {/* Edit button (top-right corner) */}
-        {editable && (
-          <button
-            type="button"
-            onClick={openEditor}
-            className="absolute top-2.5 right-2.5 z-30 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-md text-white/85 hover:text-white text-[11px] font-medium transition-colors border border-white/15"
-            aria-label={lang === 'zh' ? '編輯' : 'Edit'}
-          >
-            <svg viewBox="0 0 16 16" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {lang === 'zh' ? '編輯' : 'Edit'}
-          </button>
         )}
       </div>
 
