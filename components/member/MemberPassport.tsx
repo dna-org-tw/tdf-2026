@@ -9,6 +9,74 @@ import CardShareModal from './CardShareModal';
 
 export type IdentityTier = 'follower' | TicketTier;
 
+export type WorkType =
+  | 'admin_mgmt'
+  | 'sales_marketing'
+  | 'finance_legal'
+  | 'it_engineering'
+  | 'design_creative'
+  | 'education_research'
+  | 'healthcare_social'
+  | 'tourism_hospitality'
+  | 'manufacturing_logistics'
+  | 'freelance_entrepreneur';
+
+export type NomadExperience =
+  | 'not_yet'
+  | 'under_3m'
+  | '3m_to_1y'
+  | '1_to_3y'
+  | '3_to_5y'
+  | '5_to_10y'
+  | 'over_10y';
+
+const WORK_TYPE_LABELS: Record<WorkType, { en: string; zh: string }> = {
+  admin_mgmt: { en: 'Administration / Management', zh: '行政 / 管理' },
+  sales_marketing: { en: 'Sales / Marketing', zh: '銷售 / 市場行銷' },
+  finance_legal: { en: 'Finance / Accounting / Legal', zh: '財務 / 會計 / 法務' },
+  it_engineering: { en: 'IT / Engineering', zh: '資訊科技 / 工程' },
+  design_creative: { en: 'Design / Creative / Media', zh: '設計 / 創意 / 媒體' },
+  education_research: { en: 'Education / Training / Research', zh: '教育 / 培訓 / 研究' },
+  healthcare_social: { en: 'Healthcare / Social Services', zh: '醫療 / 保健 / 社會服務' },
+  tourism_hospitality: { en: 'Tourism / Hospitality', zh: '旅遊 / 酒店 / 服務業' },
+  manufacturing_logistics: { en: 'Manufacturing / Logistics', zh: '製造 / 物流 / 供應鏈' },
+  freelance_entrepreneur: { en: 'Freelancer / Entrepreneur', zh: '自由職業 / 創業' },
+};
+
+const NOMAD_EXPERIENCE_LABELS: Record<NomadExperience, { en: string; zh: string }> = {
+  not_yet: { en: 'Not yet', zh: '尚未' },
+  under_3m: { en: '< 3 months', zh: '< 3 個月' },
+  '3m_to_1y': { en: '3 months – 1 year', zh: '3 個月 – 1 年' },
+  '1_to_3y': { en: '1 – 3 years', zh: '1 – 3 年' },
+  '3_to_5y': { en: '3 – 5 years', zh: '3 – 5 年' },
+  '5_to_10y': { en: '5 – 10 years', zh: '5 – 10 年' },
+  over_10y: { en: '> 10 years', zh: '> 10 年' },
+};
+
+// Compact labels for the chips that sit on the card face.
+const WORK_TYPE_SHORT: Record<WorkType, { en: string; zh: string }> = {
+  admin_mgmt: { en: 'Admin', zh: '行政' },
+  sales_marketing: { en: 'Sales', zh: '銷售' },
+  finance_legal: { en: 'Finance', zh: '財務' },
+  it_engineering: { en: 'IT', zh: '科技' },
+  design_creative: { en: 'Design', zh: '設計' },
+  education_research: { en: 'Edu', zh: '教育' },
+  healthcare_social: { en: 'Health', zh: '醫療' },
+  tourism_hospitality: { en: 'Travel', zh: '旅遊' },
+  manufacturing_logistics: { en: 'Logistics', zh: '製造' },
+  freelance_entrepreneur: { en: 'Freelance', zh: '自由' },
+};
+
+const NOMAD_EXPERIENCE_SHORT: Record<NomadExperience, string> = {
+  not_yet: '0',
+  under_3m: '<3M',
+  '3m_to_1y': '3M–1Y',
+  '1_to_3y': '1–3Y',
+  '3_to_5y': '3–5Y',
+  '5_to_10y': '5–10Y',
+  over_10y: '>10Y',
+};
+
 export interface MemberProfile {
   displayName: string | null;
   bio: string | null;
@@ -19,6 +87,9 @@ export interface MemberProfile {
   languages: string[];
   socialLinks: Record<string, string>;
   isPublic: boolean;
+  nationality?: string | null;
+  workTypes?: WorkType[] | null;
+  nomadExperience?: NomadExperience | null;
 }
 
 interface QrLabels {
@@ -365,350 +436,6 @@ function InlineField({
   );
 }
 
-const COUNTRIES = [
-  { code: 'TW', en: 'Taiwan', zh: '台灣' },
-  { code: 'JP', en: 'Japan', zh: '日本' },
-  { code: 'KR', en: 'South Korea', zh: '韓國' },
-  { code: 'TH', en: 'Thailand', zh: '泰國' },
-  { code: 'VN', en: 'Vietnam', zh: '越南' },
-  { code: 'ID', en: 'Indonesia', zh: '印尼' },
-  { code: 'MY', en: 'Malaysia', zh: '馬來西亞' },
-  { code: 'SG', en: 'Singapore', zh: '新加坡' },
-  { code: 'PH', en: 'Philippines', zh: '菲律賓' },
-  { code: 'HK', en: 'Hong Kong', zh: '香港' },
-  { code: 'CN', en: 'China', zh: '中國' },
-  { code: 'US', en: 'United States', zh: '美國' },
-  { code: 'CA', en: 'Canada', zh: '加拿大' },
-  { code: 'GB', en: 'United Kingdom', zh: '英國' },
-  { code: 'DE', en: 'Germany', zh: '德國' },
-  { code: 'FR', en: 'France', zh: '法國' },
-  { code: 'NL', en: 'Netherlands', zh: '荷蘭' },
-  { code: 'ES', en: 'Spain', zh: '西班牙' },
-  { code: 'PT', en: 'Portugal', zh: '葡萄牙' },
-  { code: 'IT', en: 'Italy', zh: '義大利' },
-  { code: 'SE', en: 'Sweden', zh: '瑞典' },
-  { code: 'AU', en: 'Australia', zh: '澳洲' },
-  { code: 'NZ', en: 'New Zealand', zh: '紐西蘭' },
-  { code: 'MX', en: 'Mexico', zh: '墨西哥' },
-  { code: 'CO', en: 'Colombia', zh: '哥倫比亞' },
-  { code: 'BR', en: 'Brazil', zh: '巴西' },
-  { code: 'AR', en: 'Argentina', zh: '阿根廷' },
-  { code: 'TR', en: 'Turkey', zh: '土耳其' },
-  { code: 'GE', en: 'Georgia', zh: '喬治亞' },
-  { code: 'IN', en: 'India', zh: '印度' },
-  { code: 'AE', en: 'UAE', zh: '阿聯酋' },
-];
-
-function parseLocation(location: string | null): { country: string; city: string } {
-  if (!location) return { country: '', city: '' };
-  const parts = location.split(',').map((s) => s.trim());
-  if (parts.length >= 2) return { city: parts[0], country: parts.slice(1).join(', ') };
-  const match = COUNTRIES.find((c) => c.en === location || c.zh === location);
-  if (match) return { country: match.en, city: '' };
-  return { city: location, country: '' };
-}
-
-function InlineLocationField({
-  value,
-  placeholder,
-  onSave,
-  lang,
-}: {
-  value: string;
-  placeholder: string;
-  onSave: (v: string) => void;
-  lang: 'en' | 'zh';
-}) {
-  const [editing, setEditing] = useState(false);
-  const parsed = parseLocation(value);
-  const [country, setCountry] = useState(parsed.country);
-  const [city, setCity] = useState(parsed.city);
-
-  const startEdit = () => {
-    const p = parseLocation(value);
-    setCountry(p.country);
-    setCity(p.city);
-    setEditing(true);
-  };
-
-  const save = () => {
-    const parts = [city.trim(), country.trim()].filter(Boolean);
-    onSave(parts.join(', '));
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <div className="space-y-1.5 w-full">
-        <select
-          autoFocus
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          className="bg-white/10 border border-white/20 rounded px-2 py-1.5 text-white text-[12px] w-full outline-none focus:border-white/40 appearance-none"
-        >
-          <option value="" className="bg-neutral-800">{lang === 'zh' ? '選擇國家' : 'Select country'}</option>
-          {COUNTRIES.map((c) => (
-            <option key={c.code} value={c.en} className="bg-neutral-800">
-              {lang === 'zh' ? `${c.zh} ${c.en}` : c.en}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') { e.preventDefault(); save(); }
-            if (e.key === 'Escape') setEditing(false);
-          }}
-          placeholder={lang === 'zh' ? '城市' : 'City'}
-          className="bg-white/10 border border-white/20 rounded px-2 py-1.5 text-white text-[12px] w-full outline-none focus:border-white/40"
-        />
-        <div className="flex gap-2">
-          <button type="button" onClick={save} className="text-[11px] font-medium text-green-400 hover:text-green-300">
-            {lang === 'zh' ? '儲存' : 'Save'}
-          </button>
-          <button type="button" onClick={() => setEditing(false)} className="text-[11px] text-white/40 hover:text-white/60">
-            {lang === 'zh' ? '取消' : 'Cancel'}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!value) {
-    return (
-      <button
-        type="button"
-        onClick={startEdit}
-        className="w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2"
-      >
-        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M8 3v10M3 8h10" />
-        </svg>
-        <span className="text-white/35 text-[12px]">{placeholder}</span>
-      </button>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={startEdit}
-      className="text-left group inline-flex items-center gap-1 text-[12px] text-white/70"
-    >
-      <span>{value}</span>
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
-      </svg>
-    </button>
-  );
-}
-
-function InlineTagsField({
-  tags,
-  accent,
-  onSave,
-  placeholder,
-}: {
-  tags: string[];
-  accent: string;
-  onSave: (tags: string[]) => void;
-  placeholder: string;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(tags.join(', '));
-
-  const startEdit = () => {
-    setDraft(tags.join(', '));
-    setEditing(true);
-  };
-
-  const save = () => {
-    const newTags = draft.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 10);
-    onSave(newTags);
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <input
-        type="text"
-        autoFocus
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') { e.preventDefault(); save(); }
-          if (e.key === 'Escape') { setDraft(tags.join(', ')); setEditing(false); }
-        }}
-        onBlur={save}
-        placeholder={placeholder}
-        className="bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-[11px] w-full outline-none focus:border-white/40"
-      />
-    );
-  }
-
-  if (tags.length === 0) {
-    return (
-      <button
-        type="button"
-        onClick={startEdit}
-        className="w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2"
-      >
-        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M8 3v10M3 8h10" />
-        </svg>
-        <span className="text-white/35 text-[12px]">{placeholder}</span>
-      </button>
-    );
-  }
-
-  return (
-    <button type="button" onClick={startEdit} className="flex flex-wrap gap-1.5 group items-center">
-      {tags.slice(0, 5).map((tag) => (
-        <span
-          key={tag}
-          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-          style={{ backgroundColor: `${accent}20`, color: accent }}
-        >
-          {tag}
-        </span>
-      ))}
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
-      </svg>
-    </button>
-  );
-}
-
-const SOCIAL_PLATFORMS = [
-  { key: 'instagram', label: 'Instagram', prefix: 'https://instagram.com/', icon: '@', placeholder: 'username' },
-  { key: 'twitter', label: 'X / Twitter', prefix: 'https://x.com/', icon: '@', placeholder: 'handle' },
-  { key: 'linkedin', label: 'LinkedIn', prefix: 'https://linkedin.com/in/', icon: 'in', placeholder: 'username' },
-  { key: 'github', label: 'GitHub', prefix: 'https://github.com/', icon: '<>', placeholder: 'username' },
-  { key: 'website', label: 'Website', prefix: '', icon: '🔗', placeholder: 'https://...' },
-] as const;
-
-function extractHandle(url: string, prefix: string): string {
-  if (!url) return '';
-  if (!prefix) return url;
-  if (url.startsWith(prefix)) return url.slice(prefix.length).replace(/\/$/, '');
-  const cleaned = url.replace(/^https?:\/\/(www\.)?/, '');
-  const prefixClean = prefix.replace(/^https?:\/\/(www\.)?/, '');
-  if (cleaned.startsWith(prefixClean)) return cleaned.slice(prefixClean.length).replace(/\/$/, '');
-  return url;
-}
-
-function buildUrl(handle: string, prefix: string): string {
-  if (!handle) return '';
-  if (!prefix) return handle.startsWith('http') ? handle : `https://${handle}`;
-  if (handle.startsWith('http')) return handle;
-  return prefix + handle.replace(/^@/, '');
-}
-
-function InlineSocialLinks({
-  links,
-  onSave,
-  lang,
-}: {
-  links: Record<string, string>;
-  onSave: (links: Record<string, string>) => void;
-  lang: 'en' | 'zh';
-}) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState<Record<string, string>>({});
-
-  const startEdit = () => {
-    const handles: Record<string, string> = {};
-    for (const p of SOCIAL_PLATFORMS) {
-      handles[p.key] = extractHandle(links[p.key] ?? '', p.prefix);
-    }
-    setDraft(handles);
-    setEditing(true);
-  };
-
-  const save = () => {
-    const cleaned: Record<string, string> = {};
-    for (const p of SOCIAL_PLATFORMS) {
-      const handle = (draft[p.key] ?? '').trim();
-      if (handle) cleaned[p.key] = buildUrl(handle, p.prefix);
-    }
-    onSave(cleaned);
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <div className="space-y-1.5">
-        {SOCIAL_PLATFORMS.map((p) => (
-          <div key={p.key} className="flex items-center gap-2">
-            <span className="text-[10px] font-mono text-white/50 w-6 shrink-0 text-center">{p.icon}</span>
-            <div className="flex-1 flex items-center bg-white/10 border border-white/20 rounded overflow-hidden focus-within:border-white/40">
-              {p.prefix && (
-                <span className="text-[9px] text-white/30 pl-2 shrink-0 select-none">{p.prefix.replace('https://', '')}</span>
-              )}
-              <input
-                type="text"
-                value={draft[p.key] ?? ''}
-                onChange={(e) => setDraft((d) => ({ ...d, [p.key]: e.target.value }))}
-                onKeyDown={(e) => { if (e.key === 'Escape') { setEditing(false); } }}
-                placeholder={p.placeholder}
-                className="bg-transparent px-1.5 py-1 text-white text-[11px] flex-1 outline-none min-w-0"
-              />
-            </div>
-          </div>
-        ))}
-        <div className="flex gap-2 pt-1">
-          <button type="button" onClick={save} className="text-[11px] font-medium text-green-400 hover:text-green-300">
-            {lang === 'zh' ? '儲存' : 'Save'}
-          </button>
-          <button type="button" onClick={() => setEditing(false)} className="text-[11px] text-white/40 hover:text-white/60">
-            {lang === 'zh' ? '取消' : 'Cancel'}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const entries = Object.entries(links);
-  if (entries.length === 0) {
-    return (
-      <button
-        type="button"
-        onClick={startEdit}
-        className="w-full rounded-lg bg-white/5 border border-dashed border-white/15 px-3 py-1.5 hover:bg-white/10 hover:border-white/25 transition-colors flex items-center gap-2"
-      >
-        <svg viewBox="0 0 16 16" className="w-3 h-3 text-white/30 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M8 3v10M3 8h10" />
-        </svg>
-        <span className="text-white/35 text-[12px]">
-          {lang === 'zh' ? '新增社群連結' : 'Add social links'}
-        </span>
-      </button>
-    );
-  }
-
-  return (
-    <button type="button" onClick={startEdit} className="flex flex-wrap gap-3 group items-center">
-      {entries.map(([platform, url]) => (
-        <a
-          key={platform}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
-        >
-          {platform}
-        </a>
-      ))}
-      <svg viewBox="0 0 16 16" className="w-3 h-3 opacity-50 group-hover:opacity-95 transition-opacity shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" />
-      </svg>
-    </button>
-  );
-}
-
 function ClearanceStars({ rank, accent }: { rank: number; accent: string }) {
   return (
     <div className="flex items-center gap-[2px]" aria-label={`clearance ${rank} of 4`}>
@@ -738,26 +465,131 @@ function formatValidityDate(dateStr: string, lang: 'en' | 'zh'): string {
     : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function CardFoot({
-  displayName,
-  email,
+function NameHeroText({
+  name,
+  fallback,
+  editable,
+  onSave,
+  lang,
+}: {
+  name: string | null;
+  fallback: string;
+  editable?: boolean;
+  onSave?: (v: string) => void;
+  lang: 'en' | 'zh';
+}) {
+  const display = (name && name.trim()) || fallback;
+
+  const baseStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-display), var(--font-noto-sans-tc), system-ui, sans-serif',
+    fontWeight: 800,
+    fontSize: 'clamp(22px, 11cqw, 44px)',
+    lineHeight: 0.95,
+    letterSpacing: '-0.02em',
+    color: 'white',
+    overflowWrap: 'anywhere',
+    textShadow: '0 1px 2px rgba(0,0,0,0.45)',
+  };
+
+  if (editable && onSave) {
+    return (
+      <div className="max-w-full" style={baseStyle}>
+        <InlineField
+          value={name ?? ''}
+          placeholder={lang === 'zh' ? '輸入姓名' : 'Enter name'}
+          onSave={onSave}
+          maxLength={50}
+          className="font-bold text-white"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <h2 className="break-words" style={baseStyle}>
+      {display}
+    </h2>
+  );
+}
+
+function MemberInfoChips({
+  profile,
+  accent,
+  lang,
+}: {
+  profile?: MemberProfile;
+  accent: string;
+  lang: 'en' | 'zh';
+}) {
+  if (!profile) return null;
+  const { nationality, workTypes, nomadExperience } = profile;
+  const hasAny =
+    !!nationality ||
+    (workTypes && workTypes.length > 0) ||
+    !!nomadExperience;
+  if (!hasAny) return null;
+
+  const work = (workTypes ?? []).slice(0, 3);
+  const extraWork = (workTypes?.length ?? 0) - work.length;
+
+  const chipBase: React.CSSProperties = {
+    backgroundColor: `${accent}1f`,
+    color: accent,
+    boxShadow: `inset 0 0 0 1px ${accent}33`,
+  };
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-1 sm:gap-1.5">
+      {nationality && (
+        <span
+          className="px-1.5 py-[2px] rounded text-[9px] sm:text-[10px] font-mono tracking-wider uppercase"
+          style={chipBase}
+        >
+          {nationality}
+        </span>
+      )}
+      {work.map((w) => (
+        <span
+          key={w}
+          className="px-1.5 py-[2px] rounded text-[9px] sm:text-[10px] font-medium"
+          style={chipBase}
+        >
+          {WORK_TYPE_SHORT[w]?.[lang] ?? w}
+        </span>
+      ))}
+      {extraWork > 0 && (
+        <span className="text-[9px] sm:text-[10px] text-white/45">
+          +{extraWork}
+        </span>
+      )}
+      {nomadExperience && (
+        <span
+          className="px-1.5 py-[2px] rounded text-[9px] sm:text-[10px] font-mono tracking-wider"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.78)',
+            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
+          }}
+        >
+          {NOMAD_EXPERIENCE_SHORT[nomadExperience]}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function ValidityFoot({
   tier,
   rank,
   validFrom,
   validUntil,
   lang,
-  editable,
-  onSaveName,
 }: {
-  displayName: string | null;
-  email: string;
   tier: IdentityTier;
   rank: number;
   validFrom?: string | null;
   validUntil?: string | null;
   lang: 'en' | 'zh';
-  editable?: boolean;
-  onSaveName?: (v: string) => void;
 }) {
   const today = new Date().toISOString().slice(0, 10);
   const hasValidity = tier !== 'follower' && !!validFrom && !!validUntil;
@@ -775,26 +607,11 @@ function CardFoot({
 
   return (
     <div className="min-w-0 flex-1">
-      {editable && onSaveName ? (
-        <div className="max-w-full">
-          <InlineField
-            value={displayName ?? ''}
-            placeholder={lang === 'zh' ? '持卡人姓名' : 'Cardholder'}
-            onSave={onSaveName}
-            maxLength={50}
-            className="text-[14px] sm:text-[17px] font-bold text-white"
-          />
-        </div>
-      ) : (
-        <p className="text-[14px] sm:text-[17px] font-bold text-white truncate drop-shadow">
-          {displayName || email.split('@')[0]}
-        </p>
-      )}
-      <p className="mt-0.5 text-[9px] sm:text-[11px] font-mono tracking-[0.15em] uppercase text-white/65 truncate flex items-center gap-1.5">
+      <p className="text-[9px] sm:text-[11px] font-mono tracking-[0.15em] uppercase text-white/55 truncate flex items-center gap-1.5">
         {hasValidity ? (
           <>
             <span
-              className="inline-block w-1.5 h-1.5 rounded-full"
+              className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
               style={{ backgroundColor: validityColor }}
               aria-hidden
             />
@@ -896,89 +713,6 @@ function ChipQr({
   );
 }
 
-function TierHeroText({ tier, tierName }: { tier: IdentityTier; tierName: string }) {
-  const accent = TIER_ACCENT[tier];
-  const text = tierName.toUpperCase();
-
-  const baseStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-display), var(--font-noto-sans-tc), system-ui, sans-serif',
-    fontWeight: 900,
-    fontSize: 'clamp(24px, 12cqw, 52px)',
-    lineHeight: 0.9,
-    letterSpacing: '-0.03em',
-    textTransform: 'uppercase',
-    overflowWrap: 'anywhere',
-  };
-
-  if (tier === 'backer') {
-    return (
-      <h2
-        className="break-words motion-safe:animate-[foil_6s_linear_infinite]"
-        style={{
-          ...baseStyle,
-          fontStyle: 'italic',
-          backgroundImage: 'linear-gradient(96deg,#FFD028 0%,#FFFFFF 38%,#C54090 70%,#FFD028 100%)',
-          backgroundSize: '200% 100%',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-        }}
-      >
-        {text}
-      </h2>
-    );
-  }
-
-  if (tier === 'weekly_backer') {
-    return (
-      <h2
-        className="break-words motion-safe:animate-[shimmer_4s_linear_infinite]"
-        style={{
-          ...baseStyle,
-          backgroundImage: 'linear-gradient(100deg,#B8860B 0%,#FFD028 40%,#FFF3B0 55%,#FFD028 70%,#B8860B 100%)',
-          backgroundSize: '200% 100%',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-        }}
-      >
-        {text}
-      </h2>
-    );
-  }
-
-  if (tier === 'contribute') {
-    return (
-      <h2
-        className="break-words"
-        style={{
-          ...baseStyle,
-          color: accent,
-          textShadow: `0 1px 0 rgba(0,0,0,0.35), 0 0 18px ${accent}66`,
-        }}
-      >
-        {text}
-      </h2>
-    );
-  }
-
-  if (tier === 'explore') {
-    return (
-      <h2
-        className="break-words"
-        style={{ ...baseStyle, color: accent, textShadow: `0 0 22px ${accent}55` }}
-      >
-        {text}
-      </h2>
-    );
-  }
-
-  return (
-    <h2 className="break-words" style={{ ...baseStyle, color: accent }}>
-      {text}
-    </h2>
-  );
-}
 
 export default function MemberPassport({
   email,
@@ -989,7 +723,6 @@ export default function MemberPassport({
   profile,
   lang,
   editable,
-  onProfileChange,
   qrLabels,
   collectionsLabel,
   collectionsUnread = 0,
@@ -1001,45 +734,29 @@ export default function MemberPassport({
   const pattern = TIER_PATTERN[tier];
   const accentBar = TIER_ACCENT_BAR[tier];
   const tierName = TIER_NAMES[tier][lang] || TIER_NAMES[tier].en;
-  const tagline = TIER_TAGLINES[tier][lang];
   const levelCode = TIER_NAMES[tier].code;
   const [shareOpen, setShareOpen] = useState(false);
 
-  const saveField = useCallback((field: string, value: unknown) => {
-    if (!profile || !onProfileChange) return;
-    const updated = { ...profile, [field]: value };
-    onProfileChange(updated);
-    const snakeField = field.replace(/[A-Z]/g, (c) => '_' + c.toLowerCase());
-    const payload = { [snakeField]: value };
-    fetch('/api/member/profile', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }).catch(() => onProfileChange(profile));
-  }, [profile, onProfileChange]);
-
-  const handleAvatarChange = useCallback((newUrl: string | null) => {
-    if (!profile || !onProfileChange) return;
-    onProfileChange({ ...profile, avatarUrl: newUrl });
-  }, [profile, onProfileChange]);
-
-  const showInfoPanel = !!profile;
+  const showInfoSection = !!profile;
+  const openEditor = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('open-profile-editor'));
+    }
+  }, []);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.2, 0.7, 0.2, 1] }}
-      className="relative w-full space-y-4"
+      className="relative w-full"
     >
-      {/* Landscape VIP card face */}
+      {/* Unified card: face + info section in one rounded container */}
       <div
         className="relative overflow-hidden rounded-2xl text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)]"
-        style={{
-          backgroundColor: surface,
-          aspectRatio: '1.58 / 1',
-        }}
+        style={{ backgroundColor: surface }}
       >
+        {/* Top accent bar */}
         <div
           className="absolute inset-x-0 top-0 h-1 z-20"
           style={{ background: accentBar }}
@@ -1047,19 +764,23 @@ export default function MemberPassport({
 
         {pattern && (
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none opacity-60"
             style={{ backgroundImage: pattern }}
             aria-hidden
           />
         )}
 
         <div
-          className="absolute inset-0 pointer-events-none opacity-75"
-          style={{ background: glow }}
+          className="absolute inset-x-0 top-0 pointer-events-none opacity-75"
+          style={{ background: glow, height: '62%' }}
           aria-hidden
         />
 
-        <div className="relative z-10 flex h-full">
+        {/* ===== Card face (top) ===== */}
+        <div
+          className="relative z-10 flex"
+          style={{ aspectRatio: '1.58 / 1' }}
+        >
           <div
             className="relative shrink-0 overflow-hidden border-r border-white/10"
             style={{ width: '38%', containerType: 'inline-size' }}
@@ -1071,9 +792,8 @@ export default function MemberPassport({
               avatarUrl={profile?.avatarUrl}
               glow={glow}
               surface={surface}
-              editable={editable && !!onProfileChange}
+              editable={false}
               lang={lang}
-              onChange={handleAvatarChange}
             />
           </div>
 
@@ -1094,25 +814,44 @@ export default function MemberPassport({
             </div>
 
             <div className="flex-1 flex flex-col justify-end pb-2 sm:pb-3 min-w-0">
-              <TierHeroText tier={tier} tierName={tierName} />
-              <p className="mt-1 sm:mt-2 text-[10px] sm:text-[12px] text-white/65 italic leading-snug line-clamp-2">
-                {tagline}
-              </p>
+              {/* Tier (de-emphasised) */}
+              <div className="flex items-center gap-1.5 mb-1">
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: accent }}
+                  aria-hidden
+                />
+                <p
+                  className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] uppercase truncate"
+                  style={{ color: accent, opacity: 0.85 }}
+                >
+                  {tierName}
+                </p>
+              </div>
+
+              {/* Name (hero) — read-only */}
+              <NameHeroText
+                name={profile?.displayName ?? null}
+                fallback={email ? email.split('@')[0] : (memberNo ?? 'Member')}
+                editable={false}
+                lang={lang}
+              />
+
+              {/* Member info chips: nationality, work, nomad */}
+              <MemberInfoChips
+                profile={profile}
+                accent={accent}
+                lang={lang}
+              />
             </div>
 
             <div className="flex items-end justify-between gap-2 sm:gap-3">
-              <CardFoot
-                displayName={profile?.displayName ?? null}
-                email={email}
+              <ValidityFoot
                 tier={tier}
                 rank={rank}
                 validFrom={validFrom}
                 validUntil={validUntil}
                 lang={lang}
-                editable={editable && !!onProfileChange}
-                onSaveName={editable && onProfileChange
-                  ? (v) => saveField('displayName', v || null)
-                  : undefined}
               />
               {memberNo && qrLabels && (
                 <ChipQr
@@ -1126,129 +865,145 @@ export default function MemberPassport({
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Info panel below the card */}
-      {showInfoPanel && (
-        <div className="rounded-2xl bg-neutral-950/85 text-white border border-white/10 p-4 sm:p-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="space-y-3">
-              <div>
-                <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                  {lang === 'zh' ? '所在地' : 'Location'}
-                </p>
-                {editable && profile ? (
-                  <InlineLocationField
-                    value={profile.location ?? ''}
-                    placeholder={lang === 'zh' ? '新增所在地' : 'Add location'}
-                    onSave={(v) => saveField('location', v || null)}
-                    lang={lang}
-                  />
-                ) : (
-                  <p className="text-[12px] text-white/70">{profile?.location || '—'}</p>
-                )}
-              </div>
-
-              <div>
-                <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                  {lang === 'zh' ? '自我介紹' : 'Bio'}
-                </p>
-                {editable && profile ? (
-                  <InlineField
-                    value={profile.bio ?? ''}
-                    placeholder={lang === 'zh' ? '新增自我介紹' : 'Add bio'}
-                    onSave={(v) => saveField('bio', v || null)}
-                    multiline
-                    maxLength={280}
-                    className="text-[13px] text-white/80"
-                  />
-                ) : (
-                  <p className="text-[13px] text-white/80 leading-relaxed">{profile?.bio || '—'}</p>
-                )}
-              </div>
-
-              <div>
-                <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                  {lang === 'zh' ? '標籤' : 'Tags'}
-                </p>
-                {editable && profile ? (
-                  <InlineTagsField
-                    tags={profile.tags}
-                    accent={accent}
-                    onSave={(v) => saveField('tags', v)}
-                    placeholder={lang === 'zh' ? '新增標籤' : 'Add tags'}
-                  />
-                ) : profile && profile.tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {profile.tags.slice(0, 8).map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-                        style={{ backgroundColor: `${accent}20`, color: accent }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-[12px] text-white/40">—</p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                  {lang === 'zh' ? '社群連結' : 'Social'}
-                </p>
-                {editable && profile ? (
-                  <InlineSocialLinks
-                    links={profile.socialLinks}
-                    onSave={(v) => saveField('socialLinks', v)}
-                    lang={lang}
-                  />
-                ) : profile && Object.keys(profile.socialLinks).length > 0 ? (
-                  <div className="flex flex-wrap gap-3">
-                    {Object.entries(profile.socialLinks).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
-                      >
-                        {platform}
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-[12px] text-white/40">—</p>
-                )}
-              </div>
-
-              {memberNo && collectionsLabel && (
+        {/* ===== Info section (bottom — same container) ===== */}
+        {showInfoSection && (
+          <div className="relative z-10 border-t border-white/10 bg-black/30 backdrop-blur-[2px] p-4 sm:p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-3">
                 <div>
                   <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
-                    {lang === 'zh' ? '收藏' : 'Collections'}
+                    {lang === 'zh' ? '所在地' : 'Location'}
                   </p>
-                  <Link
-                    href="/me/collections"
-                    className="inline-flex items-center gap-2 text-[13px] text-white/75 hover:text-white transition-colors"
-                  >
-                    <span>{collectionsLabel}</span>
-                    {collectionsUnread > 0 && (
-                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
-                        {collectionsUnread}
-                      </span>
-                    )}
-                    <span aria-hidden>→</span>
-                  </Link>
+                  <p className="text-[12px] text-white/70">{profile?.location || '—'}</p>
                 </div>
-              )}
+
+                <div>
+                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
+                    {lang === 'zh' ? '自我介紹' : 'Bio'}
+                  </p>
+                  <p className="text-[13px] text-white/80 leading-relaxed">
+                    {profile?.bio || '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
+                    {lang === 'zh' ? '標籤' : 'Tags'}
+                  </p>
+                  {profile && profile.tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {profile.tags.slice(0, 8).map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          style={{ backgroundColor: `${accent}20`, color: accent }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[12px] text-white/40">—</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
+                    {lang === 'zh' ? '工作型態' : 'Work type'}
+                  </p>
+                  {profile?.workTypes && profile.workTypes.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {profile.workTypes.map((w) => (
+                        <span
+                          key={w}
+                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          style={{ backgroundColor: `${accent}20`, color: accent }}
+                        >
+                          {WORK_TYPE_LABELS[w]?.[lang] ?? w}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[12px] text-white/40">—</p>
+                  )}
+                </div>
+
+                <div>
+                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
+                    {lang === 'zh' ? '數位遊牧資歷' : 'Nomad experience'}
+                  </p>
+                  <p className="text-[12px] text-white/70">
+                    {profile?.nomadExperience
+                      ? NOMAD_EXPERIENCE_LABELS[profile.nomadExperience]?.[lang] ?? profile.nomadExperience
+                      : '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
+                    {lang === 'zh' ? '社群連結' : 'Social'}
+                  </p>
+                  {profile && Object.keys(profile.socialLinks).length > 0 ? (
+                    <div className="flex flex-wrap gap-3">
+                      {Object.entries(profile.socialLinks).map(([platform, url]) => (
+                        <a
+                          key={platform}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-mono text-white/60 hover:text-white/85 transition-colors"
+                        >
+                          {platform}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[12px] text-white/40">—</p>
+                  )}
+                </div>
+
+                {memberNo && collectionsLabel && (
+                  <div>
+                    <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-white/40 mb-1.5">
+                      {lang === 'zh' ? '收藏' : 'Collections'}
+                    </p>
+                    <Link
+                      href="/me/collections"
+                      className="inline-flex items-center gap-2 text-[13px] text-white/75 hover:text-white transition-colors"
+                    >
+                      <span>{collectionsLabel}</span>
+                      {collectionsUnread > 0 && (
+                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">
+                          {collectionsUnread}
+                        </span>
+                      )}
+                      <span aria-hidden>→</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Edit button (top-right corner) */}
+        {editable && (
+          <button
+            type="button"
+            onClick={openEditor}
+            className="absolute top-2.5 right-2.5 z-30 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-md text-white/85 hover:text-white text-[11px] font-medium transition-colors border border-white/15"
+            aria-label={lang === 'zh' ? '編輯' : 'Edit'}
+          >
+            <svg viewBox="0 0 16 16" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M11 2.5l2.5 2.5M4.5 9l-1 3.5L7 11.5 13 5.5 10.5 3l-6 6z" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {lang === 'zh' ? '編輯' : 'Edit'}
+          </button>
+        )}
+      </div>
 
       {memberNo && qrLabels && (
         <CardShareModal

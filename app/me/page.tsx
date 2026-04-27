@@ -12,6 +12,7 @@ import { FESTIVAL_START, getValidityPeriod } from '@/lib/ticketPricing';
 import type { Registration } from '@/lib/lumaSyncTypes';
 import LoginForm from '@/components/auth/LoginForm';
 import EmailPreferences from '@/components/member/EmailPreferences';
+import EmailChangeForm from '@/components/member/EmailChangeForm';
 import VisaSupportSection from '@/components/member/VisaSupportSection';
 import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
 import UpcomingEvents from '@/components/member/UpcomingEvents';
@@ -31,6 +32,9 @@ const EMPTY_PROFILE: MemberProfile = {
   languages: [],
   socialLinks: {},
   isPublic: false,
+  nationality: null,
+  workTypes: [],
+  nomadExperience: null,
 };
 
 function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTranslation>['t'] }) {
@@ -113,7 +117,7 @@ function MemberDashboard() {
       .then((d) => d && setMe({ memberNo: d.memberNo, firstSeenAt: d.firstSeenAt }))
       .catch(() => {});
 
-    fetch('/api/member/profile')
+    const loadProfile = () => fetch('/api/member/profile')
       .then((r) => r.ok ? r.json() : null)
       .then((d) => {
         if (d) {
@@ -127,15 +131,24 @@ function MemberDashboard() {
             languages: d.languages ?? [],
             socialLinks: d.social_links ?? {},
             isPublic: d.is_public ?? false,
+            nationality: d.nationality ?? null,
+            workTypes: Array.isArray(d.work_types) ? d.work_types : [],
+            nomadExperience: d.nomad_experience ?? null,
           });
         }
       })
       .catch(() => {});
+    loadProfile();
 
     fetch('/api/member/collections')
       .then((r) => r.ok ? r.json() : null)
       .then((d) => d && setCollectionsUnread(d.unreadCount ?? 0))
       .catch(() => {});
+
+    // Refresh card after the profile-completion modal saves.
+    const onSaved = () => loadProfile();
+    window.addEventListener('profile-completion-saved', onSaved);
+    return () => window.removeEventListener('profile-completion-saved', onSaved);
   }, [user?.email]);
 
   useEffect(() => {
@@ -496,6 +509,19 @@ function MemberDashboard() {
       {/* Visa support documents */}
       {user?.email && (
         <VisaSupportSection orders={orders} lang={lang} labels={t.auth.visaSupport} />
+      )}
+
+      {/* Account email + change flow */}
+      {user?.email && (
+        <CollapsibleSection
+          title={lang === 'zh' ? '帳號電子郵件' : 'Account email'}
+          defaultOpen={false}
+          tone="email"
+        >
+          <div className="mt-2">
+            <EmailChangeForm lang={lang} />
+          </div>
+        </CollapsibleSection>
       )}
 
       {/* Email preferences (collapsible) */}

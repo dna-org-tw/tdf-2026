@@ -14,6 +14,7 @@ import VisitorTracker from '@/components/VisitorTracker';
 import DiscountCodeCapture from '@/components/DiscountCodeCapture';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { AuthProvider } from '@/contexts/AuthContext';
+import ProfileEditModal from '@/components/ProfileEditModal';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -157,6 +158,7 @@ export default async function RootLayout({
         </Suspense>
         <AuthProvider>
         {children}
+        <ProfileEditModal />
         </AuthProvider>
         <CookieConsent />
         {/* SEO: Provide basic content for crawlers without JavaScript */}

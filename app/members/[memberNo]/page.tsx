@@ -5,7 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
+import MemberPassport, { type IdentityTier, type MemberProfile, type WorkType, type NomadExperience } from '@/components/member/MemberPassport';
 import CollectButton from '@/components/member/CollectButton';
 import Link from 'next/link';
 
@@ -20,6 +20,9 @@ interface PublicProfile {
   tags: string[];
   languages: string[];
   social_links: Record<string, string>;
+  nationality: string | null;
+  work_types: string[];
+  nomad_experience: string | null;
   tier: string;
   valid_from: string | null;
   valid_until: string | null;
@@ -92,6 +95,9 @@ function PublicMemberCard() {
     languages: data.languages,
     socialLinks: data.social_links,
     isPublic: true,
+    nationality: data.nationality,
+    workTypes: (data.work_types ?? []) as WorkType[],
+    nomadExperience: (data.nomad_experience ?? null) as NomadExperience | null,
   };
 
   return (

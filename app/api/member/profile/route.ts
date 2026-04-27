@@ -5,9 +5,31 @@ import { getSessionFromRequest } from '@/lib/auth';
 const MAX_DISPLAY_NAME = 50;
 const MAX_BIO = 280;
 const MAX_LOCATION = 100;
+const MAX_NATIONALITY = 80;
 const MAX_TAGS = 10;
 const MAX_LANGUAGES = 10;
 const MAX_SOCIAL_LINKS = 10;
+const ALLOWED_WORK_TYPES = [
+  'admin_mgmt',
+  'sales_marketing',
+  'finance_legal',
+  'it_engineering',
+  'design_creative',
+  'education_research',
+  'healthcare_social',
+  'tourism_hospitality',
+  'manufacturing_logistics',
+  'freelance_entrepreneur',
+] as const;
+const ALLOWED_NOMAD_EXPERIENCE = [
+  'not_yet',
+  'under_3m',
+  '3m_to_1y',
+  '1_to_3y',
+  '3_to_5y',
+  '5_to_10y',
+  'over_10y',
+] as const;
 
 function getMemberId(email: string) {
   if (!supabaseServer) throw new Error('Database not configured');
@@ -30,29 +52,7 @@ export async function GET(req: NextRequest) {
   try {
     const { data: member, error: mErr } = await getMemberId(session.email);
     if (mErr) throw mErr;
-    if (!member) {
-      // No member row yet — return empty profile
-      return NextResponse.json({
-        display_name: null,
-        bio: null,
-        avatar_url: null,
-        location: null,
-        timezone: null,
-        tags: [],
-        languages: [],
-        social_links: {},
-        is_public: false,
-      });
-    }
-
-    const { data, error } = await supabaseServer
-      .from('member_profiles')
-      .select('display_name, bio, avatar_url, location, timezone, tags, languages, social_links, is_public')
-      .eq('member_id', member.id)
-      .maybeSingle();
-    if (error) throw error;
-
-    return NextResponse.json(data ?? {
+    const empty = {
       display_name: null,
       bio: null,
       avatar_url: null,
@@ -62,7 +62,25 @@ export async function GET(req: NextRequest) {
       languages: [],
       social_links: {},
       is_public: false,
-    });
+      nationality: null,
+      work_types: [] as string[],
+      nomad_experience: null,
+      consent_activity_stats: false,
+      consent_activity_stats_at: null,
+    };
+
+    if (!member) {
+      return NextResponse.json(empty);
+    }
+
+    const { data, error } = await supabaseServer
+      .from('member_profiles')
+      .select('display_name, bio, avatar_url, location, timezone, tags, languages, social_links, is_public, nationality, work_types, nomad_experience, consent_activity_stats, consent_activity_stats_at')
+      .eq('member_id', member.id)
+      .maybeSingle();
+    if (error) throw error;
+
+    return NextResponse.json(data ?? empty);
   } catch (e) {
     console.error('[Member Profile GET]', e);
     return NextResponse.json({ error: 'Failed to load profile' }, { status: 500 });
@@ -84,10 +102,19 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    const { data: member, error: mErr } = await getMemberId(session.email);
+    const { data: existingMember, error: mErr } = await getMemberId(session.email);
     if (mErr) throw mErr;
+    // If the member row doesn't exist yet (e.g. user signed in via magic-link
+    // before any order/newsletter activity), create it now.
+    let member = existingMember;
     if (!member) {
-      return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+      const { data: created, error: cErr } = await supabaseServer
+        .from('members')
+        .upsert({ email: session.email.trim().toLowerCase() }, { onConflict: 'email' })
+        .select('id')
+        .single();
+      if (cErr) throw cErr;
+      member = created;
     }
 
     // Build update payload with validation
@@ -141,11 +168,35 @@ export async function PUT(req: NextRequest) {
     if ('is_public' in body) {
       update.is_public = body.is_public === true;
     }
+    if ('nationality' in body) {
+      const v = body.nationality;
+      update.nationality = typeof v === 'string' ? v.trim().slice(0, MAX_NATIONALITY) || null : null;
+    }
+    if ('work_types' in body) {
+      const v = body.work_types;
+      const allowed = ALLOWED_WORK_TYPES as readonly string[];
+      update.work_types = Array.isArray(v)
+        ? Array.from(new Set(
+            v.filter((t: unknown): t is string => typeof t === 'string' && allowed.includes(t)),
+          ))
+        : [];
+    }
+    if ('nomad_experience' in body) {
+      const v = body.nomad_experience;
+      update.nomad_experience = typeof v === 'string' && (ALLOWED_NOMAD_EXPERIENCE as readonly string[]).includes(v)
+        ? v
+        : null;
+    }
+    if ('consent_activity_stats' in body) {
+      const v = body.consent_activity_stats === true;
+      update.consent_activity_stats = v;
+      update.consent_activity_stats_at = v ? new Date().toISOString() : null;
+    }
 
     const { data, error } = await supabaseServer
       .from('member_profiles')
       .upsert(update, { onConflict: 'member_id' })
-      .select('display_name, bio, avatar_url, location, timezone, tags, languages, social_links, is_public')
+      .select('display_name, bio, avatar_url, location, timezone, tags, languages, social_links, is_public, nationality, work_types, nomad_experience, consent_activity_stats, consent_activity_stats_at')
       .single();
     if (error) throw error;
 

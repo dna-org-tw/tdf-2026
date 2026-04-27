@@ -31,7 +31,7 @@ export async function GET(
 
     const { data: profile, error: pErr } = await supabaseServer
       .from('member_profiles')
-      .select('display_name, bio, avatar_url, location, timezone, tags, languages, social_links, is_public')
+      .select('display_name, bio, avatar_url, location, timezone, tags, languages, social_links, is_public, nationality, work_types, nomad_experience')
       .eq('member_id', member.id)
       .maybeSingle();
     if (pErr) throw pErr;
@@ -77,6 +77,9 @@ export async function GET(
       tags: profile?.tags ?? [],
       languages: profile?.languages ?? [],
       social_links: profile?.social_links ?? {},
+      nationality: profile?.nationality ?? null,
+      work_types: Array.isArray(profile?.work_types) ? profile?.work_types : [],
+      nomad_experience: profile?.nomad_experience ?? null,
       tier: enriched?.highest_ticket_tier || 'follower',
       valid_from: validFrom,
       valid_until: validUntil,
