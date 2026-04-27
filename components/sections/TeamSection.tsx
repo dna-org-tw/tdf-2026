@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { trackEvent } from '@/components/FacebookPixel';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { useLumaData } from '@/contexts/LumaDataContext';
-import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter, X } from 'lucide-react';
+import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter, X, ArrowRight } from 'lucide-react';
 import type { SpeakerGrouped, SpeakerSocialLinks } from '@/lib/lumaSpeakers';
 import { teamMembers } from '@/data/team';
 import { MessageCircle } from 'lucide-react';
@@ -415,8 +415,103 @@ export default function TeamSection() {
               </motion.p>
             </div>
           </div>
+
         </div>
       </div>
+
+      {/* 官方平台 Nomad Taiwan — 書腰 obi banner */}
+      {t.partners.officialPlatform && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="block w-full overflow-hidden shadow-[0_4px_30px_rgba(13,74,109,0.25)]"
+        >
+          <div className="relative bg-gradient-to-r from-[#0d4a6d] via-[#1d6e8a] to-[#3d7dc9] px-6 sm:px-12 lg:px-20 py-8 sm:py-10">
+            <div className="absolute inset-0 opacity-[0.06] pointer-events-none overflow-hidden">
+              <svg className="absolute -top-10 -right-10 w-72 h-72" viewBox="0 0 200 200" fill="white">
+                <path d="M100 10L190 90V190H10V90L100 10Z" />
+              </svg>
+              <svg className="absolute -bottom-8 left-[20%] w-40 h-40" viewBox="0 0 200 200" fill="white">
+                <path d="M100 10L190 90V190H10V90L100 10Z" />
+              </svg>
+              <svg className="absolute top-2 left-[60%] w-28 h-28" viewBox="0 0 200 200" fill="white">
+                <path d="M100 10L190 90V190H10V90L100 10Z" />
+              </svg>
+            </div>
+
+            <div className="relative z-10 max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
+              <div className="flex-shrink-0">
+                <div className="relative w-[220px] sm:w-[280px] h-[60px] sm:h-[76px]">
+                  <Image
+                    src={t.partners.officialPlatform.logoWhite}
+                    alt={t.partners.officialPlatform.name}
+                    fill
+                    sizes="(max-width: 640px) 220px, 280px"
+                    className="object-contain"
+                  />
+                </div>
+                {t.partners.officialPlatform.tagline && (
+                  <p className="text-white/60 text-xs sm:text-sm mt-2 text-center sm:text-left tracking-wider uppercase">
+                    {t.partners.officialPlatform.tagline}
+                  </p>
+                )}
+              </div>
+
+              <div className="hidden sm:block w-px self-stretch bg-white/20 flex-shrink-0" />
+
+              <div className="flex-1 text-center sm:text-left">
+                <p className="text-white text-sm sm:text-base lg:text-lg leading-relaxed mb-4">
+                  {t.partners.officialPlatform.description}
+                </p>
+                <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                  {t.partners.officialPlatform.features.map((feature) => (
+                    <span
+                      key={feature}
+                      className="inline-block px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full bg-white/20 text-white border border-white/30 backdrop-blur-sm"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex-shrink-0 hidden sm:flex flex-col gap-2">
+                {t.partners.officialPlatform.ctas.map((c) => (
+                  <a
+                    key={c.url}
+                    href={c.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/cta flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 border border-white/30 rounded-full px-6 py-3 transition-colors duration-300"
+                  >
+                    <span className="text-white text-sm font-bold whitespace-nowrap">
+                      {c.label}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-white group-hover/cta:translate-x-1 transition-transform duration-300" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="sm:hidden flex flex-col">
+            {t.partners.officialPlatform.ctas.map((c) => (
+              <a
+                key={c.url}
+                href={c.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group/cta bg-[#0a3a55] hover:bg-[#072a3f] px-6 py-3 flex items-center justify-center gap-2 transition-colors duration-300 border-t border-white/10"
+              >
+                <span className="text-white text-sm font-bold">{c.label}</span>
+                <ArrowRight className="w-4 h-4 text-white group-hover/cta:translate-x-1 transition-transform duration-300" />
+              </a>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* 執行團隊 Organizing Team */}
       <div id="organizing-team" className="py-20 md:py-28 lg:py-32 bg-white">

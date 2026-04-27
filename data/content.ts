@@ -522,6 +522,17 @@ export const content = {
         bronze: "Bronze Sponsors",
         cta: { type: "Call for Sponsors", text: "Become a Sponsor", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
       },
+      officialPlatform: {
+        name: "Nomad Taiwan",
+        tagline: "Unrestricted · Cloud Work · Diversity",
+        description:
+          "Nomad Taiwan is the official platform connecting government, industry, and local communities into a single gateway for visa guidance, coworking spaces, and on-the-ground services — making Taiwan Asia's most welcoming hub for digital nomads.",
+        logoWhite: "/images/partners/nomad_taiwan_white.png",
+        features: ["Unrestricted", "Cloud Work", "Diversity"],
+        ctas: [
+          { label: "Visit nomading.tw", url: "https://nomading.tw" },
+        ],
+      },
       partners: {
         title: "Partners",
         cta: { type: "Call for Partners", text: "Join as Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
@@ -1956,6 +1967,17 @@ export const content = {
         silver: "銀級贊助",
         bronze: "銅級贊助",
         cta: { type: "Call for Sponsors", text: "成為贊助商", href: "https://forms.gle/aN3LbaHy8iV5xqyi8" }
+      },
+      officialPlatform: {
+        name: "遊牧臺灣 Nomad Taiwan",
+        tagline: "不受限制 · 雲端工作 · 多樣性",
+        description:
+          "遊牧臺灣是支持國際數位遊牧者的官方平台，串聯政府、產業與在地社群，提供簽證資訊、共享空間與在地服務的整合入口，致力於將臺灣打造成亞洲最友善的數位遊牧樞紐。",
+        logoWhite: "/images/partners/nomad_taiwan_white.png",
+        features: ["不受限制", "雲端工作", "多樣性"],
+        ctas: [
+          { label: "前往 nomading.tw", url: "https://nomading.tw" },
+        ],
       },
       partners: {
         title: "合作夥伴",
