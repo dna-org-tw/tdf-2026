@@ -482,12 +482,13 @@ function SlideDeckInner({ events, speakers }: IntroDeckProps) {
           >
             {t.partners.coOrganizers.title} & {t.partners.partners.title}
           </h2>
-          <div className="grid w-full sm:grid-cols-2 lg:grid-cols-4" style={{ maxWidth: '90vw', gap: '1.2vw' }}>
+          <div className="grid w-full sm:grid-cols-2 lg:grid-cols-5" style={{ maxWidth: '90vw', gap: '1.2vw' }}>
             {[
               t.partners.coOrganizers.nanhueiAlliance,
               t.partners.coOrganizers.yuanNatural,
               t.partners.coOrganizers.rootsCoworking,
               t.partners.coOrganizers.herflow,
+              t.partners.coOrganizers.tsaomin,
             ].map((org: { name: string; description: string }) => (
               <div key={org.name} className="rounded-2xl bg-white shadow-lg" style={{ padding: '2vh 1.2vw' }}>
                 <h4 style={{ ...fs('1rem', '1.6vw', '1.3rem'), fontWeight: 900, color: OCEAN, marginBottom: '0.8vh', lineHeight: 1.2 }}>

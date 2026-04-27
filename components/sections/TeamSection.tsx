@@ -61,6 +61,144 @@ function getSocialUrl(
   }
 }
 
+function CoOrganizerPhoto({ images, alt }: { images: string[]; alt: string }) {
+  const [index, setIndex] = useState(0);
+  const hasMany = images.length > 1;
+
+  useEffect(() => {
+    if (!hasMany) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % images.length);
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [hasMany, images.length]);
+
+  if (images.length === 0) return null;
+
+  return (
+    <div className="relative h-48 md:h-56 lg:h-64 w-72 md:w-80 lg:w-96 flex-shrink-0 rounded-2xl overflow-hidden bg-[#F4F4F4]">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={images[index]}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0"
+        >
+          <Image
+            src={images[index]}
+            alt={alt}
+            fill
+            sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
+            className="object-cover"
+            loading="lazy"
+          />
+        </motion.div>
+      </AnimatePresence>
+      {hasMany && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
+          {images.map((src, i) => (
+            <button
+              key={src}
+              type="button"
+              aria-label={`Show photo ${i + 1}`}
+              onClick={() => setIndex(i)}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/60 hover:bg-white/80'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface CoOrganizerRowProps {
+  name?: string;
+  description?: string;
+  images: string[];
+  fallbackName: string;
+  marginTop?: boolean;
+}
+
+function CoOrganizerRow({ name, description, images, fallbackName, marginTop = true }: CoOrganizerRowProps) {
+  return (
+    <div className={`flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500${marginTop ? ' mt-16 md:mt-20' : ''}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <CoOrganizerPhoto images={images} alt={name || fallbackName} />
+      </motion.div>
+      <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
+        <motion.h3
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-xl md:text-2xl font-display font-bold text-[#1E1F1C]"
+        >
+          {name}
+        </motion.h3>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1 }}
+          className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
+        >
+          {description}
+        </motion.p>
+      </div>
+    </div>
+  );
+}
+
+const CO_ORGANIZER_KEYS = [
+  {
+    key: 'nanhueiAlliance' as const,
+    fallbackName: '南迴永續旅行聯盟',
+    images: ['/images/partners/nanhuei_alliance.jpg'],
+  },
+  {
+    key: 'yuanNatural' as const,
+    fallbackName: '源天然股份有限公司',
+    images: ['/images/partners/yuan_natural.jpg'],
+  },
+  {
+    key: 'rootsCoworking' as const,
+    fallbackName: '旅蒔共享工作空間（Roots Coworking）',
+    images: [
+      '/images/partners/roots/01.jpg',
+      '/images/partners/roots/02.jpg',
+      '/images/partners/roots/03.jpg',
+      '/images/partners/roots/04.jpg',
+    ],
+  },
+  {
+    key: 'herflow' as const,
+    fallbackName: '合流生活提案所（HerFlow）',
+    images: ['/images/partners/herflow.jpeg'],
+  },
+  {
+    key: 'tsaomin' as const,
+    fallbackName: '草民 Tsaomin Brunch',
+    images: [
+      '/images/partners/tsaomin/01.jpg',
+      '/images/partners/tsaomin/02.jpg',
+      '/images/partners/tsaomin/03.jpg',
+      '/images/partners/tsaomin/04.jpg',
+      '/images/partners/tsaomin/05.jpg',
+      '/images/partners/tsaomin/06.jpg',
+      '/images/partners/tsaomin/07.jpg',
+      '/images/partners/tsaomin/08.jpg',
+      '/images/partners/tsaomin/09.jpg',
+    ],
+  },
+];
+
 export default function TeamSection() {
   const { t } = useTranslation();
   const { speakers: contextSpeakers, speakersLoading } = useLumaData();
@@ -264,157 +402,19 @@ export default function TeamSection() {
             {t.partners.coOrganizers?.title}
           </motion.h2>
 
-          {/* 南迴永續旅行聯盟 */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative h-48 md:h-56 lg:h-64 w-auto flex-shrink-0 rounded-2xl overflow-hidden"
-            >
-              <Image
-                src="/images/partners/nanhuei_alliance.jpg"
-                alt={t.partners.coOrganizers?.nanhueiAlliance?.name || "南迴永續旅行聯盟"}
-                width={400}
-                height={300}
-                className="h-full w-auto object-cover"
-                loading="lazy"
+          {CO_ORGANIZER_KEYS.map((entry, idx) => {
+            const data = t.partners.coOrganizers?.[entry.key];
+            return (
+              <CoOrganizerRow
+                key={entry.key}
+                name={data?.name}
+                description={data?.description}
+                images={entry.images}
+                fallbackName={entry.fallbackName}
+                marginTop={idx > 0}
               />
-            </motion.div>
-            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
-              <motion.h3
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-xl md:text-2xl font-display font-bold text-[#1E1F1C]"
-              >
-                {t.partners.coOrganizers?.nanhueiAlliance?.name}
-              </motion.h3>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
-              >
-                {t.partners.coOrganizers?.nanhueiAlliance?.description}
-              </motion.p>
-            </div>
-          </div>
-
-          {/* 源天然股份有限公司 */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500 mt-16 md:mt-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative h-48 md:h-56 lg:h-64 w-auto flex-shrink-0 rounded-2xl overflow-hidden"
-            >
-              <Image
-                src="/images/partners/yuan_natural.jpg"
-                alt={t.partners.coOrganizers?.yuanNatural?.name || "源天然股份有限公司"}
-                width={400}
-                height={300}
-                className="h-full w-auto object-cover"
-                loading="lazy"
-              />
-            </motion.div>
-            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
-              <motion.h3
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-xl md:text-2xl font-display font-bold text-[#1E1F1C]"
-              >
-                {t.partners.coOrganizers?.yuanNatural?.name}
-              </motion.h3>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
-              >
-                {t.partners.coOrganizers?.yuanNatural?.description}
-              </motion.p>
-            </div>
-          </div>
-
-          {/* 旅蒔共享工作空間 Roots Coworking */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500 mt-16 md:mt-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative h-48 md:h-56 lg:h-64 w-auto flex-shrink-0 rounded-2xl overflow-hidden"
-            >
-              <Image
-                src="/images/partners/roots_coworking.jpeg"
-                alt={t.partners.coOrganizers?.rootsCoworking?.name || "旅蒔共享工作空間"}
-                width={400}
-                height={300}
-                className="h-full w-auto object-cover"
-                loading="lazy"
-              />
-            </motion.div>
-            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
-              <motion.h3
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-xl md:text-2xl font-display font-bold text-[#1E1F1C]"
-              >
-                {t.partners.coOrganizers?.rootsCoworking?.name}
-              </motion.h3>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
-              >
-                {t.partners.coOrganizers?.rootsCoworking?.description}
-              </motion.p>
-            </div>
-          </div>
-
-          {/* 合流生活提案所 HerFlow */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 opacity-70 hover:opacity-100 transition-all duration-500 mt-16 md:mt-20">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative h-48 md:h-56 lg:h-64 w-auto flex-shrink-0 rounded-2xl overflow-hidden"
-            >
-              <Image
-                src="/images/partners/herflow.jpeg"
-                alt={t.partners.coOrganizers?.herflow?.name || "合流生活提案所（HerFlow）"}
-                width={400}
-                height={300}
-                className="h-full w-auto object-cover"
-                loading="lazy"
-              />
-            </motion.div>
-            <div className="flex flex-col items-start gap-4 mt-4 md:mt-0">
-              <motion.h3
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-xl md:text-2xl font-display font-bold text-[#1E1F1C]"
-              >
-                {t.partners.coOrganizers?.herflow?.name}
-              </motion.h3>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="max-w-3xl text-base md:text-lg leading-relaxed text-[#4B4C47] text-center md:text-left"
-              >
-                {t.partners.coOrganizers?.herflow?.description}
-              </motion.p>
-            </div>
-          </div>
+            );
+          })}
 
         </div>
       </div>

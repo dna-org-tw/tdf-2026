@@ -496,7 +496,7 @@ export const content = {
         nanhueiAlliance: {
           name: "Nanhuei Sustainable Travel Alliance",
           description:
-            "The Nanhuei Sustainable Travel Alliance connects around 40 local businesses and teams across Taitung's Nanhuei region, spanning food, accommodation, tourism, shopping, and transportation. With \"cultural sustainability, ecological sustainability, and environmental sustainability\" at its core, the alliance promotes locally distinctive sustainable travel practices. Through ocean waste recycling, local tour design, and a reusable cup system, the alliance integrates waste reduction, beach cleanups, and cultural experiences into everyday travel — enabling travelers to take responsibility for the environment while exploring the land.",
+            "The Nanhuei Sustainable Travel Alliance connects around 40 local businesses and teams across Taitung's Nanhuei region, spanning food, accommodation, tourism, shopping, and transportation. With \"cultural sustainability, ecological sustainability, and environmental sustainability\" at its core, the alliance promotes locally distinctive sustainable travel practices. Through ocean waste recycling, local tour design, and a reusable cup system, the alliance integrates waste reduction, beach cleanups, and cultural experiences into everyday travel — enabling travelers to take responsibility for the environment while exploring the land. The alliance is committed to shaping a new travel culture in which every journey is more than consumption or experience — it becomes an act of support and stewardship for the land. Through advocacy and practice, alliance partners transform travel from mere consumption into care for the land, giving every step lasting sustainable meaning.",
         },
         yuanNatural: {
           name: "Yuan Natural Co., Ltd.",
@@ -506,12 +506,17 @@ export const content = {
         rootsCoworking: {
           name: "Roots Coworking Space",
           description:
-            "Roots Coworking Space is located in Chishang, Taitung, and serves as a shared hub designed for freelancers and digital nomads. It provides a coworking space where digital nomads and freelancers from around the world can share knowledge, exchange experiences, and collaborate on diverse projects. The space actively hosts community building workshops, events, and exhibitions. Roots welcomes digital nomads, freelancers, and aspiring entrepreneurs to explore new possibilities through the perspectives of land, local products, and people — writing their own life chapters between work and travel, digital and humanities.",
+            "Roots is a coworking space for digital nomads and freelancers from around the world. Through knowledge exchange, shared experiences, and connected networks, members collaborate on diverse and interesting projects, build relationships, grow together, and discover new opportunities.",
         },
         herflow: {
           name: "HerFlow Living Lab",
           description:
-            "HerFlow Living Lab is a multi-functional space nestled in the heart of Dulan, Donghe Township, Taitung — backed by mountains and facing the sea. Run by artistic partners Xiao Guan and A-Xin, the space embodies the philosophy of \"mind-body unity and flowing with nature.\" It offers seasonal light meals, artisanal drinks, and handmade desserts nurtured by Taitung's terroir, alongside curated local creations, sustainability events, exhibitions, and sharing sessions — serving as a creative platform and coworking space that bridges creators with the community.",
+            "HerFlow Living Lab sits in the heart of Dulan, Taitung — a hybrid space backed by mountains and facing the sea, warm as home. Inside, you'll find seasonal light meals and tea nurtured by Taitung's terroir, alongside a coworking studio that supports local creators and sustainable living. Founded by east-coast artist partners Gwen and Alvaro, the space is guided by the philosophy of \"the body and the land are one,\" hosting cultural and sustainability events while documenting creative inspiration from the mountains and sea — crafting a way of life that flows with nature.",
+        },
+        tsaomin: {
+          name: "Tsaomin Brunch",
+          description:
+            "Founded in 2020, Tsaomin Brunch sits in a quiet alley near Taitung Forest Park — an unmissable white house wrapped in greenery. The building was once part of an air-force military village, and remains the only one in the neighborhood still preserving its original facade; combined with abundant plants, it gives Tsaomin its distinctive character. Founders Yong-Zhe and Yi-Peng both moved to Taitung from other counties; though their backgrounds had nothing to do with hospitality, those varied experiences brought a richer perspective to the brand. Tsaomin starts with brunch — emphasizing whole foods seasoned into flavorful, signature dishes — and uses plants to forge a connection between space and people, extending into plant markets, hands-on workshops, off-site catering, and private dining.",
         },
       },
       sponsors: {
@@ -1942,7 +1947,7 @@ export const content = {
         nanhueiAlliance: {
           name: "南迴永續旅行聯盟",
           description:
-            "南迴永續旅行聯盟串聯台東南迴地區約40個在地店家與團隊，涵蓋食、宿、遊、購、行等不同產業，以「文化永續、生態永續、環境永續」為核心，共同推動具在地特色的永續旅行模式。聯盟透過海廢再利用行動、在地遊程設計及永續杯借還系統，將減塑、淨灘與文化體驗融入日常旅行，讓旅人在探索地方的同時，也能實踐對環境與土地的責任。",
+            "南迴永續旅行聯盟串聯台東南迴地區約40個在地店家與團隊，涵蓋食、宿、遊、購、行等不同產業，以「文化永續、生態永續、環境永續」為核心，共同推動具在地特色的永續旅行模式。聯盟透過海廢再利用行動、在地遊程設計及永續杯借還系統，將減塑、淨灘與文化體驗融入日常旅行，讓旅人在探索地方的同時，也能實踐對環境與土地的責任。致力打造新的旅行文化，讓每段旅程不只是消費與體驗，更是對地方的支持與守護；聯盟夥伴透過倡議與實踐，將旅行從單純消費轉化為對土地的守護，使每一步旅程都帶有永續意義。",
         },
         yuanNatural: {
           name: "源天然股份有限公司",
@@ -1952,12 +1957,17 @@ export const content = {
         rootsCoworking: {
           name: "旅蒔共享工作空間（Roots Coworking）",
           description:
-            "旅蒔共享工作空間位於台東池上，是專為自由工作者與數位遊牧者打造的共享交流基地。提供來自世界各地的數位遊牧者與自由工作者一個共享工作空間，透過知識與經驗交流及資源人脈共享，大家可以一起完成多元專案、互相認識並成長；這個空間也積極舉辦社區營造、工作坊、活動與展覽規劃等地方創生活動。旅蒔歡迎旅居各地的數位游牧者、自由工作者、創業築夢者等走進這裡，從「地、產、人」的多元視角探索更多可能，在工作與旅行、數位與人文之間譜寫自己的生活篇章。",
+            "旅蒔是一個提供給來自世界各地數位遊牧及自由工作者的共享工作空間。在這裡，透過知識與經驗交流以及資源人脈的共享，一同完成多元有趣的 projects，互相認識與成長，看見更多不同的機會。",
         },
         herflow: {
           name: "合流生活提案所（HerFlow）",
           description:
-            "合流生活提案所坐落於台東東河鄉都蘭鬧區，是一處背山面海、充滿綠意又具居家感的複合式空間。營運者是在台東漂泊的藝術工作者情侶小關與阿信，他們秉持「身心合一、順勢流動」的理念，希望從山與海學習生活智慧，創造與自然合流的多樣生活樣貌。空間中提供由台東風土滋養的當令輕鮮食、醇飲與手作甜點，販售在地創作選物，並舉辦各種永續活動、展覽與分享會，鼓勵創作者與社區互動。",
+            "合流生活提案所位於都蘭鬧區，是處背山面海、溫潤如家的複合式場域。空間內提供由台東風土滋養的茶點與當令輕食，是支持在地創作與永續理念的共享工作室。由東漂的藝術工作夥伴 Gwen 與 Alvaro 共同創建，以「身土不二」為理念主持各種藝文與永續活動，並透過數位內容記錄來自山海的創作靈感，打造與自然合流的生活提案。",
+        },
+        tsaomin: {
+          name: "草民 Tsaomin Brunch",
+          description:
+            "草民早午餐成立於 2020 年，座落在台東森林公園附近巷弄，遠遠就能看見這棟充滿綠意的白色老屋。前身是空軍眷村，這棟建築是社區現存唯一一棟仍保留原始外觀的軍眷老房，搭配豐富植栽，讓草民品牌更顯特色。創辦人永哲與依芃都是來自外縣市的台東新移民，過去工作經驗雖與餐飲毫不相關，卻也因此擁有不同背景與專業，在開創草民時為品牌注入更多元的觀點。草民以早午餐出發，強調運用原型食物，調味出美味具特色的餐點；同時透過植栽打造空間與人的連結，延伸出植物市集、手作課程，並將觸角拓展至外燴、私廚等多樣的餐飲型態。",
         },
       },
       sponsors: {
