@@ -171,10 +171,10 @@ async function main() {
     const lumaOther = mapped.length - lumaApproved;
     const changes: string[] = [];
 
+    const REVIEWABLE_STATUSES = new Set(['approved', 'waitlist', 'pending_approval']);
     for (const row of mapped) {
-      // Mirror worker behaviour: external declines (admin manual / user
-      // self-cancel) and pending Luma invites are never re-evaluated.
-      if (row.activity_status === 'declined' || row.activity_status === 'invited') continue;
+      // Mirror worker allowlist: only reviewable states get re-evaluated.
+      if (row.activity_status !== null && !REVIEWABLE_STATUSES.has(row.activity_status)) continue;
       let decision;
       try {
         decision = await makeDecision(

@@ -221,6 +221,20 @@ async function processEvent(
 
   let approvedCount = 0;
 
+  // Allowlist: only these statuses are subject to auto-review. Anything else
+  // (declined/invited/not_going/cancelled/unknown) is preserved untouched —
+  // we never push 'approved' or 'waitlist' to Luma for guests already in a
+  // terminal/external-decision state. null is allowed (newly-added rows with
+  // no Luma-reported status yet behave like fresh applications).
+  const REVIEWABLE_STATUSES: ReadonlySet<string> = new Set([
+    'approved',
+    'waitlist',
+    'pending_approval',
+  ]);
+  // Statuses we skip silently (frequent, expected). Anything else triggers
+  // a one-line warn so we notice if Luma adds a new state we should handle.
+  const SILENT_SKIP_STATUSES: ReadonlySet<string> = new Set(['declined', 'invited']);
+
   const reviewLogs: Array<{
     job_id: number;
     event_api_id: string;
@@ -234,15 +248,18 @@ async function processEvent(
   }> = [];
 
   for (const row of mapped) {
-    // Preserve externally-set statuses our auto-review must not override:
-    // - 'declined': admin manual decline OR member self-cancelling on Luma.
-    //   makeDecision only produces 'approved' / 'waitlist', so any current
-    //   'declined' came from outside our system.
-    // - 'invited': Luma admin invite still awaiting the member's response;
-    //   not yet a real sign-up, so eligibility doesn't apply.
-    // Skip without writing to Luma or the review log; they do not count
-    // toward capacity.
-    if (row.activity_status === 'declined' || row.activity_status === 'invited') {
+    // Allowlist gate: never re-evaluate guests outside reviewable states.
+    // Covers 'declined' (admin manual / member self-cancel), 'invited' (Luma
+    // admin invite pending response), and any unknown future state Luma may
+    // introduce (e.g. 'not_going' via registration_status fallback). These
+    // do not run makeDecision, do not write to Luma, do not write a log
+    // entry, and do not consume capacity.
+    if (row.activity_status !== null && !REVIEWABLE_STATUSES.has(row.activity_status)) {
+      if (!SILENT_SKIP_STATUSES.has(row.activity_status)) {
+        console.warn(
+          `[luma-sync] preserving non-reviewable status '${row.activity_status}' for ${row.email} @${eventApiId}`,
+        );
+      }
       continue;
     }
 
