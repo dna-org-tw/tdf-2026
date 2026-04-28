@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { shapeRegistrations, type LumaGuestRow } from '@/lib/lumaSyncConfig';
+import { shapeRegistrations, fetchApprovedCounts, type LumaGuestRow } from '@/lib/lumaSyncConfig';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     .select(`
       event_api_id, activity_status, paid, checked_in_at, registered_at,
       ticket_type_name, amount_cents, currency, last_synced_at,
-      luma_events ( name, start_at, end_at, url )
+      luma_events ( name, start_at, end_at, url, capacity )
     `)
     .eq('email', email)
     .order('registered_at', { ascending: false, nullsFirst: false });
@@ -42,10 +42,9 @@ export async function GET(req: NextRequest) {
     (r) => r.reason === 'waitlist:no_show_penalty',
   ).length;
 
-  const registrations = await shapeRegistrations(
-    (data ?? []) as unknown as LumaGuestRow[],
-    reviewReasons,
-  );
+  const rows = (data ?? []) as unknown as LumaGuestRow[];
+  const approvedCounts = await fetchApprovedCounts(rows.map((r) => r.event_api_id));
+  const registrations = await shapeRegistrations(rows, reviewReasons, approvedCounts);
 
   return NextResponse.json({ registrations, noShowConsumedCount });
 }

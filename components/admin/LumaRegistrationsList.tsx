@@ -24,6 +24,34 @@ function formatDate(iso: string | null): string {
   });
 }
 
+function CapacityBadge({ approved, capacity }: { approved: number; capacity: number | null }) {
+  if (capacity === null) {
+    return (
+      <span
+        className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-500"
+        title="該活動未設人數上限"
+      >
+        {approved} / ∞
+      </span>
+    );
+  }
+  const ratio = capacity > 0 ? approved / capacity : 0;
+  const cls =
+    ratio >= 1
+      ? 'bg-red-100 text-red-800'
+      : ratio >= 0.85
+        ? 'bg-amber-100 text-amber-800'
+        : 'bg-slate-100 text-slate-700';
+  return (
+    <span
+      className={`rounded-full px-2 py-0.5 font-medium ${cls}`}
+      title={`目前已核准 ${approved} 人，活動上限 ${capacity} 人`}
+    >
+      {approved} / {capacity}
+    </span>
+  );
+}
+
 export default function LumaRegistrationsList({ registrations }: { registrations: Registration[] }) {
   if (registrations.length === 0) {
     return <p className="text-sm text-slate-500">尚無 Luma 報名紀錄</p>;
@@ -55,6 +83,7 @@ export default function LumaRegistrationsList({ registrations }: { registrations
                 <div className="mt-1 text-xs text-slate-500">{formatDate(r.startAt)}</div>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-xs">
+                <CapacityBadge approved={r.approvedCount} capacity={r.capacity} />
                 {status ? (
                   <span className={`rounded-full px-2 py-0.5 font-medium ${status.color}`}>
                     {status.text}

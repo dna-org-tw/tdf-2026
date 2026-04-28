@@ -1,6 +1,7 @@
 import { supabaseServer } from '@/lib/supabaseServer';
 import {
   fetchCalendarItems,
+  fetchEventDetail,
   fetchEventGuests,
   updateGuestStatus,
   updateGuestTicketType,
@@ -135,6 +136,7 @@ async function processEvent(
   eventApiId: string,
   cookie: string,
   noShowConsumedExtra: Map<string, number>,
+  logRawDetail: boolean,
 ): Promise<ProcessEventResult> {
   const eventCounters: ReviewCounters = { approved: 0, waitlisted: 0, skipped: 0 };
   const supa = db();
@@ -161,10 +163,63 @@ async function processEvent(
     };
   }
 
-  // Process higher-tier tickets first so they claim capacity ahead of lower ones.
-  mapped.sort(
-    (a, b) => guestSortWeight(b.ticket_type_name) - guestSortWeight(a.ticket_type_name),
-  );
+  // Capacity check: fetch event detail to obtain max attendee cap. Failure
+  // here downgrades to "no capacity enforcement" rather than failing the
+  // event — partial protection is better than blocking a whole sync run.
+  let eventCapacity: number | null = null;
+  try {
+    const detail = await fetchEventDetail(eventApiId, cookie);
+    eventCapacity = detail.capacity;
+    if (logRawDetail) {
+      const rawKeys =
+        detail.raw && typeof detail.raw === 'object' && !Array.isArray(detail.raw)
+          ? Object.keys(detail.raw as Record<string, unknown>).join(',')
+          : 'non-object';
+      const eventKeys =
+        detail.raw &&
+        typeof detail.raw === 'object' &&
+        'event' in (detail.raw as Record<string, unknown>) &&
+        typeof (detail.raw as { event?: unknown }).event === 'object' &&
+        (detail.raw as { event?: unknown }).event !== null
+          ? Object.keys((detail.raw as { event: Record<string, unknown> }).event).join(',')
+          : 'no-event-object';
+      console.info(
+        `[luma-sync] event-detail probe ${eventApiId}: capacity=${eventCapacity ?? 'null'} via=${detail.capacityField ?? 'no-field'} top=[${rawKeys}] event=[${eventKeys}]`,
+      );
+    } else {
+      console.info(
+        `[luma-sync] capacity ${eventApiId} = ${eventCapacity ?? 'null'} (${detail.capacityField ?? 'no-field'})`,
+      );
+    }
+    const { error: capUpdErr } = await supa
+      .from('luma_events')
+      .update({ capacity: eventCapacity, last_capacity_synced_at: new Date().toISOString() })
+      .eq('event_api_id', eventApiId);
+    if (capUpdErr) {
+      // Most likely cause: add_luma_event_capacity.sql migration not applied
+      // yet. Capacity enforcement still works in-memory for this run.
+      console.warn(
+        `[luma-sync] persist capacity failed ${eventApiId}: ${capUpdErr.message} (in-memory enforcement still active)`,
+      );
+    }
+  } catch (err) {
+    if (err instanceof LumaAuthError) throw err;
+    console.warn(
+      `[luma-sync] event-detail fetch failed ${eventApiId} (${(err as Error).message}); proceeding without capacity enforcement`,
+    );
+  }
+
+  // Sort: already-approved first (they hold their slot), then higher-tier
+  // tickets (so high-tier members claim remaining capacity ahead of lower
+  // tiers among the not-yet-approved).
+  mapped.sort((a, b) => {
+    const aApproved = a.activity_status === 'approved' ? 1 : 0;
+    const bApproved = b.activity_status === 'approved' ? 1 : 0;
+    if (aApproved !== bApproved) return bApproved - aApproved;
+    return guestSortWeight(b.ticket_type_name) - guestSortWeight(a.ticket_type_name);
+  });
+
+  let approvedCount = 0;
 
   const reviewLogs: Array<{
     job_id: number;
@@ -180,7 +235,7 @@ async function processEvent(
 
   for (const row of mapped) {
     try {
-      const decision = await makeDecision(
+      let decision = await makeDecision(
         {
           email: row.email,
           event_api_id: eventApiId,
@@ -190,6 +245,18 @@ async function processEvent(
         eventTicketTypes,
         noShowConsumedExtra,
       );
+
+      // Capacity gate: cap NEW approvals at eventCapacity. Existing approvals
+      // keep their slot (they were already in) but still count toward the cap;
+      // we never demote already-approved guests purely because the cap is full.
+      if (decision.status === 'approved') {
+        const wasApproved = row.activity_status === 'approved';
+        if (eventCapacity !== null && approvedCount >= eventCapacity && !wasApproved) {
+          decision = { status: 'waitlist', reason: 'waitlist:capacity_full' };
+        } else {
+          approvedCount += 1;
+        }
+      }
 
       const statusChanged = decision.status !== row.activity_status;
       const ticketUpgraded = !!decision.targetTicketTypeApiId;
@@ -441,6 +508,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
 
   const counters: ReviewCounters = { approved: 0, waitlisted: 0, skipped: 0 };
   const noShowConsumedExtra = new Map<string, number>();
+  let rawDetailLogged = false;
 
   for (const item of items) {
     const eventApiId = item.event.api_id;
@@ -470,7 +538,17 @@ export async function runSyncJob(jobId: number): Promise<void> {
       .eq('event_api_id', eventApiId);
 
     try {
-      const result = await processEvent(jobId, eventApiId, cookie, noShowConsumedExtra);
+      // First event of the run that actually probes the detail endpoint logs
+      // the raw payload shape so we can verify which Luma field carries
+      // capacity. processEvent flips the flag on success.
+      const result = await processEvent(
+        jobId,
+        eventApiId,
+        cookie,
+        noShowConsumedExtra,
+        !rawDetailLogged,
+      );
+      if (!result.skipped) rawDetailLogged = true;
       totalGuestsUpserted += result.guestsUpserted;
       totalGuestsRemoved += result.guestsRemoved;
       counters.approved += result.reviewApproved;

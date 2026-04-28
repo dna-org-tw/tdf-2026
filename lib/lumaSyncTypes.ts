@@ -66,4 +66,8 @@ export interface Registration {
   currency: string | null;
   stale: boolean;
   reviewReason: string | null;
+  /** Event-level attendee cap from Luma (null = unlimited / not yet synced). */
+  capacity: number | null;
+  /** Locally-mirrored count of approved guests for this event. */
+  approvedCount: number;
 }

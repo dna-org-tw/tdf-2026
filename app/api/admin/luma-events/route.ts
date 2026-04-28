@@ -11,6 +11,7 @@ interface EventRow {
   start_at: string | null;
   end_at: string | null;
   url: string | null;
+  capacity: number | null;
 }
 
 interface GuestRow {
@@ -60,7 +61,7 @@ async function listResponse() {
 
   const { data: events, error: evErr } = await supa
     .from('luma_events')
-    .select('event_api_id, name, start_at, end_at, url')
+    .select('event_api_id, name, start_at, end_at, url, capacity')
     .order('start_at', { ascending: true });
   if (evErr) return NextResponse.json({ error: evErr.message }, { status: 500 });
 
@@ -111,7 +112,7 @@ async function detailResponse(eventApiId: string) {
   const [{ data: event, error: evErr }, { data: guests, error: gErr }] = await Promise.all([
     supa
       .from('luma_events')
-      .select('event_api_id, name, start_at, end_at, url')
+      .select('event_api_id, name, start_at, end_at, url, capacity')
       .eq('event_api_id', eventApiId)
       .maybeSingle(),
     supa

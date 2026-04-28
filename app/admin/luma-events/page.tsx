@@ -19,6 +19,7 @@ interface EventListRow {
   start_at: string | null;
   end_at: string | null;
   url: string | null;
+  capacity: number | null;
   counts: StatusCounts;
 }
 
@@ -39,7 +40,7 @@ interface GuestRow {
 }
 
 interface DetailResponse {
-  event: { event_api_id: string; name: string; start_at: string | null; end_at: string | null; url: string | null };
+  event: { event_api_id: string; name: string; start_at: string | null; end_at: string | null; url: string | null; capacity: number | null };
   pivot: PivotRow[];
   guests: GuestRow[];
 }
@@ -194,6 +195,7 @@ export default function LumaEventsPage() {
               <tr>
                 <th className="px-3 py-2">日期</th>
                 <th className="px-3 py-2">活動名稱</th>
+                <th className="px-3 py-2 text-right">核准 / 上限</th>
                 <th className="px-3 py-2 text-right">總人數</th>
                 <th className="px-3 py-2">狀態分布</th>
                 <th className="px-3 py-2 text-right">已 check-in</th>
@@ -218,7 +220,7 @@ export default function LumaEventsPage() {
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-3 py-6 text-center text-sm text-slate-500">
+                  <td colSpan={6} className="px-3 py-6 text-center text-sm text-slate-500">
                     沒有符合條件的活動。
                   </td>
                 </tr>
@@ -271,6 +273,9 @@ function FragmentRow({
             </a>
           )}
         </td>
+        <td className="px-3 py-2 text-right tabular-nums">
+          <CapacityCell approved={e.counts.approved} capacity={e.capacity} />
+        </td>
         <td className="px-3 py-2 text-right tabular-nums">{e.counts.total}</td>
         <td className="px-3 py-2">
           <StatusBar counts={e.counts} />
@@ -279,7 +284,7 @@ function FragmentRow({
       </tr>
       {isOpen && (
         <tr>
-          <td colSpan={5} className="bg-slate-50 px-3 py-3">
+          <td colSpan={6} className="bg-slate-50 px-3 py-3">
             {detailLoading && <div className="text-xs text-slate-500">載入詳細…</div>}
             {detail && (
               <div className="space-y-4">
@@ -297,6 +302,19 @@ function FragmentRow({
         </tr>
       )}
     </>
+  );
+}
+
+function CapacityCell({ approved, capacity }: { approved: number; capacity: number | null }) {
+  if (capacity === null) {
+    return <span className="text-slate-400">{approved} / ∞</span>;
+  }
+  const ratio = capacity > 0 ? approved / capacity : 0;
+  const cls = ratio >= 1 ? 'text-red-700 font-semibold' : ratio >= 0.85 ? 'text-amber-700' : 'text-slate-700';
+  return (
+    <span className={cls}>
+      {approved} / {capacity}
+    </span>
   );
 }
 

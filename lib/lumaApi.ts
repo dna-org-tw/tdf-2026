@@ -103,6 +103,78 @@ export async function probeCookie(cookie: string): Promise<{ entryCount: number 
   return { entryCount: data.entries?.length ?? 0 };
 }
 
+export interface LumaEventDetail {
+  capacity: number | null;
+  capacityField: string | null;
+  raw: unknown;
+}
+
+// Verified via scripts/probe-luma-event-capacity.ts on 2026-04-28: the
+// authoritative field is `event.max_capacity` (NOT `capacity_max`). Other
+// names kept as fallbacks in case Luma renames in the future.
+const CAPACITY_FIELD_CANDIDATES = [
+  ['event', 'max_capacity'],
+  ['event', 'capacity_max'],
+  ['event', 'capacity'],
+  ['event', 'guest_capacity'],
+  ['event', 'event_capacity'],
+  ['event_capacity'],
+  ['max_capacity'],
+  ['capacity_max'],
+  ['capacity'],
+] as const;
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function extractCapacity(payload: unknown): { capacity: number | null; field: string | null } {
+  if (!isPlainRecord(payload)) return { capacity: null, field: null };
+  for (const path of CAPACITY_FIELD_CANDIDATES) {
+    let cursor: unknown = payload;
+    let ok = true;
+    for (const key of path) {
+      if (!isPlainRecord(cursor) || !(key in cursor)) {
+        ok = false;
+        break;
+      }
+      cursor = cursor[key];
+    }
+    if (!ok) continue;
+    if (cursor === null || cursor === undefined) {
+      return { capacity: null, field: path.join('.') };
+    }
+    if (typeof cursor === 'number' && Number.isFinite(cursor) && cursor >= 0) {
+      return { capacity: Math.floor(cursor), field: path.join('.') };
+    }
+    if (typeof cursor === 'string' && /^\d+$/.test(cursor.trim())) {
+      return { capacity: parseInt(cursor.trim(), 10), field: path.join('.') };
+    }
+  }
+  return { capacity: null, field: null };
+}
+
+/**
+ * Fetch full event detail from Luma admin endpoint to obtain capacity. Luma's
+ * calendar list endpoint omits capacity, so this is a per-event extra round
+ * trip. Capacity field naming has shifted historically — we try a list of
+ * known candidate paths and return the first one that yields a number.
+ * Returns capacity = null when the event has no cap (unlimited) or when no
+ * known field is present (callers should treat this as "unlimited").
+ */
+export async function fetchEventDetail(
+  eventApiId: string,
+  cookie: string,
+): Promise<LumaEventDetail> {
+  const params = new URLSearchParams({ event_api_id: eventApiId });
+  const data = (await lumaFetch(
+    `https://api2.luma.com/event/admin/get?${params}`,
+    cookie,
+  )) as unknown;
+  const { capacity, field } = extractCapacity(data);
+  return { capacity, capacityField: field, raw: data };
+}
+
 export async function fetchEventGuests(eventApiId: string, cookie: string): Promise<LumaGuest[]> {
   const guests: LumaGuest[] = [];
   let cursor: string | null = null;

@@ -134,12 +134,37 @@ export interface LumaGuestRow {
     start_at: string | null;
     end_at: string | null;
     url: string | null;
+    capacity: number | null;
   } | null;
+}
+
+/**
+ * Fetch local approved-guest counts for the given event ids in one query.
+ * Used by registration views so we can display "approved / capacity" context
+ * for each event the member is signed up for.
+ */
+export async function fetchApprovedCounts(
+  eventApiIds: string[],
+): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  if (eventApiIds.length === 0 || !supabaseServer) return counts;
+  const unique = Array.from(new Set(eventApiIds));
+  const { data, error } = await supabaseServer
+    .from('luma_guests')
+    .select('event_api_id')
+    .in('event_api_id', unique)
+    .eq('activity_status', 'approved');
+  if (error) return counts;
+  for (const row of (data ?? []) as Array<{ event_api_id: string }>) {
+    counts.set(row.event_api_id, (counts.get(row.event_api_id) ?? 0) + 1);
+  }
+  return counts;
 }
 
 export async function shapeRegistrations(
   rows: LumaGuestRow[],
   reviewReasons?: Map<string, string>,
+  approvedCounts?: Map<string, number>,
 ): Promise<Registration[]> {
   let staleCutoff: number | null = null;
   if (supabaseServer) {
@@ -168,5 +193,7 @@ export async function shapeRegistrations(
     currency: r.currency,
     stale: staleCutoff !== null && new Date(r.last_synced_at).getTime() < staleCutoff,
     reviewReason: reviewReasons?.get(r.event_api_id) ?? null,
+    capacity: r.luma_events?.capacity ?? null,
+    approvedCount: approvedCounts?.get(r.event_api_id) ?? 0,
   }));
 }
