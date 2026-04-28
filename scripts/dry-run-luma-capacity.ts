@@ -173,8 +173,8 @@ async function main() {
 
     for (const row of mapped) {
       // Mirror worker behaviour: external declines (admin manual / user
-      // self-cancel) are never re-evaluated.
-      if (row.activity_status === 'declined') continue;
+      // self-cancel) and pending Luma invites are never re-evaluated.
+      if (row.activity_status === 'declined' || row.activity_status === 'invited') continue;
       let decision;
       try {
         decision = await makeDecision(

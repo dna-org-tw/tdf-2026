@@ -234,13 +234,15 @@ async function processEvent(
   }> = [];
 
   for (const row of mapped) {
-    // Preserve external declines. makeDecision never produces 'declined' as
-    // an outcome, so any current 'declined' status came from outside our
-    // system — either an admin manual decline or the member self-cancelling
-    // their RSVP on Luma. Re-evaluating would force them back to 'approved'
-    // (or 'waitlist') against their will. Skip without writing to Luma or
-    // the review log; they also do not count toward capacity.
-    if (row.activity_status === 'declined') {
+    // Preserve externally-set statuses our auto-review must not override:
+    // - 'declined': admin manual decline OR member self-cancelling on Luma.
+    //   makeDecision only produces 'approved' / 'waitlist', so any current
+    //   'declined' came from outside our system.
+    // - 'invited': Luma admin invite still awaiting the member's response;
+    //   not yet a real sign-up, so eligibility doesn't apply.
+    // Skip without writing to Luma or the review log; they do not count
+    // toward capacity.
+    if (row.activity_status === 'declined' || row.activity_status === 'invited') {
       continue;
     }
 
