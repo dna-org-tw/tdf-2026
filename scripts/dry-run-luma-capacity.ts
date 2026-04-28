@@ -172,6 +172,9 @@ async function main() {
     const changes: string[] = [];
 
     for (const row of mapped) {
+      // Mirror worker behaviour: external declines (admin manual / user
+      // self-cancel) are never re-evaluated.
+      if (row.activity_status === 'declined') continue;
       let decision;
       try {
         decision = await makeDecision(

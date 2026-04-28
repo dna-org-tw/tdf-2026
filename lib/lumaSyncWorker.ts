@@ -234,6 +234,16 @@ async function processEvent(
   }> = [];
 
   for (const row of mapped) {
+    // Preserve external declines. makeDecision never produces 'declined' as
+    // an outcome, so any current 'declined' status came from outside our
+    // system — either an admin manual decline or the member self-cancelling
+    // their RSVP on Luma. Re-evaluating would force them back to 'approved'
+    // (or 'waitlist') against their will. Skip without writing to Luma or
+    // the review log; they also do not count toward capacity.
+    if (row.activity_status === 'declined') {
+      continue;
+    }
+
     try {
       let decision = await makeDecision(
         {
