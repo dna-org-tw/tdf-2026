@@ -65,17 +65,30 @@ async function listResponse() {
     .order('start_at', { ascending: true });
   if (evErr) return NextResponse.json({ error: evErr.message }, { status: 500 });
 
-  const { data: guests, error: gErr } = await supa
-    .from('luma_guests')
-    .select('event_api_id, activity_status, paid, checked_in_at');
-  if (gErr) return NextResponse.json({ error: gErr.message }, { status: 500 });
+  // PostgREST caps unfiltered selects at 1000 rows, which would silently
+  // under-count once the festival passes ~1k registrations. Paginate so the
+  // list-page numbers match the per-event detail (which is filtered by
+  // event_api_id and never near the cap).
+  const guests: Pick<GuestRow, 'event_api_id' | 'activity_status' | 'paid' | 'checked_in_at'>[] = [];
+  const PAGE_SIZE = 1000;
+  for (let offset = 0; ; offset += PAGE_SIZE) {
+    const { data, error } = await supa
+      .from('luma_guests')
+      .select('event_api_id, activity_status, paid, checked_in_at')
+      .order('id', { ascending: true })
+      .range(offset, offset + PAGE_SIZE - 1);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!data || data.length === 0) break;
+    guests.push(...(data as typeof guests));
+    if (data.length < PAGE_SIZE) break;
+  }
 
   const counts = new Map<
     string,
     { approved: number; waitlist: number; invited: number; declined: number; other: number; total: number; paid: number; checkedIn: number }
   >();
 
-  for (const g of (guests ?? []) as Pick<GuestRow, 'event_api_id' | 'activity_status' | 'paid' | 'checked_in_at'>[]) {
+  for (const g of guests) {
     let row = counts.get(g.event_api_id);
     if (!row) {
       row = { approved: 0, waitlist: 0, invited: 0, declined: 0, other: 0, total: 0, paid: 0, checkedIn: 0 };
