@@ -195,17 +195,22 @@ export async function makeDecision(
   const bestTdfTicket = pickBestTdfTicket(eventTickets, mWeight);
 
   // 2. Eligibility gate based on the guest's *current* ticket selection.
-  //    - Non-TDF tickets (weight 0) are never eligible — no member can stay on
-  //      them. If the event has a TDF alternative the member qualifies for, we
-  //      will redirect them to it (step 5); otherwise waitlist.
-  //    - TDF tickets use the normal tier check (member weight ≥ ticket weight).
+  //    - Non-TDF tickets (weight 0) → redirect to the best TDF ticket the
+  //      member qualifies for, or waitlist if none exist on this event.
+  //    - TDF tickets above the member's tier → downgrade to the best TDF
+  //      ticket the member qualifies for, or waitlist if none exist.
+  //    - TDF tickets at-or-below the member's tier → fall through to step 5
+  //      (which may upgrade to a higher tier if the member is entitled).
   if (currentTicketWeight === 0) {
     if (!bestTdfTicket) {
       return { status: 'waitlist', reason: 'waitlist:non_tdf_ticket' };
     }
     // fall through — bestTdfTicket will be the forced upgrade target.
   } else if (mWeight < currentTicketWeight) {
-    return { status: 'waitlist', reason: 'waitlist:tier_mismatch' };
+    if (!bestTdfTicket) {
+      return { status: 'waitlist', reason: 'waitlist:tier_mismatch' };
+    }
+    // fall through — bestTdfTicket will be the forced downgrade target.
   }
 
   // 3. Weekly backer validity — no paid order covering event date → waitlist
@@ -235,14 +240,19 @@ export async function makeDecision(
     };
   }
 
-  // 5. Approve — if the best available TDF ticket for this member is different
-  // from what they currently hold, reassign them. This both redirects non-TDF
-  // selections to a TDF ticket and upgrades low-tier TDF selections to the
-  // member's entitled tier.
+  // 5. Approve — if the best available TDF ticket for this member differs from
+  // what they currently hold, reassign them. Covers (a) non-TDF redirect to a
+  // TDF ticket, (b) upgrade to a higher-tier TDF ticket the member is entitled
+  // to, and (c) downgrade from a too-high TDF tier to the member's entitled
+  // tier (so subscriber-on-Explorer falls back to Follower instead of waitlist).
   if (bestTdfTicket && bestTdfTicket.api_id !== guest.current_ticket_type_api_id) {
+    const reason =
+      currentTicketWeight > 0 && bestTdfTicket.weight < currentTicketWeight
+        ? 'approved:downgraded'
+        : 'approved:upgraded';
     return {
       status: 'approved',
-      reason: 'approved:upgraded',
+      reason,
       targetTicketTypeApiId: bestTdfTicket.api_id,
       targetTicketTypeName: bestTdfTicket.name,
     };
