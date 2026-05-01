@@ -248,6 +248,21 @@ async function processEvent(
   }> = [];
 
   for (const row of mapped) {
+    // Check-in gate: never re-evaluate a guest who has already checked in.
+    // Their attendance is recorded; flipping them (no-show penalty, tier
+    // mismatch, weekly_backer expiry, membership lapse, etc.) would push a
+    // nonsensical status back to Luma for someone physically in the event.
+    // We still count an approved + checked-in guest toward capacity so new
+    // approvals respect the cap. The upsert below still mirrors fresh fields
+    // from Luma — only the makeDecision / Luma write / log path is skipped.
+    if (row.checked_in_at) {
+      if (row.activity_status === 'approved') {
+        approvedCount += 1;
+        eventCounters.approved += 1;
+      }
+      continue;
+    }
+
     // Allowlist gate: never re-evaluate guests outside reviewable states.
     // Covers 'declined' (admin manual / member self-cancel), 'invited' (Luma
     // admin invite pending response), and any unknown future state Luma may
