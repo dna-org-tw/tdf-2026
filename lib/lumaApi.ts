@@ -69,14 +69,17 @@ async function lumaFetch(url: string, cookie: string, init?: RequestInit): Promi
   return res.json();
 }
 
-export async function fetchCalendarItems(cookie: string): Promise<LumaCalendarItem[]> {
+async function fetchCalendarPeriod(
+  period: 'upcoming' | 'past',
+  cookie: string,
+): Promise<LumaCalendarItem[]> {
   const items: LumaCalendarItem[] = [];
   let cursor: string | null = null;
   for (let page = 0; page < 20; page++) {
     const params = new URLSearchParams({
       calendar_api_id: CALENDAR_API_ID,
       pagination_limit: '100',
-      period: 'all',
+      period,
     });
     if (cursor) params.set('pagination_cursor', cursor);
     const data = (await lumaFetch(
@@ -88,6 +91,24 @@ export async function fetchCalendarItems(cookie: string): Promise<LumaCalendarIt
     cursor = data.next_cursor;
   }
   return items;
+}
+
+// Luma's `period: 'all'` actually behaves like `upcoming` — it omits any event
+// whose start time has passed. During the festival this means as soon as an
+// event starts/ends it falls off the feed, and cleanupOrphanEventGuests then
+// treats every guest of that event as orphaned and deletes them. Fetch both
+// periods explicitly and dedupe so past-but-still-existing events stay in the
+// valid set.
+export async function fetchCalendarItems(cookie: string): Promise<LumaCalendarItem[]> {
+  const [upcoming, past] = await Promise.all([
+    fetchCalendarPeriod('upcoming', cookie),
+    fetchCalendarPeriod('past', cookie),
+  ]);
+  const byId = new Map<string, LumaCalendarItem>();
+  for (const it of [...upcoming, ...past]) {
+    byId.set(it.event.api_id, it);
+  }
+  return [...byId.values()];
 }
 
 export async function probeCookie(cookie: string): Promise<{ entryCount: number }> {
