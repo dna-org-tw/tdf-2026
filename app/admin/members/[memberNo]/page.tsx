@@ -107,6 +107,34 @@ interface TrackingEvent {
   created_at: string;
 }
 
+interface NoShowSummaryItem {
+  event_api_id: string;
+  event_name: string;
+  event_url: string | null;
+  end_at: string | null;
+  consumed: boolean;
+  penalty_event_api_id: string | null;
+  penalty_event_name: string | null;
+  penalty_at: string | null;
+}
+
+interface NoShowSummaryPenalty {
+  event_api_id: string;
+  event_name: string;
+  event_url: string | null;
+  consumed_no_show_event_api_id: string | null;
+  consumed_no_show_event_name: string | null;
+  created_at: string;
+}
+
+interface NoShowSummary {
+  total: number;
+  consumed: number;
+  pending: number;
+  items: NoShowSummaryItem[];
+  penalties: NoShowSummaryPenalty[];
+}
+
 interface OrderTransferRow {
   id: string;
   order_id: string;
@@ -223,13 +251,24 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
   const [toast, setToast] = useState<string | null>(null);
   const [sendOpen, setSendOpen] = useState(false);
   const [lumaRegs, setLumaRegs] = useState<Registration[] | null>(null);
+  const [noShowSummary, setNoShowSummary] = useState<NoShowSummary | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     fetch(`/api/admin/members/${encodeURIComponent(memberNo)}/luma-registrations`)
-      .then((r) => r.ok ? r.json() : { registrations: [] })
-      .then((d) => { if (!cancelled) setLumaRegs(d.registrations ?? []); })
-      .catch(() => { if (!cancelled) setLumaRegs([]); });
+      .then((r) => r.ok ? r.json() : { registrations: [], noShowSummary: null })
+      .then((d) => {
+        if (!cancelled) {
+          setLumaRegs(d.registrations ?? []);
+          setNoShowSummary(d.noShowSummary ?? null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLumaRegs([]);
+          setNoShowSummary(null);
+        }
+      });
     return () => { cancelled = true; };
   }, [memberNo]);
 
@@ -608,6 +647,123 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
               </tbody>
             </table>
           </div>
+        )}
+      </Section>
+
+      <Section title="Luma 出席與懲罰">
+        {noShowSummary === null ? (
+          <p className="text-sm text-slate-500">載入中…</p>
+        ) : noShowSummary.total === 0 && noShowSummary.penalties.length === 0 ? (
+          <p className="text-sm text-slate-400">無未到場紀錄</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-slate-50 rounded-lg p-3">
+                <div className="text-xs text-slate-500 mb-1">No-show 次數</div>
+                <div className="text-slate-900 font-semibold text-lg tabular-nums">{noShowSummary.total}</div>
+              </div>
+              <div className="bg-slate-50 rounded-lg p-3">
+                <div className="text-xs text-slate-500 mb-1">已執行懲罰</div>
+                <div className="text-slate-900 font-semibold text-lg tabular-nums">{noShowSummary.consumed}</div>
+              </div>
+              <div className={`rounded-lg p-3 ${noShowSummary.pending > 0 ? 'bg-amber-50' : 'bg-slate-50'}`}>
+                <div className={`text-xs mb-1 ${noShowSummary.pending > 0 ? 'text-amber-700' : 'text-slate-500'}`}>待執行懲罰</div>
+                <div className={`font-semibold text-lg tabular-nums ${noShowSummary.pending > 0 ? 'text-amber-900' : 'text-slate-900'}`}>
+                  {noShowSummary.pending}
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  No-Show 活動 ({noShowSummary.items.length})
+                </h3>
+                {noShowSummary.items.length === 0 ? (
+                  <p className="text-sm text-slate-400">無</p>
+                ) : (
+                  <ul className="space-y-1.5">
+                    {noShowSummary.items.map((n) => (
+                      <li key={n.event_api_id} className="text-sm border-l-2 pl-3 py-1 border-slate-300 rounded-r">
+                        <div className="flex items-start justify-between gap-2 flex-wrap">
+                          <div className="flex-1 min-w-0">
+                            {n.event_url ? (
+                              <a
+                                href={n.event_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="font-medium text-slate-800 hover:text-[#10B8D9] break-words"
+                              >
+                                {n.event_name}
+                              </a>
+                            ) : (
+                              <span className="font-medium text-slate-800">{n.event_name}</span>
+                            )}
+                            <div className="text-xs text-slate-500 mt-0.5">
+                              結束於 {formatDateTime(n.end_at)}
+                            </div>
+                          </div>
+                          {n.consumed ? (
+                            <span
+                              className="px-2 py-0.5 rounded-full text-xs bg-slate-200 text-slate-700 shrink-0"
+                              title={n.penalty_event_name ? `已在 "${n.penalty_event_name}" 消化（${formatDateTime(n.penalty_at)}）` : '已消化'}
+                            >
+                              已消化
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800 shrink-0">
+                              待消化
+                            </span>
+                          )}
+                        </div>
+                        {n.consumed && n.penalty_event_name && (
+                          <div className="text-xs text-slate-500 mt-1">
+                            → 罰於：<span className="text-slate-700"> {n.penalty_event_name}</span>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div>
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  懲罰紀錄 ({noShowSummary.penalties.length})
+                </h3>
+                {noShowSummary.penalties.length === 0 ? (
+                  <p className="text-sm text-slate-400">無</p>
+                ) : (
+                  <ul className="space-y-1.5">
+                    {noShowSummary.penalties.map((p) => (
+                      <li key={p.event_api_id + p.created_at} className="text-sm border-l-2 pl-3 py-1 border-amber-300 rounded-r">
+                        <div className="flex-1 min-w-0">
+                          {p.event_url ? (
+                            <a
+                              href={p.event_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="font-medium text-slate-800 hover:text-[#10B8D9] break-words"
+                            >
+                              {p.event_name}
+                            </a>
+                          ) : (
+                            <span className="font-medium text-slate-800">{p.event_name}</span>
+                          )}
+                          <div className="text-xs text-slate-500 mt-0.5">
+                            改為候補：{formatDateTime(p.created_at)}
+                          </div>
+                        </div>
+                        {p.consumed_no_show_event_name && (
+                          <div className="text-xs text-slate-500 mt-1">
+                            消化來源：<span className="text-slate-700"> {p.consumed_no_show_event_name}</span>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </>
         )}
       </Section>
 
