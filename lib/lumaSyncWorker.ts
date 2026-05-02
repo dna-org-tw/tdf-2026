@@ -18,8 +18,16 @@ import {
   type EventTicketType,
 } from '@/lib/lumaAutoReview';
 
-const SLEEP_MS_BETWEEN_EVENTS = 500;
-const SLEEP_MS_BETWEEN_LUMA_WRITES = 300;
+// Throttles tuned so one sync lands in ~15–18 min (vs ~10 min at the original
+// 500/300 settings, but well under the 20-min freshness budget). With the
+// pg_cron schedule firing every 30 min, that leaves >10 min idle between
+// runs and stretches Luma API call rate enough to avoid the rate limit we
+// were tripping on the tighter loop. Per-event sleep is the dominant lever
+// because each event triggers a detail fetch plus a paginated guests fetch
+// plus optional writes; pausing between events flattens burstiness more
+// than tightening per-call sleeps.
+const SLEEP_MS_BETWEEN_EVENTS = 10000;
+const SLEEP_MS_BETWEEN_LUMA_WRITES = 500;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
