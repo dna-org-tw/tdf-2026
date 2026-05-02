@@ -115,6 +115,7 @@ interface NoShowSummaryItem {
   consumed: boolean;
   penalty_event_api_id: string | null;
   penalty_event_name: string | null;
+  penalty_event_url: string | null;
   penalty_at: string | null;
 }
 
@@ -124,6 +125,7 @@ interface NoShowSummaryPenalty {
   event_url: string | null;
   consumed_no_show_event_api_id: string | null;
   consumed_no_show_event_name: string | null;
+  consumed_no_show_event_url: string | null;
   created_at: string;
 }
 
@@ -691,9 +693,10 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
                                 href={n.event_url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="font-medium text-slate-800 hover:text-[#10B8D9] break-words"
+                                className="font-medium text-slate-800 hover:text-[#10B8D9] break-words inline-flex items-baseline gap-1"
                               >
-                                {n.event_name}
+                                <span>{n.event_name}</span>
+                                <span className="text-slate-400 text-xs">↗</span>
                               </a>
                             ) : (
                               <span className="font-medium text-slate-800">{n.event_name}</span>
@@ -717,7 +720,20 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
                         </div>
                         {n.consumed && n.penalty_event_name && (
                           <div className="text-xs text-slate-500 mt-1">
-                            → 罰於：<span className="text-slate-700"> {n.penalty_event_name}</span>
+                            → 罰於：{' '}
+                            {n.penalty_event_url ? (
+                              <a
+                                href={n.penalty_event_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-slate-700 hover:text-[#10B8D9] inline-flex items-baseline gap-0.5"
+                              >
+                                <span>{n.penalty_event_name}</span>
+                                <span className="text-slate-400">↗</span>
+                              </a>
+                            ) : (
+                              <span className="text-slate-700">{n.penalty_event_name}</span>
+                            )}
                           </div>
                         )}
                       </li>
@@ -741,9 +757,10 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
                               href={p.event_url}
                               target="_blank"
                               rel="noreferrer"
-                              className="font-medium text-slate-800 hover:text-[#10B8D9] break-words"
+                              className="font-medium text-slate-800 hover:text-[#10B8D9] break-words inline-flex items-baseline gap-1"
                             >
-                              {p.event_name}
+                              <span>{p.event_name}</span>
+                              <span className="text-slate-400 text-xs">↗</span>
                             </a>
                           ) : (
                             <span className="font-medium text-slate-800">{p.event_name}</span>
@@ -754,7 +771,20 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
                         </div>
                         {p.consumed_no_show_event_name && (
                           <div className="text-xs text-slate-500 mt-1">
-                            消化來源：<span className="text-slate-700"> {p.consumed_no_show_event_name}</span>
+                            消化來源：{' '}
+                            {p.consumed_no_show_event_url ? (
+                              <a
+                                href={p.consumed_no_show_event_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-slate-700 hover:text-[#10B8D9] inline-flex items-baseline gap-0.5"
+                              >
+                                <span>{p.consumed_no_show_event_name}</span>
+                                <span className="text-slate-400">↗</span>
+                              </a>
+                            ) : (
+                              <span className="text-slate-700">{p.consumed_no_show_event_name}</span>
+                            )}
                           </div>
                         )}
                       </li>

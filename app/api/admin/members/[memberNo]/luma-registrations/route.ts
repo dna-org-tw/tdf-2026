@@ -18,6 +18,7 @@ interface NoShowItem {
   consumed: boolean;
   penalty_event_api_id: string | null;
   penalty_event_name: string | null;
+  penalty_event_url: string | null;
   penalty_at: string | null;
 }
 
@@ -27,6 +28,7 @@ interface PenaltyItem {
   event_url: string | null;
   consumed_no_show_event_api_id: string | null;
   consumed_no_show_event_name: string | null;
+  consumed_no_show_event_url: string | null;
   created_at: string;
 }
 
@@ -94,6 +96,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ memb
       consumed: false,
       penalty_event_api_id: null,
       penalty_event_name: null,
+      penalty_event_url: null,
       penalty_at: null,
     }))
     .sort((a, b) => (a.end_at ?? '').localeCompare(b.end_at ?? ''));
@@ -146,6 +149,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ memb
       event_url: toLumaEventUrl(meta?.url ?? null),
       consumed_no_show_event_api_id: p.consumed_no_show_event_api_id,
       consumed_no_show_event_name: consumedMeta?.name ?? null,
+      consumed_no_show_event_url: toLumaEventUrl(consumedMeta?.url ?? null),
       created_at: p.created_at,
     };
   });
@@ -164,6 +168,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ memb
       target.consumed = true;
       target.penalty_event_api_id = p.event_api_id;
       target.penalty_event_name = knownEvents.get(p.event_api_id)?.name ?? p.event_api_id;
+      target.penalty_event_url = toLumaEventUrl(knownEvents.get(p.event_api_id)?.url ?? null);
       target.penalty_at = p.created_at;
     } else {
       unpaired.push(p);
@@ -175,6 +180,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ memb
       target.consumed = true;
       target.penalty_event_api_id = p.event_api_id;
       target.penalty_event_name = knownEvents.get(p.event_api_id)?.name ?? p.event_api_id;
+      target.penalty_event_url = toLumaEventUrl(knownEvents.get(p.event_api_id)?.url ?? null);
       target.penalty_at = p.created_at;
     }
   }

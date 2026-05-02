@@ -42,6 +42,7 @@ interface NoShowEntry {
   consumed: boolean;
   penalty_event_api_id: string | null;
   penalty_event_name: string | null;
+  penalty_event_url: string | null;
   penalty_at: string | null;
 }
 
@@ -51,6 +52,7 @@ interface PenaltyEntry {
   event_url: string | null;
   consumed_no_show_event_api_id: string | null;
   consumed_no_show_event_name: string | null;
+  consumed_no_show_event_url: string | null;
   created_at: string;
 }
 
@@ -206,6 +208,7 @@ export async function GET(req: NextRequest) {
       consumed: false,
       penalty_event_api_id: null,
       penalty_event_name: null,
+      penalty_event_url: null,
       penalty_at: null,
     });
   }
@@ -222,6 +225,7 @@ export async function GET(req: NextRequest) {
       event_url: toLumaEventUrl(penaltyMeta?.url ?? null),
       consumed_no_show_event_api_id: p.consumed_no_show_event_api_id,
       consumed_no_show_event_name: consumedMeta?.name ?? null,
+      consumed_no_show_event_url: toLumaEventUrl(consumedMeta?.url ?? null),
       created_at: p.created_at,
     });
   }
@@ -249,6 +253,7 @@ export async function GET(req: NextRequest) {
         target.consumed = true;
         target.penalty_event_api_id = p.event_api_id;
         target.penalty_event_name = p.event_name;
+        target.penalty_event_url = p.event_url;
         target.penalty_at = p.created_at;
       } else {
         unpairedPenalties.push(p);
@@ -262,6 +267,7 @@ export async function GET(req: NextRequest) {
         target.consumed = true;
         target.penalty_event_api_id = p.event_api_id;
         target.penalty_event_name = p.event_name;
+        target.penalty_event_url = p.event_url;
         target.penalty_at = p.created_at;
       }
     }

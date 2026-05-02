@@ -16,6 +16,7 @@ interface NoShowEntry {
   consumed: boolean;
   penalty_event_api_id: string | null;
   penalty_event_name: string | null;
+  penalty_event_url: string | null;
   penalty_at: string | null;
 }
 
@@ -25,6 +26,7 @@ interface PenaltyEntry {
   event_url: string | null;
   consumed_no_show_event_api_id: string | null;
   consumed_no_show_event_name: string | null;
+  consumed_no_show_event_url: string | null;
   created_at: string;
 }
 
@@ -220,7 +222,7 @@ export default function NoShowsPage() {
                 <th className="text-right px-3 py-2 font-medium text-slate-600">No-show</th>
                 <th className="text-right px-3 py-2 font-medium text-slate-600">已消化</th>
                 <th className="text-right px-3 py-2 font-medium text-slate-600">待消化</th>
-                <th className="text-left px-3 py-2 font-medium text-slate-600">最近未到場</th>
+                <th className="text-left px-3 py-2 font-medium text-slate-600">最近未到場活動</th>
               </tr>
             </thead>
             <tbody>
@@ -320,8 +322,36 @@ function RowGroup({
             <span className="text-slate-400">0</span>
           )}
         </td>
-        <td className="px-3 py-2 text-xs text-slate-500">
-          {fmtDateOnly(row.last_no_show_at)}
+        <td className="px-3 py-2">
+          {(() => {
+            const latest = row.no_shows.length > 0 ? row.no_shows[row.no_shows.length - 1] : null;
+            if (!latest) return <span className="text-slate-400 text-xs">—</span>;
+            return (
+              <div className="flex flex-col min-w-0">
+                {latest.event_url ? (
+                  <a
+                    href={latest.event_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-sm text-slate-800 hover:text-[#10B8D9] truncate inline-flex items-center gap-1"
+                    title={latest.event_name}
+                  >
+                    <span className="truncate">{latest.event_name}</span>
+                    <span className="text-slate-400 shrink-0">↗</span>
+                  </a>
+                ) : (
+                  <span className="text-sm text-slate-800 truncate" title={latest.event_name}>{latest.event_name}</span>
+                )}
+                <span className="text-xs text-slate-500">
+                  {fmtDateOnly(latest.end_at ?? row.last_no_show_at)}
+                  {row.no_shows.length > 1 && (
+                    <span className="text-slate-400"> · 共 {row.no_shows.length} 場</span>
+                  )}
+                </span>
+              </div>
+            );
+          })()}
         </td>
       </tr>
       {isOpen && (
@@ -348,9 +378,10 @@ function RowGroup({
                                 href={n.event_url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="font-medium text-slate-800 hover:text-[#10B8D9] break-words"
+                                className="font-medium text-slate-800 hover:text-[#10B8D9] break-words inline-flex items-baseline gap-1"
                               >
-                                {n.event_name}
+                                <span>{n.event_name}</span>
+                                <span className="text-slate-400 text-xs">↗</span>
                               </a>
                             ) : (
                               <span className="font-medium text-slate-800">{n.event_name}</span>
@@ -378,8 +409,20 @@ function RowGroup({
                         </div>
                         {n.consumed && n.penalty_event_name && (
                           <div className="text-xs text-slate-500 mt-1">
-                            → 罰於：
-                            <span className="text-slate-700"> {n.penalty_event_name}</span>
+                            → 罰於：{' '}
+                            {n.penalty_event_url ? (
+                              <a
+                                href={n.penalty_event_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-slate-700 hover:text-[#10B8D9] inline-flex items-baseline gap-0.5"
+                              >
+                                <span>{n.penalty_event_name}</span>
+                                <span className="text-slate-400">↗</span>
+                              </a>
+                            ) : (
+                              <span className="text-slate-700">{n.penalty_event_name}</span>
+                            )}
                           </div>
                         )}
                       </li>
@@ -407,9 +450,10 @@ function RowGroup({
                                 href={p.event_url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="font-medium text-slate-800 hover:text-[#10B8D9] break-words"
+                                className="font-medium text-slate-800 hover:text-[#10B8D9] break-words inline-flex items-baseline gap-1"
                               >
-                                {p.event_name}
+                                <span>{p.event_name}</span>
+                                <span className="text-slate-400 text-xs">↗</span>
                               </a>
                             ) : (
                               <span className="font-medium text-slate-800">{p.event_name}</span>
@@ -421,8 +465,20 @@ function RowGroup({
                         </div>
                         {p.consumed_no_show_event_name && (
                           <div className="text-xs text-slate-500 mt-1">
-                            消化來源：
-                            <span className="text-slate-700"> {p.consumed_no_show_event_name}</span>
+                            消化來源：{' '}
+                            {p.consumed_no_show_event_url ? (
+                              <a
+                                href={p.consumed_no_show_event_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-slate-700 hover:text-[#10B8D9] inline-flex items-baseline gap-0.5"
+                              >
+                                <span>{p.consumed_no_show_event_name}</span>
+                                <span className="text-slate-400">↗</span>
+                              </a>
+                            ) : (
+                              <span className="text-slate-700">{p.consumed_no_show_event_name}</span>
+                            )}
                           </div>
                         )}
                       </li>
