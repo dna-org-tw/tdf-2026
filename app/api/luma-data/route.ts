@@ -4,8 +4,13 @@ import { getSpeakersFromEntries, type SpeakerGrouped } from '@/lib/lumaSpeakers'
 import eventLocations from '@/data/event-locations.json';
 import { enforceRateLimit } from '@/lib/rateLimitResponse';
 
-const LUMA_API_URL =
-  'https://api2.luma.com/calendar/get-items?calendar_api_id=cal-S2KwfjOEzcZl8E8&pagination_limit=100&period=future';
+const LUMA_CALENDAR_BASE =
+  'https://api2.luma.com/calendar/get-items?calendar_api_id=cal-S2KwfjOEzcZl8E8&pagination_limit=100';
+
+// Luma's `future`/`all` periods drop events the moment they start, so the
+// calendar empties out during the festival itself. Fetch upcoming + past in
+// parallel and dedupe so already-started/finished events stay visible.
+const LUMA_PERIODS: ReadonlyArray<'future' | 'past'> = ['future', 'past'];
 
 const FETCH_OPTIONS = {
   headers: {
@@ -20,6 +25,15 @@ const FETCH_OPTIONS = {
       : { revalidate: 3600 },
 };
 
+async function fetchEntriesForPeriod(period: 'future' | 'past'): Promise<LumaApiEntry[]> {
+  const res = await fetch(`${LUMA_CALENDAR_BASE}&period=${period}`, FETCH_OPTIONS);
+  if (!res.ok) {
+    throw new Error(`Luma calendar (${period}) failed: ${res.statusText}`);
+  }
+  const data = (await res.json()) as { entries?: LumaApiEntry[] };
+  return data.entries ?? [];
+}
+
 /**
  * Single calendar fetch: returns both schedule events and speakers
  * so the frontend can avoid duplicate requests (EventsSection + TeamSection).
@@ -29,13 +43,17 @@ export async function GET(req: NextRequest) {
   if (rl) return rl;
 
   try {
-    const calRes = await fetch(LUMA_API_URL, FETCH_OPTIONS);
-    if (!calRes.ok) {
-      throw new Error(`Luma calendar failed: ${calRes.statusText}`);
+    const periodResults = await Promise.all(LUMA_PERIODS.map(fetchEntriesForPeriod));
+    const byApiId = new Map<string, LumaApiEntry>();
+    for (const list of periodResults) {
+      for (const entry of list) {
+        const apiId = entry?.event?.api_id;
+        if (typeof apiId === 'string' && apiId.length > 0) {
+          byApiId.set(apiId, entry);
+        }
+      }
     }
-
-    const data = (await calRes.json()) as { entries?: LumaApiEntry[] };
-    const entries: LumaApiEntry[] = data.entries || [];
+    const entries: LumaApiEntry[] = [...byApiId.values()];
 
     const events = buildScheduleFromEntries(entries);
 
