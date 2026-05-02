@@ -133,7 +133,14 @@ export default function LumaEventsPage() {
     const now = Date.now();
     const q = search.trim().toLowerCase();
     return events.filter((e) => {
-      if (!showPast && e.start_at && new Date(e.start_at).getTime() < now - 24 * 60 * 60 * 1000) return false;
+      if (!showPast) {
+        const endMs = e.end_at
+          ? new Date(e.end_at).getTime()
+          : e.start_at
+          ? new Date(e.start_at).getTime() + 24 * 60 * 60 * 1000
+          : null;
+        if (endMs !== null && endMs < now) return false;
+      }
       if (q && !e.name.toLowerCase().includes(q)) return false;
       return true;
     });
