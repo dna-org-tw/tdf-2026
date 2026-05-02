@@ -37,16 +37,16 @@ function iso(gmt8: string): string {
 
 console.log('getCutoffAt');
 
-test('morning 01:00 → previous day 00:00', () => {
+test('morning 01:00 → same day 00:00', () => {
   const start = iso('2026-05-10T01:00:00');
   const cutoff = getCutoffAt(start);
-  assert.equal(cutoff.toISOString(), iso('2026-05-09T00:00:00'));
+  assert.equal(cutoff.toISOString(), iso('2026-05-10T00:00:00'));
 });
 
-test('morning 11:59 → previous day 00:00', () => {
+test('morning 11:59 → same day 00:00', () => {
   const start = iso('2026-05-10T11:59:00');
   const cutoff = getCutoffAt(start);
-  assert.equal(cutoff.toISOString(), iso('2026-05-09T00:00:00'));
+  assert.equal(cutoff.toISOString(), iso('2026-05-10T00:00:00'));
 });
 
 test('afternoon 12:00 → same day 06:00', () => {
@@ -73,36 +73,36 @@ test('evening 23:59 → same day 12:00', () => {
   assert.equal(cutoff.toISOString(), iso('2026-05-10T12:00:00'));
 });
 
-test('morning 00:00 boundary → previous day 00:00', () => {
+test('morning 00:00 boundary → same day 00:00 (cutoff equals start)', () => {
   const start = iso('2026-05-10T00:00:00');
   const cutoff = getCutoffAt(start);
-  assert.equal(cutoff.toISOString(), iso('2026-05-09T00:00:00'));
+  assert.equal(cutoff.toISOString(), iso('2026-05-10T00:00:00'));
 });
 
-test('month rollover: morning 01:00 on 1st → previous month last day 00:00', () => {
+test('month rollover: morning 01:00 on 1st → same day 00:00', () => {
   const start = iso('2026-06-01T01:00:00');
   const cutoff = getCutoffAt(start);
-  assert.equal(cutoff.toISOString(), iso('2026-05-31T00:00:00'));
+  assert.equal(cutoff.toISOString(), iso('2026-06-01T00:00:00'));
 });
 
 console.log('isPastCutoff');
 
 test('exactly at cutoff (00:00:00) is past', () => {
-  const start = iso('2026-05-10T01:00:00'); // morning → cutoff = 2026-05-09T00:00 GMT+8
-  const now = new Date(iso('2026-05-09T00:00:00'));
+  const start = iso('2026-05-10T01:00:00'); // morning → cutoff = 2026-05-10T00:00 GMT+8
+  const now = new Date(iso('2026-05-10T00:00:00'));
   assert.equal(isPastCutoff(start, now), true);
 });
 
 test('one second before cutoff is not past', () => {
   const start = iso('2026-05-10T01:00:00');
-  const cutoffMs = new Date(iso('2026-05-09T00:00:00')).getTime();
+  const cutoffMs = new Date(iso('2026-05-10T00:00:00')).getTime();
   const now = new Date(cutoffMs - 1000);
   assert.equal(isPastCutoff(start, now), false);
 });
 
 test('one second after cutoff is past', () => {
   const start = iso('2026-05-10T01:00:00');
-  const cutoffMs = new Date(iso('2026-05-09T00:00:00')).getTime();
+  const cutoffMs = new Date(iso('2026-05-10T00:00:00')).getTime();
   const now = new Date(cutoffMs + 1000);
   assert.equal(isPastCutoff(start, now), true);
 });

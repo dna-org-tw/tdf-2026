@@ -4,7 +4,7 @@ import type { ReviewDecision } from '@/lib/lumaAutoReview';
 // promoting guests to approved. Existing approveds keep their seat; everything
 // else collapses to declined:cutoff_*. Three fixed wall-clock cutoffs map to
 // three time-of-day buckets of the event's start_at:
-//   morning   [00:00, 12:00) → previous day 00:00
+//   morning   [00:00, 12:00) → same day 00:00
 //   afternoon [12:00, 18:00) → same day 06:00
 //   evening   [18:00, 24:00) → same day 12:00
 // Taiwan does not observe DST, so a fixed +8h offset is exact.
@@ -23,7 +23,7 @@ export function getCutoffAt(eventStartAt: string): Date {
 
   let cutoffWallMs: number;
   if (hour < 12) {
-    cutoffWallMs = Date.UTC(y, m, d - 1, 0, 0, 0);
+    cutoffWallMs = Date.UTC(y, m, d, 0, 0, 0);
   } else if (hour < 18) {
     cutoffWallMs = Date.UTC(y, m, d, 6, 0, 0);
   } else {
