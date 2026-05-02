@@ -141,17 +141,30 @@ interface NoShowData {
   consumedCount: number;
 }
 
-async function getNoShowData(email: string): Promise<NoShowData> {
+async function getNoShowData(
+  email: string,
+  currentEventApiId: string,
+): Promise<NoShowData> {
   if (!supabaseServer) throw new Error('supabase not initialised');
 
-  // Past events where guest was approved but never checked in
+  // "Missed" = approved + no check-in for an event whose end_at was at least
+  // 4 hours ago. Two guards prevent self-referential penalties:
+  //   • end_at + 4h grace: an event still in progress (or just finished) is
+  //     not counted; on-site check-ins may still be flowing in.
+  //   • neq currentEventApiId: even after end_at + 4h, the event currently
+  //     being reviewed must never appear as its own no-show source — that
+  //     would close-loop waitlist the very guests we're processing for it.
+  const NO_SHOW_GRACE_MS = 4 * 60 * 60 * 1000;
+  const noShowCutoff = new Date(Date.now() - NO_SHOW_GRACE_MS).toISOString();
+
   const { data: noShows, error: nsErr } = await supabaseServer
     .from('luma_guests')
-    .select('event_api_id, luma_events!inner(start_at)')
+    .select('event_api_id, luma_events!inner(end_at)')
     .eq('email', email.toLowerCase().trim())
     .eq('activity_status', 'approved')
     .is('checked_in_at', null)
-    .lt('luma_events.start_at', new Date().toISOString());
+    .neq('event_api_id', currentEventApiId)
+    .lt('luma_events.end_at', noShowCutoff);
 
   if (nsErr) throw new Error(`no_show_query: ${nsErr.message}`);
 
@@ -225,7 +238,7 @@ export async function makeDecision(
   }
 
   // 4. No-show penalty
-  const noShowData = await getNoShowData(email);
+  const noShowData = await getNoShowData(email, guest.event_api_id);
   const extraConsumed = noShowConsumedExtra.get(email) ?? 0;
   const effectiveConsumed = noShowData.consumedCount + extraConsumed;
   const pendingNoShows = noShowData.noShowEventApiIds.length - effectiveConsumed;
