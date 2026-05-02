@@ -318,6 +318,9 @@ export default function LumaSyncPage() {
             </div>
             <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-600">
               <span className="text-green-700">核准 {current.review_approved}</span>
+              {current.review_declined > 0 && (
+                <span className="text-red-600">拒絕 {current.review_declined}</span>
+              )}
               <span className="text-amber-700">候補 {current.review_waitlisted}</span>
               {current.review_skipped > 0 && <span>跳過 {current.review_skipped}</span>}
             </div>
@@ -331,6 +334,9 @@ export default function LumaSyncPage() {
                 <span className="text-slate-500" title="本次同步該活動的 guest 總數">{r.guests_count}</span>
                 {r.review_approved > 0 && (
                   <span className="text-green-700" title="核准">✓{r.review_approved}</span>
+                )}
+                {r.review_declined > 0 && (
+                  <span className="text-red-600" title="拒絕（含 cutoff）">✗{r.review_declined}</span>
                 )}
                 {r.review_waitlisted > 0 && (
                   <span className="text-amber-700" title="候補">⏳{r.review_waitlisted}</span>
@@ -419,6 +425,9 @@ export default function LumaSyncPage() {
                               <span className="text-slate-500" title="本次同步該活動的 guest 總數">{r.guests_count}</span>
                               {r.review_approved > 0 && (
                                 <span className="text-green-700" title="核准">✓{r.review_approved}</span>
+                              )}
+                              {r.review_declined > 0 && (
+                                <span className="text-red-600" title="拒絕（含 cutoff）">✗{r.review_declined}</span>
                               )}
                               {r.review_waitlisted > 0 && (
                                 <span className="text-amber-700" title="候補">⏳{r.review_waitlisted}</span>

@@ -17,6 +17,7 @@ import {
   ticketWeight,
   type EventTicketType,
 } from '@/lib/lumaAutoReview';
+import { isPastCutoff, applyCutoffOverride } from '@/lib/lumaCutoff';
 
 // Throttles tuned so one sync lands in ~15–18 min (vs ~10 min at the original
 // 500/300 settings, but well under the 20-min freshness budget). With the
@@ -120,6 +121,7 @@ async function failJob(jobId: number, reason: string) {
 
 interface ReviewCounters {
   approved: number;
+  declined: number;
   waitlisted: number;
   skipped: number;
 }
@@ -128,6 +130,7 @@ interface ProcessEventResult {
   guestsUpserted: number;
   guestsRemoved: number;
   reviewApproved: number;
+  reviewDeclined: number;
   reviewWaitlisted: number;
   reviewSkipped: number;
   skipped: boolean;
@@ -146,7 +149,7 @@ async function processEvent(
   noShowConsumedExtra: Map<string, number>,
   logRawDetail: boolean,
 ): Promise<ProcessEventResult> {
-  const eventCounters: ReviewCounters = { approved: 0, waitlisted: 0, skipped: 0 };
+  const eventCounters: ReviewCounters = { approved: 0, declined: 0, waitlisted: 0, skipped: 0 };
   const supa = db();
   const guests = await fetchEventGuests(eventApiId, cookie);
   const mapped = guests
@@ -165,10 +168,28 @@ async function processEvent(
       guestsUpserted: 0,
       guestsRemoved: 0,
       reviewApproved: 0,
+      reviewDeclined: 0,
       reviewWaitlisted: 0,
       reviewSkipped: 0,
       skipped: true,
     };
+  }
+
+  // Approve cutoff: once past it, no new approvals — pending / waitlisted
+  // guests collapse to declined:cutoff_*. Computed once per event from
+  // luma_events.start_at; null start_at falls back to "not past cutoff" so
+  // the cutoff feature degrades open instead of mass-declining when an
+  // event's start time is missing.
+  let pastCutoff = false;
+  {
+    const { data: evRow } = await supa
+      .from('luma_events')
+      .select('start_at')
+      .eq('event_api_id', eventApiId)
+      .maybeSingle();
+    if (evRow?.start_at) {
+      pastCutoff = isPastCutoff(evRow.start_at, new Date());
+    }
   }
 
   // Capacity check: fetch event detail to obtain max attendee cap. Failure
@@ -310,6 +331,20 @@ async function processEvent(
         }
       }
 
+      // Approve-cutoff override (post-capacity): once past cutoff, any new
+      // approval and any waitlist outcome — including capacity-induced
+      // waitlist:capacity_full — collapses to declined:cutoff_*. Already-
+      // approved guests keep their seat. If the override demotes a new
+      // approval, rewind approvedCount so the cap reflects only seats that
+      // actually stay approved this run.
+      if (pastCutoff) {
+        const before = decision.status;
+        decision = applyCutoffOverride(decision, row.activity_status);
+        if (before === 'approved' && decision.status !== 'approved') {
+          approvedCount -= 1;
+        }
+      }
+
       const statusChanged = decision.status !== row.activity_status;
       const ticketUpgraded = !!decision.targetTicketTypeApiId;
       const mutated = statusChanged || ticketUpgraded;
@@ -352,6 +387,7 @@ async function processEvent(
       }
 
       if (decision.status === 'approved') eventCounters.approved += 1;
+      else if (decision.status === 'declined') eventCounters.declined += 1;
       else eventCounters.waitlisted += 1;
     } catch (err) {
       if (err instanceof LumaAuthError) throw err;
@@ -422,6 +458,7 @@ async function processEvent(
     guestsUpserted: mapped.length,
     guestsRemoved: ghosts.length,
     reviewApproved: eventCounters.approved,
+    reviewDeclined: eventCounters.declined,
     reviewWaitlisted: eventCounters.waitlisted,
     reviewSkipped: eventCounters.skipped,
     skipped: false,
@@ -558,7 +595,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
   let cancelled = false;
   let abandoned = false;
 
-  const counters: ReviewCounters = { approved: 0, waitlisted: 0, skipped: 0 };
+  const counters: ReviewCounters = { approved: 0, declined: 0, waitlisted: 0, skipped: 0 };
   const noShowConsumedExtra = new Map<string, number>();
   let rawDetailLogged = false;
 
@@ -604,6 +641,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
       totalGuestsUpserted += result.guestsUpserted;
       totalGuestsRemoved += result.guestsRemoved;
       counters.approved += result.reviewApproved;
+      counters.declined += result.reviewDeclined;
       counters.waitlisted += result.reviewWaitlisted;
       counters.skipped += result.reviewSkipped;
       processed += 1;
@@ -615,6 +653,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
           guests_count: result.guestsUpserted,
           guests_removed: result.guestsRemoved,
           review_approved: result.reviewApproved,
+          review_declined: result.reviewDeclined,
           review_waitlisted: result.reviewWaitlisted,
           review_skipped: result.reviewSkipped,
           finished_at: new Date().toISOString(),
@@ -647,6 +686,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
         total_guests_upserted: totalGuestsUpserted,
         total_guests_removed: totalGuestsRemoved,
         review_approved: counters.approved,
+        review_declined: counters.declined,
         review_waitlisted: counters.waitlisted,
         review_skipped: counters.skipped,
       })
@@ -673,6 +713,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
         total_guests_upserted: totalGuestsUpserted,
         total_guests_removed: totalGuestsRemoved,
         review_approved: counters.approved,
+        review_declined: counters.declined,
         review_waitlisted: counters.waitlisted,
         review_skipped: counters.skipped,
       })
@@ -691,6 +732,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
         finished_at: new Date().toISOString(),
         error_summary: 'cookie_invalid_during_run',
         review_approved: counters.approved,
+        review_declined: counters.declined,
         review_waitlisted: counters.waitlisted,
         review_skipped: counters.skipped,
       })
@@ -730,6 +772,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
       total_guests_upserted: totalGuestsUpserted,
       total_guests_removed: totalGuestsRemoved,
       review_approved: counters.approved,
+      review_declined: counters.declined,
       review_waitlisted: counters.waitlisted,
       review_skipped: counters.skipped,
     })

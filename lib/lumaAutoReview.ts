@@ -24,7 +24,7 @@ interface MemberInfo {
 }
 
 export interface ReviewDecision {
-  status: 'approved' | 'waitlist';
+  status: 'approved' | 'waitlist' | 'declined';
   reason: string;
   consumedNoShowEventApiId?: string;
   /**
