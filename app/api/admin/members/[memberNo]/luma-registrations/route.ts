@@ -3,6 +3,7 @@ import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { shapeRegistrations, fetchApprovedCounts, type LumaGuestRow } from '@/lib/lumaSyncConfig';
 import { toLumaEventUrl } from '@/lib/lumaUrl';
+import { TDF_TICKET_NAMES } from '@/lib/lumaAutoReview';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,16 +79,35 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ memb
   const registrations = await shapeRegistrations(rows, reviewReasons, approvedCounts);
 
   // No-show summary: events the member was approved for but didn't check in
-  // to, where end_at is at least 4h ago. Pair against penalty rows.
+  // to, where end_at is at least 4h ago. Pair against penalty rows. Non-TDF
+  // events (e.g. open events with "Entry Ticket" / "Explorer" / "Contributor"
+  // tickets that lack the "TDF" prefix) are excluded — same rule as
+  // lib/lumaAutoReview.ts:getNoShowData and admin/no-shows/route.ts.
   const cutoff = Date.now() - NO_SHOW_GRACE_MS;
-  const noShowItems: NoShowItem[] = rows
-    .filter((r) => {
-      if (r.activity_status !== 'approved') return false;
-      if (r.checked_in_at) return false;
-      const endIso = r.luma_events?.end_at;
-      if (!endIso) return false;
-      return new Date(endIso).getTime() < cutoff;
-    })
+  const candidateNoShowRows = rows.filter((r) => {
+    if (r.activity_status !== 'approved') return false;
+    if (r.checked_in_at) return false;
+    const endIso = r.luma_events?.end_at;
+    if (!endIso) return false;
+    return new Date(endIso).getTime() < cutoff;
+  });
+
+  let tdfNoShowEventIds = new Set<string>();
+  if (candidateNoShowRows.length > 0) {
+    const candidateIds = Array.from(new Set(candidateNoShowRows.map((r) => r.event_api_id)));
+    const { data: tdfRows, error: tdfErr } = await supa
+      .from('luma_guests')
+      .select('event_api_id')
+      .in('event_api_id', candidateIds)
+      .in('ticket_type_name', TDF_TICKET_NAMES as string[]);
+    if (tdfErr) return NextResponse.json({ error: tdfErr.message }, { status: 500 });
+    tdfNoShowEventIds = new Set(
+      (tdfRows ?? []).map((r: { event_api_id: string }) => r.event_api_id),
+    );
+  }
+
+  const noShowItems: NoShowItem[] = candidateNoShowRows
+    .filter((r) => tdfNoShowEventIds.has(r.event_api_id))
     .map((r) => ({
       event_api_id: r.event_api_id,
       event_name: r.luma_events?.name ?? r.event_api_id,

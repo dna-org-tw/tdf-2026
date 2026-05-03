@@ -47,6 +47,16 @@ const LUMA_TICKET_WEIGHTS: Record<string, number> = {
   'TDF Backer': 4,
 };
 
+/**
+ * Ticket-type names that mark an event as a "TDF event". An event qualifies
+ * if any guest holds one of these tickets — same heuristic as the worker's
+ * hasTdfTicket gate (lumaSyncWorker.ts). Open / non-TDF events (e.g. tickets
+ * named "Entry Ticket", "Explorer", "Contributor" without the "TDF" prefix)
+ * are never gated by the TDF flow and therefore must never trigger no-show
+ * penalties — sometimes check-in isn't even enforced on those events.
+ */
+export const TDF_TICKET_NAMES: readonly string[] = Object.keys(LUMA_TICKET_WEIGHTS);
+
 const TIER_WEIGHTS: Record<string, number> = {
   explore: 2,
   contribute: 3,
@@ -168,9 +178,32 @@ async function getNoShowData(
 
   if (nsErr) throw new Error(`no_show_query: ${nsErr.message}`);
 
-  const noShowEventApiIds = (noShows ?? []).map(
-    (r: { event_api_id: string }) => r.event_api_id,
-  );
+  // Preserve order (consumedNoShowEventApiId picks by index later) while
+  // de-duplicating, then drop events that aren't TDF events. The worker's
+  // hasTdfTicket gate already skips non-TDF events from sync, but stale rows
+  // from past syncs (or events whose TDF tickets were renamed/removed) can
+  // linger in luma_guests and would otherwise penalize unfairly.
+  const candidateOrdered: string[] = [];
+  const seenCandidates = new Set<string>();
+  for (const r of (noShows ?? []) as { event_api_id: string }[]) {
+    if (seenCandidates.has(r.event_api_id)) continue;
+    seenCandidates.add(r.event_api_id);
+    candidateOrdered.push(r.event_api_id);
+  }
+
+  let noShowEventApiIds: string[] = [];
+  if (candidateOrdered.length > 0) {
+    const { data: tdfRows, error: tdfErr } = await supabaseServer
+      .from('luma_guests')
+      .select('event_api_id')
+      .in('event_api_id', candidateOrdered)
+      .in('ticket_type_name', TDF_TICKET_NAMES as string[]);
+    if (tdfErr) throw new Error(`tdf_event_filter: ${tdfErr.message}`);
+    const tdfSet = new Set(
+      (tdfRows ?? []).map((r: { event_api_id: string }) => r.event_api_id),
+    );
+    noShowEventApiIds = candidateOrdered.filter((id) => tdfSet.has(id));
+  }
 
   const { count, error: cErr } = await supabaseServer
     .from('luma_review_log')

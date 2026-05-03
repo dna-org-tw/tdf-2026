@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { toLumaEventUrl } from '@/lib/lumaUrl';
+import { TDF_TICKET_NAMES } from '@/lib/lumaAutoReview';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,7 +85,7 @@ export async function GET(req: NextRequest) {
 
   // 1) All no-shows: approved + not checked in + event ended >= 4h ago.
   // Paginate to dodge the 1000-row PostgREST cap.
-  const noShows: NoShowRow[] = [];
+  const noShowsRaw: NoShowRow[] = [];
   const PAGE = 1000;
   for (let offset = 0; ; offset += PAGE) {
     const { data, error } = await supa
@@ -97,9 +98,36 @@ export async function GET(req: NextRequest) {
       .range(offset, offset + PAGE - 1);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     if (!data || data.length === 0) break;
-    noShows.push(...(data as unknown as NoShowRow[]));
+    noShowsRaw.push(...(data as unknown as NoShowRow[]));
     if (data.length < PAGE) break;
   }
+
+  // Filter to TDF events only — non-TDF (open/free) events should never count
+  // as a no-show. Mirrors the rule in lib/lumaAutoReview.ts:getNoShowData and
+  // the worker's hasTdfTicket gate.
+  const candidateNoShowEventIds = Array.from(
+    new Set(noShowsRaw.map((r) => r.event_api_id)),
+  );
+  const tdfEventIdSet = new Set<string>();
+  if (candidateNoShowEventIds.length > 0) {
+    // Same 1000-row pagination dance: ANY guest with a TDF ticket name is
+    // enough to qualify the event, but we must page in case the join surface
+    // exceeds the cap.
+    for (let offset = 0; ; offset += PAGE) {
+      const { data, error } = await supa
+        .from('luma_guests')
+        .select('event_api_id')
+        .in('event_api_id', candidateNoShowEventIds)
+        .in('ticket_type_name', TDF_TICKET_NAMES as string[])
+        .order('id', { ascending: true })
+        .range(offset, offset + PAGE - 1);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      if (!data || data.length === 0) break;
+      for (const r of data as { event_api_id: string }[]) tdfEventIdSet.add(r.event_api_id);
+      if (data.length < PAGE) break;
+    }
+  }
+  const noShows: NoShowRow[] = noShowsRaw.filter((r) => tdfEventIdSet.has(r.event_api_id));
 
   // 2) All no-show penalties.
   const penalties: PenaltyRow[] = [];
