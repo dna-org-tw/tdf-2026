@@ -18,7 +18,7 @@ import {
   NO_SHOW_PENALTY_SOFT_LOG_REASON,
   type EventTicketType,
 } from '@/lib/lumaAutoReview';
-import { isPastCutoff, applyCutoffOverride } from '@/lib/lumaCutoff';
+import { isPastCutoff } from '@/lib/lumaCutoff';
 
 // Throttles tuned so one sync lands in ~15–18 min (vs ~10 min at the original
 // 500/300 settings, but well under the 20-min freshness budget). With the
@@ -176,11 +176,12 @@ async function processEvent(
     };
   }
 
-  // Approve cutoff: once past it, no new approvals — pending / waitlisted
-  // guests collapse to declined:cutoff_*. Computed once per event from
-  // luma_events.start_at; null start_at falls back to "not past cutoff" so
-  // the cutoff feature degrades open instead of mass-declining when an
-  // event's start time is missing.
+  // Approve cutoff: once past it, NO auto-review runs — every reviewable
+  // guest is left untouched (no makeDecision, no Luma writes, no review log
+  // entries). Local mirror still updates via the upsert + reverse-sync
+  // below, so admin views stay current with whatever the Luma admin does
+  // manually after cutoff. Null start_at degrades open (treated as
+  // not-past-cutoff) so missing data doesn't accidentally freeze the event.
   let pastCutoff = false;
   {
     const { data: evRow } = await supa
@@ -323,6 +324,16 @@ async function processEvent(
       continue;
     }
 
+    // Post-cutoff: never auto-review. Whoever is currently waitlist /
+    // pending stays where they are; admins handle any further movement
+    // manually. The local mirror still picks up Luma-side status changes
+    // via the upsert below — we just stop initiating any of our own.
+    if (pastCutoff) {
+      if (row.activity_status === 'waitlist') eventCounters.waitlisted += 1;
+      else eventCounters.skipped += 1;
+      continue;
+    }
+
     try {
       let decision = await makeDecision(
         {
@@ -344,20 +355,6 @@ async function processEvent(
           decision = { status: 'waitlist', reason: 'waitlist:capacity_full' };
         } else {
           approvedCount += 1;
-        }
-      }
-
-      // Approve-cutoff override (post-capacity): once past cutoff, any new
-      // approval and any waitlist outcome — including capacity-induced
-      // waitlist:capacity_full — collapses to declined:cutoff_*. Already-
-      // approved guests keep their seat. If the override demotes a new
-      // approval, rewind approvedCount so the cap reflects only seats that
-      // actually stay approved this run.
-      if (pastCutoff) {
-        const before = decision.status;
-        decision = applyCutoffOverride(decision, row.activity_status);
-        if (before === 'approved' && decision.status !== 'approved') {
-          approvedCount -= 1;
         }
       }
 
