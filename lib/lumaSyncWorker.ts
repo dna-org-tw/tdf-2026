@@ -15,6 +15,7 @@ import {
   makeDecision,
   guestSortWeight,
   ticketWeight,
+  NO_SHOW_PENALTY_SOFT_LOG_REASON,
   type EventTicketType,
 } from '@/lib/lumaAutoReview';
 import { isPastCutoff, applyCutoffOverride } from '@/lib/lumaCutoff';
@@ -292,6 +293,21 @@ async function processEvent(
       continue;
     }
 
+    // Approved-lock gate: any guest Luma already shows as approved keeps
+    // their seat permanently. Re-evaluating them risks pushing a confusing
+    // status flip onto someone who already received an approval notification
+    // — no-show penalties, tier-mismatch downgrades, weekly_backer expiry,
+    // membership lapse, and silent ticket-type reassignment all become
+    // visible RSVP changes for the participant. Trust > correctness here:
+    // the rare lapsed-approval case is acceptable; mass RSVP flips are not.
+    // They still count toward capacity (so new approvals respect the cap)
+    // and the upsert below still refreshes their local mirror.
+    if (row.activity_status === 'approved') {
+      approvedCount += 1;
+      eventCounters.approved += 1;
+      continue;
+    }
+
     // Allowlist gate: never re-evaluate guests outside reviewable states.
     // Covers 'declined' (admin manual / member self-cancel), 'invited' (Luma
     // admin invite pending response), and any unknown future state Luma may
@@ -384,6 +400,26 @@ async function processEvent(
           row.event_ticket_type_api_id = decision.targetTicketTypeApiId;
           row.ticket_type_name = decision.targetTicketTypeName ?? row.ticket_type_name;
         }
+      }
+
+      // Soft no-show audit trail: emit even when the decision didn't mutate
+      // status (the whole point of soft mode is "don't demote"). Same shape
+      // as the regular review log so admin views can render both reasons
+      // uniformly. consumed_no_show_event_api_id carries the source event
+      // so each unchecked event is logged at most once per user — see the
+      // 'in [legacy, soft] reason' filter in getNoShowData consumed count.
+      if (decision.softNoShowPenaltyEventApiId) {
+        reviewLogs.push({
+          job_id: jobId,
+          event_api_id: eventApiId,
+          email: row.email,
+          member_id: null,
+          luma_guest_api_id: row.luma_guest_api_id,
+          previous_status: row.activity_status ?? 'unknown',
+          new_status: decision.status,
+          reason: NO_SHOW_PENALTY_SOFT_LOG_REASON,
+          consumed_no_show_event_api_id: decision.softNoShowPenaltyEventApiId,
+        });
       }
 
       if (decision.status === 'approved') eventCounters.approved += 1;

@@ -34,7 +34,18 @@ export interface ReviewDecision {
    */
   targetTicketTypeApiId?: string;
   targetTicketTypeName?: string;
+  /**
+   * Soft no-show: the worker should write a separate audit row with
+   * reason='no_show_penalty:logged' for this no-show, but the decision's
+   * status / reason are unchanged so the guest is not demoted. Set when
+   * HARD_NO_SHOW_PENALTY is false (the current default — see step 4).
+   */
+  softNoShowPenaltyEventApiId?: string;
 }
+
+/** Audit-log reason emitted under soft mode. Mirrors hard-mode's
+ * 'waitlist:no_show_penalty' but never accompanies a status change. */
+export const NO_SHOW_PENALTY_SOFT_LOG_REASON = 'no_show_penalty:logged';
 
 // ---------------------------------------------------------------------------
 // Weight helpers
@@ -205,11 +216,14 @@ async function getNoShowData(
     noShowEventApiIds = candidateOrdered.filter((id) => tdfSet.has(id));
   }
 
+  // Consumed = either a legacy hard-mode penalty ('waitlist:no_show_penalty',
+  // pre-soft-mode) OR a soft-mode log row. Counting both ensures the same
+  // no-show is never re-logged once it's been recorded under either regime.
   const { count, error: cErr } = await supabaseServer
     .from('luma_review_log')
     .select('id', { count: 'exact', head: true })
     .eq('email', email.toLowerCase().trim())
-    .eq('reason', 'waitlist:no_show_penalty');
+    .in('reason', ['waitlist:no_show_penalty', NO_SHOW_PENALTY_SOFT_LOG_REASON]);
 
   if (cErr) throw new Error(`consumed_count_query: ${cErr.message}`);
 
@@ -270,20 +284,32 @@ export async function makeDecision(
     }
   }
 
-  // 4. No-show penalty
+  // 4. No-show penalty.
+  // Hard mode (HARD_NO_SHOW_PENALTY=true) demotes the guest to waitlist for
+  // each unconsumed no-show. Soft mode (current default) only records the
+  // would-be penalty in the audit log via softNoShowPenaltyEventApiId — the
+  // guest is NOT demoted, avoiding the "approved → waitlist" surprise that
+  // confused festival participants. Re-enable hard mode by flipping the flag.
+  const HARD_NO_SHOW_PENALTY = false;
+
   const noShowData = await getNoShowData(email, guest.event_api_id);
   const extraConsumed = noShowConsumedExtra.get(email) ?? 0;
   const effectiveConsumed = noShowData.consumedCount + extraConsumed;
   const pendingNoShows = noShowData.noShowEventApiIds.length - effectiveConsumed;
 
+  let softNoShowPenaltyEventApiId: string | undefined;
   if (pendingNoShows > 0) {
     const consumedEventApiId = noShowData.noShowEventApiIds[effectiveConsumed] ?? undefined;
     noShowConsumedExtra.set(email, extraConsumed + 1);
-    return {
-      status: 'waitlist',
-      reason: 'waitlist:no_show_penalty',
-      consumedNoShowEventApiId: consumedEventApiId,
-    };
+    if (HARD_NO_SHOW_PENALTY) {
+      return {
+        status: 'waitlist',
+        reason: 'waitlist:no_show_penalty',
+        consumedNoShowEventApiId: consumedEventApiId,
+      };
+    }
+    softNoShowPenaltyEventApiId = consumedEventApiId;
+    // Fall through to step 5.
   }
 
   // 5. Approve — if the best available TDF ticket for this member differs from
@@ -301,7 +327,8 @@ export async function makeDecision(
       reason,
       targetTicketTypeApiId: bestTdfTicket.api_id,
       targetTicketTypeName: bestTdfTicket.name,
+      softNoShowPenaltyEventApiId,
     };
   }
-  return { status: 'approved', reason: 'approved:eligible' };
+  return { status: 'approved', reason: 'approved:eligible', softNoShowPenaltyEventApiId };
 }

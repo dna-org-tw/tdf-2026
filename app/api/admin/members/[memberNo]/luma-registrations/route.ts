@@ -3,13 +3,18 @@ import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { shapeRegistrations, fetchApprovedCounts, type LumaGuestRow } from '@/lib/lumaSyncConfig';
 import { toLumaEventUrl } from '@/lib/lumaUrl';
-import { TDF_TICKET_NAMES } from '@/lib/lumaAutoReview';
+import { TDF_TICKET_NAMES, NO_SHOW_PENALTY_SOFT_LOG_REASON } from '@/lib/lumaAutoReview';
 
 export const dynamic = 'force-dynamic';
 
 // Mirrors lib/lumaAutoReview.ts NO_SHOW_GRACE_MS — events ended at least 4h ago.
 const NO_SHOW_GRACE_MS = 4 * 60 * 60 * 1000;
-const NO_SHOW_PENALTY_REASON = 'waitlist:no_show_penalty';
+// Both legacy hard-mode penalties and soft-mode audit rows surface here as
+// "the no-show was recorded". Soft mode does not demote — the row is a log.
+const NO_SHOW_PENALTY_REASONS = new Set([
+  'waitlist:no_show_penalty',
+  NO_SHOW_PENALTY_SOFT_LOG_REASON,
+]);
 
 interface NoShowItem {
   event_api_id: string;
@@ -127,7 +132,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ memb
     consumed_no_show_event_api_id: string | null;
     created_at: string;
   }>)
-    .filter((r) => r.reason === NO_SHOW_PENALTY_REASON)
+    .filter((r) => NO_SHOW_PENALTY_REASONS.has(r.reason))
     .sort((a, b) => a.created_at.localeCompare(b.created_at));
 
   // Resolve event names for events referenced by penalty rows that aren't

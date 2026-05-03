@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { toLumaEventUrl } from '@/lib/lumaUrl';
-import { TDF_TICKET_NAMES } from '@/lib/lumaAutoReview';
+import { TDF_TICKET_NAMES, NO_SHOW_PENALTY_SOFT_LOG_REASON } from '@/lib/lumaAutoReview';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +10,13 @@ export const dynamic = 'force-dynamic';
 // 4 hours ago. Keep in sync with lib/lumaAutoReview.ts (NO_SHOW_GRACE_MS).
 const NO_SHOW_GRACE_MS = 4 * 60 * 60 * 1000;
 
-const NO_SHOW_PENALTY_REASON = 'waitlist:no_show_penalty';
+// Both reasons surface as "consumed no-show" in the admin view: the legacy
+// hard-mode penalty (which actually demoted the guest) and the soft-mode
+// audit row (log-only — no demotion).
+const NO_SHOW_PENALTY_REASONS = [
+  'waitlist:no_show_penalty',
+  NO_SHOW_PENALTY_SOFT_LOG_REASON,
+];
 
 interface NoShowRow {
   email: string;
@@ -135,7 +141,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supa
       .from('luma_review_log')
       .select('email, event_api_id, consumed_no_show_event_api_id, created_at')
-      .eq('reason', NO_SHOW_PENALTY_REASON)
+      .in('reason', NO_SHOW_PENALTY_REASONS)
       .order('created_at', { ascending: true })
       .range(offset, offset + PAGE - 1);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
