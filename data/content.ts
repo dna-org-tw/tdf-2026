@@ -538,6 +538,17 @@ export const content = {
           { label: "Visit nomading.tw", url: "https://nomading.tw" },
         ],
       },
+      engineerCafe: {
+        name: "Engineer Cafe in Fukuoka, Japan",
+        tagline: "Public–Private Partnership · Fukuoka City",
+        description:
+          "Fukuoka city welcomes digital nomads. Engineer Cafe provides free co-working spaces, event venues, and an online community where engineers with diverse backgrounds can interact and grow together. As part of the \"Engineer Friendly City Fukuoka\" initiative, it operates through public–private partnership — promoting open-source contributions from the local community and collaboration with the global ecosystem.",
+        logo: "/images/partners/engineer_cafe_white.png",
+        features: ["Free Co-working", "Event Venue", "Online Community", "Open Source"],
+        ctas: [
+          { label: "Visit Engineer Cafe", url: "https://engineercafe.jp/" },
+        ],
+      },
       partners: {
         title: "Partners",
         cta: { type: "Call for Partners", text: "Join as Partner", href: "https://forms.gle/KqJGkQhdWmSZVTdv6" }
@@ -1987,6 +1998,17 @@ export const content = {
         features: ["不受限制", "雲端工作", "多樣性"],
         ctas: [
           { label: "前往 nomading.tw", url: "https://nomading.tw" },
+        ],
+      },
+      engineerCafe: {
+        name: "Engineer Cafe（日本福岡）",
+        tagline: "公私協力 · 福岡市",
+        description:
+          "福岡市歡迎全球數位遊牧者。Engineer Cafe 提供免費的共享工作空間與活動場地，並經營線上社群，打造一個讓不同背景的工程師能彼此交流、共同成長的環境。作為「工程師友善城市福岡」計畫的核心，由公私協力營運，特別支持在地對開放原始碼的貢獻與全球生態系的合作。",
+        logo: "/images/partners/engineer_cafe_white.png",
+        features: ["免費共享空間", "活動場地", "線上社群", "開放原始碼"],
+        ctas: [
+          { label: "造訪 Engineer Cafe", url: "https://engineercafe.jp/" },
         ],
       },
       partners: {
