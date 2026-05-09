@@ -120,17 +120,44 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false, // 關閉 source maps 以減少 bundle 大小
   
   async headers() {
-    return [
-      {
-        // 為圖片資源設置快取
-        source: '/images/:path*',
-        headers: [
+    const isProd = process.env.NODE_ENV === 'production';
+    const immutableCacheHeaders = isProd
+      ? [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            // 為圖片資源設置快取
+            source: '/images/:path*',
+            headers: [
+              {
+                key: 'Cache-Control',
+                value: 'public, max-age=31536000, immutable',
+              },
+            ],
           },
-        ],
-      },
+          {
+            // 為 JavaScript 和 CSS 設置長期快取
+            source: '/_next/static/:path*',
+            headers: [
+              {
+                key: 'Cache-Control',
+                value: 'public, max-age=31536000, immutable',
+              },
+            ],
+          },
+          {
+            // 為字體設置長期快取
+            source: '/_next/static/media/:path*',
+            headers: [
+              {
+                key: 'Cache-Control',
+                value: 'public, max-age=31536000, immutable',
+              },
+            ],
+          },
+        ]
+      : [];
+
+    return [
+      ...immutableCacheHeaders,
       {
         // 為靜態資源啟用 HTTP/3 和現代協定
         source: '/:path*',
@@ -174,26 +201,6 @@ const nextConfig: NextConfig = {
               "base-uri 'self'",
               "form-action 'self'",
             ].join('; '),
-          },
-        ],
-      },
-      {
-        // 為 JavaScript 和 CSS 設置長期快取
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        // 為字體設置長期快取
-        source: '/_next/static/media/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
