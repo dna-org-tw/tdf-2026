@@ -39,11 +39,84 @@ interface GuestRow {
   latest_reason: string | null;
 }
 
+interface ProfileBreakdownItem {
+  label: string;
+  count: number;
+}
+
+interface ProfileBreakdown {
+  approved: ProfileBreakdownItem[];
+  all: ProfileBreakdownItem[];
+}
+
+interface ProfileStats {
+  totals: { approved: number; all: number };
+  ticketTier: ProfileBreakdown;
+  nationality: ProfileBreakdown;
+  workTypes: ProfileBreakdown;
+  nomadExperience: ProfileBreakdown;
+  profileCompletion: ProfileBreakdown;
+}
+
 interface DetailResponse {
   event: { event_api_id: string; name: string; start_at: string | null; end_at: string | null; url: string | null; capacity: number | null };
   pivot: PivotRow[];
   guests: GuestRow[];
+  profile_stats?: ProfileStats;
 }
+
+const TIER_LABEL: Record<string, string> = {
+  backer: 'Backer 贊助者',
+  weekly_backer: 'Weekly Backer 週支持',
+  contribute: 'Contribute 響應者',
+  explore: 'Explore 探索者',
+  none: '未購票',
+};
+
+const TIER_CLASS: Record<string, string> = {
+  backer: 'bg-purple-500',
+  weekly_backer: 'bg-fuchsia-500',
+  contribute: 'bg-blue-500',
+  explore: 'bg-sky-400',
+  none: 'bg-slate-300',
+};
+
+const WORK_TYPE_LABEL: Record<string, string> = {
+  admin_mgmt: '行政管理',
+  sales_marketing: '業務行銷',
+  finance_legal: '財金法務',
+  it_engineering: '資訊工程',
+  design_creative: '設計創意',
+  education_research: '教育研究',
+  healthcare_social: '醫療社福',
+  tourism_hospitality: '旅遊餐旅',
+  manufacturing_logistics: '製造物流',
+  freelance_entrepreneur: '自由工作 / 創業',
+  __unknown__: '未填寫',
+};
+
+const NOMAD_EXP_LABEL: Record<string, string> = {
+  not_yet: '尚未開始',
+  under_3m: '< 3 個月',
+  '3m_to_1y': '3 個月 ~ 1 年',
+  '1_to_3y': '1 ~ 3 年',
+  '3_to_5y': '3 ~ 5 年',
+  '5_to_10y': '5 ~ 10 年',
+  over_10y: '> 10 年',
+  __unknown__: '未填寫',
+};
+
+const COMPLETION_LABEL: Record<string, string> = {
+  complete: '完整',
+  partial: '部分填寫',
+  none: '未填寫',
+};
+
+const COMPLETION_CLASS: Record<string, string> = {
+  complete: 'bg-emerald-500',
+  partial: 'bg-amber-400',
+  none: 'bg-slate-300',
+};
 
 const STATUS_BADGE: Record<string, string> = {
   approved: 'bg-green-100 text-green-800',
@@ -296,6 +369,7 @@ function FragmentRow({
             {detail && (
               <div className="space-y-4">
                 <PivotTable pivot={detail.pivot} />
+                {detail.profile_stats && <ProfileStatsPanel stats={detail.profile_stats} />}
                 <GuestList
                   guests={filteredGuests}
                   total={detail.guests.length}
@@ -392,6 +466,132 @@ function PivotTable({ pivot }: { pivot: PivotRow[] }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function ProfileStatsPanel({ stats }: { stats: ProfileStats }) {
+  const [scope, setScope] = useState<'approved' | 'all'>('approved');
+  const denom = scope === 'approved' ? stats.totals.approved : stats.totals.all;
+
+  return (
+    <div className="rounded border border-slate-200 bg-white">
+      <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-slate-700">參與者輪廓</span>
+          <span className="text-slate-500">
+            （核准 {stats.totals.approved}・全部 {stats.totals.all}）
+          </span>
+        </div>
+        <div className="flex gap-1">
+          <FilterBtn
+            label={`核准 ${stats.totals.approved}`}
+            active={scope === 'approved'}
+            onClick={() => setScope('approved')}
+          />
+          <FilterBtn
+            label={`全部 ${stats.totals.all}`}
+            active={scope === 'all'}
+            onClick={() => setScope('all')}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-x-6 gap-y-4 p-3 md:grid-cols-2">
+        <BreakdownChart
+          title="會員票券等級"
+          items={stats.ticketTier[scope]}
+          denom={denom}
+          labelMap={TIER_LABEL}
+          colorMap={TIER_CLASS}
+        />
+        <BreakdownChart
+          title="資料完整度"
+          items={stats.profileCompletion[scope]}
+          denom={denom}
+          labelMap={COMPLETION_LABEL}
+          colorMap={COMPLETION_CLASS}
+        />
+        <BreakdownChart
+          title="國籍 / 地區"
+          items={stats.nationality[scope]}
+          denom={denom}
+          labelMap={{ __other__: '其他', __unknown__: '未填寫' }}
+          color="bg-teal-500"
+        />
+        <BreakdownChart
+          title="工作類型 (可複選)"
+          items={stats.workTypes[scope]}
+          denom={denom}
+          labelMap={WORK_TYPE_LABEL}
+          color="bg-indigo-500"
+          note="同一人可選多項，故總和可能超過樣本數。"
+        />
+        <BreakdownChart
+          title="數位遊牧資歷"
+          items={stats.nomadExperience[scope]}
+          denom={denom}
+          labelMap={NOMAD_EXP_LABEL}
+          color="bg-rose-500"
+          className="md:col-span-2"
+        />
+      </div>
+    </div>
+  );
+}
+
+function BreakdownChart({
+  title,
+  items,
+  denom,
+  labelMap,
+  colorMap,
+  color,
+  note,
+  className,
+}: {
+  title: string;
+  items: ProfileBreakdownItem[];
+  denom: number;
+  labelMap?: Record<string, string>;
+  colorMap?: Record<string, string>;
+  color?: string;
+  note?: string;
+  className?: string;
+}) {
+  const max = items.reduce((m, it) => Math.max(m, it.count), 0);
+  const widthFor = (n: number) => (max > 0 ? Math.max(2, (n / max) * 100) : 0);
+  return (
+    <div className={className}>
+      <div className="mb-1.5 text-xs font-medium text-slate-700">{title}</div>
+      {items.length === 0 ? (
+        <div className="text-[11px] text-slate-400">無資料</div>
+      ) : (
+        <div className="space-y-1">
+          {items.map((it) => {
+            const label = labelMap?.[it.label] ?? it.label;
+            const pct = denom > 0 ? Math.round((it.count / denom) * 100) : 0;
+            const cls = colorMap?.[it.label] ?? color ?? 'bg-slate-400';
+            return (
+              <div key={it.label} className="flex items-center gap-2 text-[11px]">
+                <div className="w-28 truncate text-slate-600" title={label}>
+                  {label}
+                </div>
+                <div className="relative flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-3 ${cls}`}
+                    style={{ width: `${widthFor(it.count)}%` }}
+                  />
+                </div>
+                <div className="w-16 text-right tabular-nums text-slate-700">
+                  {it.count}
+                  <span className="ml-1 text-slate-400">({pct}%)</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {note && <div className="mt-1.5 text-[10px] text-slate-400">{note}</div>}
     </div>
   );
 }
