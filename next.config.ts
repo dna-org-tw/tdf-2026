@@ -184,19 +184,27 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            // microphone=self allows the ElevenLabs convai widget to capture
+            // voice for the conversational AI on the home page.
+            value: 'camera=(), microphone=(self), geolocation=()',
           },
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.recaptcha.net https://connect.facebook.net https://www.instagram.com https://js.stripe.com",
+              // unpkg.com → ElevenLabs convai embed script
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.recaptcha.net https://connect.facebook.net https://www.instagram.com https://js.stripe.com https://unpkg.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
               "img-src 'self' data: blob: https: http:",
               "font-src 'self' https://fonts.gstatic.com",
-              "connect-src 'self' https://*.supabase.co https://*.stripe.com https://www.google.com https://recaptchaenterprise.googleapis.com https://www.facebook.com https://api.lu.ma https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
+              // *.elevenlabs.io (HTTPS + WSS) → ConvAI API + real-time audio.
+              // blob: for the widget's audio worklet message channels.
+              "connect-src 'self' blob: https://*.supabase.co https://*.stripe.com https://www.google.com https://recaptchaenterprise.googleapis.com https://www.facebook.com https://api.lu.ma https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://*.elevenlabs.io wss://*.elevenlabs.io",
               "frame-src 'self' https://www.google.com https://www.recaptcha.net https://js.stripe.com https://www.instagram.com https://www.youtube.com https://www.youtube-nocookie.com",
-              "worker-src 'self'",
+              // blob: for AudioWorklet (ElevenLabs widget audio pipeline)
+              "worker-src 'self' blob:",
+              // ElevenLabs widget plays TTS audio from generated blob URLs.
+              "media-src 'self' blob: data: https://*.elevenlabs.io",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
