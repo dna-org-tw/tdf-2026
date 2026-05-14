@@ -127,6 +127,11 @@ export async function probeCookie(cookie: string): Promise<{ entryCount: number 
 export interface LumaEventDetail {
   capacity: number | null;
   capacityField: string | null;
+  /** TWD price of the ticket type literally named "Standard Ticket"; null when
+   *  no such ticket exists or its currency isn't TWD. Used as the no-show
+   *  guarantee amount on event-confirmation flow — events without a Standard
+   *  Ticket are non-billable. */
+  standardTicketPriceTwd: number | null;
   raw: unknown;
 }
 
@@ -147,6 +152,42 @@ const CAPACITY_FIELD_CANDIDATES = [
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+// Find the Standard Ticket price in the event detail payload. Luma's admin
+// payload structure has varied over time, so this checks a few likely shapes
+// (top-level `ticket_types`, `event.ticket_types`, `entries`). Returns the
+// TWD amount converted from cents (Luma reports `amount` in the smallest
+// currency unit, matching the per-guest ticket.amount we already capture in
+// mapGuest). Non-TWD currencies are ignored — we don't auto-FX no-show fees.
+function extractStandardTicketPriceTwd(payload: unknown): number | null {
+  if (!isPlainRecord(payload)) return null;
+  const candidates: unknown[] = [];
+  const event = payload['event'];
+  if (isPlainRecord(event)) candidates.push(event['ticket_types']);
+  candidates.push(payload['ticket_types']);
+  candidates.push(payload['entries']);
+  for (const arr of candidates) {
+    if (!Array.isArray(arr)) continue;
+    for (const t of arr) {
+      if (!isPlainRecord(t)) continue;
+      const name = typeof t['name'] === 'string' ? t['name'].trim() : '';
+      if (name.toLowerCase() !== 'standard ticket') continue;
+      const currencyRaw = t['currency'];
+      const currency = typeof currencyRaw === 'string' ? currencyRaw.toLowerCase() : null;
+      if (currency && currency !== 'twd') continue;
+      // Try common amount fields in order: explicit cents → human amount.
+      const amountFields = ['amount_cents', 'amount', 'price_cents', 'price'];
+      for (const field of amountFields) {
+        const v = t[field];
+        if (typeof v === 'number' && Number.isFinite(v) && v >= 0) {
+          // Match mapGuest: treat as cents, convert to TWD.
+          return Math.round(v / 100);
+        }
+      }
+    }
+  }
+  return null;
 }
 
 function extractCapacity(payload: unknown): { capacity: number | null; field: string | null } {
@@ -193,7 +234,8 @@ export async function fetchEventDetail(
     cookie,
   )) as unknown;
   const { capacity, field } = extractCapacity(data);
-  return { capacity, capacityField: field, raw: data };
+  const standardTicketPriceTwd = extractStandardTicketPriceTwd(data);
+  return { capacity, capacityField: field, standardTicketPriceTwd, raw: data };
 }
 
 export async function fetchEventGuests(eventApiId: string, cookie: string): Promise<LumaGuest[]> {

@@ -13,10 +13,22 @@ function diffDays(target: Date, now: Date) {
   return Math.ceil(ms / (1000 * 60 * 60 * 24));
 }
 
+export type PaymentMethodSummary = {
+  brand: string | null;
+  last4: string | null;
+  expMonth: number | null;
+  expYear: number | null;
+} | null;
+
 interface Props {
   registrations: Registration[];
   lang: 'en' | 'zh';
   noShowConsumedCount: number;
+  paymentMethod: PaymentMethodSummary;
+  onAddPaymentMethod: () => void;
+  onRemovePaymentMethod: () => void;
+  onConfirm: (eventApiId: string) => Promise<void>;
+  onCancelConfirm: (eventApiId: string) => Promise<void>;
 }
 
 const STATUS_LABELS: Record<string, { zh: string; en: string; tone: 'pos' | 'warn' | 'neutral' | 'neg' }> = {
@@ -57,7 +69,16 @@ const subscribe = (cb: () => void) => {
 const getServerSnapshot = () => null;
 const getClientSnapshot = () => cachedNow;
 
-export default function UpcomingEvents({ registrations, lang, noShowConsumedCount }: Props) {
+export default function UpcomingEvents({
+  registrations,
+  lang,
+  noShowConsumedCount,
+  paymentMethod,
+  onAddPaymentMethod,
+  onRemovePaymentMethod,
+  onConfirm,
+  onCancelConfirm,
+}: Props) {
   const now = useSyncExternalStore<number | null>(subscribe, getClientSnapshot, getServerSnapshot);
 
   const { upcoming, past } = useMemo(() => {
@@ -153,13 +174,44 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
         </div>
       </header>
 
+      {/* Payment-method banner: only when an upcoming event actually needs
+          a guarantee card (admin opted in via requires_confirmation). */}
+      {upcoming.some((r) => r.requiresConfirmation) && (
+        <PaymentMethodBanner
+          lang={lang}
+          paymentMethod={paymentMethod}
+          onAdd={onAddPaymentMethod}
+          onRemove={onRemovePaymentMethod}
+        />
+      )}
+
       {/* Event list */}
       <ul className="divide-y divide-[#C7DECB]/50">
         {upcoming.map((r) => (
-          <EventRow key={r.eventApiId} reg={r} lang={lang} past={false} />
+          <EventRow
+            key={r.eventApiId}
+            reg={r}
+            lang={lang}
+            past={false}
+            now={now}
+            hasPaymentMethod={!!paymentMethod}
+            onAddPaymentMethod={onAddPaymentMethod}
+            onConfirm={onConfirm}
+            onCancelConfirm={onCancelConfirm}
+          />
         ))}
         {upcoming.length === 0 && past.slice(0, 3).map((r) => (
-          <EventRow key={r.eventApiId} reg={r} lang={lang} past />
+          <EventRow
+            key={r.eventApiId}
+            reg={r}
+            lang={lang}
+            past
+            now={now}
+            hasPaymentMethod={!!paymentMethod}
+            onAddPaymentMethod={onAddPaymentMethod}
+            onConfirm={onConfirm}
+            onCancelConfirm={onCancelConfirm}
+          />
         ))}
       </ul>
 
@@ -176,7 +228,17 @@ export default function UpcomingEvents({ registrations, lang, noShowConsumedCoun
           </summary>
           <ul className="divide-y divide-[#C7DECB]/50">
             {past.map((r) => (
-              <EventRow key={r.eventApiId} reg={r} lang={lang} past />
+              <EventRow
+                key={r.eventApiId}
+                reg={r}
+                lang={lang}
+                past
+                now={now}
+                hasPaymentMethod={!!paymentMethod}
+                onAddPaymentMethod={onAddPaymentMethod}
+                onConfirm={onConfirm}
+                onCancelConfirm={onCancelConfirm}
+              />
             ))}
           </ul>
         </details>
@@ -247,7 +309,187 @@ function getWaitlistLabel(reg: Registration, lang: 'en' | 'zh'): { label: string
   return { label: lang === 'zh' ? '候補中' : 'Waitlist', tone: 'warn' };
 }
 
-function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; past: boolean }) {
+function PaymentMethodBanner({
+  lang,
+  paymentMethod,
+  onAdd,
+  onRemove,
+}: {
+  lang: 'en' | 'zh';
+  paymentMethod: PaymentMethodSummary;
+  onAdd: () => void;
+  onRemove: () => void;
+}) {
+  if (!paymentMethod) {
+    return (
+      <div className="border-b border-[#C7DECB]/60 bg-white/40 px-5 py-3">
+        <p className="text-[12px] leading-snug text-slate-600">
+          {lang === 'zh'
+            ? '尚未綁定擔保信用卡。確認出席前請先綁卡，未到場時將以該活動票價扣款。'
+            : 'No payment method on file. Bind a card before confirming so we can charge no-shows at the event ticket price.'}
+        </p>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="mt-2 inline-flex items-center gap-1 rounded-lg bg-[#10B8D9]/10 px-2.5 py-1 text-[11px] font-medium text-[#10B8D9] transition-colors hover:bg-[#10B8D9]/20"
+        >
+          {lang === 'zh' ? '綁定信用卡' : 'Add card'}
+          <span aria-hidden>→</span>
+        </button>
+      </div>
+    );
+  }
+  const brandLabel = paymentMethod.brand
+    ? paymentMethod.brand.charAt(0).toUpperCase() + paymentMethod.brand.slice(1)
+    : (lang === 'zh' ? '信用卡' : 'Card');
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-[#C7DECB]/60 bg-white/40 px-5 py-2.5">
+      <div className="min-w-0">
+        <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-slate-400">
+          {lang === 'zh' ? '擔保信用卡' : 'Guarantee card'}
+        </p>
+        <p className="mt-0.5 text-[13px] font-medium text-slate-800">
+          {brandLabel} •••• {paymentMethod.last4 ?? '----'}
+          {paymentMethod.expMonth && paymentMethod.expYear && (
+            <span className="ml-2 text-[11px] font-normal text-slate-400">
+              {String(paymentMethod.expMonth).padStart(2, '0')}/{String(paymentMethod.expYear).slice(-2)}
+            </span>
+          )}
+        </p>
+      </div>
+      <div className="flex shrink-0 gap-2 text-[11px] font-medium">
+        <button
+          type="button"
+          onClick={onAdd}
+          className="rounded-md px-2 py-1 text-[#10B8D9] transition-colors hover:bg-[#10B8D9]/10"
+        >
+          {lang === 'zh' ? '更換' : 'Change'}
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="rounded-md px-2 py-1 text-slate-500 transition-colors hover:bg-slate-100"
+        >
+          {lang === 'zh' ? '移除' : 'Remove'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ConfirmActions({
+  reg,
+  lang,
+  now,
+  hasPaymentMethod,
+  onAddPaymentMethod,
+  onConfirm,
+  onCancelConfirm,
+}: {
+  reg: Registration;
+  lang: 'en' | 'zh';
+  now: number | null;
+  hasPaymentMethod: boolean;
+  onAddPaymentMethod: () => void;
+  onConfirm: (eventApiId: string) => Promise<void>;
+  onCancelConfirm: (eventApiId: string) => Promise<void>;
+}) {
+  // Only render confirmation UI for events the admin opted into the mechanism.
+  // Other events keep the standard Luma status display untouched.
+  if (!reg.requiresConfirmation) return null;
+  // Only the auto-review-reachable statuses can be confirmed/cancelled.
+  // declined/invited/checked-in are terminal for confirmation purposes.
+  const eligible = reg.activityStatus === 'approved' || reg.activityStatus === 'pending_approval';
+  if (!eligible) return null;
+  if (reg.checkedInAt) return null;
+
+  const cutoffPassed = reg.cutoffAt && now !== null && new Date(reg.cutoffAt).getTime() <= now;
+  const isConfirmed = reg.confirmationStatus === 'confirmed';
+  const isBillable = (reg.standardTicketPriceTwd ?? 0) > 0;
+
+  if (cutoffPassed) {
+    if (isConfirmed) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] px-2 py-[2px] rounded-full font-medium bg-[#00993E]/15 text-[#00993E]">
+          {lang === 'zh' ? '已確認出席' : 'Confirmed'}
+        </span>
+      );
+    }
+    return null;
+  }
+
+  if (isConfirmed) {
+    return (
+      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+        <span className="inline-flex items-center gap-1 text-[10px] px-2 py-[2px] rounded-full font-medium bg-[#00993E]/15 text-[#00993E]">
+          {lang === 'zh' ? '已確認出席' : 'Confirmed'}
+        </span>
+        {isBillable && (
+          <span className="text-[10px] text-slate-500">
+            {lang === 'zh'
+              ? `未到場將扣 NT$${reg.standardTicketPriceTwd}`
+              : `No-show charge: NT$${reg.standardTicketPriceTwd}`}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={() => onCancelConfirm(reg.eventApiId)}
+          className="ml-auto rounded-md px-2 py-[2px] text-[10px] font-medium text-slate-500 transition-colors hover:bg-slate-100"
+        >
+          {lang === 'zh' ? '取消確認' : 'Cancel'}
+        </button>
+      </div>
+    );
+  }
+
+  // Not confirmed: show the call to action.
+  return (
+    <div className="mt-1.5 flex flex-wrap items-center gap-2">
+      <span className="text-[10px] text-amber-700">
+        {lang === 'zh' ? '尚未確認出席' : 'Not yet confirmed'}
+      </span>
+      {isBillable && (
+        <span className="text-[10px] text-slate-500">
+          {lang === 'zh'
+            ? `未到場將扣 NT$${reg.standardTicketPriceTwd}`
+            : `No-show charge: NT$${reg.standardTicketPriceTwd}`}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={() => {
+          if (isBillable && !hasPaymentMethod) onAddPaymentMethod();
+          else onConfirm(reg.eventApiId);
+        }}
+        className="ml-auto inline-flex items-center gap-1 rounded-md bg-[#10B8D9]/10 px-2.5 py-[3px] text-[10px] font-medium text-[#10B8D9] transition-colors hover:bg-[#10B8D9]/20"
+      >
+        {isBillable && !hasPaymentMethod
+          ? (lang === 'zh' ? '先綁卡' : 'Add card first')
+          : (lang === 'zh' ? '確認出席' : 'Confirm')}
+      </button>
+    </div>
+  );
+}
+
+function EventRow({
+  reg,
+  lang,
+  past,
+  now,
+  hasPaymentMethod,
+  onAddPaymentMethod,
+  onConfirm,
+  onCancelConfirm,
+}: {
+  reg: Registration;
+  lang: 'en' | 'zh';
+  past: boolean;
+  now: number | null;
+  hasPaymentMethod: boolean;
+  onAddPaymentMethod: () => void;
+  onConfirm: (eventApiId: string) => Promise<void>;
+  onCancelConfirm: (eventApiId: string) => Promise<void>;
+}) {
   const start = reg.startAt ? new Date(reg.startAt) : null;
   const status = reg.activityStatus ? STATUS_LABELS[reg.activityStatus] : null;
   const isCheckedIn = !!reg.checkedInAt;
@@ -264,7 +506,7 @@ function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; p
         ? 'bg-[#FFD028]/10'
         : 'bg-stone-100';
 
-  const content = (
+  const summary = (
     <div className={`flex gap-3 px-5 py-3 ${past && !isCheckedIn ? 'opacity-55' : past ? 'opacity-70' : ''}`}>
       {/* Date tile */}
       <div className={`shrink-0 w-11 h-12 rounded-lg flex flex-col items-center justify-center ${tileClasses}`}>
@@ -323,19 +565,37 @@ function EventRow({ reg, lang, past }: { reg: Registration; lang: 'en' | 'zh'; p
     </div>
   );
 
-  if (href) {
-    return (
-      <li>
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group block hover:bg-[#DCE8DF] transition-colors"
-        >
-          {content}
-        </a>
-      </li>
-    );
-  }
-  return <li>{content}</li>;
+  const summaryNode = href ? (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block hover:bg-[#DCE8DF] transition-colors"
+    >
+      {summary}
+    </a>
+  ) : (
+    summary
+  );
+
+  // Confirm actions render below the link block (not nested inside the link)
+  // so the buttons aren't swallowed by the anchor's click handler.
+  return (
+    <li>
+      {summaryNode}
+      {!past && (
+        <div className="px-5 pb-3 -mt-1">
+          <ConfirmActions
+            reg={reg}
+            lang={lang}
+            now={now}
+            hasPaymentMethod={hasPaymentMethod}
+            onAddPaymentMethod={onAddPaymentMethod}
+            onConfirm={onConfirm}
+            onCancelConfirm={onCancelConfirm}
+          />
+        </div>
+      )}
+    </li>
+  );
 }

@@ -20,6 +20,8 @@ interface EventListRow {
   end_at: string | null;
   url: string | null;
   capacity: number | null;
+  requires_confirmation: boolean;
+  standard_ticket_price_twd: number | null;
   counts: StatusCounts;
 }
 
@@ -235,6 +237,26 @@ export default function LumaEventsPage() {
     }
   };
 
+  // Optimistic toggle for the confirmation-mechanism flag. On failure we
+  // refetch the list so the UI re-syncs with the actual DB state instead
+  // of staying on the optimistic value.
+  const onToggleRequiresConfirmation = useCallback(async (eventApiId: string, next: boolean) => {
+    setEvents((prev) =>
+      prev ? prev.map((e) => (e.event_api_id === eventApiId ? { ...e, requires_confirmation: next } : e)) : prev,
+    );
+    try {
+      const r = await fetch(`/api/admin/luma-events?eventApiId=${encodeURIComponent(eventApiId)}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ requires_confirmation: next }),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    } catch (e) {
+      console.error('toggle requires_confirmation failed:', e);
+      fetchList();
+    }
+  }, [fetchList]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between flex-wrap gap-3">
@@ -279,6 +301,9 @@ export default function LumaEventsPage() {
                 <th className="px-3 py-2 text-right">總人數</th>
                 <th className="px-3 py-2">狀態分布</th>
                 <th className="px-3 py-2 text-right">已 check-in</th>
+                <th className="px-3 py-2 text-center" title="開啟後：未確認者於 cutoff 後自動降為 waitlist，已確認但未到場者扣 Standard Ticket 票價">
+                  擔保確認
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -295,12 +320,13 @@ export default function LumaEventsPage() {
                     filteredGuests={isOpen ? filteredGuests : []}
                     statusFilter={statusFilter}
                     setStatusFilter={setStatusFilter}
+                    onToggleRequiresConfirmation={onToggleRequiresConfirmation}
                   />
                 );
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-3 py-6 text-center text-sm text-slate-500">
+                  <td colSpan={7} className="px-3 py-6 text-center text-sm text-slate-500">
                     沒有符合條件的活動。
                   </td>
                 </tr>
@@ -322,6 +348,7 @@ function FragmentRow({
   filteredGuests,
   statusFilter,
   setStatusFilter,
+  onToggleRequiresConfirmation,
 }: {
   e: EventListRow;
   isOpen: boolean;
@@ -331,6 +358,7 @@ function FragmentRow({
   filteredGuests: GuestRow[];
   statusFilter: string;
   setStatusFilter: (s: string) => void;
+  onToggleRequiresConfirmation: (eventApiId: string, next: boolean) => void;
 }) {
   return (
     <>
@@ -361,10 +389,17 @@ function FragmentRow({
           <StatusBar counts={e.counts} />
         </td>
         <td className="px-3 py-2 text-right tabular-nums text-slate-600">{e.counts.checkedIn}</td>
+        <td className="px-3 py-2 text-center" onClick={(ev) => ev.stopPropagation()}>
+          <RequiresConfirmationToggle
+            checked={e.requires_confirmation}
+            priceTwd={e.standard_ticket_price_twd}
+            onChange={(next) => onToggleRequiresConfirmation(e.event_api_id, next)}
+          />
+        </td>
       </tr>
       {isOpen && (
         <tr>
-          <td colSpan={6} className="bg-slate-50 px-3 py-3">
+          <td colSpan={7} className="bg-slate-50 px-3 py-3">
             {detailLoading && <div className="text-xs text-slate-500">載入詳細…</div>}
             {detail && (
               <div className="space-y-4">
@@ -383,6 +418,34 @@ function FragmentRow({
         </tr>
       )}
     </>
+  );
+}
+
+function RequiresConfirmationToggle({
+  checked,
+  priceTwd,
+  onChange,
+}: {
+  checked: boolean;
+  priceTwd: number | null;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <label className="inline-flex items-center gap-1.5 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="h-4 w-4 cursor-pointer"
+      />
+      <span className="text-xs text-slate-500 tabular-nums">
+        {checked
+          ? priceTwd && priceTwd > 0
+            ? `NT$${priceTwd}`
+            : '免費'
+          : '—'}
+      </span>
+    </label>
   );
 }
 

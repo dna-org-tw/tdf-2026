@@ -71,4 +71,12 @@ export interface Registration {
   capacity: number | null;
   /** Locally-mirrored count of approved guests for this event. */
   approvedCount: number;
+  /** Per-member event confirmation state; null = no row yet (trigger pending). */
+  confirmationStatus: 'pending' | 'confirmed' | 'cancelled' | null;
+  /** ISO cutoff time after which auto-review demotes unconfirmed to waitlist. */
+  cutoffAt: string | null;
+  /** Captured at sync time. Null = free event, no-show non-billable. */
+  standardTicketPriceTwd: number | null;
+  /** Admin opted this event into the confirmation+no-show-charge mechanism. */
+  requiresConfirmation: boolean;
 }

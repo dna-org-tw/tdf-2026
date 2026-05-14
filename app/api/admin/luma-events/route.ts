@@ -12,6 +12,8 @@ interface EventRow {
   end_at: string | null;
   url: string | null;
   capacity: number | null;
+  requires_confirmation: boolean;
+  standard_ticket_price_twd: number | null;
 }
 
 interface GuestRow {
@@ -56,12 +58,68 @@ export async function GET(req: NextRequest) {
   return listResponse();
 }
 
+/**
+ * PATCH /api/admin/luma-events?eventApiId=evt-xxx
+ * Body: { requires_confirmation?: boolean; standard_ticket_price_twd?: number | null }
+ *
+ * Admin-only toggle for the per-event confirmation+credit-card guarantee
+ * mechanism. Setting requires_confirmation=false at any time is safe:
+ *   - Members who already confirmed keep their event_confirmations row, but
+ *     the worker stops demoting unconfirmed approveds and the no-show charger
+ *     stops scanning the event.
+ *   - Setting it back to true re-enables the gate for subsequent worker runs.
+ *
+ * standard_ticket_price_twd override is rarely needed (the sync auto-fills
+ * it from Luma ticket types), but admin can force a value e.g. for events
+ * with non-standard ticket naming.
+ */
+export async function PATCH(req: NextRequest) {
+  const session = await getAdminSession(req);
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!supabaseServer) return NextResponse.json({ error: 'db' }, { status: 500 });
+
+  const { searchParams } = new URL(req.url);
+  const eventApiId = searchParams.get('eventApiId');
+  if (!eventApiId) return NextResponse.json({ error: 'missing_event_api_id' }, { status: 400 });
+
+  let body: { requires_confirmation?: boolean; standard_ticket_price_twd?: number | null };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'invalid_body' }, { status: 400 });
+  }
+
+  const update: Record<string, unknown> = {};
+  if (typeof body.requires_confirmation === 'boolean') {
+    update.requires_confirmation = body.requires_confirmation;
+  }
+  if (body.standard_ticket_price_twd === null || typeof body.standard_ticket_price_twd === 'number') {
+    if (typeof body.standard_ticket_price_twd === 'number' && body.standard_ticket_price_twd < 0) {
+      return NextResponse.json({ error: 'invalid_price' }, { status: 400 });
+    }
+    update.standard_ticket_price_twd = body.standard_ticket_price_twd;
+  }
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json({ error: 'no_updatable_fields' }, { status: 400 });
+  }
+
+  const { data, error } = await supabaseServer
+    .from('luma_events')
+    .update(update)
+    .eq('event_api_id', eventApiId)
+    .select('event_api_id, requires_confirmation, standard_ticket_price_twd')
+    .maybeSingle();
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data) return NextResponse.json({ error: 'event_not_found' }, { status: 404 });
+  return NextResponse.json({ event: data });
+}
+
 async function listResponse() {
   const supa = supabaseServer!;
 
   const { data: events, error: evErr } = await supa
     .from('luma_events')
-    .select('event_api_id, name, start_at, end_at, url, capacity')
+    .select('event_api_id, name, start_at, end_at, url, capacity, requires_confirmation, standard_ticket_price_twd')
     .order('start_at', { ascending: true });
   if (evErr) return NextResponse.json({ error: evErr.message }, { status: 500 });
 
@@ -103,6 +161,8 @@ async function listResponse() {
   const rows = (events ?? []).map((e: EventRow) => ({
     ...e,
     url: toLumaEventUrl(e.url),
+    requires_confirmation: e.requires_confirmation === true,
+    standard_ticket_price_twd: e.standard_ticket_price_twd ?? null,
     counts:
       counts.get(e.event_api_id) ?? {
         approved: 0,

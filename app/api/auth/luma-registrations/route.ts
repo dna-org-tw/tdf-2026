@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { shapeRegistrations, fetchApprovedCounts, type LumaGuestRow } from '@/lib/lumaSyncConfig';
+import {
+  shapeRegistrations,
+  fetchApprovedCounts,
+  fetchConfirmationStatuses,
+  type LumaGuestRow,
+} from '@/lib/lumaSyncConfig';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,12 +16,21 @@ export async function GET(req: NextRequest) {
   if (!supabaseServer) return NextResponse.json({ error: 'db' }, { status: 500 });
 
   const email = session.email.trim().toLowerCase();
+
+  // Resolve member id once so we can fetch confirmation statuses keyed by it.
+  const { data: memberRow } = await supabaseServer
+    .from('members')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
+  const memberId = (memberRow?.id as number | undefined) ?? null;
+
   const { data, error } = await supabaseServer
     .from('luma_guests')
     .select(`
       event_api_id, activity_status, paid, checked_in_at, registered_at,
       ticket_type_name, amount_cents, currency, last_synced_at,
-      luma_events ( name, start_at, end_at, url, capacity )
+      luma_events ( name, start_at, end_at, url, capacity, standard_ticket_price_twd, requires_confirmation )
     `)
     .eq('email', email)
     .order('registered_at', { ascending: false, nullsFirst: false });
@@ -43,8 +57,17 @@ export async function GET(req: NextRequest) {
   ).length;
 
   const rows = (data ?? []) as unknown as LumaGuestRow[];
-  const approvedCounts = await fetchApprovedCounts(rows.map((r) => r.event_api_id));
-  const registrations = await shapeRegistrations(rows, reviewReasons, approvedCounts);
+  const eventApiIds = rows.map((r) => r.event_api_id);
+  const [approvedCounts, confirmationStatuses] = await Promise.all([
+    fetchApprovedCounts(eventApiIds),
+    fetchConfirmationStatuses(memberId, eventApiIds),
+  ]);
+  const registrations = await shapeRegistrations(
+    rows,
+    reviewReasons,
+    approvedCounts,
+    confirmationStatuses,
+  );
 
   return NextResponse.json({ registrations, noShowConsumedCount });
 }

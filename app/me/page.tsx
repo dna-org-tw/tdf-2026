@@ -15,7 +15,8 @@ import EmailPreferences from '@/components/member/EmailPreferences';
 import EmailChangeForm from '@/components/member/EmailChangeForm';
 import VisaSupportSection from '@/components/member/VisaSupportSection';
 import MemberPassport, { type IdentityTier, type MemberProfile } from '@/components/member/MemberPassport';
-import UpcomingEvents from '@/components/member/UpcomingEvents';
+import UpcomingEvents, { type PaymentMethodSummary } from '@/components/member/UpcomingEvents';
+import PaymentMethodModal from '@/components/member/PaymentMethodModal';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 import StaySummaryCard from '@/components/member/StaySummaryCard';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
@@ -68,6 +69,8 @@ function MemberDashboard() {
   const [loading, setLoading] = useState(true);
   const [lumaRegs, setLumaRegs] = useState<Registration[]>([]);
   const [noShowConsumedCount, setNoShowConsumedCount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodSummary>(null);
+  const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
   const [me, setMe] = useState<{ memberNo: string | null; firstSeenAt: string | null } | null>(null);
   const [profile, setProfile] = useState<MemberProfile>(EMPTY_PROFILE);
   const [transferTarget, setTransferTarget] = useState<{ parent: Order; hasChildren: boolean } | null>(null);
@@ -111,6 +114,11 @@ function MemberDashboard() {
         setNoShowConsumedCount(d.noShowConsumedCount ?? 0);
       })
       .catch(() => setLumaRegs([]));
+
+    fetch('/api/me/payment-method')
+      .then((r) => r.ok ? r.json() : { paymentMethod: null })
+      .then((d) => setPaymentMethod(d.paymentMethod ?? null))
+      .catch(() => setPaymentMethod(null));
 
     fetch('/api/auth/me')
       .then((r) => r.ok ? r.json() : null)
@@ -206,6 +214,80 @@ function MemberDashboard() {
     }).catch(() => setProfile((p) => ({ ...p, isPublic: !isPublic })));
   }, []);
 
+  const reloadConfirmations = useCallback(() => {
+    fetch('/api/auth/luma-registrations')
+      .then((r) => r.ok ? r.json() : { registrations: [] })
+      .then((d) => {
+        setLumaRegs(d.registrations ?? []);
+        setNoShowConsumedCount(d.noShowConsumedCount ?? 0);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleConfirmEvent = useCallback(async (eventApiId: string) => {
+    const resp = await fetch(`/api/me/events/${encodeURIComponent(eventApiId)}/confirm`, {
+      method: 'POST',
+    });
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({}));
+      if (body.error === 'payment_method_required') {
+        setShowPaymentMethodModal(true);
+        return;
+      }
+      console.error('[me] confirm failed:', body);
+      return;
+    }
+    reloadConfirmations();
+  }, [reloadConfirmations]);
+
+  const handleCancelConfirmation = useCallback(async (eventApiId: string) => {
+    const resp = await fetch(`/api/me/events/${encodeURIComponent(eventApiId)}/cancel-confirmation`, {
+      method: 'POST',
+    });
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({}));
+      console.error('[me] cancel-confirmation failed:', body);
+      return;
+    }
+    reloadConfirmations();
+  }, [reloadConfirmations]);
+
+  const handleAddPaymentMethod = useCallback(() => {
+    setShowPaymentMethodModal(true);
+  }, []);
+
+  const handleRemovePaymentMethod = useCallback(async () => {
+    const confirmed = typeof window !== 'undefined'
+      ? window.confirm(lang === 'zh' ? '確定移除擔保信用卡？' : 'Remove guarantee card?')
+      : false;
+    if (!confirmed) return;
+    const resp = await fetch('/api/me/payment-method', { method: 'DELETE' });
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({}));
+      if (body.error === 'has_active_confirmations') {
+        if (typeof window !== 'undefined') {
+          window.alert(
+            lang === 'zh'
+              ? '尚有已確認的未開始活動，請先取消確認後再移除信用卡。'
+              : 'You have active confirmations on upcoming events. Cancel them first.',
+          );
+        }
+        return;
+      }
+      console.error('[me] remove payment method failed:', body);
+      return;
+    }
+    setPaymentMethod(null);
+  }, [lang]);
+
+  const handlePaymentMethodConfirmed = useCallback(() => {
+    setShowPaymentMethodModal(false);
+    fetch('/api/me/payment-method')
+      .then((r) => r.ok ? r.json() : { paymentMethod: null })
+      .then((d) => setPaymentMethod(d.paymentMethod ?? null))
+      .catch(() => {});
+  }, []);
+
   const formatAmount = (amount: number, currency: string) =>
     formatOrderAmount(amount, currency, { lang });
 
@@ -286,7 +368,24 @@ function MemberDashboard() {
       />
 
       {/* Upcoming events + festival countdown */}
-      <UpcomingEvents registrations={lumaRegs} lang={lang} noShowConsumedCount={noShowConsumedCount} />
+      <UpcomingEvents
+        registrations={lumaRegs}
+        lang={lang}
+        noShowConsumedCount={noShowConsumedCount}
+        paymentMethod={paymentMethod}
+        onAddPaymentMethod={handleAddPaymentMethod}
+        onRemovePaymentMethod={handleRemovePaymentMethod}
+        onConfirm={handleConfirmEvent}
+        onCancelConfirm={handleCancelConfirmation}
+      />
+
+      {showPaymentMethodModal && (
+        <PaymentMethodModal
+          lang={lang}
+          onClose={() => setShowPaymentMethodModal(false)}
+          onConfirmed={handlePaymentMethodConfirmed}
+        />
+      )}
 
       {staySummary && <StaySummaryCard summary={staySummary} />}
 

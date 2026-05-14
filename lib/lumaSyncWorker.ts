@@ -19,6 +19,7 @@ import {
   type EventTicketType,
 } from '@/lib/lumaAutoReview';
 import { isPastCutoff } from '@/lib/lumaCutoff';
+import { sweepNoShowCharges } from '@/lib/noShowCharger';
 
 // Throttles tuned so one sync lands in ~15–18 min (vs ~10 min at the original
 // 500/300 settings, but well under the 20-min freshness budget). With the
@@ -182,15 +183,39 @@ async function processEvent(
   // below, so admin views stay current with whatever the Luma admin does
   // manually after cutoff. Null start_at degrades open (treated as
   // not-past-cutoff) so missing data doesn't accidentally freeze the event.
+  //
+  // Also fetch requires_confirmation: the confirmation gate (demote
+  // approved+unconfirmed → waitlist) ONLY fires for events the admin has
+  // explicitly opted in via the admin Luma events page. Default false.
   let pastCutoff = false;
+  let requiresConfirmation = false;
   {
     const { data: evRow } = await supa
       .from('luma_events')
-      .select('start_at')
+      .select('start_at, requires_confirmation')
       .eq('event_api_id', eventApiId)
       .maybeSingle();
     if (evRow?.start_at) {
       pastCutoff = isPastCutoff(evRow.start_at, new Date());
+    }
+    requiresConfirmation = evRow?.requires_confirmation === true;
+  }
+
+  // Confirmation gate prep: when past cutoff AND the event opted in, demote
+  // approved-but-unconfirmed guests to waitlist. Fetch all confirmation
+  // statuses for this event in one query, keyed by email.
+  const confirmationByEmail = new Map<string, 'pending' | 'confirmed' | 'cancelled'>();
+  if (pastCutoff && requiresConfirmation) {
+    const { data: confs } = await supa
+      .from('event_confirmations')
+      .select('status, members!inner(email)')
+      .eq('event_api_id', eventApiId);
+    for (const row of (confs ?? []) as unknown as Array<{
+      status: 'pending' | 'confirmed' | 'cancelled';
+      members: { email: string } | { email: string }[] | null;
+    }>) {
+      const member = Array.isArray(row.members) ? row.members[0] : row.members;
+      if (member?.email) confirmationByEmail.set(member.email.toLowerCase(), row.status);
     }
   }
 
@@ -224,7 +249,11 @@ async function processEvent(
     }
     const { error: capUpdErr } = await supa
       .from('luma_events')
-      .update({ capacity: eventCapacity, last_capacity_synced_at: new Date().toISOString() })
+      .update({
+        capacity: eventCapacity,
+        last_capacity_synced_at: new Date().toISOString(),
+        standard_ticket_price_twd: detail.standardTicketPriceTwd,
+      })
       .eq('event_api_id', eventApiId);
     if (capUpdErr) {
       // Most likely cause: add_luma_event_capacity.sql migration not applied
@@ -295,17 +324,52 @@ async function processEvent(
     }
 
     // Approved-lock gate: any guest Luma already shows as approved keeps
-    // their seat permanently. Re-evaluating them risks pushing a confusing
-    // status flip onto someone who already received an approval notification
-    // — no-show penalties, tier-mismatch downgrades, weekly_backer expiry,
-    // membership lapse, and silent ticket-type reassignment all become
-    // visible RSVP changes for the participant. Trust > correctness here:
-    // the rare lapsed-approval case is acceptable; mass RSVP flips are not.
-    // They still count toward capacity (so new approvals respect the cap)
-    // and the upsert below still refreshes their local mirror.
+    // their seat permanently — UNLESS we're past cutoff and the member never
+    // confirmed attendance. The confirmation guarantee is the only path that
+    // can demote an approved guest; it fires exactly once per cutoff window
+    // and aligns with the rule shown to members on /me. Pre-cutoff approveds
+    // are always preserved; missing member_id / missing confirmation row
+    // (e.g. luma_guests with no matching members row, or a stale sync that
+    // ran before the auto-pending-row trigger fired) fails open and preserves
+    // the seat to avoid mass surprise demotions.
     if (row.activity_status === 'approved') {
-      approvedCount += 1;
-      eventCounters.approved += 1;
+      const confirmationStatus = confirmationByEmail.get(row.email);
+      const shouldDemote =
+        pastCutoff &&
+        requiresConfirmation &&
+        confirmationStatus !== undefined &&
+        confirmationStatus !== 'confirmed';
+      if (!shouldDemote) {
+        approvedCount += 1;
+        eventCounters.approved += 1;
+        continue;
+      }
+      // Demote unconfirmed approveds to waitlist. We do not free the slot
+      // for promotion — post-cutoff is otherwise frozen, and refilling
+      // would surprise people who registered late expecting waitlist.
+      if (row.luma_guest_api_id) {
+        try {
+          await updateGuestStatus(cookie, eventApiId, row.luma_guest_api_id, 'waitlist');
+          await sleep(SLEEP_MS_BETWEEN_LUMA_WRITES);
+        } catch (err) {
+          console.warn(
+            `[luma-sync] confirmation-gate demote failed ${row.email} @${eventApiId}: ${(err as Error).message}`,
+          );
+        }
+      }
+      reviewLogs.push({
+        job_id: jobId,
+        event_api_id: eventApiId,
+        email: row.email,
+        member_id: null,
+        luma_guest_api_id: row.luma_guest_api_id,
+        previous_status: row.activity_status,
+        new_status: 'waitlist',
+        reason: 'waitlist:unconfirmed',
+        consumed_no_show_event_api_id: null,
+      });
+      row.activity_status = 'waitlist';
+      eventCounters.waitlisted += 1;
       continue;
     }
 
@@ -790,6 +854,22 @@ export async function runSyncJob(jobId: number): Promise<void> {
         .update({ error_summary: `orphan_cleanup_failed: ${msg}` })
         .eq('id', jobId);
     }
+  }
+
+  // Post-event no-show charge sweep. Runs every job; protected by the
+  // no_show_charges UNIQUE constraint and per-pair idempotency key so
+  // duplicate scans never double charge. Failures are logged but do not
+  // affect the sync job's final status — Stripe outages should not block
+  // the next scheduled Luma sync.
+  try {
+    const sweep = await sweepNoShowCharges();
+    if (sweep.candidatesScanned > 0) {
+      console.info(
+        `[luma-sync] no-show sweep: scanned=${sweep.candidatesScanned} charged=${sweep.charged} skipped=${sweep.skipped} failed=${sweep.failed}`,
+      );
+    }
+  } catch (err) {
+    console.error('[luma-sync] no-show sweep failed:', (err as Error).message);
   }
 
   const finalStatus = failed === 0 ? 'succeeded' : processed > 0 ? 'partial' : 'failed';

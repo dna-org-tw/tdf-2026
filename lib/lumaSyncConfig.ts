@@ -2,6 +2,7 @@ import { supabaseServer } from '@/lib/supabaseServer';
 import { decryptCookie, encryptCookie } from '@/lib/lumaSyncCrypto';
 import type { Registration, SyncConfigPublic } from '@/lib/lumaSyncTypes';
 import { toLumaEventUrl } from '@/lib/lumaUrl';
+import { getCutoffAt } from '@/lib/lumaCutoff';
 
 interface RawConfig {
   luma_session_cookie_enc: string | null;
@@ -135,6 +136,8 @@ export interface LumaGuestRow {
     end_at: string | null;
     url: string | null;
     capacity: number | null;
+    standard_ticket_price_twd?: number | null;
+    requires_confirmation?: boolean | null;
   } | null;
 }
 
@@ -161,10 +164,34 @@ export async function fetchApprovedCounts(
   return counts;
 }
 
+/**
+ * Fetch the requesting member's confirmation status for each event. Returns
+ * empty map if memberId is missing (legacy callers that don't pass it).
+ */
+export async function fetchConfirmationStatuses(
+  memberId: number | null,
+  eventApiIds: string[],
+): Promise<Map<string, 'pending' | 'confirmed' | 'cancelled'>> {
+  const map = new Map<string, 'pending' | 'confirmed' | 'cancelled'>();
+  if (!memberId || eventApiIds.length === 0 || !supabaseServer) return map;
+  const unique = Array.from(new Set(eventApiIds));
+  const { data, error } = await supabaseServer
+    .from('event_confirmations')
+    .select('event_api_id, status')
+    .eq('member_id', memberId)
+    .in('event_api_id', unique);
+  if (error) return map;
+  for (const row of (data ?? []) as Array<{ event_api_id: string; status: 'pending' | 'confirmed' | 'cancelled' }>) {
+    map.set(row.event_api_id, row.status);
+  }
+  return map;
+}
+
 export async function shapeRegistrations(
   rows: LumaGuestRow[],
   reviewReasons?: Map<string, string>,
   approvedCounts?: Map<string, number>,
+  confirmationStatuses?: Map<string, 'pending' | 'confirmed' | 'cancelled'>,
 ): Promise<Registration[]> {
   let staleCutoff: number | null = null;
   if (supabaseServer) {
@@ -195,5 +222,9 @@ export async function shapeRegistrations(
     reviewReason: reviewReasons?.get(r.event_api_id) ?? null,
     capacity: r.luma_events?.capacity ?? null,
     approvedCount: approvedCounts?.get(r.event_api_id) ?? 0,
+    confirmationStatus: confirmationStatuses?.get(r.event_api_id) ?? null,
+    cutoffAt: r.luma_events?.start_at ? getCutoffAt(r.luma_events.start_at).toISOString() : null,
+    standardTicketPriceTwd: r.luma_events?.standard_ticket_price_twd ?? null,
+    requiresConfirmation: r.luma_events?.requires_confirmation === true,
   }));
 }
