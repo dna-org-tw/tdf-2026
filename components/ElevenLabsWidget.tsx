@@ -1,15 +1,31 @@
-// Voice agent embedded via iframe from beavermind.ai. The agent itself
-// (ElevenLabs ConvAI) runs in the iframe's origin, so its CSP, microphone,
-// and AudioWorklet requirements are handled there — this page only needs to
-// allow the frame and delegate microphone permission via Permissions-Policy.
+import Script from 'next/script';
+
+// ElevenLabs Conversational AI floating widget. The custom element is
+// hydrated by the embed script at runtime — until the script loads, the
+// element is an inert no-op, so SSR is unaffected.
+
+declare module 'react' {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      'elevenlabs-convai': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & { 'agent-id': string },
+        HTMLElement
+      >;
+    }
+  }
+}
+
+const AGENT_ID = 'agent_0001kr0tqx6cf6ysrgkwdeysg38x';
 
 export default function ElevenLabsWidget() {
   return (
-    <iframe
-      src="https://beavermind.ai/taiwandigitalfest-voiceagent"
-      allow="microphone"
-      title="Taiwan Digital Fest Voice Agent"
-      style={{ width: '100%', height: 700, border: 0 }}
-    />
+    <>
+      <elevenlabs-convai agent-id={AGENT_ID} />
+      <Script
+        src="https://unpkg.com/@elevenlabs/convai-widget-embed"
+        strategy="afterInteractive"
+      />
+    </>
   );
 }
