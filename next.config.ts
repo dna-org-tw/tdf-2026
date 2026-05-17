@@ -194,7 +194,10 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               // unpkg.com → ElevenLabs convai embed script.
               // *.elevenlabs.io → AudioWorklet modules (rawAudioProcessor etc).
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.recaptcha.net https://connect.facebook.net https://www.instagram.com https://js.stripe.com https://unpkg.com https://*.elevenlabs.io",
+              // blob: → widget bundles the worklet code inline and loads it
+              // via audioWorklet.addModule(blobUrl); per CSP3 this falls
+              // under script-src.
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.recaptcha.net https://connect.facebook.net https://www.instagram.com https://js.stripe.com https://unpkg.com https://*.elevenlabs.io",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
               "img-src 'self' data: blob: https: http:",
               "font-src 'self' https://fonts.gstatic.com",
