@@ -32,7 +32,22 @@ import { sweepNoShowCharges } from '@/lib/noShowCharger';
 const SLEEP_MS_BETWEEN_EVENTS = 10000;
 const SLEEP_MS_BETWEEN_LUMA_WRITES = 500;
 
+// Grace period before treating an event as "ended" for sync skip purposes.
+// Keeps syncing for a while after end_at so late check-ins / admin tweaks
+// still flow through. With cron firing every 30 min, 2h ≈ 4 extra runs.
+const ENDED_EVENT_GRACE_MS = 2 * 60 * 60 * 1000;
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function isEventEnded(item: LumaCalendarItem, now: number): boolean {
+  const { end_at, start_at } = item.event;
+  if (!end_at && !start_at) return false;
+  const endMs = end_at
+    ? new Date(end_at).getTime()
+    : new Date(start_at as string).getTime() + 24 * 60 * 60 * 1000;
+  if (!Number.isFinite(endMs)) return false;
+  return endMs + ENDED_EVENT_GRACE_MS < now;
+}
 
 function db() {
   if (!supabaseServer) throw new Error('db_not_configured');
@@ -695,6 +710,7 @@ export async function runSyncJob(jobId: number): Promise<void> {
   const counters: ReviewCounters = { approved: 0, declined: 0, waitlisted: 0, skipped: 0 };
   const noShowConsumedExtra = new Map<string, number>();
   let rawDetailLogged = false;
+  const nowMs = Date.now();
 
   for (const item of items) {
     const eventApiId = item.event.api_id;
@@ -715,6 +731,21 @@ export async function runSyncJob(jobId: number): Promise<void> {
     if (checkRow?.cancel_requested_at) {
       cancelled = true;
       break;
+    }
+
+    // Skip events that ended past the grace window: no guest/detail fetch,
+    // no auto-review, no reverse-sync. Local mirror metadata (name, dates)
+    // was already refreshed via the bulk upsert above. This trims dozens of
+    // Luma API round trips per run once the festival accumulates past events.
+    if (isEventEnded(item, nowMs)) {
+      const ts = new Date().toISOString();
+      await supa
+        .from('luma_sync_event_results')
+        .update({ status: 'skipped', started_at: ts, finished_at: ts })
+        .eq('job_id', jobId)
+        .eq('event_api_id', eventApiId);
+      processed += 1;
+      continue;
     }
 
     await supa
