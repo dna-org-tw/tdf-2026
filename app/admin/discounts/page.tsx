@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 interface TierBreakdown {
   explore: number;
@@ -251,7 +251,7 @@ export default function DiscountsPage() {
                     </td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <a
-                        href={`/admin/orders?discount_code=${encodeURIComponent(d.code)}`}
+                        href={`${BASE_PATH}/admin/orders?discount_code=${encodeURIComponent(d.code)}`}
                         className="text-[#10B8D9] hover:underline text-xs font-medium"
                       >
                         查看訂單
