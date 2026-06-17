@@ -474,6 +474,88 @@ EOF
 
 ---
 
+### Task 6b: 非 fetch 的 basePath 缺口修補（執行期發現，計畫補追加）
+
+**背景：** 原計畫聚焦 `fetch()` 與 origin 分享連結，遺漏了 Next 在 basePath 下**不會**自動補前綴的其他 root-relative 參照。執行 Task 6 時掃出下列缺口，必須在分支完成前修正。
+
+**Files:**
+- 純 `<a>` 錨點補 `BASE_PATH`（Next 不會為原生 `<a>`/`<form>` 補前綴）：
+  - `app/admin/stay/page.tsx`（兩個 `<a href={`/api/admin/stay/weeks/${w.id}/export(-pdf)`}>` 下載連結）
+  - `app/admin/orders/page.tsx`（`<a href="/admin/orders/new">`）
+  - `app/admin/orders/new/page.tsx`（`<a href="/admin/orders">`）
+  - `app/admin/orders/[id]/page.tsx`（`<a href="/admin/orders">`）
+  - `components/sections/TicketsSection.tsx`（`<a href="/terms">`、`<a href="/privacy">`）
+- 伺服端 route handler 重導補 `BASE_PATH`（route handler 重導不會自動補前綴）：
+  - `app/api/award/confirm-vote/route.ts`（9 處 `new URL(`/award/confirm?...`, req.url)`）
+- 過時網域字串／fallback 預設值更新為 `https://www.taiwandigitalfest.com/2026`：
+  - `app/robots.ts:4`、`app/sitemap.ts:4`（`||` fallback 預設）
+  - `lib/stayInviteEmail.ts:3`（`SITE_URL` fallback 預設）
+  - `app/api/checkout/route.ts:137`（Terms 連結）
+  - `lib/visaLetter.tsx:103,163`（Website 顯示文字）
+  - `app/terms/layout.tsx:8`（description 文字）
+
+**Interfaces:**
+- Consumes: `BASE_PATH`（Task 1）— client 與 server 皆可讀（`NEXT_PUBLIC_*` 於建置期內聯）。
+
+**不需更動（執行期已正確）：** `app/api/auth/verify/route.ts`、`app/api/auth/magic-link/route.ts`、`lib/unsubscribeEmail.ts`、`app/api/checkout/route.ts` 的 `${baseUrl}/...`（`baseUrl=NEXT_PUBLIC_SITE_URL` 已含 `/2026`）；所有 `<Link href>`（Next 自動補前綴）。
+
+- [ ] **Step 1: 純 `<a>` 錨點補 BASE_PATH**
+
+對上列 `<a>` 檔案，於既有 `@/lib/basePath` import 併入 `BASE_PATH`，並把 root-relative href 改為樣板字串前綴 `${BASE_PATH}`。範例：
+
+```tsx
+// TicketsSection.tsx — before
+<a href="/terms" ...>
+// after
+<a href={`${BASE_PATH}/terms`} ...>
+
+// admin/stay/page.tsx — before
+href={`/api/admin/stay/weeks/${w.id}/export`}
+// after
+href={`${BASE_PATH}/api/admin/stay/weeks/${w.id}/export`}
+```
+
+保留 `<a>`（下載／既有全頁載入行為），不改成 `<Link>`。
+
+- [ ] **Step 2: confirm-vote 伺服端重導補 BASE_PATH**
+
+`app/api/award/confirm-vote/route.ts` 加入 `import { BASE_PATH } from '@/lib/basePath';`，把 9 處 `new URL(`/award/confirm?...`, req.url)` 改為 `new URL(`${BASE_PATH}/award/confirm?...`, req.url)`。第 66 行 `new URL(req.url)`（僅解析 searchParams）不動。
+
+- [ ] **Step 3: 過時網域字串更新**
+
+將上列檔案中的 `https://2026.taiwandigitalfest.com` 改為 `https://www.taiwandigitalfest.com/2026`；`terms/layout.tsx` 顯示文字 `2026.taiwandigitalfest.com` 改為 `www.taiwandigitalfest.com/2026`。勿動 email 信箱與 2027 連結。
+
+- [ ] **Step 4: 驗證**
+
+```bash
+# 不應再有純 <a> 指向未前綴的 root-relative（人工確認剩餘者皆為 ${BASE_PATH} 或外部）
+grep -rnE "<a [^>]*href=[\"\`']/" app components | grep -vE "BASE_PATH|https?:|//|mailto:|/#"
+grep -rnE "href=\{\`/(api|[a-z])" app components | grep -v BASE_PATH   # template-literal a href 未前綴者
+grep -rn "2026\.taiwandigitalfest\.com" app components lib data | grep -vE "registration@|2027\."   # 應為空
+grep -nE "new URL\(\`/award/confirm" app/api/award/confirm-vote/route.ts   # 應為空（皆已前綴）
+```
+Expected: 前兩個 grep 無未前綴殘留；第三個（過時網域）為空；第四個為空。
+
+Run: `npx tsc --noEmit` 與 `npx eslint <changed files>` → 無錯誤；`npm run build` → 成功（controller 於 sandbox 外執行）。
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add app components lib
+git commit -m "$(cat <<'EOF'
+fix(routing): basePath-prefix plain anchors, server redirects, stale domains
+
+Plain <a>/<form> and route-handler redirects are not auto-prefixed under
+basePath; prefix them with BASE_PATH. Update remaining hardcoded
+2026.taiwandigitalfest.com URLs to www.taiwandigitalfest.com/2026.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+EOF
+)"
+```
+
+---
+
 ### Task 7: Playwright e2e 路徑調整、全站驗證、Zeabur 與第三方交付文件
 
 **Files:**
