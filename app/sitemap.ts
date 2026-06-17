@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.taiwandigitalfest.com/2026';
 
   return [
     {

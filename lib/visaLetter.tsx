@@ -100,7 +100,7 @@ function OrganizerBlock() {
       <Text style={styles.metaLine}>Certificate No. 1130006174</Text>
       <Text style={styles.metaLine}>臺北市中正區黎明里忠孝西路1段72號2樓之1</Text>
       <Text style={styles.metaLine}>2F-1, NO. 72, SECTION 1, ZHONGXIAO WEST ROAD, LIMING DISTRICT, ZHONGZHENG DISTRICT, TAIPEI CITY</Text>
-      <Text style={styles.metaLine}>Email: kk@dna.org.tw | Phone: +886 983665352 | Website: https://2026.taiwandigitalfest.com</Text>
+      <Text style={styles.metaLine}>Email: kk@dna.org.tw | Phone: +886 983665352 | Website: https://www.taiwandigitalfest.com/2026</Text>
     </View>
   );
 }
@@ -160,7 +160,7 @@ function VisaLetterDocument({ data }: { data: VisaLetterPdfData }) {
             <Text>Contact Person: Kai Hsu</Text>
             <Text>Email: kk@dna.org.tw</Text>
             <Text>Phone: +886 983665352</Text>
-            <Text>Website: https://2026.taiwandigitalfest.com</Text>
+            <Text>Website: https://www.taiwandigitalfest.com/2026</Text>
             <Text>Signatory: Kai Hsu, President</Text>
           </View>
         </View>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { getTaipeiDayBounds } from '@/lib/taipeiTime';
 import crypto from 'crypto';
+import { BASE_PATH } from '@/lib/basePath';
 
 // Voting deadline: 2026-04-30 12:00 (Taiwan time)
 const VOTING_DEADLINE = new Date('2026-04-30T12:00:00+08:00');
@@ -53,13 +54,13 @@ export async function GET(req: NextRequest) {
     // Check if voting has ended
     if (new Date() > VOTING_DEADLINE) {
       return NextResponse.redirect(
-        new URL(`/award/confirm?error=voting_ended`, req.url)
+        new URL(`${BASE_PATH}/award/confirm?error=voting_ended`, req.url)
       );
     }
 
     if (!supabaseServer) {
       return NextResponse.redirect(
-        new URL(`/award/confirm?error=server_error`, req.url)
+        new URL(`${BASE_PATH}/award/confirm?error=server_error`, req.url)
       );
     }
 
@@ -68,7 +69,7 @@ export async function GET(req: NextRequest) {
 
     if (!token) {
       return NextResponse.redirect(
-        new URL(`/award/confirm?error=missing_token`, req.url)
+        new URL(`${BASE_PATH}/award/confirm?error=missing_token`, req.url)
       );
     }
 
@@ -77,7 +78,7 @@ export async function GET(req: NextRequest) {
     if (!tokenData) {
       // Redirect to error page
       return NextResponse.redirect(
-        new URL(`/award/confirm?error=invalid_token`, req.url)
+        new URL(`${BASE_PATH}/award/confirm?error=invalid_token`, req.url)
       );
     }
 
@@ -107,13 +108,13 @@ export async function GET(req: NextRequest) {
       if (confirmedVote && confirmedVote.length > 0) {
         // Redirect to already-confirmed page
         return NextResponse.redirect(
-          new URL(`/award/confirm?error=already_confirmed`, req.url)
+          new URL(`${BASE_PATH}/award/confirm?error=already_confirmed`, req.url)
         );
       }
 
       // Redirect to not-found page
       return NextResponse.redirect(
-        new URL(`/award/confirm?error=not_found`, req.url)
+        new URL(`${BASE_PATH}/award/confirm?error=not_found`, req.url)
       );
     }
 
@@ -138,7 +139,7 @@ export async function GET(req: NextRequest) {
 
       // Redirect to already-voted page
       return NextResponse.redirect(
-        new URL(`/award/confirm?error=already_voted_today`, req.url)
+        new URL(`${BASE_PATH}/award/confirm?error=already_voted_today`, req.url)
       );
     }
 
@@ -154,13 +155,13 @@ export async function GET(req: NextRequest) {
     if (updateError) {
       console.error('[Award Confirm API] Failed to confirm vote:', updateError);
       return NextResponse.redirect(
-        new URL(`/award/confirm?error=failed`, req.url)
+        new URL(`${BASE_PATH}/award/confirm?error=failed`, req.url)
       );
     }
 
     // Redirect to confirmation success page
     return NextResponse.redirect(
-      new URL(`/award/confirm?success=true&token=${token}`, req.url)
+      new URL(`${BASE_PATH}/award/confirm?success=true&token=${token}`, req.url)
     );
   } catch (error) {
     console.error('[Award Confirm API] Unexpected error:', error);

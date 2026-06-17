@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 const TIERS = [
   { value: 'explore', label: 'Explore' },
@@ -69,7 +69,7 @@ export default function NewOrderPage() {
 
   return (
     <div className="max-w-xl space-y-4">
-      <a href="/admin/orders" className="text-sm text-slate-500 hover:text-slate-700">← 返回列表</a>
+      <a href={`${BASE_PATH}/admin/orders`} className="text-sm text-slate-500 hover:text-slate-700">← 返回列表</a>
       <h1 className="text-2xl font-bold text-slate-900">手動建單</h1>
       <p className="text-sm text-slate-500">透過 Stripe Invoice 建立一筆線下付款的訂單（標記為 paid out of band）。</p>
       <form onSubmit={submit} className="bg-white rounded-xl p-6 shadow-sm space-y-3">

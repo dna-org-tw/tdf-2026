@@ -1,6 +1,6 @@
 import { sendStayEmail } from './stayEmail';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.taiwandigitalfest.com/2026';
 
 export async function sendStayInviteEmail(input: { to: string; code: string }): Promise<void> {
   const { to, code } = input;

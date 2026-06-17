@@ -10,7 +10,7 @@ import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 type TicketKey = 'explore' | 'contribute' | 'weekly_backer' | 'backer';
 
@@ -867,11 +867,11 @@ export default function TicketsSection() {
           {t.tickets.legalNotice?.line1 ??
             'Ticket sales are processed by Nomad Explore LLC (Wyoming, USA). Event services are operated by Taiwan Digital Nomad Association.'}{' '}
           {t.tickets.legalNotice?.line2 ?? 'By purchasing, you agree to our'}{' '}
-          <a href="/terms" className="text-[#10B8D9] underline hover:text-[#10B8D9]/80">
+          <a href={`${BASE_PATH}/terms`} className="text-[#10B8D9] underline hover:text-[#10B8D9]/80">
             {t.tickets.legalNotice?.terms ?? 'Terms of Service'}
           </a>{' '}
           {t.tickets.legalNotice?.and ?? 'and'}{' '}
-          <a href="/privacy" className="text-[#10B8D9] underline hover:text-[#10B8D9]/80">
+          <a href={`${BASE_PATH}/privacy`} className="text-[#10B8D9] underline hover:text-[#10B8D9]/80">
             {t.tickets.legalNotice?.privacy ?? 'Privacy Policy'}
           </a>
           {t.tickets.legalNotice?.line3 ??

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 interface Order {
   id: string;
@@ -298,7 +298,7 @@ export default function OrderDetailPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <a href="/admin/orders" className="text-sm text-slate-500 hover:text-slate-700">← 返回列表</a>
+        <a href={`${BASE_PATH}/admin/orders`} className="text-sm text-slate-500 hover:text-slate-700">← 返回列表</a>
       </div>
 
       <h1 className="text-2xl font-bold text-slate-900">訂單 {order.id.slice(0, 8)}</h1>
@@ -306,7 +306,7 @@ export default function OrderDetailPage() {
       {order.parent_order_id && (
         <div className="bg-indigo-50 border border-indigo-200 rounded-lg px-4 py-2 text-sm text-indigo-900">
           這是一筆升級訂單，來自{' '}
-          <a href={`/admin/orders/${order.parent_order_id}`} className="font-mono underline">
+          <a href={`${BASE_PATH}/admin/orders/${order.parent_order_id}`} className="font-mono underline">
             {order.parent_order_id.slice(0, 8)}
           </a>
         </div>
@@ -335,7 +335,7 @@ export default function OrderDetailPage() {
             <span className="text-slate-900 font-mono">-{formatAmount(order.amount_discount, order.currency)}</span>
             {order.discount_code && (
               <a
-                href={`/admin/discounts`}
+                href={`${BASE_PATH}/admin/discounts`}
                 className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded bg-[#10B8D9]/10 text-[#0B7A92] text-[11px] font-mono hover:underline"
                 title="查看折扣碼分析"
               >
@@ -387,7 +387,7 @@ export default function OrderDetailPage() {
             {order.customer_email && (
               <div>
                 <a
-                  href={`/admin/members/${encodeURIComponent(order.customer_email)}`}
+                  href={`${BASE_PATH}/admin/members/${encodeURIComponent(order.customer_email)}`}
                   className="text-xs text-[#10B8D9] hover:underline"
                 >
                   查看會員頁 →
@@ -432,7 +432,7 @@ export default function OrderDetailPage() {
           <ul className="space-y-2">
             {upgrades.map((u) => (
               <li key={u.id} className="flex items-center gap-3 text-sm border-l-2 border-[#10B8D9] pl-3">
-                <a href={`/admin/orders/${u.id}`} className="font-mono text-[#10B8D9] hover:underline">{u.id.slice(0, 8)}</a>
+                <a href={`${BASE_PATH}/admin/orders/${u.id}`} className="font-mono text-[#10B8D9] hover:underline">{u.id.slice(0, 8)}</a>
                 <span className="text-slate-700">→ {u.ticket_tier}</span>
                 <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_STYLES[u.status] ?? 'bg-slate-100'}`}>
                   {STATUS_LABELS[u.status] ?? u.status}
@@ -460,7 +460,7 @@ export default function OrderDetailPage() {
                       {t.initiated_by === 'admin' ? '管理員轉讓' : '會員自助轉讓'}
                     </span>
                     {!isThisOrder && (
-                      <a href={`/admin/orders/${t.order_id}`} className="text-xs font-mono text-[#10B8D9] hover:underline">
+                      <a href={`${BASE_PATH}/admin/orders/${t.order_id}`} className="text-xs font-mono text-[#10B8D9] hover:underline">
                         {t.order_id.slice(0, 8)}（子訂單）
                       </a>
                     )}

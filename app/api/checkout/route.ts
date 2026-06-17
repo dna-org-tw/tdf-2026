@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
       custom_text: {
         submit: {
           message:
-            'By completing this purchase you agree to the [Terms & Conditions](https://2026.taiwandigitalfest.com/terms).',
+            'By completing this purchase you agree to the [Terms & Conditions](https://www.taiwandigitalfest.com/2026/terms).',
         },
       },
       ...(week ? { metadata: { week } } : {}),

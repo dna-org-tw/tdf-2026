@@ -12,7 +12,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 interface Order {
   id: string;
@@ -202,7 +202,7 @@ export default function OrdersPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-900">訂單管理</h1>
         <a
-          href="/admin/orders/new"
+          href={`${BASE_PATH}/admin/orders/new`}
           className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4] transition-colors"
         >
           手動建單
@@ -341,7 +341,7 @@ export default function OrdersPage() {
         )}
         <span className="text-sm text-slate-500">共 {total} 筆訂單</span>
         <a
-          href={`/api/admin/orders/export?${new URLSearchParams({
+          href={`${BASE_PATH}/api/admin/orders/export?${new URLSearchParams({
             ...(search ? { search } : {}),
             ...(tier ? { tier } : {}),
             ...(status ? { status } : {}),
@@ -397,7 +397,7 @@ export default function OrdersPage() {
                     <td className="px-4 py-3 max-w-[240px]">
                       {o.customer_email ? (
                         <a
-                          href={`/admin/members/${encodeURIComponent(o.customer_email)}`}
+                          href={`${BASE_PATH}/admin/members/${encodeURIComponent(o.customer_email)}`}
                           className="block hover:underline"
                           title={o.customer_email}
                         >
@@ -434,7 +434,7 @@ export default function OrdersPage() {
                     </td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <a
-                        href={`/admin/orders/${o.id}`}
+                        href={`${BASE_PATH}/admin/orders/${o.id}`}
                         className="text-[#10B8D9] hover:underline text-xs font-medium"
                       >
                         查看

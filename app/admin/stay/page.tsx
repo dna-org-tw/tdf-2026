@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 interface Week {
   id: number;
@@ -126,14 +126,14 @@ export default function StayAdminDashboard() {
                       <td className="py-2 px-3 text-right">
                         <div className="inline-flex gap-1.5">
                           <a
-                            href={`/api/admin/stay/weeks/${w.id}/export`}
+                            href={`${BASE_PATH}/api/admin/stay/weeks/${w.id}/export`}
                             download
                             className="inline-block px-2.5 py-1 text-xs bg-cyan-500 hover:bg-cyan-600 text-white rounded transition-colors"
                           >
                             匯出 CSV
                           </a>
                           <a
-                            href={`/api/admin/stay/weeks/${w.id}/export-pdf`}
+                            href={`${BASE_PATH}/api/admin/stay/weeks/${w.id}/export-pdf`}
                             download
                             className="inline-block px-2.5 py-1 text-xs bg-slate-700 hover:bg-slate-800 text-white rounded transition-colors"
                           >
