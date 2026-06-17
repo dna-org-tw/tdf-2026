@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { apiFetch } from '@/lib/basePath';
 
 interface StatusCounts {
   approved: number;
@@ -174,7 +175,7 @@ export default function LumaEventsPage() {
 
   const fetchList = useCallback(async () => {
     try {
-      const r = await fetch('/api/admin/luma-events');
+      const r = await apiFetch('/api/admin/luma-events');
       const data = await r.json();
       if (!r.ok) {
         setError(data.error ?? `HTTP ${r.status}`);
@@ -191,7 +192,7 @@ export default function LumaEventsPage() {
     setDetail(null);
     setStatusFilter('all');
     try {
-      const r = await fetch(`/api/admin/luma-events?eventApiId=${encodeURIComponent(eventApiId)}`);
+      const r = await apiFetch(`/api/admin/luma-events?eventApiId=${encodeURIComponent(eventApiId)}`);
       const data = await r.json();
       if (r.ok) setDetail(data as DetailResponse);
     } finally {
@@ -245,7 +246,7 @@ export default function LumaEventsPage() {
       prev ? prev.map((e) => (e.event_api_id === eventApiId ? { ...e, requires_confirmation: next } : e)) : prev,
     );
     try {
-      const r = await fetch(`/api/admin/luma-events?eventApiId=${encodeURIComponent(eventApiId)}`, {
+      const r = await apiFetch(`/api/admin/luma-events?eventApiId=${encodeURIComponent(eventApiId)}`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ requires_confirmation: next }),

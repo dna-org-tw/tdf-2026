@@ -22,6 +22,7 @@ import StaySummaryCard from '@/components/member/StaySummaryCard';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
 import ProfileVisibility from '@/components/member/ProfileVisibility';
 import { formatOrderAmount } from '@/lib/orderDisplay';
+import { apiFetch } from '@/lib/basePath';
 
 const EMPTY_PROFILE: MemberProfile = {
   displayName: null,
@@ -81,7 +82,7 @@ function MemberDashboard() {
 
   const reloadOrders = () => {
     if (!user?.email) return;
-    fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
+    apiFetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
       .then((r) => (r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false, outgoing_transfers: [] }))
       .then((d) => {
         setOrders(d.orders ?? []);
@@ -96,7 +97,7 @@ function MemberDashboard() {
   useEffect(() => {
     if (!user?.email) return;
 
-    fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
+    apiFetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
       .then((r) => r.ok ? r.json() : { orders: [], transfer_deadline: null, deadline_passed: false, outgoing_transfers: [] })
       .then((d) => {
         setOrders(d.orders ?? []);
@@ -107,7 +108,7 @@ function MemberDashboard() {
       .catch((err) => console.error('[Member] Failed to fetch orders:', err))
       .finally(() => setLoading(false));
 
-    fetch('/api/auth/luma-registrations')
+    apiFetch('/api/auth/luma-registrations')
       .then((r) => r.ok ? r.json() : { registrations: [] })
       .then((d) => {
         setLumaRegs(d.registrations ?? []);
@@ -115,17 +116,17 @@ function MemberDashboard() {
       })
       .catch(() => setLumaRegs([]));
 
-    fetch('/api/me/payment-method')
+    apiFetch('/api/me/payment-method')
       .then((r) => r.ok ? r.json() : { paymentMethod: null })
       .then((d) => setPaymentMethod(d.paymentMethod ?? null))
       .catch(() => setPaymentMethod(null));
 
-    fetch('/api/auth/me')
+    apiFetch('/api/auth/me')
       .then((r) => r.ok ? r.json() : null)
       .then((d) => d && setMe({ memberNo: d.memberNo, firstSeenAt: d.firstSeenAt }))
       .catch(() => {});
 
-    const loadProfile = () => fetch('/api/member/profile')
+    const loadProfile = () => apiFetch('/api/member/profile')
       .then((r) => r.ok ? r.json() : null)
       .then((d) => {
         if (d) {
@@ -148,7 +149,7 @@ function MemberDashboard() {
       .catch(() => {});
     loadProfile();
 
-    fetch('/api/member/collections')
+    apiFetch('/api/member/collections')
       .then((r) => r.ok ? r.json() : null)
       .then((d) => d && setCollectionsUnread(d.unreadCount ?? 0))
       .catch(() => {});
@@ -161,7 +162,7 @@ function MemberDashboard() {
 
   useEffect(() => {
     if (!user?.email) return;
-    fetch('/api/stay/bookings')
+    apiFetch('/api/stay/bookings')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setStaySummary(d))
       .catch(() => setStaySummary(null));
@@ -207,7 +208,7 @@ function MemberDashboard() {
 
   const handleTogglePublic = useCallback(async (isPublic: boolean) => {
     setProfile((p) => ({ ...p, isPublic }));
-    await fetch('/api/member/profile', {
+    await apiFetch('/api/member/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_public: isPublic }),
@@ -215,7 +216,7 @@ function MemberDashboard() {
   }, []);
 
   const reloadConfirmations = useCallback(() => {
-    fetch('/api/auth/luma-registrations')
+    apiFetch('/api/auth/luma-registrations')
       .then((r) => r.ok ? r.json() : { registrations: [] })
       .then((d) => {
         setLumaRegs(d.registrations ?? []);
@@ -225,7 +226,7 @@ function MemberDashboard() {
   }, []);
 
   const handleConfirmEvent = useCallback(async (eventApiId: string) => {
-    const resp = await fetch(`/api/me/events/${encodeURIComponent(eventApiId)}/confirm`, {
+    const resp = await apiFetch(`/api/me/events/${encodeURIComponent(eventApiId)}/confirm`, {
       method: 'POST',
     });
     if (!resp.ok) {
@@ -241,7 +242,7 @@ function MemberDashboard() {
   }, [reloadConfirmations]);
 
   const handleCancelConfirmation = useCallback(async (eventApiId: string) => {
-    const resp = await fetch(`/api/me/events/${encodeURIComponent(eventApiId)}/cancel-confirmation`, {
+    const resp = await apiFetch(`/api/me/events/${encodeURIComponent(eventApiId)}/cancel-confirmation`, {
       method: 'POST',
     });
     if (!resp.ok) {
@@ -261,7 +262,7 @@ function MemberDashboard() {
       ? window.confirm(lang === 'zh' ? '確定移除擔保信用卡？' : 'Remove guarantee card?')
       : false;
     if (!confirmed) return;
-    const resp = await fetch('/api/me/payment-method', { method: 'DELETE' });
+    const resp = await apiFetch('/api/me/payment-method', { method: 'DELETE' });
     if (!resp.ok) {
       const body = await resp.json().catch(() => ({}));
       if (body.error === 'has_active_confirmations') {
@@ -282,7 +283,7 @@ function MemberDashboard() {
 
   const handlePaymentMethodConfirmed = useCallback(() => {
     setShowPaymentMethodModal(false);
-    fetch('/api/me/payment-method')
+    apiFetch('/api/me/payment-method')
       .then((r) => r.ok ? r.json() : { paymentMethod: null })
       .then((d) => setPaymentMethod(d.paymentMethod ?? null))
       .catch(() => {});

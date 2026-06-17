@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 
 interface Week {
   id: number;
@@ -32,7 +33,7 @@ export default function StayWeeksPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/stay/summary')
+    apiFetch('/api/admin/stay/summary')
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -66,7 +67,7 @@ export default function StayWeeksPage() {
     setMessage(null);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/stay/weeks/${week.id}`, {
+      const res = await apiFetch(`/api/admin/stay/weeks/${week.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

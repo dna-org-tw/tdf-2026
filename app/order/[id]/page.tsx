@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
+import { apiFetch } from '@/lib/basePath';
 
 interface OrderDetail {
   id: string;
@@ -89,7 +90,7 @@ function MemberOrderDetail() {
   const fetchOrder = async () => {
     try {
       setError(null);
-      const res = await fetch(`/api/auth/orders/${encodeURIComponent(orderId)}`);
+      const res = await apiFetch(`/api/auth/orders/${encodeURIComponent(orderId)}`);
       if (res.status === 401) {
         router.push('/me');
         return;

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiFetch } from '@/lib/basePath';
 
 const TIERS = [
   { value: 'explore', label: 'Explore' },
@@ -43,7 +44,7 @@ export default function NewOrderPage() {
       }
       amountCents = Math.round(parsed * 100);
     }
-    const res = await fetch('/api/admin/orders', {
+    const res = await apiFetch('/api/admin/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

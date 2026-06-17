@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { TIER_ACCENT, type IdentityTier } from '@/components/member/MemberPassport';
+import { apiFetch } from '@/lib/basePath';
 
 interface MemberCard {
   member_no: string | null;
@@ -103,7 +104,7 @@ function MemberDirectory() {
       const params = new URLSearchParams();
       if (q) params.set('q', q);
       params.set('page', String(p));
-      const res = await fetch(`/api/members?${params}`);
+      const res = await apiFetch(`/api/members?${params}`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       setMembers(data.members);

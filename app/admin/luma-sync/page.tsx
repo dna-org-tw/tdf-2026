@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, Fragment } from 'react';
 import type { SyncJob, SyncEventResult, SyncConfigPublic } from '@/lib/lumaSyncTypes';
+import { apiFetch } from '@/lib/basePath';
 
 export default function LumaSyncPage() {
   const [config, setConfig] = useState<SyncConfigPublic | null>(null);
@@ -24,7 +25,7 @@ export default function LumaSyncPage() {
   const [testing, setTesting] = useState(false);
 
   const fetchConfig = useCallback(async () => {
-    const r = await fetch('/api/admin/luma-sync/config');
+    const r = await apiFetch('/api/admin/luma-sync/config');
     if (r.ok) {
       const c = (await r.json()) as SyncConfigPublic;
       setConfig(c);
@@ -32,7 +33,7 @@ export default function LumaSyncPage() {
   }, []);
 
   const fetchJobs = useCallback(async () => {
-    const r = await fetch('/api/admin/luma-sync/jobs');
+    const r = await apiFetch('/api/admin/luma-sync/jobs');
     if (r.ok) {
       const data = (await r.json()) as { current: SyncJob | null; recent: SyncJob[] };
       setCurrent(data.current);
@@ -41,7 +42,7 @@ export default function LumaSyncPage() {
   }, []);
 
   const fetchCurrentResults = useCallback(async (jobId: number) => {
-    const r = await fetch(`/api/admin/luma-sync/jobs/${jobId}`);
+    const r = await apiFetch(`/api/admin/luma-sync/jobs/${jobId}`);
     if (r.ok) {
       const data = (await r.json()) as { results: SyncEventResult[] };
       setResults(data.results);
@@ -49,7 +50,7 @@ export default function LumaSyncPage() {
   }, []);
 
   const fetchExpanded = useCallback(async (jobId: number) => {
-    const r = await fetch(`/api/admin/luma-sync/jobs/${jobId}`);
+    const r = await apiFetch(`/api/admin/luma-sync/jobs/${jobId}`);
     if (r.ok) {
       const data = (await r.json()) as { results: SyncEventResult[] };
       setExpandedResults(data.results);
@@ -75,7 +76,7 @@ export default function LumaSyncPage() {
   const startSync = async () => {
     setBusy(true); setError(null);
     try {
-      const r = await fetch('/api/admin/luma-sync/start', { method: 'POST' });
+      const r = await apiFetch('/api/admin/luma-sync/start', { method: 'POST' });
       const data = await r.json();
       if (!r.ok) setError(data.error ?? 'failed');
       await fetchJobs();
@@ -86,7 +87,7 @@ export default function LumaSyncPage() {
     if (!confirm('要取消目前的同步嗎？worker 會在下一個活動邊界停止（進行中的那個活動會先處理完）。')) return;
     setCancelling(true); setError(null);
     try {
-      const r = await fetch(`/api/admin/luma-sync/jobs/${jobId}`, { method: 'DELETE' });
+      const r = await apiFetch(`/api/admin/luma-sync/jobs/${jobId}`, { method: 'DELETE' });
       const data = await r.json();
       if (!r.ok) setError(data.error ?? 'cancel_failed');
       await fetchJobs();
@@ -97,7 +98,7 @@ export default function LumaSyncPage() {
     setTesting(true);
     setTestResult(null);
     try {
-      const r = await fetch('/api/admin/luma-sync/test', { method: 'POST' });
+      const r = await apiFetch('/api/admin/luma-sync/test', { method: 'POST' });
       const data = await r.json();
       if (data.ok) {
         setTestResult({ kind: 'ok', entryCount: data.entryCount ?? 0 });
@@ -117,7 +118,7 @@ export default function LumaSyncPage() {
   const saveCookie = async () => {
     setBusy(true); setError(null);
     try {
-      const r = await fetch('/api/admin/luma-sync/config', {
+      const r = await apiFetch('/api/admin/luma-sync/config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cookie: cookieDraft }),

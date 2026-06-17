@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { ReconcileResult } from '@/lib/stripeReconcileTypes';
 import { isTerminalResult } from '@/lib/stripeReconcileTypes';
+import { apiFetch } from '@/lib/basePath';
 
 interface Stats {
   uniqueEmails: number;
@@ -116,7 +117,7 @@ export default function AdminDashboard() {
   const [reconcileLoading, setReconcileLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/admin/stats')
+    apiFetch('/api/admin/stats')
       .then((res) => res.json())
       .then((data) => setStats(data))
       .catch((err) => console.error('[Admin]', err))
@@ -124,7 +125,7 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    fetch('/api/admin/stripe-reconcile')
+    apiFetch('/api/admin/stripe-reconcile')
       .then((res) => res.json())
       .then((data) => setReconcile(data))
       .catch((err) => console.error('[Admin Reconcile]', err))

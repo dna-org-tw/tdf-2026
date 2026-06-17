@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { apiFetch } from '@/lib/basePath';
 
 interface Subscriber {
   email: string;
@@ -33,7 +34,7 @@ export default function SubscribersPage() {
       params.set('page', String(page));
       params.set('limit', '20');
 
-      const res = await fetch(`/api/admin/subscribers?${params}`);
+      const res = await apiFetch(`/api/admin/subscribers?${params}`);
       if (res.ok) {
         const data = await res.json();
         setSubscribers(data.subscribers || []);

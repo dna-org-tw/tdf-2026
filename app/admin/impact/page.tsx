@@ -16,6 +16,7 @@ import {
   Tooltip,
   LabelList,
 } from 'recharts';
+import { apiFetch } from '@/lib/basePath';
 
 // Brand palette (matches site/admin).
 const C = {
@@ -111,7 +112,7 @@ export default function ImpactPage() {
     let cancelled = false;
     const q = new URLSearchParams({ dailySpend: String(dailySpend), usdRate: String(usdRate) });
     if (stayDays.trim()) q.set('stayDays', stayDays.trim());
-    fetch(`/api/admin/impact?${q.toString()}`)
+    apiFetch(`/api/admin/impact?${q.toString()}`)
       .then((r) => r.json())
       .then((d) => {
         if (cancelled) return;
@@ -132,13 +133,13 @@ export default function ImpactPage() {
 
   // Speakers (live Luma calendar) + partners (Google Sheet) via public endpoints.
   useEffect(() => {
-    fetch('/api/luma-data')
+    apiFetch('/api/luma-data')
       .then((r) => r.json())
       .then((d) => {
         if (Array.isArray(d?.speakers)) setSpeakers(d.speakers.length);
       })
       .catch(() => {});
-    fetch('/api/partners')
+    apiFetch('/api/partners')
       .then((r) => r.json())
       .then((d) => {
         const list = Array.isArray(d) ? d : d?.partners;

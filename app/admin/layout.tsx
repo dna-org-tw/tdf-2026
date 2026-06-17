@@ -9,6 +9,7 @@ import {
   LumaCookieBanner,
   useLumaCookieStatus,
 } from '@/components/admin/LumaCookieStatus';
+import { apiFetch } from '@/lib/basePath';
 
 function AdminNav() {
   const { user, signOut } = useAuth();
@@ -106,7 +107,7 @@ function LoginForm() {
     setSending(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/send-code', {
+      const res = await apiFetch('/api/auth/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
@@ -130,7 +131,7 @@ function LoginForm() {
     setVerifying(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/verify-code', {
+      const res = await apiFetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), code: code.trim() }),

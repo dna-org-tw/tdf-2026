@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 
 interface NotificationDetail {
   id: string;
@@ -60,7 +61,7 @@ export default function NotificationDetailPage() {
 
   const fetchDetail = useCallback(async () => {
     try {
-      const res = await fetch(`/api/admin/history/${id}`);
+      const res = await apiFetch(`/api/admin/history/${id}`);
       const data = await res.json();
       if (data.notification) setNotification(data.notification);
       if (data.emailLogs) setEmailLogs(data.emailLogs);
@@ -102,7 +103,7 @@ export default function NotificationDetailPage() {
   const handleRetry = async () => {
     setRetrying(true);
     try {
-      const res = await fetch(`/api/admin/history/${id}/retry`, { method: 'POST' });
+      const res = await apiFetch(`/api/admin/history/${id}/retry`, { method: 'POST' });
       const data = await res.json();
       if (data.retried > 0) {
         await fetchDetail();
@@ -121,7 +122,7 @@ export default function NotificationDetailPage() {
     )) return;
     setResuming(true);
     try {
-      await fetch(`/api/admin/history/${id}/resume`, { method: 'POST' });
+      await apiFetch(`/api/admin/history/${id}/resume`, { method: 'POST' });
       await fetchDetail();
     } catch (err) {
       console.error('[Detail] resume error', err);

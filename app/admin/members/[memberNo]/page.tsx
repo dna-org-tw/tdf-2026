@@ -15,6 +15,7 @@ import {
 } from '@/lib/members';
 import LumaRegistrationsList from '@/components/admin/LumaRegistrationsList';
 import type { Registration } from '@/lib/lumaSyncTypes';
+import { apiFetch } from '@/lib/basePath';
 
 interface MemberRow {
   id: number;
@@ -207,7 +208,7 @@ function SendEmailModal({ memberNo, email, onClose, onSent }: {
     if (!subject.trim() || !body.trim()) { setErr('主旨與內容不可空白'); return; }
     setSending(true);
     setErr(null);
-    const res = await fetch(`/api/admin/members/${encodeURIComponent(memberNo)}/send-email`, {
+    const res = await apiFetch(`/api/admin/members/${encodeURIComponent(memberNo)}/send-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subject, body }),
@@ -257,7 +258,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/admin/members/${encodeURIComponent(memberNo)}/luma-registrations`)
+    apiFetch(`/api/admin/members/${encodeURIComponent(memberNo)}/luma-registrations`)
       .then((r) => r.ok ? r.json() : { registrations: [], noShowSummary: null })
       .then((d) => {
         if (!cancelled) {
@@ -278,7 +279,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/members/${encodeURIComponent(memberNo)}`);
+      const res = await apiFetch(`/api/admin/members/${encodeURIComponent(memberNo)}`);
       if (res.status === 404) {
         setError('查無此會員');
       } else if (!res.ok) {
@@ -302,14 +303,14 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
 
   const handleUnsubscribe = async () => {
     if (!confirm('確定要將此會員從電子報退訂嗎？')) return;
-    const res = await fetch(`/api/admin/members/${encodeURIComponent(memberNo)}/unsubscribe`, { method: 'POST' });
+    const res = await apiFetch(`/api/admin/members/${encodeURIComponent(memberNo)}/unsubscribe`, { method: 'POST' });
     if (res.ok) { showToast('已取消訂閱'); load(); }
     else { showToast('退訂失敗'); }
   };
 
   const handleResend = async (orderId: string) => {
     if (!confirm('重新寄送訂單確認信？')) return;
-    const res = await fetch(`/api/admin/members/${encodeURIComponent(memberNo)}/resend-confirmation`, {
+    const res = await apiFetch(`/api/admin/members/${encodeURIComponent(memberNo)}/resend-confirmation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId }),

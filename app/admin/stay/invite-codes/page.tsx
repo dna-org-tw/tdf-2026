@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 
 interface InviteCode {
   id: string;
@@ -33,7 +34,7 @@ export default function StayInviteCodesPage() {
 
   const load = useCallback(() => {
     setLoading(true);
-    fetch('/api/admin/stay/invite-codes/batch')
+    apiFetch('/api/admin/stay/invite-codes/batch')
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -53,7 +54,7 @@ export default function StayInviteCodesPage() {
     setMessage(null);
     setError(null);
     try {
-      const res = await fetch('/api/admin/stay/invite-codes/batch', {
+      const res = await apiFetch('/api/admin/stay/invite-codes/batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,7 +90,7 @@ export default function StayInviteCodesPage() {
     setSending(true);
     setRowError(null);
     try {
-      const res = await fetch(`/api/admin/stay/invite-codes/${rowId}/send`, {
+      const res = await apiFetch(`/api/admin/stay/invite-codes/${rowId}/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: sendEmail.trim() }),

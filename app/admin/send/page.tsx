@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { marked } from 'marked';
+import { apiFetch } from '@/lib/basePath';
 import {
   type MemberStatus,
   type MemberTier,
@@ -93,7 +94,7 @@ export default function SendNotificationPage() {
   const [emailConfig, setEmailConfig] = useState<{ from: string; replyTo: string | null; domain: string | null } | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/email-config')
+    apiFetch('/api/admin/email-config')
       .then((res) => res.ok ? res.json() : null)
       .then((data) => { if (data) setEmailConfig(data); })
       .catch(() => {});
@@ -151,7 +152,7 @@ export default function SendNotificationPage() {
       if (memberTiers.length) params.set('memberTiers', memberTiers.join(','));
       if (ticketTiers.length) params.set('ticketTiers', ticketTiers.join(','));
       params.set('category', category);
-      const res = await fetch(`/api/admin/recipients?${params}`);
+      const res = await apiFetch(`/api/admin/recipients?${params}`);
       if (res.ok) {
         const data = await res.json();
         setRecipientCount(data.count ?? 0);
@@ -188,7 +189,7 @@ export default function SendNotificationPage() {
         if (memberTiers.length) payload.memberTiers = memberTiers;
         if (ticketTiers.length) payload.ticketTiers = ticketTiers;
       }
-      const res = await fetch('/api/admin/send', {
+      const res = await apiFetch('/api/admin/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

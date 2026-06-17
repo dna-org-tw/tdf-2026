@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CollectionList from '@/components/member/CollectionList';
 import type { CollectionEntry } from '@/lib/memberCollections';
+import { apiFetch } from '@/lib/basePath';
 
 function CollectionsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -20,7 +21,7 @@ function CollectionsPage() {
 
   const fetchLists = useCallback(async () => {
     try {
-      const res = await fetch('/api/member/collections');
+      const res = await apiFetch('/api/member/collections');
       if (!res.ok) throw new Error();
       const data = await res.json();
       setCollected(data.collected ?? []);
@@ -36,12 +37,12 @@ function CollectionsPage() {
   useEffect(() => {
     if (!user) return;
     fetchLists();
-    fetch('/api/member/collections/mark-viewed', { method: 'POST' }).catch(() => {});
+    apiFetch('/api/member/collections/mark-viewed', { method: 'POST' }).catch(() => {});
   }, [user, fetchLists]);
 
   const handleRemove = async (memberNo: string) => {
     setCollected((prev) => prev.filter((c) => c.member_no !== memberNo));
-    await fetch(`/api/member/collections/${memberNo}`, { method: 'DELETE' });
+    await apiFetch(`/api/member/collections/${memberNo}`, { method: 'DELETE' });
   };
 
   if (authLoading) {

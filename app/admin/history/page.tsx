@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 
 interface NotificationLog {
   id: string;
@@ -34,7 +35,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/admin/history')
+    apiFetch('/api/admin/history')
       .then((res) => res.json())
       .then((data) => setNotifications(data.notifications || []))
       .catch((err) => console.error('[Admin]', err))

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import TransferOrderModal from '@/components/order/TransferOrderModal';
+import { apiFetch } from '@/lib/basePath';
 
 interface Order {
   id: string;
@@ -108,7 +109,7 @@ export default function OrderDetailPage() {
   const [notes, setNotes] = useState('');
 
   const load = useCallback(async () => {
-    const res = await fetch(`/api/admin/orders/${params.id}`);
+    const res = await apiFetch(`/api/admin/orders/${params.id}`);
     if (res.ok) {
       const data = await res.json();
       setOrder(data.order);
@@ -146,7 +147,7 @@ export default function OrderDetailPage() {
     setEditing(true);
   };
   const saveEdit = async () => {
-    const res = await fetch(`/api/admin/orders/${params.id}`, {
+    const res = await apiFetch(`/api/admin/orders/${params.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ customer_name: editName, customer_email: editEmail }),
@@ -178,7 +179,7 @@ export default function OrderDetailPage() {
   };
   const submitRefund = async () => {
     setRefundSubmitting(true);
-    const res = await fetch(`/api/admin/orders/${params.id}/refund`, {
+    const res = await apiFetch(`/api/admin/orders/${params.id}/refund`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: refundAmount, reason: refundReason, note: refundNote }),
@@ -197,7 +198,7 @@ export default function OrderDetailPage() {
   // --- Cancel ---
   const doCancel = async () => {
     if (!confirm('確定取消此訂單？')) return;
-    const res = await fetch(`/api/admin/orders/${params.id}/cancel`, { method: 'POST' });
+    const res = await apiFetch(`/api/admin/orders/${params.id}/cancel`, { method: 'POST' });
     if (res.ok) { showToast('已取消'); load(); }
     else {
       const data = await res.json().catch(() => ({}));
@@ -207,7 +208,7 @@ export default function OrderDetailPage() {
 
   // --- Resend receipt ---
   const doResend = async () => {
-    const res = await fetch(`/api/admin/orders/${params.id}/resend-receipt`, { method: 'POST' });
+    const res = await apiFetch(`/api/admin/orders/${params.id}/resend-receipt`, { method: 'POST' });
     if (res.ok) showToast('收據已重寄');
     else {
       const data = await res.json().catch(() => ({}));
@@ -237,7 +238,7 @@ export default function OrderDetailPage() {
   };
   const submitUpgrade = async () => {
     setUpSubmitting(true);
-    const res = await fetch(`/api/admin/orders/${params.id}/upgrade`, {
+    const res = await apiFetch(`/api/admin/orders/${params.id}/upgrade`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -268,7 +269,7 @@ export default function OrderDetailPage() {
 
   // --- Notes ---
   const saveNotes = async () => {
-    const res = await fetch(`/api/admin/orders/${params.id}/notes`, {
+    const res = await apiFetch(`/api/admin/orders/${params.id}/notes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ internal_notes: notes }),

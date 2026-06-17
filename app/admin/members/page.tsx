@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 import {
   type EnrichedMember,
   type MemberIdentity,
@@ -50,7 +51,7 @@ export default function MembersPage() {
       params.set('page', String(page));
       params.set('limit', '20');
 
-      const res = await fetch(`/api/admin/members?${params}`);
+      const res = await apiFetch(`/api/admin/members?${params}`);
       if (res.ok) {
         const data: ApiResponse = await res.json();
         setMembers(data.members || []);

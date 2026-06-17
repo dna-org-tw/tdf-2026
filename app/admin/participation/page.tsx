@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 
 interface ParticipantEvent {
   event_api_id: string;
@@ -112,7 +113,7 @@ export default function ParticipationPage() {
       const params = new URLSearchParams();
       params.set('mode', mode);
       if (!includePast) params.set('includePast', '0');
-      const r = await fetch(`/api/admin/event-participation?${params.toString()}`);
+      const r = await apiFetch(`/api/admin/event-participation?${params.toString()}`);
       const json = await r.json();
       if (!r.ok) throw new Error(json.error ?? `HTTP ${r.status}`);
       setData(json as ApiResponse);

@@ -9,6 +9,7 @@ import type {
   ReconcileTerminalResult,
 } from '@/lib/stripeReconcileTypes';
 import { isTerminalResult } from '@/lib/stripeReconcileTypes';
+import { apiFetch } from '@/lib/basePath';
 
 function formatCurrency(amount: number, currency: string) {
   return `${(amount / 100).toLocaleString(undefined, {
@@ -49,7 +50,7 @@ export default function ReconcilePage() {
     if (force) setRefreshing(true);
     else setLoading(true);
     try {
-      const res = await fetch(`/api/admin/stripe-reconcile${force ? '?force=1' : ''}`);
+      const res = await apiFetch(`/api/admin/stripe-reconcile${force ? '?force=1' : ''}`);
       const data = (await res.json()) as ReconcileResult;
       setResult(data);
     } catch (err) {

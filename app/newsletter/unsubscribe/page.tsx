@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { trackEvent } from '@/components/FacebookPixel';
+import { apiFetch } from '@/lib/basePath';
 
 export default function UnsubscribePage() {
   const searchParams = useSearchParams();
@@ -28,7 +29,7 @@ export default function UnsubscribePage() {
         setStatus('loading');
         setMessage(t.unsubscribe.processing);
 
-        const res = await fetch(`/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`);
+        const res = await apiFetch(`/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`);
 
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({ error: t.unsubscribe.errorTitle }));
@@ -70,7 +71,7 @@ export default function UnsubscribePage() {
         return;
       }
 
-      const res = await fetch('/api/newsletter/unsubscribe', {
+      const res = await apiFetch('/api/newsletter/unsubscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), recaptchaToken }),
@@ -164,7 +165,7 @@ export default function UnsubscribePage() {
                       try {
                         setStatus('loading');
                         setMessage(t.unsubscribe.processing);
-                        const res = await fetch(`/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`);
+                        const res = await apiFetch(`/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`);
                         if (!res.ok) {
                           const errorData = await res.json().catch(() => ({ error: t.unsubscribe.errorTitle }));
                           throw new Error(errorData.error || t.unsubscribe.errorTitle);

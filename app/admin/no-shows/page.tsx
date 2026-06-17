@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 import {
   TICKET_TIER_LABELS,
   TICKET_TIER_BADGE_CLASSES,
@@ -119,7 +120,7 @@ export default function NoShowsPage() {
     setLoading(true);
     setError(null);
     try {
-      const r = await fetch('/api/admin/no-shows');
+      const r = await apiFetch('/api/admin/no-shows');
       const j = await r.json();
       if (!r.ok) {
         setError(j.error ?? `HTTP ${r.status}`);

@@ -14,6 +14,7 @@ import AwardRules from '@/components/award/AwardRules';
 import AwardError from '@/components/award/AwardError';
 import AwardPostsGrid from '@/components/award/AwardPostsGrid';
 import { InstagramPost } from '@/components/award/types';
+import { apiFetch } from '@/lib/basePath';
 
 // Dynamically import Footer for performance optimization
 const Footer = dynamic(() => import('@/components/Footer'), {
@@ -51,7 +52,7 @@ export default function AwardPage() {
   const fetchReels = async () => {
     try {
       // Call API to fetch Instagram Reels (runs every time, no cache)
-      const response = await fetch('/api/award/fetch-reels', {
+      const response = await apiFetch('/api/award/fetch-reels', {
         method: 'GET',
         cache: 'no-store', // Ensure no caching
       });
@@ -74,7 +75,7 @@ export default function AwardPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/award/posts');
+      const response = await apiFetch('/api/award/posts');
       const data = await response.json();
 
       if (!response.ok) {
@@ -151,7 +152,7 @@ export default function AwardPage() {
         throw new Error(t.award?.posts?.recaptchaError || 'reCAPTCHA verification failed');
       }
 
-      const response = await fetch('/api/award/vote', {
+      const response = await apiFetch('/api/award/vote', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

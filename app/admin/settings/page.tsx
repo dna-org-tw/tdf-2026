@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { DEFAULT_CUTOFF_ISO } from '@/lib/ticketSaleCutoff';
+import { apiFetch } from '@/lib/basePath';
 
 function formatLocalInputValue(iso: string | null): string {
   if (!iso) return '';
@@ -31,14 +32,14 @@ export default function AdminSettingsPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/settings/order-transfer-deadline');
+      const res = await apiFetch('/api/admin/settings/order-transfer-deadline');
       if (res.ok) {
         const data = await res.json();
         setDeadline(data.value ?? null);
         setInput(formatLocalInputValue(data.value ?? null));
       }
 
-      const cRes = await fetch('/api/admin/settings/ticket-sale-cutoff');
+      const cRes = await apiFetch('/api/admin/settings/ticket-sale-cutoff');
       if (cRes.ok) {
         const cData = await cRes.json();
         setCutoff(cData.value ?? null);
@@ -70,7 +71,7 @@ export default function AdminSettingsPage() {
     }
     setSaving(true);
     try {
-      const res = await fetch('/api/admin/settings/order-transfer-deadline', {
+      const res = await apiFetch('/api/admin/settings/order-transfer-deadline', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ value: localDate.toISOString() }),
@@ -106,7 +107,7 @@ export default function AdminSettingsPage() {
     }
     setCutoffSaving(true);
     try {
-      const res = await fetch('/api/admin/settings/ticket-sale-cutoff', {
+      const res = await apiFetch('/api/admin/settings/ticket-sale-cutoff', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ value: localDate.toISOString() }),

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { apiFetch } from '@/lib/basePath';
 
 interface Week {
   id: number;
@@ -82,7 +83,7 @@ export default function StayBookingDetailPage() {
   const load = useCallback(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`/api/admin/stay/bookings/${id}`)
+    apiFetch(`/api/admin/stay/bookings/${id}`)
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -102,7 +103,7 @@ export default function StayBookingDetailPage() {
     setActionMsg(null);
     setActionErr(null);
     try {
-      const res = await fetch(`/api/admin/stay/bookings/${bookingWeekId}/no-show`, { method: 'POST' });
+      const res = await apiFetch(`/api/admin/stay/bookings/${bookingWeekId}/no-show`, { method: 'POST' });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || 'failed');
       setActionMsg('已標記 no-show 並扣款');
@@ -121,7 +122,7 @@ export default function StayBookingDetailPage() {
     setActionMsg(null);
     setActionErr(null);
     try {
-      const res = await fetch(`/api/admin/stay/bookings/${id}/comp`, { method: 'POST' });
+      const res = await apiFetch(`/api/admin/stay/bookings/${id}/comp`, { method: 'POST' });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || 'failed');
       setActionMsg('已轉為 complimentary');
@@ -138,7 +139,7 @@ export default function StayBookingDetailPage() {
     setActionMsg(null);
     setActionErr(null);
     try {
-      const res = await fetch(`/api/admin/stay/transfers/${transferId}/resend`, { method: 'POST' });
+      const res = await apiFetch(`/api/admin/stay/transfers/${transferId}/resend`, { method: 'POST' });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || 'failed');
       setActionMsg('已重新寄出轉讓信');

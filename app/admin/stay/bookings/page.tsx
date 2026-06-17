@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/basePath';
 
 interface BookingWeek {
   id: string;
@@ -28,7 +29,7 @@ export default function StayBookingsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/stay/bookings')
+    apiFetch('/api/admin/stay/bookings')
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

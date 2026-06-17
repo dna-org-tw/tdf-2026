@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { apiFetch } from '@/lib/basePath';
 
 interface TierBreakdown {
   explore: number;
@@ -82,7 +83,7 @@ export default function DiscountsPage() {
     }
 
     try {
-      const res = await fetch(`/api/admin/discounts?${params}`, { signal });
+      const res = await apiFetch(`/api/admin/discounts?${params}`, { signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setDiscounts(data.discounts || []);

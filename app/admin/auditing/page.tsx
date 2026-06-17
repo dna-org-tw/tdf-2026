@@ -2,6 +2,7 @@
 
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import type { UnifiedEvent, AuditSource, ActorType } from '@/lib/adminAuditing';
+import { apiFetch } from '@/lib/basePath';
 
 const SOURCE_LABELS: Record<AuditSource, string> = {
   order_action: '訂單操作',
@@ -76,7 +77,7 @@ export default function AdminAuditingPage() {
         if (q.trim()) params.set('q', q.trim());
         params.set('limit', '100');
 
-        const res = await fetch(`/api/admin/auditing?${params.toString()}`);
+        const res = await apiFetch(`/api/admin/auditing?${params.toString()}`);
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           throw new Error(body.error || `HTTP ${res.status}`);

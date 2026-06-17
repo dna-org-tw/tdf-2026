@@ -12,6 +12,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
+import { apiFetch } from '@/lib/basePath';
 
 interface Order {
   id: string;
@@ -130,7 +131,7 @@ export default function OrdersPage() {
   // Fetch daily chart data
   useEffect(() => {
     setChartLoading(true);
-    fetch(`/api/admin/orders/daily?days=${chartRange}`)
+    apiFetch(`/api/admin/orders/daily?days=${chartRange}`)
       .then((res) => res.json())
       .then((data) => {
         // Compute cumulative revenue starting from prior total
@@ -158,7 +159,7 @@ export default function OrdersPage() {
       params.set('page', String(page));
       params.set('limit', '20');
 
-      const res = await fetch(`/api/admin/orders?${params}`);
+      const res = await apiFetch(`/api/admin/orders?${params}`);
       if (res.ok) {
         const data = await res.json();
         setOrders(data.orders || []);
