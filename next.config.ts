@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // 路徑前綴：整站服務於 /2026 之下（由 NEXT_PUBLIC_BASE_PATH 注入）
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
+
   // 啟用 standalone 輸出以優化 Docker 映像大小
   output: 'standalone',
   
