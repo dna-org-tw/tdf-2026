@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const CANONICAL_HOST = 'fest.dna.org.tw';
+const CANONICAL_HOST = '2026.taiwandigitalfest.com';
 
 export function proxy(request: NextRequest) {
   const host = request.headers.get('host')?.split(':')[0];
 
-  // 301 redirect non-canonical domains (taiwandigitalfest.com, tdf-2026.zeabur.app) to fest.dna.org.tw
+  // 301 redirect non-canonical domains (fest.dna.org.tw, taiwandigitalfest.com, tdf-2026.zeabur.app) to 2026.taiwandigitalfest.com
   if (host && host !== CANONICAL_HOST && host !== 'localhost' && host !== '127.0.0.1') {
     const url = new URL(request.url);
     url.hostname = CANONICAL_HOST;

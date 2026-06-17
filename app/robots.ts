@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fest.dna.org.tw';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com';
 
   return {
     rules: [

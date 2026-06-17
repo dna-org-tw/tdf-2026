@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: 'Taiwan Digital Fest 2026 Terms of Service — ticket purchase, refund and cancellation policy, event liability, governing law.',
   openGraph: {
     title: 'Terms of Service | Taiwan Digital Fest 2026',
-    description: 'The agreement that governs your use of fest.dna.org.tw and participation in TDF 2026.',
+    description: 'The agreement that governs your use of 2026.taiwandigitalfest.com and participation in TDF 2026.',
   },
 };
 

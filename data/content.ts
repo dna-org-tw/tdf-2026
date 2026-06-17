@@ -882,6 +882,13 @@ export const content = {
       accept: "Accept",
       reject: "Reject"
     },
+    tdf2027Popup: {
+      ariaLabel: "TDF 2027 announcement",
+      title: "TDF 2027 is coming!",
+      message: "Taiwan Digital Fest returns in 2027. Be the first to know.",
+      cta: "Learn more",
+      close: "Close"
+    },
     a11y: {
       skipToContent: "Skip to main content"
     },
@@ -933,7 +940,7 @@ export const content = {
     privacy: {
       title: "Privacy Policy",
       lastUpdated: "Last updated: April 2026",
-      intro: "This Privacy Policy explains how Taiwan Digital Fest 2026 (\"TDF 2026\", \"we\", \"us\") handles personal information when you visit fest.dna.org.tw, buy a ticket, subscribe to our updates, or participate in festival activities. Two legal entities jointly operate TDF 2026, acting as joint controllers under Article 26 of the EU GDPR: Taiwan Digital Nomad Association (Taiwan) runs the festival, member services, and event logistics; Nomad Explore LLC (Wyoming, USA) handles ticket sales and payments. We process personal data in accordance with Taiwan's Personal Data Protection Act (PDPA), the EU General Data Protection Regulation (GDPR) where applicable, California Consumer Privacy Rights Act (CPRA), and equivalent local laws.",
+      intro: "This Privacy Policy explains how Taiwan Digital Fest 2026 (\"TDF 2026\", \"we\", \"us\") handles personal information when you visit 2026.taiwandigitalfest.com, buy a ticket, subscribe to our updates, or participate in festival activities. Two legal entities jointly operate TDF 2026, acting as joint controllers under Article 26 of the EU GDPR: Taiwan Digital Nomad Association (Taiwan) runs the festival, member services, and event logistics; Nomad Explore LLC (Wyoming, USA) handles ticket sales and payments. We process personal data in accordance with Taiwan's Personal Data Protection Act (PDPA), the EU General Data Protection Regulation (GDPR) where applicable, California Consumer Privacy Rights Act (CPRA), and equivalent local laws.",
       sections: [
         {
           title: "1. Who we are",
@@ -1070,7 +1077,7 @@ export const content = {
     terms: {
       title: "Terms of Service",
       lastUpdated: "Last updated: April 2026",
-      intro: "These Terms of Service (\"Terms\") govern your use of fest.dna.org.tw (the \"Site\") and your participation in Taiwan Digital Fest 2026 (\"TDF 2026\"). By purchasing a ticket, registering an account, or using the Site, you agree to these Terms. If you do not agree, do not use the Site or attend the event. The Site and TDF 2026 are jointly operated by Taiwan Digital Nomad Association (\"TDNA\", Taiwan) and Nomad Explore LLC (Wyoming, USA).",
+      intro: "These Terms of Service (\"Terms\") govern your use of 2026.taiwandigitalfest.com (the \"Site\") and your participation in Taiwan Digital Fest 2026 (\"TDF 2026\"). By purchasing a ticket, registering an account, or using the Site, you agree to these Terms. If you do not agree, do not use the Site or attend the event. The Site and TDF 2026 are jointly operated by Taiwan Digital Nomad Association (\"TDNA\", Taiwan) and Nomad Explore LLC (Wyoming, USA).",
       sections: [
         {
           title: "1. Parties and scope",
@@ -2344,6 +2351,13 @@ export const content = {
       accept: "同意",
       reject: "拒絕"
     },
+    tdf2027Popup: {
+      ariaLabel: "TDF 2027 公告",
+      title: "TDF 2027 即將登場！",
+      message: "台灣數位嘉年華 2027 即將回歸，搶先掌握最新消息。",
+      cta: "前往了解",
+      close: "關閉"
+    },
     a11y: {
       skipToContent: "跳至主要內容"
     },
@@ -2395,7 +2409,7 @@ export const content = {
     privacy: {
       title: "隱私權政策",
       lastUpdated: "最後更新：2026 年 4 月",
-      intro: "本隱私權政策說明 Taiwan Digital Fest 2026（「TDF 2026」、「我們」）在您造訪 fest.dna.org.tw、購票、訂閱更新或參與活動時如何處理您的個人資料。TDF 2026 由兩個法律實體共同營運，依 GDPR 第 26 條屬於共同控制者（joint controllers）：社團法人台灣數位遊牧者協會（Taiwan Digital Nomad Association，TDNA，台灣）負責活動營運與會員服務；Nomad Explore LLC（美國懷俄明州）負責票券銷售與付款處理。我們依循台灣個人資料保護法（個資法）、歐盟一般資料保護規則（GDPR，於適用時）、加州消費者隱私權法（CPRA）及其他當地法律處理個資。",
+      intro: "本隱私權政策說明 Taiwan Digital Fest 2026（「TDF 2026」、「我們」）在您造訪 2026.taiwandigitalfest.com、購票、訂閱更新或參與活動時如何處理您的個人資料。TDF 2026 由兩個法律實體共同營運，依 GDPR 第 26 條屬於共同控制者（joint controllers）：社團法人台灣數位遊牧者協會（Taiwan Digital Nomad Association，TDNA，台灣）負責活動營運與會員服務；Nomad Explore LLC（美國懷俄明州）負責票券銷售與付款處理。我們依循台灣個人資料保護法（個資法）、歐盟一般資料保護規則（GDPR，於適用時）、加州消費者隱私權法（CPRA）及其他當地法律處理個資。",
       sections: [
         {
           title: "1. 我們是誰",
@@ -2526,7 +2540,7 @@ export const content = {
     terms: {
       title: "服務條款",
       lastUpdated: "最後更新：2026 年 4 月",
-      intro: "本服務條款（「條款」）規範您使用 fest.dna.org.tw（「網站」）及參與 Taiwan Digital Fest 2026（「TDF 2026」）之行為。您購票、註冊帳號或使用本網站即表示同意本條款。若您不同意，請勿使用本網站或出席活動。本網站與 TDF 2026 由社團法人台灣數位遊牧者協會（「TDNA」，台灣）與 Nomad Explore LLC（美國懷俄明州）共同營運。",
+      intro: "本服務條款（「條款」）規範您使用 2026.taiwandigitalfest.com（「網站」）及參與 Taiwan Digital Fest 2026（「TDF 2026」）之行為。您購票、註冊帳號或使用本網站即表示同意本條款。若您不同意，請勿使用本網站或出席活動。本網站與 TDF 2026 由社團法人台灣數位遊牧者協會（「TDNA」，台灣）與 Nomad Explore LLC（美國懷俄明州）共同營運。",
       sections: [
         {
           title: "1. 當事人與適用範圍",

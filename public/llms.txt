@@ -3,7 +3,7 @@
 
 # Site Information
 Site: Taiwan Digital Fest 2026 (2026 台灣數位嘉年華)
-Base URL: https://fest.dna.org.tw
+Base URL: https://2026.taiwandigitalfest.com
 Organization: Taiwan Digital Nomad Association (TDNA)
 Language: English, Traditional Chinese (zh-TW)
 Event Period: May 1-31, 2026

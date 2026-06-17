@@ -8,6 +8,7 @@ import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
 import GoogleTag from '@/components/GoogleTag';
 import CookieConsent from '@/components/CookieConsent';
+import Tdf2027Popup from '@/components/Tdf2027Popup';
 import SkipLink from '@/components/SkipLink';
 import RecaptchaScript from '@/components/RecaptchaScript';
 import VisitorTracker from '@/components/VisitorTracker';
@@ -68,20 +69,20 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://fest.dna.org.tw'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com'),
   alternates: {
-    canonical: 'https://fest.dna.org.tw/',
+    canonical: 'https://2026.taiwandigitalfest.com/',
     languages: {
-      'en': 'https://fest.dna.org.tw/?lang=en',
-      'zh-TW': 'https://fest.dna.org.tw/?lang=zh',
-      'x-default': 'https://fest.dna.org.tw/',
+      'en': 'https://2026.taiwandigitalfest.com/?lang=en',
+      'zh-TW': 'https://2026.taiwandigitalfest.com/?lang=zh',
+      'x-default': 'https://2026.taiwandigitalfest.com/',
     },
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     alternateLocale: ['zh_TW'],
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://fest.dna.org.tw',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com',
     siteName: 'Taiwan Digital Fest 2026',
     title: 'Taiwan Digital Fest 2026',
     description: 'Nomad festival in Taitung & Hualien, Taiwan. May 2026.',
@@ -161,6 +162,7 @@ export default async function RootLayout({
         <ProfileEditModal />
         </AuthProvider>
         <CookieConsent />
+        <Tdf2027Popup />
         {/* SEO: Provide basic content for crawlers without JavaScript */}
         <noscript>
           <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
@@ -177,7 +179,7 @@ export default async function RootLayout({
               <li>Accommodation in Taitung and Hualien</li>
               <li>Nomad Award — Instagram Reels contest</li>
             </ul>
-            <p>Visit <a href="https://fest.dna.org.tw">fest.dna.org.tw</a> with JavaScript enabled for the full experience.</p>
+            <p>Visit <a href="https://2026.taiwandigitalfest.com">2026.taiwandigitalfest.com</a> with JavaScript enabled for the full experience.</p>
           </div>
         </noscript>
       </body>
