@@ -6,7 +6,7 @@ interface StructuredDataProps {
 
 export default function StructuredData({ lang = 'en' }: StructuredDataProps) {
   const t = content[lang];
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.taiwandigitalfest.com/2026';
   const currentDate = new Date().toISOString();
   const eventStartDate = '2026-05-01T00:00:00+08:00';
   const eventEndDate = '2026-05-31T23:59:59+08:00';

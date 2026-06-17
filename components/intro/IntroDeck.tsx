@@ -541,7 +541,7 @@ function SlideDeckInner({ events, speakers }: IntroDeckProps) {
             </a>
           </div>
           <p className="text-center" style={{ ...fs('1.1rem', '2vw', '1.5rem'), fontWeight: 700, opacity: 0.3, marginTop: '4vh' }}>
-            taiwandigitalfest.com
+            www.taiwandigitalfest.com/2026
           </p>
         </Slide>
       </div>

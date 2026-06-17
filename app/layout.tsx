@@ -69,20 +69,20 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.taiwandigitalfest.com/2026'),
   alternates: {
-    canonical: 'https://2026.taiwandigitalfest.com/',
+    canonical: '/',
     languages: {
-      'en': 'https://2026.taiwandigitalfest.com/?lang=en',
-      'zh-TW': 'https://2026.taiwandigitalfest.com/?lang=zh',
-      'x-default': 'https://2026.taiwandigitalfest.com/',
+      'en': '/?lang=en',
+      'zh-TW': '/?lang=zh',
+      'x-default': '/',
     },
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     alternateLocale: ['zh_TW'],
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://2026.taiwandigitalfest.com',
+    url: '/',
     siteName: 'Taiwan Digital Fest 2026',
     title: 'Taiwan Digital Fest 2026',
     description: 'Nomad festival in Taitung & Hualien, Taiwan. May 2026.',
@@ -179,7 +179,7 @@ export default async function RootLayout({
               <li>Accommodation in Taitung and Hualien</li>
               <li>Nomad Award — Instagram Reels contest</li>
             </ul>
-            <p>Visit <a href="https://2026.taiwandigitalfest.com">2026.taiwandigitalfest.com</a> with JavaScript enabled for the full experience.</p>
+            <p>Visit <a href="https://www.taiwandigitalfest.com/2026">www.taiwandigitalfest.com/2026</a> with JavaScript enabled for the full experience.</p>
           </div>
         </noscript>
       </body>
