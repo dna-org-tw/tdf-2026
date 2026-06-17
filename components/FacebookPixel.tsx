@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import { readCookieConsent, useCookieConsent } from '@/lib/cookieConsent';
+import { apiFetch } from '@/lib/basePath';
 
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1740357633585300';
 
@@ -59,7 +60,7 @@ function forwardToWebhook(
   eventId: string
 ) {
   if (typeof window === 'undefined') return;
-  fetch('/api/events/track', {
+  apiFetch('/api/events/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ eventType, eventName, parameters: parameters ?? {}, eventId }),

@@ -12,6 +12,7 @@ import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useNewsletterCount } from '@/hooks/useNewsletterCount';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
+import { apiFetch } from '@/lib/basePath';
 
 // Animated counter component
 function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
@@ -113,7 +114,7 @@ export default function HeroSection() {
       // Get user info
       const userInfo = getUserInfo();
 
-      const response = await fetch('/api/newsletter/subscribe', {
+      const response = await apiFetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

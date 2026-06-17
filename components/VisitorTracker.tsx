@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint, setVisitorFingerprint } from '@/lib/visitorStorage';
+import { apiFetch } from '@/lib/basePath';
 
 const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
 
@@ -29,7 +30,7 @@ export default function VisitorTracker() {
         if (!fingerprint) return;
 
         const userInfo = getUserInfo();
-        const response = await fetch('/api/visitors/record', {
+        const response = await apiFetch('/api/visitors/record', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

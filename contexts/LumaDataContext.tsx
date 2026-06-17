@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { apiFetch } from '@/lib/basePath';
 import type { CalendarEvent } from '@/lib/lumaSchedule';
 import type { SpeakerGrouped } from '@/lib/lumaSpeakers';
 
@@ -29,7 +30,7 @@ export function LumaDataProvider({ children }: { children: React.ReactNode }) {
       setSpeakersLoading(true);
       setError(null);
       try {
-        const response = await fetch('/api/luma-data');
+        const response = await apiFetch('/api/luma-data');
         if (!response.ok) throw new Error('Failed to fetch Luma data');
         const data = await response.json();
         if (cancelled) return;

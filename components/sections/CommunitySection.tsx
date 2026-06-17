@@ -15,6 +15,7 @@ import { trackEvent, trackCustomEvent } from '@/components/FacebookPixel';
 import FollowModal from '@/components/FollowModal';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
+import { apiFetch } from '@/lib/basePath';
 import { pickRandomAnimals, type AnonymousAnimal } from '@/lib/anonymousAnimals';
 
 const MEMBER_GRID_SIZE = 30;
@@ -168,7 +169,7 @@ export default function CommunitySection() {
 
   useEffect(() => {
     if (!shouldLoadMembers) return;
-    fetch(`/api/members?page=1&limit=${MEMBER_GRID_SIZE}`)
+    apiFetch(`/api/members?page=1&limit=${MEMBER_GRID_SIZE}`)
       .then((r) => r.ok ? r.json() : { members: [], total: 0, anonymousCount: 0 })
       .then((d) => {
         const fetchedMembers: PublicMember[] = d.members ?? [];
@@ -199,7 +200,7 @@ export default function CommunitySection() {
       }
 
       const userInfo = getUserInfo();
-      const response = await fetch('/api/newsletter/subscribe', {
+      const response = await apiFetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { apiFetch } from '@/lib/basePath';
 
 interface AuthUser {
   id: string;
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchSession = useCallback(async () => {
     try {
-      const res = await fetch('/api/auth/session');
+      const res = await apiFetch('/api/auth/session');
       if (res.ok) {
         const data = await res.json();
         setUser(data.user ?? null);
@@ -47,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await apiFetch('/api/auth/logout', { method: 'POST' });
     } catch {
       // ignore
     }

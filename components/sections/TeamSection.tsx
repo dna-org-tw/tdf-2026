@@ -10,6 +10,7 @@ import { useLumaData } from '@/contexts/LumaDataContext';
 import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter, X, ArrowRight } from 'lucide-react';
 import type { SpeakerGrouped, SpeakerSocialLinks } from '@/lib/lumaSpeakers';
 import { teamMembers } from '@/data/team';
+import { apiFetch } from '@/lib/basePath';
 import { MessageCircle } from 'lucide-react';
 
 interface Partner {
@@ -227,7 +228,7 @@ export default function TeamSection() {
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        const response = await fetch('/api/partners');
+        const response = await apiFetch('/api/partners');
         if (response.ok) {
           const data = await response.json();
           setPartners(data.partners || []);

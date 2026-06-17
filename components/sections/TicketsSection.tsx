@@ -10,6 +10,7 @@ import FollowModal from '@/components/FollowModal';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
+import { apiFetch } from '@/lib/basePath';
 
 type TicketKey = 'explore' | 'contribute' | 'weekly_backer' | 'backer';
 
@@ -82,7 +83,7 @@ export default function TicketsSection() {
 
   useEffect(() => {
     let alive = true;
-    fetch('/api/tickets/status')
+    apiFetch('/api/tickets/status')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (alive && d) setSaleStatus({ closed: !!d.closed, cutoff: d.cutoff });
@@ -229,7 +230,7 @@ export default function TicketsSection() {
         return;
       }
 
-      const response = await fetch('/api/checkout', {
+      const response = await apiFetch('/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -292,7 +293,7 @@ export default function TicketsSection() {
         return;
       }
       const userInfo = getUserInfo();
-      const response = await fetch('/api/newsletter/subscribe', {
+      const response = await apiFetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

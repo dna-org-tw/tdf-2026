@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
+import { apiFetch } from '@/lib/basePath';
 import { ExternalLink, Calendar, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface NewsPost {
@@ -253,7 +254,7 @@ export default function NewsSection() {
 
     async function fetchNews() {
       try {
-        const res = await fetch('/api/news');
+        const res = await apiFetch('/api/news');
         if (!res.ok) throw new Error('Failed to fetch');
         const json: AotterResponse = await res.json();
         if (!cancelled) {

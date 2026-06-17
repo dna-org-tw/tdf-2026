@@ -6,6 +6,7 @@ import { X, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import CountryCombobox from '@/components/member/CountryCombobox';
+import { apiFetch } from '@/lib/basePath';
 
 const SKIP_KEY = 'tdf_profile_complete_skipped_at_v1';
 const DRAFT_KEY = 'tdf_profile_complete_draft_v1';
@@ -292,7 +293,7 @@ export default function ProfileEditModal() {
     try {
       // Use the completion endpoint so we also get the `complete` flag and
       // any name-prefill fallback from members_enriched.
-      const res = await fetch('/api/member/profile-completion');
+      const res = await apiFetch('/api/member/profile-completion');
       if (!res.ok) {
         if (res.status === 401) return null;
         throw new Error('failed');
@@ -315,7 +316,7 @@ export default function ProfileEditModal() {
 
       // Pull the rest (avatar/bio/tags/languages/social) from the regular profile route
       try {
-        const fullRes = await fetch('/api/member/profile');
+        const fullRes = await apiFetch('/api/member/profile');
         if (fullRes.ok) {
           const full = await fullRes.json();
           setAvatarUrl(full.avatar_url ?? null);
@@ -443,7 +444,7 @@ export default function ProfileEditModal() {
     const t = setTimeout(async () => {
       setSaveStatus('saving');
       try {
-        const res = await fetch('/api/member/profile', {
+        const res = await apiFetch('/api/member/profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(buildPayload()),
@@ -522,7 +523,7 @@ export default function ProfileEditModal() {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/member/avatar', { method: 'POST', body: fd });
+      const res = await apiFetch('/api/member/avatar', { method: 'POST', body: fd });
       if (!res.ok) throw new Error();
       const data = await res.json();
       setAvatarUrl(data.avatar_url ?? null);
@@ -537,7 +538,7 @@ export default function ProfileEditModal() {
     setAvatarBusy(true);
     setError('');
     try {
-      const res = await fetch('/api/member/avatar', { method: 'DELETE' });
+      const res = await apiFetch('/api/member/avatar', { method: 'DELETE' });
       if (!res.ok) throw new Error();
       setAvatarUrl(null);
     } catch {

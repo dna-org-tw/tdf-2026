@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/basePath';
 
 let cachedValue: number | null = null;
 let fetchPromise: Promise<number | null> | null = null;
@@ -8,7 +9,7 @@ const subscribers = new Set<(value: number | null) => void>();
 
 async function fetchCount(): Promise<number | null> {
   if (fetchPromise) return fetchPromise;
-  fetchPromise = fetch('/api/newsletter/count')
+  fetchPromise = apiFetch('/api/newsletter/count')
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => (typeof d?.count === 'number' ? d.count : null))
     .catch(() => null);
