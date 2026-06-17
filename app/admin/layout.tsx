@@ -21,6 +21,9 @@ function AdminNav() {
           <Link href="/admin" className="text-[#10B8D9] font-bold text-base sm:text-lg whitespace-nowrap shrink-0">
             TDF 2026 Admin
           </Link>
+          <Link href="/admin/impact" className="text-sm font-medium text-[#10B8D9] hover:text-white transition-colors whitespace-nowrap">
+            成效
+          </Link>
           <Link href="/admin/members" className="text-sm text-slate-300 hover:text-white transition-colors whitespace-nowrap">
             會員管理
           </Link>
