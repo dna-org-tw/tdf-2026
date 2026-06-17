@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 import {
   type EnrichedMember,
   type MemberIdentity,
@@ -150,7 +150,7 @@ export default function MembersPage() {
         </label>
         <span className="text-sm text-slate-500">共 {total} 位會員</span>
         <a
-          href={`/api/admin/members/export?${new URLSearchParams({
+          href={`${BASE_PATH}/api/admin/members/export?${new URLSearchParams({
             ...(search ? { search } : {}),
             ...(identities.length ? { identity: identities.join(',') } : {}),
             ...(displayStatuses.length ? { displayStatus: displayStatuses.join(',') } : {}),

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 interface Subscriber {
   email: string;
@@ -81,7 +81,7 @@ export default function SubscribersPage() {
         />
         <span className="text-sm text-slate-500">共 {total} 位訂閱者</span>
         <a
-          href={`/api/admin/subscribers/export${search ? `?search=${encodeURIComponent(search)}` : ''}`}
+          href={`${BASE_PATH}/api/admin/subscribers/export${search ? `?search=${encodeURIComponent(search)}` : ''}`}
           className="px-4 py-2 text-sm font-medium text-white bg-[#10B8D9] rounded-lg hover:bg-[#0EA5C4] transition-colors whitespace-nowrap"
           title={search ? '匯出目前搜尋結果' : '匯出全部訂閱者'}
         >

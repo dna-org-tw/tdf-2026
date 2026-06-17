@@ -15,7 +15,7 @@ import {
 } from '@/lib/members';
 import LumaRegistrationsList from '@/components/admin/LumaRegistrationsList';
 import type { Registration } from '@/lib/lumaSyncTypes';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 interface MemberRow {
   id: number;
@@ -379,7 +379,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ memberN
           <div className="flex items-center gap-2">
             <button onClick={() => setSendOpen(true)} className="px-3 py-1.5 text-sm bg-[#10B8D9] text-white rounded-lg hover:bg-[#0EA5C4]">寄信</button>
             <button onClick={handleUnsubscribe} disabled={!enriched?.subscribed_newsletter} className="px-3 py-1.5 text-sm bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">取消訂閱</button>
-            <a href={`/api/admin/members/${encodeURIComponent(memberNo)}/export`} className="px-3 py-1.5 text-sm bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50">匯出 JSON</a>
+            <a href={`${BASE_PATH}/api/admin/members/${encodeURIComponent(memberNo)}/export`} className="px-3 py-1.5 text-sm bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50">匯出 JSON</a>
           </div>
         </div>
       </div>
