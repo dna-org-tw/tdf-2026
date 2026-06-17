@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('guide page renders dual entry cards and grouped quick nav', async ({ page }) => {
-  await page.goto('/guide?lang=zh');
+  await page.goto('/2026/guide?lang=zh');
 
   await expect(page.getByRole('heading', { name: /完整指南|參與指南/ })).toBeVisible();
   await expect(page.getByRole('link', { name: '活動指南' })).toBeVisible();
@@ -13,9 +13,9 @@ test('guide page renders dual entry cards and grouped quick nav', async ({ page 
 });
 
 test('guide deep link and homepage FAQ target the new section ids', async ({ page }) => {
-  await page.goto('/guide?lang=zh#member-guide');
+  await page.goto('/2026/guide?lang=zh#member-guide');
   await expect(page.locator('#member-guide')).toBeInViewport();
 
-  await page.goto('/?lang=zh');
-  await expect(page.locator('a[href="/guide#event-registration"]').first()).toBeVisible();
+  await page.goto('/2026/?lang=zh');
+  await expect(page.locator('a[href="/2026/guide#event-registration"]').first()).toBeVisible();
 });

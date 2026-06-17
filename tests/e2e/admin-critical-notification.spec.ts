@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Admin critical notification flow', () => {
   test('UI shows warning + gating + badge for critical category', async ({ page }) => {
-    await page.goto('/admin/send');
+    await page.goto('/2026/admin/send');
     await expect(page.getByRole('heading', { name: '發送通知' })).toBeVisible();
 
     // Select the critical category
@@ -38,7 +38,7 @@ test.describe('Admin critical notification flow', () => {
   });
 
   test('API rejects critical send without identity/status/tier filter', async ({ request }) => {
-    const res = await request.post('/api/admin/send', {
+    const res = await request.post('/2026/api/admin/send', {
       data: {
         subject: 'Should be rejected',
         body: 'No filter provided',
@@ -55,7 +55,7 @@ test.describe('Admin critical notification flow', () => {
     // Guard regression: non-critical sends with `groups` alone must still work.
     // We only test the validation path — use a subject that makes side-effects
     // auditable, and rely on the 1/min rate limit + 'test' group to avoid blast.
-    const res = await request.post('/api/admin/send', {
+    const res = await request.post('/2026/api/admin/send', {
       data: {
         subject: 'E2E validation probe (test-only)',
         body: 'Validation probe',

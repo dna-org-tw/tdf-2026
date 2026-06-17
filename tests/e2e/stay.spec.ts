@@ -14,7 +14,7 @@ test('public stay page renders rounded TWD prices and policy copy', async ({ pag
     });
   });
 
-  await page.goto('/stay?lang=zh');
+  await page.goto('/2026/stay?lang=zh');
   await expect(page.getByText(/任何取消或未到都收整週房費/)).toBeVisible();
   await expect(page.getByText(/NT\$6,125/)).toBeVisible();
   await expect(page.getByText(/NT\$4,904/)).toBeVisible();
@@ -29,6 +29,6 @@ test('authenticated member page shows stay summary card', async ({ page }) => {
     });
   });
 
-  await page.goto('/me');
+  await page.goto('/2026/me');
   await expect(page.getByText(/Partner Stay|合作住宿/)).toBeVisible({ timeout: 15000 });
 });

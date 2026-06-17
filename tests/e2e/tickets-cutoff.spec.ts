@@ -15,7 +15,7 @@ test.describe('ticket sale cutoff UI', () => {
       }),
     );
 
-    await page.goto('/?lang=en#tickets');
+    await page.goto('/2026/?lang=en#tickets');
 
     // Banner copy (partial match on the hard-coded contact email)
     await expect(
@@ -41,7 +41,7 @@ test.describe('ticket sale cutoff UI', () => {
       }),
     );
 
-    await page.goto('/?lang=en#tickets');
+    await page.goto('/2026/?lang=en#tickets');
 
     const buyButtons = page.getByRole('button', { name: /pay with card|start your journey/i });
     await expect(buyButtons.first()).toBeVisible();

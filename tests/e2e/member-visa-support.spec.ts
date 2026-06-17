@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('member can save visa details and download a visa support letter', async ({ page }) => {
-  await page.goto('/me');
+  await page.goto('/2026/me');
   await expect(page.getByRole('button', { name: /sign out|登出/i })).toBeVisible({ timeout: 15_000 });
 
   await page.getByRole('button', { name: /visa support documents|簽證輔助文件/i }).click();
