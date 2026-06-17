@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { apiFetch } from '@/lib/basePath';
 import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -38,7 +39,7 @@ export default function UpgradePageContent() {
 
   useEffect(() => {
     let alive = true;
-    fetch('/api/tickets/status')
+    apiFetch('/api/tickets/status')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (alive && d) {
@@ -60,7 +61,7 @@ export default function UpgradePageContent() {
       setLoading(false);
       return;
     }
-    fetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
+    apiFetch(`/api/auth/orders?email=${encodeURIComponent(user.email)}`)
       .then((r) => (r.ok ? r.json() : { orders: [] }))
       .then((d) => setOrders(d.orders ?? []))
       .catch(() => setOrders([]))
@@ -89,7 +90,7 @@ export default function UpgradePageContent() {
     setProcessingTier(targetTier);
     setError('');
     try {
-      const res = await fetch('/api/member/upgrade', {
+      const res = await apiFetch('/api/member/upgrade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ order_id: eligibleOrder.id, target_tier: targetTier }),

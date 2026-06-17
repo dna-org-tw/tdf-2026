@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
+import { apiFetch } from '@/lib/basePath';
 
 // Modal that walks a member through binding a payment method as off-session
 // guarantee for event confirmations. The shape mirrors components/stay/
@@ -31,7 +32,7 @@ export default function PaymentMethodModal({ lang, onClose, onConfirmed }: Props
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/me/payment-method/setup', { method: 'POST' })
+    apiFetch('/api/me/payment-method/setup', { method: 'POST' })
       .then(async (r) => {
         const body = await r.json();
         if (!r.ok) throw new Error(body.error ?? 'setup_failed');
@@ -130,7 +131,7 @@ function PaymentMethodForm({
         setError(lang === 'zh' ? '驗卡未完成' : 'Setup did not complete');
         return;
       }
-      const persistResp = await fetch('/api/me/payment-method', {
+      const persistResp = await apiFetch('/api/me/payment-method', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ setupIntentId }),

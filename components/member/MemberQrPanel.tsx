@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 
 interface MemberQrPanelProps {
   memberNo: string;
@@ -27,7 +28,7 @@ export default function MemberQrPanel({ memberNo, accent, surface, lang, labels 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/member/qr-token', { method: 'POST' });
+      const res = await apiFetch('/api/member/qr-token', { method: 'POST' });
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
       setToken(data.token);
@@ -62,7 +63,7 @@ export default function MemberQrPanel({ memberNo, accent, surface, lang, labels 
   const qrUrl = useMemo(() => {
     if (!token) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/members/${memberNo}?t=${token}`;
+    return `${origin}${BASE_PATH}/members/${memberNo}?t=${token}`;
   }, [token, memberNo]);
 
   return (

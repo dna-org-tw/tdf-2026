@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
+import { apiFetch } from '@/lib/basePath';
 import Footer from '@/components/Footer';
 import LoginForm from '@/components/auth/LoginForm';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -23,12 +24,12 @@ export default function StayPageContent() {
 
   useEffect(() => {
     if (!user?.email) return;
-    fetch('/api/stay/weeks').then((r) => r.json()).then((d) => setWeeks(d.weeks ?? []));
+    apiFetch('/api/stay/weeks').then((r) => r.json()).then((d) => setWeeks(d.weeks ?? []));
   }, [user?.email]);
 
   useEffect(() => {
     if (!user?.email) return;
-    fetch('/api/stay/bookings')
+    apiFetch('/api/stay/bookings')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setSummary(d))
       .catch(() => setSummary(null));

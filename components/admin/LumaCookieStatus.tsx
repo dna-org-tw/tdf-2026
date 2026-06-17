@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { apiFetch } from '@/lib/basePath';
 
 interface LumaCookieStatus {
   cookieInvalid: boolean;
@@ -33,7 +34,7 @@ export function LumaCookieStatusProvider({ children }: { children: ReactNode }) 
 
   const fetchStatus = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/luma-sync/config', { cache: 'no-store' });
+      const res = await apiFetch('/api/admin/luma-sync/config', { cache: 'no-store' });
       if (!res.ok) return;
       const data = (await res.json()) as { cookieInvalid?: boolean; hasCookie?: boolean };
       setStatus({

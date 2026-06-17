@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiFetch } from '@/lib/basePath';
 
 interface CollectButtonProps {
   memberNo: string;
@@ -27,7 +28,7 @@ export default function CollectButton({ memberNo, token, lang, labels }: Collect
   const [alreadyCollected, setAlreadyCollected] = useState<boolean>(false);
 
   useEffect(() => {
-    fetch('/api/member/collections')
+    apiFetch('/api/member/collections')
       .then((r) => {
         if (r.status === 401) { setHasSession(false); return null; }
         setHasSession(true);
@@ -50,7 +51,7 @@ export default function CollectButton({ memberNo, token, lang, labels }: Collect
     setStatus('collecting');
     setErrorMessage(null);
     try {
-      const res = await fetch('/api/member/collections', {
+      const res = await apiFetch('/api/member/collections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ member_no: memberNo, token: token ?? undefined }),

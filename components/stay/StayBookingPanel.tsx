@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { apiFetch } from '@/lib/basePath';
 import StayGuaranteeStep from './StayGuaranteeStep';
 import { PHONE_COUNTRIES } from '@/lib/phoneCountries';
 import { getStayBookingDeadlineDate } from '@/lib/stayTime';
@@ -45,7 +46,7 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
 
   async function startCardVerification() {
     setError(null);
-    const res = await fetch('/api/stay/setup-intent', { method: 'POST' });
+    const res = await apiFetch('/api/stay/setup-intent', { method: 'POST' });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       setError(data.error ?? 'setup_intent_failed');
@@ -72,7 +73,7 @@ export default function StayBookingPanel({ weeks, memberEmail }: { weeks: any[];
     setError(null);
     setSubmitting(true);
     try {
-      const res = await fetch('/api/stay/bookings', {
+      const res = await apiFetch('/api/stay/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

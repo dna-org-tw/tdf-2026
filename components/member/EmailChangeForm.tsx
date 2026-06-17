@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Mail, Send, Check, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { apiFetch } from '@/lib/basePath';
 
 interface Props {
   lang: 'en' | 'zh';
@@ -94,7 +95,7 @@ export default function EmailChangeForm({ lang }: Props) {
 
     setBusy(true);
     try {
-      const res = await fetch('/api/auth/email/request-change', {
+      const res = await apiFetch('/api/auth/email/request-change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newEmail: trimmed }),
@@ -126,7 +127,7 @@ export default function EmailChangeForm({ lang }: Props) {
 
     setBusy(true);
     try {
-      const res = await fetch('/api/auth/email/confirm-change', {
+      const res = await apiFetch('/api/auth/email/confirm-change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newEmail: newEmail.trim().toLowerCase(), code: code.trim() }),

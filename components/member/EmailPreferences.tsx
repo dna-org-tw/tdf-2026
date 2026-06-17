@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { apiFetch } from '@/lib/basePath';
 
 type Category = 'newsletter' | 'events' | 'award';
 const CATEGORIES: readonly Category[] = ['newsletter', 'events', 'award'];
@@ -35,7 +36,7 @@ export default function EmailPreferences({ userEmail }: Props) {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/member/preferences');
+        const res = await apiFetch('/api/member/preferences');
         if (!res.ok) throw new Error('load failed');
         const data: ApiPayload = await res.json();
         if (cancelled) return;
@@ -61,7 +62,7 @@ export default function EmailPreferences({ userEmail }: Props) {
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch('/api/member/preferences', {
+      const res = await apiFetch('/api/member/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(unsubscribeAll ? { unsubscribeAll: true } : { preferences: prefs }),

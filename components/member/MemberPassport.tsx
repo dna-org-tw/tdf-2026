@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { apiFetch, BASE_PATH } from '@/lib/basePath';
 import { QRCodeSVG } from 'qrcode.react';
 import { MapPin, Briefcase, Hourglass, Tag, Link2, Bookmark, FileText, Pencil } from 'lucide-react';
 import type { TicketTier } from '@/lib/members';
@@ -262,7 +263,7 @@ function AvatarHero({
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/member/avatar', { method: 'POST', body: fd });
+      const res = await apiFetch('/api/member/avatar', { method: 'POST', body: fd });
       if (!res.ok) throw new Error();
       const data = await res.json();
       setImgError(false);
@@ -520,7 +521,7 @@ function ChipQr({
   const fetchToken = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/member/qr-token', { method: 'POST' });
+      const res = await apiFetch('/api/member/qr-token', { method: 'POST' });
       if (!res.ok) throw new Error();
       const data = await res.json();
       setToken(data.token);
@@ -547,7 +548,7 @@ function ChipQr({
   }, [isExpired, loading, fetchToken]);
 
   const qrUrl = token
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/members/${memberNo}?t=${token}`
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}${BASE_PATH}/members/${memberNo}?t=${token}`
     : '';
 
   return (

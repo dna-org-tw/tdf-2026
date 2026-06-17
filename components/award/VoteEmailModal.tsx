@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
+import { apiFetch } from '@/lib/basePath';
 
 interface VoteEmailModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ export default function VoteEmailModal({
         return;
       }
 
-      const response = await fetch('/api/award/check-follow', {
+      const response = await apiFetch('/api/award/check-follow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ export default function VoteEmailModal({
       const userInfo = getUserInfo();
 
       // Call subscribe API
-      const response = await fetch('/api/newsletter/subscribe', {
+      const response = await apiFetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

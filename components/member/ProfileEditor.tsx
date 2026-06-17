@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import type { MemberProfile } from './MemberPassport';
+import { apiFetch } from '@/lib/basePath';
 
 const SUGGESTED_TAGS = [
   'Developer', 'Designer', 'Creator', 'Writer', 'Photographer',
@@ -92,7 +93,7 @@ export default function ProfileEditor({ profile, lang, onSave, onCancel }: Profi
     formData.append('file', file);
 
     try {
-      const res = await fetch('/api/member/avatar', { method: 'POST', body: formData });
+      const res = await apiFetch('/api/member/avatar', { method: 'POST', body: formData });
       if (!res.ok) throw new Error();
       const data = await res.json();
       setAvatarPreview(data.avatar_url);
@@ -107,7 +108,7 @@ export default function ProfileEditor({ profile, lang, onSave, onCancel }: Profi
     setAvatarUploading(true);
     setError('');
     try {
-      const res = await fetch('/api/member/avatar', { method: 'DELETE' });
+      const res = await apiFetch('/api/member/avatar', { method: 'DELETE' });
       if (!res.ok) throw new Error();
       setAvatarPreview(null);
     } catch {
@@ -156,7 +157,7 @@ export default function ProfileEditor({ profile, lang, onSave, onCancel }: Profi
     };
 
     try {
-      const res = await fetch('/api/member/profile', {
+      const res = await apiFetch('/api/member/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

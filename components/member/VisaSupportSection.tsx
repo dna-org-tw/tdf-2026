@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { apiFetch } from '@/lib/basePath';
 import type { Order } from '@/lib/types/order';
 import CollapsibleSection from '@/components/member/CollapsibleSection';
 import VisaSupportForm from './VisaSupportForm';
@@ -80,7 +81,7 @@ export default function VisaSupportSection({ orders, lang = 'en', labels }: Visa
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/member/visa-profile')
+    apiFetch('/api/member/visa-profile')
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error())))
       .then((data) => {
         if (cancelled) return;
@@ -131,7 +132,7 @@ export default function VisaSupportSection({ orders, lang = 'en', labels }: Visa
     setSaving(true);
     setError('');
     try {
-      const res = await fetch('/api/member/visa-profile', {
+      const res = await apiFetch('/api/member/visa-profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
@@ -149,7 +150,7 @@ export default function VisaSupportSection({ orders, lang = 'en', labels }: Visa
     setDownloading(true);
     setError('');
     try {
-      const res = await fetch('/api/member/visa-letter', { method: 'POST' });
+      const res = await apiFetch('/api/member/visa-letter', { method: 'POST' });
       if (res.status === 429) {
         const data = await res.json();
         const minutes = Math.max(1, Math.ceil((Number(data.retryAfter) || 60) / 60));

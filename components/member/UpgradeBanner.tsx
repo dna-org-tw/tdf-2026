@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
+import { apiFetch } from '@/lib/basePath';
 import { getPricingByKey, isOnSale } from '@/lib/ticketPricing';
 import type { TicketTier } from '@/lib/members';
 import {
@@ -28,7 +29,7 @@ export default function UpgradeBanner({ currentTier, lang }: Props) {
   const [salesClosed, setSalesClosed] = useState<boolean | null>(null);
   useEffect(() => {
     let alive = true;
-    fetch('/api/tickets/status')
+    apiFetch('/api/tickets/status')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (alive) setSalesClosed(d?.closed === true); })
       .catch(() => { if (alive) setSalesClosed(false); });

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { apiFetch } from '@/lib/basePath';
 
 export default function LoginForm() {
   const { t } = useTranslation();
@@ -22,7 +23,7 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/send-code', {
+      const res = await apiFetch('/api/auth/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
@@ -55,7 +56,7 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/verify-code', {
+      const res = await apiFetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), code: code.trim() }),
@@ -77,7 +78,7 @@ export default function LoginForm() {
     setError('');
     setSending(true);
     try {
-      const res = await fetch('/api/auth/send-code', {
+      const res = await apiFetch('/api/auth/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
