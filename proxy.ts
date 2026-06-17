@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BASE_PATH } from '@/lib/basePath';
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -8,7 +9,7 @@ export function proxy(request: NextRequest) {
     const redirectUrl = new URL(request.url);
     // 移除 /zh 前綴，如果結果為空，則設為根路徑
     const remainingPath = pathname.replace(/^\/zh\/?/, '');
-    redirectUrl.pathname = remainingPath ? `/${remainingPath}` : '/';
+    redirectUrl.pathname = `${BASE_PATH}${remainingPath ? `/${remainingPath}` : '/'}`;
     redirectUrl.searchParams.set('lang', 'zh');
     return NextResponse.redirect(redirectUrl);
   }
@@ -17,7 +18,7 @@ export function proxy(request: NextRequest) {
     const redirectUrl = new URL(request.url);
     // 移除 /en 前綴，如果結果為空，則設為根路徑
     const remainingPath = pathname.replace(/^\/en\/?/, '');
-    redirectUrl.pathname = remainingPath ? `/${remainingPath}` : '/';
+    redirectUrl.pathname = `${BASE_PATH}${remainingPath ? `/${remainingPath}` : '/'}`;
     redirectUrl.searchParams.set('lang', 'en');
     return NextResponse.redirect(redirectUrl);
   }
