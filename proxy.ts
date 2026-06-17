@@ -1,19 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const CANONICAL_HOST = '2026.taiwandigitalfest.com';
-
 export function proxy(request: NextRequest) {
-  const host = request.headers.get('host')?.split(':')[0];
-
-  // 301 redirect non-canonical domains (fest.dna.org.tw, taiwandigitalfest.com, tdf-2026.zeabur.app) to 2026.taiwandigitalfest.com
-  if (host && host !== CANONICAL_HOST && host !== 'localhost' && host !== '127.0.0.1') {
-    const url = new URL(request.url);
-    url.hostname = CANONICAL_HOST;
-    url.port = '';
-    url.protocol = 'https:';
-    return NextResponse.redirect(url, 301);
-  }
-
   const { pathname } = request.nextUrl;
 
   // 處理 /zh 和 /en 路徑，重新導向至根路徑並新增查詢參數
