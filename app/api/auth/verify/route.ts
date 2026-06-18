@@ -4,7 +4,7 @@ import { signSessionToken, setSessionCookie } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { createHash } from 'crypto';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000/2026';
 
 export async function GET(req: NextRequest) {
   const memberUrl = `${baseUrl}/me`;

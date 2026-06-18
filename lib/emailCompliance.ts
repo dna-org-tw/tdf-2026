@@ -19,7 +19,7 @@ export function isTransactionalEmailType(type: EmailType): boolean {
   return TRANSACTIONAL_EMAIL_TYPES.includes(type);
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000/2026';
 
 const PHYSICAL_ADDRESS =
   process.env.EMAIL_PHYSICAL_ADDRESS?.trim() ||

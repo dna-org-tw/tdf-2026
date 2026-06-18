@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000/2026';
 
     // Read discount code from cookie and auto-apply Stripe promotion code
     const discountCode = req.cookies.get('discount_code')?.value;
