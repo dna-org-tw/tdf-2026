@@ -1,9 +1,12 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import UpgradePageContent from '@/components/upgrade/UpgradePageContent';
+import { routeAlternates } from '@/lib/seo';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Upgrade Your Ticket | Taiwan Digital Fest 2026',
   description: 'Upgrade your TDF 2026 ticket tier and unlock more festival experiences.',
+  alternates: routeAlternates('/upgrade'),
 };
 
 export default function UpgradePage() {

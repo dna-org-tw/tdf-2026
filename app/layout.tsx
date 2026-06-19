@@ -4,6 +4,7 @@ import { Inter, Outfit, Noto_Sans_TC } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
+import { routeAlternates } from '@/lib/seo';
 import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
 import GoogleTag from '@/components/GoogleTag';
@@ -70,14 +71,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.taiwandigitalfest.com/2026'),
-  alternates: {
-    canonical: '/',
-    languages: {
-      'en': '/?lang=en',
-      'zh-TW': '/?lang=zh',
-      'x-default': '/',
-    },
-  },
+  alternates: routeAlternates('/'),
   openGraph: {
     type: 'website',
     locale: 'en_US',

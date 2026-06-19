@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import IntroDeck from '@/components/intro/IntroDeck';
 import { buildScheduleFromEntries, type LumaApiEntry } from '@/lib/lumaSchedule';
 import { getSpeakersFromEntries } from '@/lib/lumaSpeakers';
+import { routeAlternates } from '@/lib/seo';
 
 export const revalidate = 3600;
 
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
   title: 'Introduction',
   description:
     'Taiwan Digital Fest 2026 — a month-long digital nomad festival in Taitung & Hualien, May 2026.',
+  alternates: routeAlternates('/intro'),
 };
 
 const LUMA_API_URL =
