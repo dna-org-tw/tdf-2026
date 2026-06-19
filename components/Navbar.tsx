@@ -6,6 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { asset } from '@/lib/basePath';
 import MobileMenu from './MobileMenu';
 import { trackEvent } from '@/components/FacebookPixel';
 import { useAuth } from '@/contexts/AuthContext';
@@ -128,7 +129,7 @@ export default function Navbar() {
             scrolled ? 'text-[#1E1F1C]' : 'text-white'
           }`}>
           <Image
-            src="/images/logo/tdf2026_logo.png"
+            src={asset('/images/logo/tdf2026_logo.png')}
             alt="Taiwan Digital Fest 2026 Logo - Taiwan Digital Nomad Association"
             width={40}
             height={40}

@@ -10,7 +10,7 @@ import { useLumaData } from '@/contexts/LumaDataContext';
 import { ExternalLink, Instagram, Mail, Globe, User, Youtube, Linkedin, Twitter, X, ArrowRight } from 'lucide-react';
 import type { SpeakerGrouped, SpeakerSocialLinks } from '@/lib/lumaSpeakers';
 import { teamMembers } from '@/data/team';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, asset } from '@/lib/basePath';
 import { MessageCircle } from 'lucide-react';
 
 interface Partner {
@@ -88,7 +88,7 @@ function CoOrganizerPhoto({ images, alt }: { images: string[]; alt: string }) {
           className="absolute inset-0"
         >
           <Image
-            src={images[index]}
+            src={asset(images[index])}
             alt={alt}
             fill
             sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
@@ -271,7 +271,7 @@ export default function TeamSection() {
               className="relative h-20 md:h-28 lg:h-32 w-auto block flex-shrink-0"
             >
               <Image
-                src="/images/logo/tdna_logo.png"
+                src={asset('/images/logo/tdna_logo.png')}
                 alt="Taiwan Digital Nomad Association"
                 width={200}
                 height={192}
@@ -336,7 +336,7 @@ export default function TeamSection() {
               className="relative h-20 md:h-28 lg:h-32 w-auto block flex-shrink-0"
             >
               <Image
-                src="/images/logo/taitung_gov_logo.png"
+                src={asset('/images/logo/taitung_gov_logo.png')}
                 alt="Taitung County Government"
                 width={200}
                 height={192}
@@ -446,7 +446,7 @@ export default function TeamSection() {
               <div className="flex-shrink-0">
                 <div className="relative w-[220px] sm:w-[280px] h-[60px] sm:h-[76px]">
                   <Image
-                    src={t.partners.officialPlatform.logoWhite}
+                    src={asset(t.partners.officialPlatform.logoWhite)}
                     alt={t.partners.officialPlatform.name}
                     fill
                     sizes="(max-width: 640px) 220px, 280px"
@@ -540,7 +540,7 @@ export default function TeamSection() {
               <div className="flex-shrink-0">
                 <div className="relative w-[180px] sm:w-[240px] h-[180px] sm:h-[240px]">
                   <Image
-                    src={t.partners.engineerCafe.logo}
+                    src={asset(t.partners.engineerCafe.logo)}
                     alt={t.partners.engineerCafe.name}
                     fill
                     sizes="(max-width: 640px) 180px, 240px"
@@ -643,7 +643,7 @@ export default function TeamSection() {
               >
                 <div className="relative w-[clamp(5.5rem,32vw,8rem)] h-[clamp(5.5rem,32vw,8rem)] rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] group-hover:border-[#C54090] transition-colors flex-shrink-0 mb-3 aspect-square">
                   <Image
-                    src={member.photo || '/images/team/placeholder.svg'}
+                    src={asset(member.photo || '/images/team/placeholder.svg')}
                     alt={member.name}
                     fill
                     className="object-cover"
@@ -727,7 +727,7 @@ export default function TeamSection() {
                   <div className="flex flex-col items-center text-center">
                     <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-[#F6F6F6] border-2 border-[#E0E0E0] mb-4">
                       <Image
-                        src={selectedMember.photo || '/images/team/placeholder.svg'}
+                        src={asset(selectedMember.photo || '/images/team/placeholder.svg')}
                         alt={selectedMember.name}
                         fill
                         className="object-cover"
@@ -972,7 +972,7 @@ export default function TeamSection() {
                   className="relative h-24 md:h-32 lg:h-40 w-24 md:w-32 lg:w-40 bg-white p-4 rounded-lg border-4 border-[#ffd028] flex items-center justify-center"
                 >
                   <Image
-                    src="/images/default_sponsor.jpg"
+                    src={asset('/images/default_sponsor.jpg')}
                     alt="Sponsor"
                     width={160}
                     height={160}
@@ -1010,7 +1010,7 @@ export default function TeamSection() {
                   className="relative h-24 md:h-32 lg:h-40 w-24 md:w-32 lg:w-40 bg-white p-4 rounded-lg border-4 border-[#10b8d9] flex items-center justify-center"
                 >
                   <Image
-                    src="/images/default_sponsor.jpg"
+                    src={asset('/images/default_sponsor.jpg')}
                     alt="Sponsor"
                     width={160}
                     height={160}
@@ -1048,7 +1048,7 @@ export default function TeamSection() {
                   className="relative h-24 md:h-32 lg:h-40 w-24 md:w-32 lg:w-40 bg-white p-4 rounded-lg border-4 border-[#00993e] flex items-center justify-center"
                 >
                   <Image
-                    src="/images/default_sponsor.jpg"
+                    src={asset('/images/default_sponsor.jpg')}
                     alt="Sponsor"
                     width={160}
                     height={160}
