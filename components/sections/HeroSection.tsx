@@ -12,7 +12,7 @@ import { useRecaptcha } from '@/hooks/useRecaptcha';
 import { useNewsletterCount } from '@/hooks/useNewsletterCount';
 import { getUserInfo } from '@/lib/userInfo';
 import { getVisitorFingerprint } from '@/lib/visitorStorage';
-import { apiFetch } from '@/lib/basePath';
+import { apiFetch, asset } from '@/lib/basePath';
 
 // Animated counter component
 function AnimatedCounter({ value, duration = 3500 }: { value: number; duration?: number }) {
@@ -199,7 +199,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-[#1E1F1C] z-0" /> {/* Fallback background */}
         <div className="absolute inset-0 bg-[#1E1F1C]/70 z-10" /> {/* Overlay */}
         <Image
-          src="/images/tdf2025.webp"
+          src={asset('/images/tdf2025.webp')}
           alt="Taiwan Digital Fest 2026 - Where Digital Nomads Meet Nature & Innovation in Taitung and Hualien, Taiwan"
           fill
           priority

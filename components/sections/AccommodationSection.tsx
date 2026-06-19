@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MapPin, ExternalLink, ChevronLeft, ChevronRight, ArrowRight, Navigation } from 'lucide-react';
 import Image from 'next/image';
+import { asset } from '@/lib/basePath';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useSectionTracking } from '@/hooks/useSectionTracking';
 import { useNearViewport } from '@/hooks/useNearViewport';
@@ -284,7 +285,7 @@ export default function AccommodationSection() {
                   <div className="flex-shrink-0">
                     <div className="relative w-[200px] sm:w-[260px] h-[50px] sm:h-[64px]">
                       <Image
-                        src={platform.logoWhite}
+                        src={asset(platform.logoWhite)}
                         alt={platform.name}
                         fill
                         className="object-contain"
