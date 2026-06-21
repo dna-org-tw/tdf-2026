@@ -9,7 +9,6 @@ import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
 import GoogleTag from '@/components/GoogleTag';
 import CookieConsent from '@/components/CookieConsent';
-import Tdf2027Popup from '@/components/Tdf2027Popup';
 import SkipLink from '@/components/SkipLink';
 import RecaptchaScript from '@/components/RecaptchaScript';
 import VisitorTracker from '@/components/VisitorTracker';
@@ -156,7 +155,6 @@ export default async function RootLayout({
         <ProfileEditModal />
         </AuthProvider>
         <CookieConsent />
-        <Tdf2027Popup />
         {/* SEO: Provide basic content for crawlers without JavaScript */}
         <noscript>
           <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>

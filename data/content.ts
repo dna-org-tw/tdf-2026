@@ -882,13 +882,6 @@ export const content = {
       accept: "Accept",
       reject: "Reject"
     },
-    tdf2027Popup: {
-      ariaLabel: "TDF 2027 announcement",
-      title: "TDF 2027 is coming!",
-      message: "Taiwan Digital Fest returns in 2027. Be the first to know.",
-      cta: "Learn more",
-      close: "Close"
-    },
     a11y: {
       skipToContent: "Skip to main content"
     },
@@ -2350,13 +2343,6 @@ export const content = {
       learnMore: "了解更多",
       accept: "同意",
       reject: "拒絕"
-    },
-    tdf2027Popup: {
-      ariaLabel: "TDF 2027 公告",
-      title: "TDF 2027 即將登場！",
-      message: "台灣數位嘉年華 2027 即將回歸，搶先掌握最新消息。",
-      cta: "前往了解",
-      close: "關閉"
     },
     a11y: {
       skipToContent: "跳至主要內容"
