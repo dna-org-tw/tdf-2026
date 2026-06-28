@@ -70,7 +70,7 @@ async function lumaFetch(url: string, cookie: string, init?: RequestInit): Promi
 }
 
 async function fetchCalendarPeriod(
-  period: 'upcoming' | 'past',
+  period: 'future' | 'past',
   cookie: string,
 ): Promise<LumaCalendarItem[]> {
   const items: LumaCalendarItem[] = [];
@@ -93,19 +93,19 @@ async function fetchCalendarPeriod(
   return items;
 }
 
-// Luma's `period: 'all'` actually behaves like `upcoming` — it omits any event
-// whose start time has passed. During the festival this means as soon as an
-// event starts/ends it falls off the feed, and cleanupOrphanEventGuests then
-// treats every guest of that event as orphaned and deletes them. Fetch both
-// periods explicitly and dedupe so past-but-still-existing events stay in the
-// valid set.
+// Luma's get-items only returns one side of "now" per request. The valid
+// `period` values changed: `upcoming`/`all` now 400 ("Invalid request"); the
+// accepted values are `future` and `past`. Fetch both explicitly and dedupe so
+// past-but-still-existing events stay in the valid set (otherwise
+// cleanupOrphanEventGuests would treat every ended event's guests as orphaned
+// and delete them).
 export async function fetchCalendarItems(cookie: string): Promise<LumaCalendarItem[]> {
-  const [upcoming, past] = await Promise.all([
-    fetchCalendarPeriod('upcoming', cookie),
+  const [future, past] = await Promise.all([
+    fetchCalendarPeriod('future', cookie),
     fetchCalendarPeriod('past', cookie),
   ]);
   const byId = new Map<string, LumaCalendarItem>();
-  for (const it of [...upcoming, ...past]) {
+  for (const it of [...future, ...past]) {
     byId.set(it.event.api_id, it);
   }
   return [...byId.values()];
@@ -115,7 +115,7 @@ export async function probeCookie(cookie: string): Promise<{ entryCount: number 
   const params = new URLSearchParams({
     calendar_api_id: CALENDAR_API_ID,
     pagination_limit: '1',
-    period: 'all',
+    period: 'past',
   });
   const data = (await lumaFetch(
     `https://api2.luma.com/calendar/get-items?${params}`,
