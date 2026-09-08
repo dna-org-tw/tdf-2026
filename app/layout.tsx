@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import { routeAlternates } from '@/lib/seo';
+import { resolveConsentRegion } from '@/lib/consentRegion';
 import PreconnectLinks from '@/components/PreconnectLinks';
 import FacebookPixel from '@/components/FacebookPixel';
 import GoogleTag from '@/components/GoogleTag';
@@ -126,12 +127,26 @@ export default async function RootLayout({
   // Read language from the request header set by proxy
   const headersList = await headers();
   const lang = headersList.get('x-lang') || 'en';
-  
+  // Region-aware consent: only EEA/UK/CH visitors get the banner. Everywhere else
+  // (this site's audience is Taiwan and South-East Asia) analytics is on by default.
+  // Zeabur sets x-zeabur-ip-country; an unknown country falls back to asking.
+  const { consentRequired } = resolveConsentRegion(headersList.get('x-zeabur-ip-country'));
+
   return (
     <html lang={lang} className="scroll-smooth">
       <body
         className={`${inter.variable} ${outfit.variable} ${notoSansTC.variable} font-sans antialiased bg-stone-50 text-slate-900 selection:bg-teal-500 selection:text-white`}
       >
+        {/* Region default: seed consent before hydration so the pixel/GA render on the
+            first paint instead of waiting for a banner the visitor never has to see. */}
+        {!consentRequired && (
+          <script
+            id="consent-region-default"
+            dangerouslySetInnerHTML={{
+              __html: `try{var k="tdf_cookie_consent_v1";if(!localStorage.getItem(k)){localStorage.setItem(k,"accepted");localStorage.setItem("tdf_cookie_consent_basis","region-default")}}catch(e){}`,
+            }}
+          />
+        )}
         <SkipLink />
         <ServiceWorkerRegistration />
         {/* Performance optimization: Preconnect to external domains - Next.js will move these to head */}
