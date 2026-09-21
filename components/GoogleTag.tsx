@@ -1,0 +1,30 @@
+'use client';
+
+import Script from 'next/script';
+import { useCookieConsent } from '@/lib/cookieConsent';
+
+const GA_MEASUREMENT_ID = 'G-514WNV4FS9';
+const ADS_ID = 'AW-17947994689';
+
+export default function GoogleTag() {
+  const consent = useCookieConsent();
+  if (consent !== 'accepted') return null;
+
+  return (
+    <>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        strategy="lazyOnload"
+      />
+      <Script id="google-gtag" strategy="lazyOnload">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_MEASUREMENT_ID}');
+          gtag('config', '${ADS_ID}');
+        `}
+      </Script>
+    </>
+  );
+}

@@ -1,0 +1,105 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@source "../components";
+
+@theme {
+  --font-sans: var(--font-inter), var(--font-noto-sans-tc), system-ui, sans-serif;
+  --font-display: var(--font-outfit), var(--font-noto-sans-tc), system-ui, sans-serif;
+
+  /* 新色彩方案 - 鲜明活泼 */
+  --color-yellow: #FFD028;
+  --color-cyan: #10B8D9;
+  --color-light-pink: #F9D2E5;
+  --color-orange: #E74310;
+  --color-green: #00993E;
+  --color-red: #E4003D;
+  --color-magenta: #C54090;
+  --color-dark-blue: #004E9D;
+  --color-light-gray: #F6F6F6;
+  --color-dark-gray: #1E1F1C;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+
+  /* 相容性對應 - 保持現有語義化變數名 */
+  --color-ocean: #004E9D;
+  --color-ocean-light: #10B8D9;
+  --color-forest: #00993E;
+  --color-forest-light: #00993E;
+  --color-sand: #F6F6F6;
+  --color-sand-dark: #F9D2E5;
+  --color-earth: #E74310;
+  --color-slate: #1E1F1C;
+}
+
+body {
+  background-color: var(--color-light-gray);
+  color: var(--color-dark-gray);
+  /* 平滑捲動和過渡 */
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Section 過渡優化 */
+section {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 統一的容器最大寬度 */
+.container {
+  max-width: 1280px;
+}
+
+/* 優化按鈕和連結的過渡 */
+a, button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 優化卡片陰影 */
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* VIP card tier text animations */
+@keyframes foil {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Hide reCAPTCHA badge and footer elements (required by Google guidelines when hiding badge) */
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+/* Hide reCAPTCHA anchor footer elements */
+.rc-anchor-normal-footer,
+.rc-anchor-logo-large,
+.rc-anchor-pt,
+.rc-anchor-logo-img,
+.rc-anchor-logo-img-large {
+  display: none !important;
+  visibility: hidden !important;
+}

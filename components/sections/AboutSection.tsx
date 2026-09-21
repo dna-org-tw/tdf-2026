@@ -1,0 +1,167 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useSectionTracking } from '@/hooks/useSectionTracking';
+import LazyYouTubeEmbed from '@/components/LazyYouTubeEmbed';
+
+const REEL_EMBED_URL = 'https://www.instagram.com/reel/DLKU-cjpk7G/embed/?autoplay=1&muted=1';
+
+export default function AboutSection() {
+  const { t, lang } = useTranslation();
+  useSectionTracking({ sectionId: 'about', sectionName: 'About Section', category: 'Event Information' });
+
+  return (
+    <section
+      id="about"
+      className="pt-20 md:pt-28 lg:pt-32 bg-white overflow-hidden relative transition-colors duration-500"
+    >
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex flex-col md:flex-row items-center gap-16">
+          {/* Instagram Reel Side */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.8 }}
+            className="w-full md:w-1/2"
+          >
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white aspect-[9/16] mx-auto max-w-sm md:max-w-none">
+              <iframe
+                src={REEL_EMBED_URL}
+                title="Taiwan Digital Fest Reel"
+                loading="lazy"
+                allow="autoplay; encrypted-media; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0"
+              />
+            </div>
+          </motion.div>
+
+          {/* Content Side */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-full md:w-1/2"
+          >
+            {/* AEO 優化：BLUF 原則 - 結論先行，問題導向標題 */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#1E1F1C] mb-8 leading-tight">
+              {t.about.title}
+            </h2>
+
+            {/* SEO 優化：答案塊格式 - 整合關鍵資訊，包含核心關鍵字 */}
+            <div className="mb-8 p-6 bg-teal-50 rounded-xl border-l-4 border-teal-500">
+              <p className="text-lg md:text-xl font-semibold text-[#1E1F1C] leading-relaxed">
+                {lang === 'en'
+                  ? "Join Taiwan Digital Fest 2026 - the premier Digital Nomad Event in Taiwan. A curated remote work summit combining AI workshops, networking opportunities, and startup pitches with scenic biking, ocean tours, and hot springs. Experience geo-arbitrage while connecting with the global nomad tribe in Asia's hidden gem."
+                  : '前往山海交界的壯麗之地。專為數位遊牧者策劃的節慶，結合 AI 工作坊、社交活動與創業路演，以及稻浪單車、海洋導覽與溫泉體驗，在台灣最美麗的地區。'}
+              </p>
+            </div>
+
+            {/* 關鍵活動資訊摘要 - AEO 優化：結構化資料 */}
+            <div className="mb-6 p-6 bg-[#F6F6F6] rounded-xl border border-[#1E1F1C]/10">
+              <h3 className="text-xl font-semibold text-[#1E1F1C] mb-4">
+                {t.about.info.title}
+              </h3>
+              <dl className="space-y-2 text-[#1E1F1C]/80">
+                <div>
+                  <dt className="font-semibold inline">{t.about.info.time}</dt>
+                  <dd className="inline">
+                    <time dateTime="2026-05-01/2026-05-31">
+                      {t.about.info.timeValue}
+                    </time>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold inline">
+                    {t.about.info.location}
+                  </dt>
+                  <dd className="inline">{t.about.info.locationValue}</dd>
+                </div>
+                <div>
+                  <dt className="font-semibold inline">{t.about.info.theme}</dt>
+                  <dd className="inline">{t.about.info.themeValue}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="flex flex-wrap gap-3 mb-12">
+              {t.about.tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-4 py-2 bg-[#F9D2E5] text-[#C54090] rounded-full text-sm font-medium"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              {t.about.ctas?.map((cta, index) => {
+                const isPrimary = cta.type === 'Register';
+                return (
+                  <motion.a
+                    key={cta.type}
+                    href={cta.href}
+                    target={cta.href.startsWith('http') ? '_blank' : undefined}
+                    rel={
+                      cta.href.startsWith('http')
+                        ? 'noopener noreferrer'
+                        : undefined
+                    }
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-100px' }}
+                    transition={{
+                      duration: 0.5,
+                      delay: 0.4 + index * 0.1,
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`inline-block px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full text-sm sm:text-base md:text-lg font-bold tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
+                      isPrimary
+                        ? 'bg-[#10B8D9] hover:bg-[#10B8D9]/90 text-white shadow-[#10B8D9]/30 hover:shadow-[#10B8D9]/50'
+                        : 'bg-white hover:bg-stone-50 text-[#1E1F1C] border-2 border-[#1E1F1C] hover:border-[#10B8D9]'
+                    }`}
+                  >
+                    {cta.text}
+                  </motion.a>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* 花東影片：滿版、無文字覆蓋，自動靜音播放 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw]"
+      >
+        <div className="grid md:grid-cols-2 gap-0">
+          <div className="relative">
+            <LazyYouTubeEmbed
+              videoId="i7WnQn7c5bc"
+              title="Taitung"
+              autoPlayMuted
+              loop
+            />
+          </div>
+          <div className="relative">
+            <LazyYouTubeEmbed
+              videoId="U40EpRW5p-c"
+              title="Hualien"
+              autoPlayMuted
+              loop
+            />
+          </div>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
